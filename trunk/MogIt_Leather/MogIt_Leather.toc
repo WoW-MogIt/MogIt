@@ -1,0 +1,35 @@
+﻿## Interface: 40200
+## Author: Aelobin (The Maelstrom EU)
+## Version: 1.1
+## LoadOnDemand: 1
+## RequiredDeps: MogIt
+
+## Title: MogIt_Leather
+## Title-deDE: MogIt_Leder
+## Title-frFR: MogIt_Cuir
+## Title-esES: MogIt_Cuero
+## Title-ruRU: MogIt_Кожа
+## Title-koKR: MogIt_가죽
+## Title-zhTW: MogIt_皮革
+## Title-zhCN: MogIt_皮甲
+
+## Notes: MogIt Data
+## Notes-deDE: MogIt Daten
+## Notes-frFR: MogIt Données
+## Notes-esES: MogIt Datos
+## Notes-ruRU: MogIt данные
+## Notes-koKR: MogIt 데이터
+## Notes-zhTW: MogIt 的數據
+## Notes-zhCN: MogIt 数据
+
+Bosses.lua
+Colours.lua
+
+Head.lua
+Shoulders.lua
+Chest.lua
+Wrists.lua
+Hands.lua
+Waist.lua
+Legs.lua
+Feet.lua
