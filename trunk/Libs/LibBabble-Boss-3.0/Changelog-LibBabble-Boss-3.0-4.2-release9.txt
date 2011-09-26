@@ -1,0 +1,25 @@
+------------------------------------------------------------------------
+r352 | nevcairiel | 2011-08-28 11:22:39 +0000 (Sun, 28 Aug 2011) | 1 line
+Changed paths:
+   A /tags/4.2-release9 (from /trunk:351)
+
+Weekly Tag - #9
+------------------------------------------------------------------------
+r351 | nevcairiel | 2011-08-28 11:22:17 +0000 (Sun, 28 Aug 2011) | 1 line
+Changed paths:
+   M /trunk/LibBabble-Boss-3.0.lua
+
+Automated LibBabble re-generation from the localization system
+------------------------------------------------------------------------
+r349 | nevcairiel | 2011-08-11 14:23:01 +0000 (Thu, 11 Aug 2011) | 1 line
+Changed paths:
+   M /trunk/LibBabble-Boss-3.0.lua
+
+Automated LibBabble re-generation from the localization system
+------------------------------------------------------------------------
+r348 | nevcairiel | 2011-07-02 07:33:55 +0000 (Sat, 02 Jul 2011) | 1 line
+Changed paths:
+   M /trunk/LibBabble-Boss-3.0.lua
+
+Automated LibBabble re-generation from the localization system
+------------------------------------------------------------------------
