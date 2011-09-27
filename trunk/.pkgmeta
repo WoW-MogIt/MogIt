@@ -1,3 +1,5 @@
+enable-nolib-creation: no
+
 externals:
     Libs/LibStub:
         url: svn://svn.wowace.com/wow/libstub/mainline/trunk
