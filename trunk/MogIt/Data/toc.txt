@@ -1,0 +1,17 @@
+﻿## Interface: 40200
+## Author: Aelobin (The Maelstrom EU)
+## Version: 1.1
+## LoadOnDemand: 1
+## RequiredDeps: MogIt
+%s
+## Notes: MogIt Data
+## Notes-deDE: MogIt Daten
+## Notes-frFR: MogIt Données
+## Notes-esES: MogIt Datos
+## Notes-ruRU: MogIt данные
+## Notes-koKR: MogIt 데이터
+## Notes-zhTW: MogIt 的數據
+## Notes-zhCN: MogIt 数据
+
+Bosses.lua
+Colours.lua
