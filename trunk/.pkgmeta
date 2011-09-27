@@ -19,6 +19,7 @@ externals:
         tag: latest
 
 move-folders:
+    MogIt/MogIt: MogIt
     MogIt/MogIt_Accessories: MogIt_Accessories
     MogIt/MogIt_Cloth: MogIt_Cloth
     MogIt/MogIt_Leather: MogIt_Leather
