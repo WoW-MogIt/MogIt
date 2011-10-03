@@ -36,4 +36,3 @@ move-folders:
 
 ignore:
     - .pkgmeta
-    - MogIt/Changelog.txt
