@@ -630,7 +630,7 @@ end
 
 function mog.itemTooltip(self)
 	local item = self.item;
-	if not item then return end;
+	if type(item) ~= "number" then return end;
 	GameTooltip:SetOwner(self,"ANCHOR_NONE");
 	
 	local name,link,_,_,_,_,_,_,_,texture = GetItemInfo(item);
