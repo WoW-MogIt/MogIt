@@ -1,0 +1,38 @@
+enable-nolib-creation: no
+
+manual-changelog: Changelog.txt
+
+externals:
+    Libs/LibStub:
+        url: svn://svn.wowace.com/wow/libstub/mainline/trunk
+        tag: latest
+    Libs/CallbackHandler-1.0:
+        url: svn://svn.wowace.com/wow/callbackhandler/mainline/trunk/CallbackHandler-1.0
+        tag: latest
+    Libs/LibDataBroker-1.1:
+        url: git://git.wowace.com/wow/libdatabroker-1-1/mainline.git
+        tag: latest
+    Libs/LibDBIcon-1.0:
+        url: svn://svn.wowace.com/wow/libdbicon-1-0/mainline/trunk/LibDBIcon-1.0
+        tag: latest
+    Libs/LibBabble-Boss-3.0:
+        url: svn://svn.wowace.com/wow/libbabble-boss-3-0/mainline/trunk
+        tag: latest
+    Libs/LibBabble-Inventory-3.0:
+        url: svn://svn.wowace.com/wow/libbabble-inventory-3-0/mainline/trunk
+        tag: latest
+
+ignore:
+    - .pkgmeta
+    - Changelog.txt
+
+move-folders:
+    MogIt/Modules/MogIt_Accessories: MogIt_Accessories
+    MogIt/Modules/MogIt_Cloth: MogIt_Cloth
+    MogIt/Modules/MogIt_Leather: MogIt_Leather
+    MogIt/Modules/MogIt_Mail: MogIt_Mail
+    MogIt/Modules/MogIt_OneHanded: MogIt_OneHanded
+    MogIt/Modules/MogIt_Other: MogIt_Other
+    MogIt/Modules/MogIt_Plate: MogIt_Plate
+    MogIt/Modules/MogIt_Ranged: MogIt_Ranged
+    MogIt/Modules/MogIt_TwoHanded: MogIt_TwoHanded
