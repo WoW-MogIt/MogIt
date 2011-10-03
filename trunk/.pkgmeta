@@ -1,6 +1,6 @@
 enable-nolib-creation: no
 
-manual-changelog: Changelog.txt
+manual-changelog: MogIt/Changelog.txt
 
 externals:
     Libs/LibStub:
@@ -36,4 +36,4 @@ move-folders:
 
 ignore:
     - .pkgmeta
-    - Changelog.txt
+    - MogIt/Changelog.txt
