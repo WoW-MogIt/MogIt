@@ -99,17 +99,18 @@ mog.container:SetScript("OnEvent",function(self,event,arg1,...)
 				tooltipDress = false,
 				tooltipRotate = true,
 				tooltipMog = true,
-				--tooltipAnchor = false,
 				gridDress = true,
+				noAnim = false;
 			};
 		end
 		mog.global = MogIt_Global;
 		mog.global.wishlist = mog.global.wishlist or {};
+		mog.global.wishlist.sets = mog.global.wishlist.sets or {};
+		mog.global.wishlist.items = mog.global.wishlist.items or {};
 		mog.global.minimap = mog.global.minimap or {};
 		mog.global.url = mog.global.url or "Battle.net";
 		mog.global.tooltipWidth = mog.global.tooltipWidth or 300;
 		mog.global.tooltipHeight = mog.global.tooltipHeight or 300;
-		--mog.global.tooltipMod;
 		mog.global.gridWidth = mog.global.gridWidth or 200;
 		mog.global.gridHeight = mog.global.gridHeight or 200;
 		mog.global.rows = mog.global.rows or 2;
@@ -124,11 +125,19 @@ mog.container:SetScript("OnEvent",function(self,event,arg1,...)
 		end
 		mog.char = MogIt_Character;
 		mog.char.wishlist = mog.char.wishlist or {};
-		mog.char.wishlist.display = mog.char.wishlist.display or {};
-		mog.char.wishlist.time = mog.char.wishlist.time or {};
+		mog.char.wishlist.sets = mog.char.wishlist.sets or {};
+		mog.char.wishlist.items = mog.char.wishlist.items or {};
+		if not mog.char.version then
+			if MogIt_Wishlist then
+				for k,v in pairs(MogIt_Wishlist.display) do
+					table.insert(mog.char.wishlist.items,type(v) == "table" and v[1] or v);
+				end
+			end
+		end
 		mog.char.version = GetAddOnMetadata(MogIt,"Version");
+		mog.wl = mog.char.wishlist;
 		
-		mog.view.model:SetUnit("PLAYER");
+		mog.view.model.model:SetUnit("PLAYER");
 		mog.updateGrid();
 		mog.updateModels();
 		
@@ -149,6 +158,10 @@ mog.container:SetScript("OnEvent",function(self,event,arg1,...)
 		mog.LDBI:Register(MogIt,mog.mmb,mog.global.minimap);
 		mog.frame:UnregisterEvent("PLAYER_LOGIN");
 	elseif event == "GET_ITEM_INFO_RECEIVED" then
+		local owner = GameTooltip:IsShown() and GameTooltip:GetOwner();
+		if owner and (owner.MogItModel or owner.MogItSlot) then
+			mog.itemTooltip(owner);
+		end
 		local now = time();
 		for k,v in pairs(mog.view.waitList) do
 			if select(9,GetItemInfo(k)) then
@@ -167,7 +180,7 @@ mog.container:SetScript("OnEvent",function(self,event,arg1,...)
 			mog.tooltip.hookAtlasLoot();
 		else
 			local _,title = GetAddOnInfo(arg1);
-			if title and title:match("^MogIt_(.+)") and mog.frame:IsShown() then
+			if title and title:match("^MogIt_(.+)") and mog.frame:IsVisible() then
 				ToggleDropDownMenu(1,arg1,mog.frame.dd);
 			end
 		end
@@ -182,12 +195,11 @@ SLASH_MOGIT2 = "/mogit";
 SlashCmdList["MOGIT"] = mog.toggle;
 
 BINDING_HEADER_MogIt = "MogIt";
-BINDING_NAME_MogIt = "Toggle Mogit";
+BINDING_NAME_MogIt = L["Toggle Mogit"];
 
 mog.frame = CreateFrame("Frame","MogItFrame",mog.container,"PortraitFrameTemplate");
 mog.frame:SetPoint("CENTER",UIParent,"CENTER");
-mog.frame:SetSize(252,130);
-mog.frame:SetFrameLevel(15);
+mog.frame:SetSize(252,108);
 mog.frame:SetToplevel(true);
 mog.frame:SetClampedToScreen(true);
 mog.frame:EnableMouse(true);
@@ -206,24 +218,26 @@ end);
 
 mog.frame.dd = CreateFrame("Frame","MogItDropdown",mog.frame,"UIDropDownMenuTemplate");
 mog.frame.dd:SetPoint("TOPLEFT",mog.frame,"TOPLEFT",44,-27);
-UIDropDownMenu_SetWidth(mog.frame.dd,mog.frame:GetWidth()-85);
-UIDropDownMenu_SetButtonWidth(mog.frame.dd,mog.frame:GetWidth()-85+15);
+UIDropDownMenu_SetWidth(mog.frame.dd,mog.frame:GetWidth()-85-25);
+UIDropDownMenu_SetButtonWidth(mog.frame.dd,mog.frame:GetWidth()-85+15-25);
 UIDropDownMenu_JustifyText(mog.frame.dd,"LEFT");
 UIDropDownMenu_SetText(mog.frame.dd,L["Select a category"]);
-function mog.frame.dd:initialize(tier)
+local tier1;
+function mog.frame.dd.initialize(self,tier)
 	local info;
+	
+	if tier == 2 then
+		tier1 = UIDROPDOWNMENU_MENU_VALUE;
+	end
+	
 	if tier == 1 then
-		info = UIDropDownMenu_CreateInfo();
-		info.text = L["Wishlist"];
-		info.value = "wl";
-		info.colorCode = "\124cFFFFFF00";
-		info.notCheckable = true;
-		info.func = function(self)
-			UIDropDownMenu_SetText(mog.frame.dd,L["Wishlist"]);
-			mog.selected = self.value;
-			mog.buildList(true,true);
-		end
-		UIDropDownMenu_AddButton(info,tier);
+		mog.wlMenu(self,tier);
+	elseif tier1 == mog.char.wishlist or tier1 == mog.global.wishlist then
+		mog.wlMenu(self,tier);
+		return;
+	end
+	
+	if tier == 1 then
 		for k,v in pairs(mog.db) do
 			info = UIDropDownMenu_CreateInfo();
 			local d = type(v) == "table";
@@ -258,9 +272,45 @@ function mog.frame.dd:initialize(tier)
 	end
 end
 
+mog.help = CreateFrame("Frame",nil,mog.frame);
+mog.help:SetPoint("TOPRIGHT",mog.frame,"TOPRIGHT",-8,-29);
+mog.help:SetSize(20,25);
+mog.help.texture = mog.help:CreateTexture(nil,"ARTWORK");
+mog.help.texture:SetAllPoints(mog.help);
+mog.help.texture:SetTexture("Interface\\Buttons\\UI-MicroButton-Help-Up");
+mog.help.texture:SetTexCoord(0,1,24/64,1);
+mog.help:EnableMouse();
+mog.help:SetScript("OnEnter",function(self)
+	GameTooltip:SetOwner(self,"ANCHOR_NONE");
+	GameTooltip:AddLine("Help",1,0,0);
+	
+	GameTooltip:AddLine(" ");
+	GameTooltip:AddLine(L["Item Controls"]);
+	GameTooltip:AddDoubleLine(L["Change item"],L["Left click"],0,1,0,1,1,1);
+	GameTooltip:AddDoubleLine(L["Chat link"],L["Shift + Left click"],0,1,0,1,1,1);
+	GameTooltip:AddDoubleLine(L["Try on"],L["Ctrl + Left click"],0,1,0,1,1,1);
+	GameTooltip:AddDoubleLine(L["Add/Delete from wishlist"],L["Right click"],0,1,0,1,1,1);
+	GameTooltip:AddDoubleLine(L["Item URL"],L["Shift + Right click"],0,1,0,1,1,1);
+	GameTooltip:AddDoubleLine(L["Add/Dele from preview"],L["Ctrl + Right click"],0,1,0,1,1,1);
+	
+	GameTooltip:AddLine(" ");
+	GameTooltip:AddLine(L["Positioning Controls"]);
+	GameTooltip:AddDoubleLine(L["Rotate"],L["Left click + horizontal drag"],0,1,0,1,1,1);
+	GameTooltip:AddDoubleLine(L["Zoom"],L["Left click + vertical drag"],0,1,0,1,1,1);
+	GameTooltip:AddDoubleLine(L["Move"],L["Right click + drag"],0,1,0,1,1,1);
+	GameTooltip:AddDoubleLine(L["Resize"],L["Click bottom right corner + drag"],0,1,0,1,1,1);
+	
+	GameTooltip:Show();
+	GameTooltip:ClearAllPoints();
+	GameTooltip:SetPoint("TOPRIGHT",mog.frame,"BOTTOMRIGHT",0,-5);
+end);
+mog.help:SetScript("OnLeave",function(self)
+	GameTooltip:Hide();
+end);
+
 mog.frame.btnGrid = CreateFrame("Button","MogItBtnGrid",mog.frame,"UIPanelButtonTemplate2");
 mog.frame.btnGrid:SetPoint("TOPLEFT",mog.frame,"TOPLEFT",5,-58);
-mog.frame.btnGrid:SetText("Catalogue");
+mog.frame.btnGrid:SetText(L["Catalogue"]);
 mog.frame.btnGrid:SetSize(120,22);
 mog.frame.btnGrid:SetScript("OnClick",function(self)
 	if mog.grid:IsShown() then
@@ -269,11 +319,10 @@ mog.frame.btnGrid:SetScript("OnClick",function(self)
 		mog.grid:Show();
 	end
 end);
-mog.frame.btnGrid.tooltipText = "Show/Hide the Catalogue window";
 
 mog.frame.btnFilters = CreateFrame("Button","MogItBtnFilters",mog.frame,"UIPanelButtonTemplate2");
 mog.frame.btnFilters:SetPoint("LEFT",mog.frame.btnGrid,"RIGHT");
-mog.frame.btnFilters:SetText("Filters");
+mog.frame.btnFilters:SetText(FILTERS);
 mog.frame.btnFilters:SetSize(120,22);
 mog.frame.btnFilters:SetScript("OnClick",function(self)
 	if mog.filt:IsShown() then
@@ -282,11 +331,10 @@ mog.frame.btnFilters:SetScript("OnClick",function(self)
 		mog.filt:Show();
 	end
 end);
-mog.frame.btnFilters.tooltipText = "Show/Hide the Filters window";
 
 mog.frame.btnPreview = CreateFrame("Button","MogItBtnPreview",mog.frame,"UIPanelButtonTemplate2");
 mog.frame.btnPreview:SetPoint("TOP",mog.frame.btnGrid,"BOTTOM");
-mog.frame.btnPreview:SetText("Preview");
+mog.frame.btnPreview:SetText(L["Preview"]);
 mog.frame.btnPreview:SetSize(120,22);
 mog.frame.btnPreview:SetScript("OnClick",function(self)
 	if mog.view:IsShown() then
@@ -295,24 +343,10 @@ mog.frame.btnPreview:SetScript("OnClick",function(self)
 		mog.view:Show();
 	end
 end);
-mog.frame.btnPreview.tooltipText = "Show/Hide the Preview window";
-
-mog.frame.btnInfo = CreateFrame("Button","MogItBtnInfo",mog.frame,"UIPanelButtonTemplate2");
-mog.frame.btnInfo:SetPoint("LEFT",mog.frame.btnPreview,"RIGHT");
-mog.frame.btnInfo:SetText("Item Info");
-mog.frame.btnInfo:SetSize(120,22);
-mog.frame.btnInfo:SetScript("OnClick",function(self)
-	if mog.info:IsShown() then
-		mog.info:Hide();
-	else
-		mog.info:Show();
-	end
-end);
-mog.frame.btnInfo.tooltipText = "Show/Hide the Item Info window";
 
 mog.frame.btnOptions = CreateFrame("Button","MogItBtnOptions",mog.frame,"UIPanelButtonTemplate2");
-mog.frame.btnOptions:SetPoint("TOP",mog.frame.btnPreview,"BOTTOM");
-mog.frame.btnOptions:SetText("Options");
+mog.frame.btnOptions:SetPoint("LEFT",mog.frame.btnPreview,"RIGHT");
+mog.frame.btnOptions:SetText(MAIN_MENU);
 mog.frame.btnOptions:SetSize(120,22);
 mog.frame.btnOptions:SetScript("OnClick",function(self)
 	if mog.opt:IsShown() then
@@ -321,20 +355,181 @@ mog.frame.btnOptions:SetScript("OnClick",function(self)
 		mog.opt:Show();
 	end
 end);
-mog.frame.btnOptions.tooltipText = "Show/Hide the Options window";
 
-mog.frame.btnHelp = CreateFrame("Button","MogItBtnHelp",mog.frame,"UIPanelButtonTemplate2");
-mog.frame.btnHelp:SetPoint("LEFT",mog.frame.btnOptions,"RIGHT");
-mog.frame.btnHelp:SetText("Help");
-mog.frame.btnHelp:SetSize(120,22);
-mog.frame.btnHelp:SetScript("OnClick",function(self)
-	if mog.help:IsShown() then
-		mog.help:Hide();
-	else
-		mog.help:Show();
+function mog.wlMenu(self,tier)
+	local info;
+	if tier == 1 then
+		info = UIDropDownMenu_CreateInfo();
+		info.text = L["Wishlist"].." ("..L["Per Character"]..")";
+		info.value = mog.char.wishlist;
+		info.colorCode = "\124cFFFFFF00";
+		if self.wlSave then
+			info.notCheckable = true;
+			info.keepShownOnClick = true;
+		else
+			info.isNotRadio = true;
+			info.func = function(self)
+				UIDropDownMenu_SetText(mog.frame.dd,"\124cFFFFFF00"..L["Wishlist"].." ("..L["Per Character"]..")");
+				mog.selected = {wl=true,tbl=self.value};
+				mog.buildList(true,true);
+			end
+			info.checked = mog.wl == mog.char.wishlist;
+		end
+		info.hasArrow = true;
+		UIDropDownMenu_AddButton(info,tier);
+		
+		info = UIDropDownMenu_CreateInfo();
+		info.text = L["Wishlist"].." ("..L["Account Wide"]..")";
+		info.value = mog.global.wishlist;
+		info.colorCode = "\124cFFFFFF00";
+		if self.wlSave then
+			info.notCheckable = true;
+			info.keepShownOnClick = true;
+		else
+			info.isNotRadio = true;
+			info.func = function(self)
+				UIDropDownMenu_SetText(mog.frame.dd,"\124cFFFFFF00"..L["Wishlist"].." ("..L["Account Wide"]..")");
+				mog.selected = {wl=true,tbl=self.value};
+				mog.buildList(true,true);
+			end
+			info.checked = mog.wl == mog.global.wishlist;
+		end
+		info.hasArrow = true;
+		UIDropDownMenu_AddButton(info,tier);
+	elseif tier == 2 then
+		tier1 = UIDROPDOWNMENU_MENU_VALUE;
+		
+		if (not self.wlSave) then
+			if mog.wl ~= tier1 then
+				info = UIDropDownMenu_CreateInfo();
+				info.text = L["Activate Wishlist"];
+				info.value = nil;
+				info.colorCode = "\124cFF00FF00";
+				info.notCheckable = true;
+				info.func = function(self)
+					mog.wl = tier1;
+					CloseDropDownMenus();
+				end
+				UIDropDownMenu_AddButton(info,tier);
+			end
+			
+			info = UIDropDownMenu_CreateInfo();
+			info.text = L["Reset Wishlist"];
+			info.value = nil;
+			info.colorCode = "\124cFF00FF00";
+			info.notCheckable = true;
+			info.func = function(self)
+				StaticPopup_Show("MOGIT_RESETWLCONFIRM",nil,nil,tier1);
+				CloseDropDownMenus();
+			end
+			UIDropDownMenu_AddButton(info,tier);
+		end
+		
+		info = UIDropDownMenu_CreateInfo();
+		info.text = L["New Set"];
+		info.value = nil;
+		info.colorCode = "\124cFF00FF00";
+		info.notCheckable = true;
+		info.func = function(self)
+			StaticPopup_Show("MOGIT_NEWSET",nil,nil,{tier1,self.arg1});
+			CloseDropDownMenus();
+		end
+		info.arg1 = self.wlSave;
+		UIDropDownMenu_AddButton(info,tier);
+		
+		for k,v in ipairs(tier1.sets) do
+			info = UIDropDownMenu_CreateInfo();
+			info.text = v.name;
+			info.value = k;
+			info.notCheckable = true;
+			if self.wlSave then
+				info.func = function(self)
+					StaticPopup_Show("MOGIT_SAVESETCONFIRM",tier1.sets[self.value].name,nil,{tier1,self.value});
+					CloseDropDownMenus();
+				end
+			else
+				info.func = function(self)
+					UIDropDownMenu_SetText(mog.frame.dd,tier1.sets[self.value].name);
+					mog.selected = {wl=true,tbl=tier1.sets,num=self.value};
+					mog.buildList(true,true);
+					CloseDropDownMenus();
+				end
+				info.hasArrow = true;
+			end
+			UIDropDownMenu_AddButton(info,tier);
+		end
+	elseif tier == 3 then
+		info = UIDropDownMenu_CreateInfo();
+		info.text = L["Load Set"];
+		info.value = UIDROPDOWNMENU_MENU_VALUE;
+		info.colorCode = "\124cFF00FF00";
+		info.notCheckable = true;
+		info.func = function(self)
+			for k,v in ipairs(mog.itemSlots) do
+				if tier1.sets[self.value][k] then
+					for x,y in ipairs(tier1.sets[self.value][k]) do
+						mog.view.addItem(y);
+					end
+				end
+			end
+			CloseDropDownMenus();
+		end
+		UIDropDownMenu_AddButton(info,tier);
+	
+		info = UIDropDownMenu_CreateInfo();
+		info.text = L["Rename Set"];
+		info.value = UIDROPDOWNMENU_MENU_VALUE;
+		info.colorCode = "\124cFF00FF00";
+		info.notCheckable = true;
+		info.func = function(self)
+			StaticPopup_Show("MOGIT_RENAMESET",nil,nil,{tier1,self.value});
+			CloseDropDownMenus();
+		end
+		UIDropDownMenu_AddButton(info,tier);
+		
+		info = UIDropDownMenu_CreateInfo();
+		info.text = L["Move Set"];
+		info.value = UIDROPDOWNMENU_MENU_VALUE;
+		info.colorCode = "\124cFF00FF00";
+		info.notCheckable = true;
+		info.func = function(self)
+			if tier1 == mog.global.wishlist then
+				table.insert(mog.char.wishlist.sets,mog.global.wishlist.sets[self.value]);
+				table.remove(mog.global.wishlist.sets,self.value);
+				if mog.selected then
+					if mog.selected.tbl == tier1.sets and mog.selected.num == self.value then
+						mog.selected = {wl=true,tbl=mog.char.wishlist.sets,num=#mog.char.wishlist.sets};
+					elseif mog.selected.tbl == mog.char.wishlist or mog.selected.tbl == mog.global.wishlist then
+						mog.buildList();
+					end
+				end
+			else
+				table.insert(mog.global.wishlist.sets,mog.char.wishlist.sets[self.value]);
+				table.remove(mog.char.wishlist.sets,self.value);
+				if mog.selected then
+					if mog.selected.tbl == tier1.sets and mog.selected.num == self.value then
+						mog.selected = {wl=true,tbl=mog.global.wishlist.sets,num=#mog.global.wishlist.sets};
+					elseif mog.selected.tbl == mog.char.wishlist or mog.selected.tbl == mog.global.wishlist then
+						mog.buildList();
+					end
+				end
+			end
+			CloseDropDownMenus();
+		end
+		UIDropDownMenu_AddButton(info,tier);
+		
+		info = UIDropDownMenu_CreateInfo();
+		info.text = L["Delete Set"];
+		info.value = UIDROPDOWNMENU_MENU_VALUE;
+		info.colorCode = "\124cFF00FF00";
+		info.notCheckable = true;
+		info.func = function(self)
+			StaticPopup_Show("MOGIT_DELSETCONFIRM",tier1.sets[self.value].name,nil,{tier1,self.value});
+			CloseDropDownMenus();
+		end
+		UIDropDownMenu_AddButton(info,tier);
 	end
-end);
-mog.frame.btnHelp.tooltipText = "Show/Hide the Help window";
+end
 
 mog.interface = CreateFrame("Frame");
 mog.interface.title = mog.interface:CreateFontString(nil,"ARTWORK","GameFontNormalLarge");
@@ -353,14 +548,6 @@ end);
 mog.interface.name = "MogIt";
 InterfaceOptions_AddCategory(mog.interface);
 
---[[local animG = mog.frame.portrait:CreateAnimationGroup();
-animG:SetLooping("BOUNCE");
-local anim = animG:CreateAnimation("Rotation");
-anim:SetDuration(5);
-anim:SetSmoothing("IN_OUT");
-anim:SetDegrees(360);
-animG:Play();--]]
-
 mog.source = {
 	[1] = L["Drop"],
 	[2] = PVP,
@@ -372,13 +559,24 @@ mog.source = {
 };
 
 mog.diffs = {
-	--[1] = "5N",
-	[2] = ITEM_HEROIC,
+	--[1] = PLAYER_DIFFICULTY1,
+	[2] = PLAYER_DIFFICULTY2,
 	[3] = L["10N"],
 	[4] = L["25N"],
 	[5] = L["10H"],
 	[6] = L["25H"],
-	[7] = ITEM_HEROIC,
+	--[7] = PLAYER_DIFFICULTY1;
+	[8] = PLAYER_DIFFICULTY2;
+};
+
+mog.difficulties = {
+	[1] = DUNGEON_DIFFICULTY_5PLAYER;
+	[2] = DUNGEON_DIFFICULTY_5PLAYER_HEROIC;
+	[3] = RAID_DIFFICULTY_10PLAYER;
+	[4] = RAID_DIFFICULTY_10PLAYER_HEROIC;
+	[5] = RAID_DIFFICULTY_25PLAYER;
+	[6] = RAID_DIFFICULTY_25PLAYER_HEROIC;
+	[7] = OTHER,
 };
 
 mog.slots = {
@@ -445,8 +643,8 @@ function mog.addURL(name,fav,item,set,npc,spell)
 	mog.urlSpell[name] = spell;
 end
 
-mog.addURL("Battle.net","fav_wow",L["http://eu.battle.net/wow/en/item/%d"],nil,nil,nil);
-mog.addURL("Wowhead","fav_wh",L["http://www.wowhead.com/item=%d"],L["http://www.wowhead.com/itemset=%d"],L["http://www.wowhead.com/npc=%d"],L["http://www.wowhead.com/spell=%d"]);
+mog.addURL("Battle.net","fav_wow",L["http://eu.battle.net/wow/en/"].."item/%d",nil,nil,nil);
+mog.addURL("Wowhead","fav_wh",L["http://www.wowhead.com/"].."item=%d",L["http://www.wowhead.com/"].."itemset=%d",L["http://www.wowhead.com/"].."npc=%d",L["http://www.wowhead.com/"].."spell=%d");
 mog.addURL("MMO-Champion","fav_mmo","http://db.mmo-champion.com/i/%d/","http://db.mmo-champion.com/is/%d/","http://db.mmo-champion.com/c/%d/","http://db.mmo-champion.com/s/%d/");
 mog.addURL("Wowpedia","fav_wp","http://www.wowpedia.org/index.php?search=\"{{elinks-item|%d}}\"","http://www.wowpedia.org/index.php?search=\"{{elinks-set|%d}}\"","http://www.wowpedia.org/index.php?search=\"{{elinks-NPC|%d}}\"","http://www.wowpedia.org/index.php?search=\"{{elinks-spell|%d}}\"");
 mog.addURL("Thottbot","fav_tb","http://thottbot.com/item=%d","http://thottbot.com/itemset=%d","http://thottbot.com/npc=%d","http://thottbot.com/spell=%d");
@@ -454,7 +652,7 @@ mog.addURL("Buffed.de","fav_buff","http://wowdata.buffed.de/?i=%d","http://wowda
 mog.addURL("JudgeHype","fav_jh","http://worldofwarcraft.judgehype.com/?page=objet&w=%d",nil,"http://worldofwarcraft.judgehype.com/index.php?page=pnj&w=%d","http://worldofwarcraft.judgehype.com/index.php?page=spell&w=%d");
 
 StaticPopupDialogs["MOGIT_URL"] = {
-	text = L["%s Item URL"],
+	text = "%s "..L["Item URL"],
 	button1 = CLOSE,
 	hasEditBox = 1,
 	maxLetters = 512,
@@ -469,6 +667,161 @@ StaticPopupDialogs["MOGIT_URL"] = {
 	end,
 	EditBoxOnEscapePressed = function(self)
 		self:GetParent():Hide();
+	end,
+	timeout = 0,
+	exclusive = 1,
+	whileDead = 1,
+	hideOnEscape = 1
+};
+
+StaticPopupDialogs["MOGIT_NEWSET"] = {
+	text = L["Choose a name for your new set"],
+	button1 = ACCEPT,
+	button2 = CANCEL,
+	hasEditBox = 1,
+	maxLetters = 256,
+	editBoxWidth = 260,
+	OnAccept = function(self,wl)
+		local name = self.editBox:GetText();
+		if name and name ~= "" then
+			local set = {name = name};
+			table.insert(wl[1].sets,set);
+			if wl[2] then
+				mog.view.saveSet(set);
+			end
+			if mog.selected and mog.selected.tbl == wl[1] then
+				mog.buildList();
+			end
+		end
+	end,
+	EditBoxOnEnterPressed = function(self,wl)
+		self:GetParent():Hide();
+		local name = self:GetText();
+		if name and name ~= "" then
+			local set = {name = name};
+			table.insert(wl[1].sets,set);
+			if wl[2] then
+				mog.view.saveSet(set);
+			end
+			if mog.selected and mog.selected.tbl == wl[1] then
+				mog.buildList();
+			end
+		end
+	end,
+	EditBoxOnEscapePressed = function(self)
+		self:GetParent():Hide();
+	end,
+	timeout = 0,
+	exclusive = 1,
+	whileDead = 1,
+	hideOnEscape = 1
+};
+
+StaticPopupDialogs["MOGIT_RENAMESET"] = {
+	text = L["Choose a new name for your set"],
+	button1 = ACCEPT,
+	button2 = CANCEL,
+	hasEditBox = 1,
+	maxLetters = 256,
+	editBoxWidth = 260,
+	OnAccept = function(self,wl)
+		local name = self.editBox:GetText();
+		if name and name ~= "" then
+			wl[1].sets[wl[2]].name = name;
+			if mog.selected then
+				if mog.selected.tbl == wl[1].sets and mog.selected.num == wl[2] then
+					UIDropDownMenu_SetText(mog.frame.dd,name);
+				elseif mog.selected.tbl == wl[1] then
+					mog.scroll:update();
+				end
+			end
+		end
+	end,
+	EditBoxOnEnterPressed = function(self,wl)
+		self:GetParent():Hide();
+		local name = self:GetText();
+		if wl and name and name ~= "" then
+			wl[1].sets[wl[2]].name = name;
+			if mog.selected then
+				if mog.selected.tbl == wl[1].sets and mog.selected.num == wl[2] then
+					UIDropDownMenu_SetText(mog.frame.dd,name);
+				elseif mog.selected.tbl == wl[1] then
+					mog.scroll:update();
+				end
+			end
+		end
+	end,
+	EditBoxOnEscapePressed = function(self)
+		self:GetParent():Hide();
+	end,
+	timeout = 0,
+	exclusive = 1,
+	whileDead = 1,
+	hideOnEscape = 1
+};
+
+StaticPopupDialogs["MOGIT_SAVESETCONFIRM"] = {
+	text = L["Are you sure you want to overwrite \"%s\"?"],
+	button1 = YES,
+	button2 = CANCEL,
+	OnAccept = function(self,wl)
+		mog.view.saveSet(wl[1].sets[wl[2]]);
+		if mog.selected then
+			if mog.selected.tbl == wl[1].sets and mog.selected.num == wl[2] then
+				mog.buildList();
+			elseif mog.selected.tbl == wl[1] then
+				mog.buildList();
+			end
+		end
+	end,
+	timeout = 0,
+	exclusive = 1,
+	whileDead = 1,
+	hideOnEscape = 1
+};
+
+StaticPopupDialogs["MOGIT_RESETWLCONFIRM"] = {
+	text = L["Are you sure you want to reset this wishlist?"],
+	button1 = YES,
+	button2 = CANCEL,
+	OnAccept = function(self,wl)
+		wipe(wl.sets);
+		wipe(wl.items);
+		if mog.selected then
+			if mog.selected.tbl == wl then
+				mog.buildList();
+			elseif mog.selected.tbl == wl.sets then
+				mog.selected = {wl=true,tbl=wl};
+				UIDropDownMenu_SetText(mog.frame.dd,"\124cFFFFFF00"..L["Wishlist"].." ("..(wl == mog.char.wishlist and L["Per Character"] or L["Account Wide"]).."}");
+				mog.buildList();
+			end
+		end
+	end,
+	timeout = 0,
+	exclusive = 1,
+	whileDead = 1,
+	hideOnEscape = 1
+};
+
+StaticPopupDialogs["MOGIT_DELSETCONFIRM"] = {
+	text = L["Are you sure you want to delete \"%s\"?"],
+	button1 = YES,
+	button2 = CANCEL,
+	OnAccept = function(self,wl)
+		table.remove(wl[1].sets,wl[2]);
+		if mog.selected then
+			if mog.selected.tbl == wl[1].sets then
+				if mog.selected.num == wl[2] then
+					mog.selected = {wl=true,tbl=wl[1]};
+					UIDropDownMenu_SetText(mog.frame.dd,"\124cFFFFFF00"..L["Wishlist"].." ("..(wl[1] == mog.char.wishlist and L["Per Character"] or L["Account Wide"]).."}");
+					mog.buildList();
+				elseif wl[2] < mog.selected.num then
+					mog.selected.num = mog.selected.num - 1;
+				end
+			elseif mog.selected.tbl == wl[1] then
+				mog.buildList();
+			end
+		end
 	end,
 	timeout = 0,
 	exclusive = 1,

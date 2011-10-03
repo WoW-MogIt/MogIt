@@ -1,5 +1,7 @@
 enable-nolib-creation: no
 
+manual-changelog: Changelog.txt
+
 externals:
     Libs/LibStub:
         url: svn://svn.wowace.com/wow/libstub/mainline/trunk

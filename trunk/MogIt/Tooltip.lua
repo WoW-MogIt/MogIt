@@ -38,6 +38,11 @@ mog.tooltip.slots = {
 	INVTYPE_LEGS = 0,
 	INVTYPE_FEET = 0,
 };
+mog.tooltip.mod = {
+	Shift = IsShiftKeyDown,
+	Ctrl = IsControlKeyDown,
+	Alt = IsAltKeyDown,
+};
 
 mog.tooltip.model = CreateFrame("DressUpModel",nil,mog.tooltip);
 mog.tooltip.model:SetPoint("TOPLEFT",mog.tooltip,"TOPLEFT",5,-5);
@@ -90,13 +95,14 @@ mog.tooltip.repos:SetScript("OnUpdate",function(self)
 end);
 
 function mog.tooltip.ShowItem(self)
-	if mog.global.tooltip then
+	if mog.global.tooltip and (not mog.tooltip.mod[mog.global.tooltipMod] or mog.tooltip.mod[mog.global.tooltipMod]()) then
 		local _,item = self:GetItem();
-		if item then
+		local owner = self:GetOwner();
+		if item and owner and not (owner.MogItModel or owner.MogItSlot) then
 			if mog.tooltip.item ~= item then
 				mog.tooltip.item = item;
 				local _,_,quality,_,_,class,subclass,_,slot = GetItemInfo(item);
-				if (not mog.global.tooltipMog or quality == 2 or quality == 3 or quality == 4) and mog.tooltip.slots[slot] and IsDressableItem(item) then
+				if (not mog.global.tooltipMog or quality == 2 or quality == 3 or quality == 4 or quality == 7) and mog.tooltip.slots[slot] and IsDressableItem(item) then
 					mog.tooltip.model:SetFacing(mog.tooltip.slots[slot]-(mog.global.tooltipRotate and 0.5 or 0));
 					mog.tooltip:Show();
 					mog.tooltip.owner = self;

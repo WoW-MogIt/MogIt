@@ -33,7 +33,6 @@ mog.face = 0;
 mog.grid = MogItGrid;
 mog.grid:Hide();
 mog.grid:SetPoint("CENTER",UIParent,"CENTER");
-mog.grid:SetFrameLevel(5);
 mog.grid:SetClampedToScreen(true);
 mog.grid:EnableMouse(true);
 mog.grid:EnableMouseWheel(true);
@@ -46,6 +45,8 @@ mog.grid:SetHitRectInsets(-10,-10,-10,-10);
 mog.grid:SetScript("OnShow",function(self)
 	mog.scroll:update();
 end);
+
+mog.frame:SetFrameLevel(mog.grid:GetFrameLevel()+5);
 
 mog.grid.resize = CreateFrame("Frame",nil,mog.grid);
 mog.grid.resize:SetSize(16,16);
@@ -114,14 +115,14 @@ mog.scroll.down:SetScript("OnClick",function(self)
 end);
 
 function mog.updateModels()
-	mog.view.model:SetFacing(mog.face);
-	if mog.view.model:IsShown() then
-		mog.view.model:SetPosition(mog.posZ,mog.posX,mog.posY);
+	mog.view.model.model:SetFacing(mog.face);
+	if mog.view.model.model:IsVisible() then
+		mog.view.model.model:SetPosition(mog.posZ,mog.posX,mog.posY);
 	end
 	for k,v in ipairs(mog.models) do
-		v:SetFacing(mog.face);
-		if v:IsShown() then
-			v:SetPosition(mog.posZ,mog.posX,mog.posY);
+		v.model:SetFacing(mog.face);
+		if v.model:IsVisible() then
+			v.model:SetPosition(mog.posZ,mog.posX,mog.posY);
 		end
 	end
 end
@@ -153,18 +154,25 @@ function mog.itemClick(self,btn)
 			DressUpItemLink(self.item);
 		else
 			if type(self.list) == "table" then
-				if mog.info.item == self.item then
-					self.cycle = (self.cycle < #self.list and (self.cycle + 1)) or 1;
-					self.item = self.list[self.cycle];
+				self.cycle = (self.cycle < #self.list and (self.cycle + 1)) or 1;
+				self.item = self.list[self.cycle];
+				if self.MogItModel then
+					self.model:TryOn(self.item);
+				elseif self.MogItSlot then
+					mog.view.model.model:TryOn(self.item);
+					mog.view.setTexture(self.slot,select(10,GetItemInfo(self.item)));
+					if mog.global.gridDress then
+						mog.scroll:update();
+					end
 				end
+				mog.itemTooltip(self);
 			end
-			mog.info.setItem(self.item);
 		end
 	elseif btn == "RightButton" then
 		if IsControlKeyDown() then
-			if self.slot then
+			if self.MogItSlot then
 				mog.view.delItem(self.slot);
-				mog.dressModel(mog.view.model);
+				mog.dressModel(mog.view.model.model);
 				if mog.global.gridDress then
 					mog.scroll:update();
 				end
@@ -173,33 +181,22 @@ function mog.itemClick(self,btn)
 			end
 		elseif IsShiftKeyDown() then
 			StaticPopup_Show("MOGIT_URL",mog.global.url,nil,self.item);
-		elseif self.star then
-			if mog.char.wishlist.display[self.display] then
-				mog.char.wishlist.display[self.display] = nil;
-				mog.char.wishlist.time[self.display] = nil;
-				if mog.selected == "wl" then
-					table.remove(mog.list,self.index);
-					mog.display[self.display] = nil;
-					mog.scroll:update();
-				else
-					self.star:Hide();
-				end
-			else
-				mog.char.wishlist.display[self.display] = self.list;
-				mog.char.wishlist.time[self.display] = time();
-				if mog.selected == "wl" then
-					mog.scroll:update();
-				else
-					self.star:Show();
-				end
+		elseif type(self.display) == "table" then
+			if self.display.set then
+				StaticPopup_Show("MOGIT_DELSETCONFIRM",self.display.data.name,nil,{mog.selected.tbl,self.display.num});
+			elseif self.display.item then
+				table.remove(self.display.tbl,self.display.num);
+				mog.buildList();
 			end
+		else
+			table.insert(mog.wl.items,self.item);
 		end
 	end
 end
 
 function mog.dressModel(model)
 	model:Undress();
-	if mog.global.gridDress or (mog.view.model == model) then
+	if mog.global.gridDress or (model == mog.view.model.model) then
 		for k,v in ipairs(mog.view.slots) do
 			if v.item then
 				model:TryOn(v.item);
@@ -214,60 +211,71 @@ function mog.addModel(view)
 		f = mog.bin[1];
 		tremove(mog.bin,1);
 	else
-		f = CreateFrame("DressUpModel",nil,view and mog.view or mog.grid);
+		f = CreateFrame("Button",nil,view and mog.view or mog.grid);
 		f:Hide();
-		f:SetBackdrop({
-			bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", 
-			tile = true, tileSize = 16,
-			insets = { left = 0, right = 0, top = 0, bottom = 0 }
-		});
-		f:SetBackdropColor(0,0,0,0.6);
-		f:SetModelScale(2);
-		f:SetPosition(0,0,0);
-		f.btn = CreateFrame("Button",nil,f);
-		f.btn:SetAllPoints(f);
-		f.btn:RegisterForDrag("LeftButton","RightButton");
-		f.btn:SetScript("OnDragStart",function(self,btn)
+				
+		f:RegisterForDrag("LeftButton","RightButton");
+		f:SetScript("OnDragStart",function(self,btn)
 			mog.modelUpdater.btn = btn;
 			mog.modelUpdater.model = self;
 			mog.modelUpdater.prevx,mog.modelUpdater.prevy = GetCursorPosition();
 			mog.modelUpdater:Show();
 		end);
-		f.btn:SetScript("OnDragStop",function(self,btn)
+		f:SetScript("OnDragStop",function(self,btn)
 			mog.modelUpdater:Hide();
 			mog.modelUpdater.btn = nil;
 			mog.modelUpdater.model = nil;
 		end);
-		f:SetScript("OnHide",function(self)
-			if mog.modelUpdater.model == self.btn then
-				self.btn:GetScript("OnDragStop")(self);
-			end
-			self:SetPosition(0,0,0);
-		end);
-		f:SetScript("OnShow",function(self)
+		
+		f.model = CreateFrame("DressUpModel",nil,f);
+		f.model:SetBackdrop({
+			bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", 
+			tile = true, tileSize = 16,
+			insets = { left = 0, right = 0, top = 0, bottom = 0 }
+		});
+		f.model:SetBackdropColor(0,0,0,0.6);
+		f.model:SetModelScale(2);
+		f.model:SetPosition(0,0,0);
+		f.model:SetAllPoints(f);
+		f.model.btn = f;
+		
+		f.model:SetScript("OnShow",function(self)
 			self:SetPosition(mog.posZ,mog.posX,mog.posY);
 			mog.dressModel(self);
 		end);
+		f.model:SetScript("OnHide",function(self)
+			if mog.modelUpdater.model == self.btn then
+				self.btn:GetScript("OnDragStop")(self.btn);
+			end
+			self:SetPosition(0,0,0);
+		end);
+		f.model:SetScript("OnUpdate",function(self)
+			if mog.global.noAnim then
+				self:SetSequence(3);
+			end
+		end);
 		
 		if not view then
-			f:SetUnit("PLAYER");
-			f.btn.star = f:CreateTexture(nil,"ARTWORK");
-			f.btn.star:Hide();
-			f.btn.star:SetSize(16,16);
-			f.btn.star:SetPoint("TOPRIGHT",f,"TOPRIGHT",-4,-4);
-			f.btn.star:SetTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcon_1");
-			f.btn:RegisterForClicks("AnyUp");
-			f.btn:SetScript("OnClick",mog.itemClick);
-			--[[f.c = {};
-			f.c[1] = f:CreateTexture(nil,"OVERLAY");
-			f.c[1]:SetSize(16,16);
-			f.c[1]:SetPoint("BOTTOMLEFT",f,"BOTTOMLEFT",4,4);
-			f.c[2] = f:CreateTexture(nil,"OVERLAY");
-			f.c[2]:SetSize(16,16);
-			f.c[2]:SetPoint("LEFT",f.c[1],"RIGHT",2,0);
-			f.c[3] = f:CreateTexture(nil,"OVERLAY");
-			f.c[3]:SetSize(16,16);
-			f.c[3]:SetPoint("LEFT",f.c[2],"RIGHT",2,0);--]]
+			f.text = f.model:CreateFontString(nil,"OVERLAY","GameFontNormal");
+			f.text:SetPoint("TOP",f,"TOP",0,-1);
+			f.text:Hide();
+			
+			f.model:SetUnit("PLAYER");
+			
+			f:RegisterForClicks("AnyUp");
+			f:SetScript("OnClick",mog.itemClick);
+			f:SetScript("OnEnter",mog.itemTooltip);
+			f:SetScript("OnLeave",function(self)
+				GameTooltip:Hide();
+			end);
+			
+			f:HookScript("OnShow",function(self)
+				if self:GetFrameLevel() <= mog.grid:GetFrameLevel() then
+					self:SetFrameLevel(mog.grid:GetFrameLevel()+1);
+				end
+			end);
+			
+			f.MogItModel = true;
 		end
 	end
 	if not view then
@@ -321,6 +329,7 @@ end
 function mog.scroll.update(self,page,offset)
 	local models = #mog.models;
 	local total = ceil(#mog.list/models);
+	local owner = GameTooltip:IsShown() and GameTooltip:GetOwner();
 	
 	if total > 1 then
 		self:SetMinMaxValues(1,total);
@@ -359,34 +368,30 @@ function mog.scroll.update(self,page,offset)
 	for id,model in ipairs(mog.models) do
 		index = ((page-1)*models)+id;
 		if mog.list[index] then
-			model.btn.display = mog.list[index];
-			model.btn.list = mog.display[model.btn.display];
-			model.btn.cycle = 1;
-			model.btn.item = type(model.btn.list) == "table" and model.btn.list[1] or model.btn.list;
-			model.btn.index = index;
+			model.display = mog.list[index];
+			model.list = mog.display[model.display];
+			model.cycle = 1;
+			model.item = type(model.list) == "table" and model.list[1] or model.list;
 			if model:IsShown() then
-				mog.dressModel(model);
+				mog.dressModel(model.model);
 			else
 				model:Show();
 			end
-			model:TryOn(model.btn.item);
-			if mog.char.wishlist.display[model.btn.display] then
-				model.btn.star:Show();
-			else
-				model.btn.star:Hide();
-			end
-			--[[for i=1,3 do
-				if mog.filters.colours[i][model.btn.display] then
-					model.c[i]:Show();
-					local r,g,b = mog.filters.colours[i][model.btn.display]:match("^(..)(..)(..)$");
-					r = tonumber(r,16);
-					g = tonumber(g,16);
-					b = tonumber(b,16); 
-					model.c[i]:SetTexture(r/255,g/255,b/255,1);
-				else
-					model.c[i]:Hide();
+			if type(model.display) == "table" and model.display.set then
+				model.text:Show();
+				model.text:SetText(model.display.data.name);
+				for k,v in ipairs(mog.itemSlots) do
+					if model.display.data[k] and model.display.data[k][1] then
+						model.model:TryOn(model.display.data[k][1]);
+					end
 				end
-			end--]]
+			else
+				model.text:Hide();
+				model.model:TryOn(model.item);
+			end
+			if owner == model then
+				mog.itemTooltip(model);
+			end
 		else
 			model:Hide();
 		end
@@ -408,18 +413,39 @@ function mog.buildList(top,show)
 	if not mog.selected then return end;
 	wipe(mog.list);
 	wipe(mog.display);
-	if mog.selected == "wl" then
-		for k,v in pairs(mog.char.wishlist.display) do
-			table.insert(mog.list,k);
-			mog.display[k] = v;
-		end
-		table.sort(mog.list,function(a,b)
-			if mog.char.wishlist.time[a] == mog.char.wishlist.time[b] then
-				return a > b;
-			else
-				return mog.char.wishlist.time[a] > mog.char.wishlist.time[b];
+	if mog.selected.wl then
+		if mog.selected.tbl == mog.char.wishlist or mog.selected.tbl == mog.global.wishlist then
+			for k,v in ipairs(mog.selected.tbl.sets) do
+				local data = {set=true,num=k,data=v};
+				table.insert(mog.list,data);
+				local disp = {};
+				for x,y in ipairs(mog.itemSlots) do
+					if v[x] then
+						for a,b in ipairs(v[x]) do
+							table.insert(disp,b);
+						end
+					end
+				end
+				mog.display[data] = disp;
 			end
-		end);
+			for k,v in ipairs(mog.selected.tbl.items) do
+				local data = {item=true,tbl=mog.selected.tbl.items,num=k};
+				table.insert(mog.list,data);
+				mog.display[data] = v;
+			end
+		else
+			for k,v in ipairs(mog.itemSlots) do
+				if mog.selected.tbl[mog.selected.num][k] then
+					for x,y in ipairs(mog.selected.tbl[mog.selected.num][k]) do
+						local data = {item=true,tbl=mog.selected.tbl[mog.selected.num][k],num=x};
+						table.insert(mog.list,data);
+						mog.display[data] = y;
+					end
+				end
+			end
+		end
+		mog.grid.sort:Hide();
+		mog.grid.sorting:Hide();
 	else
 		for k,v in ipairs(mog.selected.items) do
 			if mog.filterLevel(v) and mog.filterFaction(v) and mog.filterClass(v) and mog.filterSlot(v) and mog.filterSource(v) and mog.filterQuality(v) then
@@ -434,6 +460,8 @@ function mog.buildList(top,show)
 				end
 			end
 		end
+		mog.grid.sort:Show();
+		mog.grid.sorting:Show();
 	end
 	mog.sort();
 	mog.scroll:update(top and 1);
@@ -459,7 +487,22 @@ function mog.filterSlot(v)
 end
 
 function mog.filterSource(v)
-	return (not mog.filters.source[v]) or mog.filt._sources[mog.filters.source[v]];
+	if not mog.filters.source[v] then
+		return true;
+	elseif mog.filt._sources[mog.filters.source[v]] then
+		if mog.filters.source[v] == 1 then
+			if not mog.filters.sourceinfo[v] then
+				return mog.filt.sourceSub[1][7];
+			elseif mog.filters.sourceinfo[v] == 7 then
+				return mog.filt.sourceSub[1][3] or mog.filt.sourceSub[1][5];
+			elseif mog.filters.sourceinfo[v] == 8 then
+				return mog.filt.sourceSub[1][4] or mog.filt.sourceSub[1][6];
+			else
+				return mog.filt.sourceSub[1][mog.filters.sourceinfo[v]];
+			end
+		end
+		return true;
+	end
 end
 
 function mog.filterQuality(v)
@@ -471,15 +514,8 @@ local itemCache = {};
 function mog.sort()
 	wipe(colourCache);
 	wipe(itemCache);
-	if mog.sorting == "level" then
-		table.sort(mog.list,function(a,b)
-			local aI,bI = mog.minItem(a),mog.minItem(b);
-			if mog.filters.lvl[aI] == mog.filters.lvl[bI] then
-				return aI > bI;
-			else
-				return (mog.filters.lvl[aI] or 0) > (mog.filters.lvl[bI] or 0);
-			end
-		end);
+	if mog.selected.wl then
+		
 	elseif mog.sorting == "colour" then
 		table.sort(mog.list,function(a,b)
 			local aS,bS = mog.colourScore(a),mog.colourScore(b);
@@ -489,12 +525,20 @@ function mog.sort()
 				return aS < bS;
 			end
 		end);
+	elseif mog.sorting == "level" then
+		table.sort(mog.list,function(a,b)
+			local aI,bI = mog.minItem(a),mog.minItem(b);
+			if mog.filters.lvl[aI] == mog.filters.lvl[bI] then
+				return aI > bI;
+			else
+				return (mog.filters.lvl[aI] or 0) > (mog.filters.lvl[bI] or 0);
+			end
+		end);
 	end
 end
 
 function mog.colourScore(display)
 	if not colourCache[display] then
-		--local d1,d2;
 		local distance = 195075;
 		for i=1,3 do
 			if mog.filters.colours[i][display] then
@@ -506,17 +550,11 @@ function mog.colourScore(display)
 				if dist < distance then
 					distance = dist;
 				end
-				--[[if (not d1) or dist < d1 then
-					d2 = d1 or dist;
-					d1 = dist;
-				elseif dist < d2 then
-					d2 = dist;
-				end--]]
+
 			else
 				break;
 			end
 		end
-		--local distance = (195075-(d1 or 195075))^2+(195075-(d2 or 195075))^2;
 		colourCache[display] = distance;
 	end
 	return colourCache[display];
@@ -538,15 +576,17 @@ function mog.minItem(display)
 end
 
 mog.grid.sorting = mog.grid.topbar:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall");
-mog.grid.sorting:SetPoint("RIGHT",mog.grid.topbar,"RIGHT",-125,0);
+mog.grid.sorting:SetPoint("RIGHT",mog.grid.topbar,"RIGHT",-145,0);
 mog.grid.sorting:SetText(L["Sort by:"]);
+mog.grid.sorting:Hide();
 
 mog.cR,mog.cG,mog.cB = 255,255,255;
 mog.sorting = "level";
 mog.grid.sort = CreateFrame("Frame","MogItGridSortDropdown",mog.grid,"UIDropDownMenuTemplate");
+mog.grid.sort:Hide();
 mog.grid.sort:SetPoint("RIGHT",mog.grid.topbar,"RIGHT",16,-2);
-UIDropDownMenu_SetWidth(mog.grid.sort,105);
-UIDropDownMenu_SetButtonWidth(mog.grid.sort,120);
+UIDropDownMenu_SetWidth(mog.grid.sort,125);
+UIDropDownMenu_SetButtonWidth(mog.grid.sort,140);
 UIDropDownMenu_JustifyText(mog.grid.sort,"LEFT");
 UIDropDownMenu_SetText(mog.grid.sort,LEVEL);
 function mog.grid.sort:initialize()
@@ -567,6 +607,8 @@ function mog.grid.sort:initialize()
 	info.func = function(self)
 		mog.sorting = self.value;
 		UIDropDownMenu_SetText(mog.grid.sort,L["Approximate Colour"]);
+		mog.sort();
+		mog.scroll:update();
 	end
 	info.checked = mog.sorting == "colour";
 	info.hasColorSwatch = true;
@@ -583,58 +625,59 @@ function mog.grid.sort:initialize()
 			mog.scroll:update();
 		end
 	end
-	--[[info.cancelFunc = function(prev)
-		mog.cR,mog.cG,mog.cB = prev.r*255,prev.g*255,prev.b*255;
-	end--]]
 	UIDropDownMenu_AddButton(info);
 end
 
-function mog.updateTooltip(self)
-	mog.over = self;
-	GameTooltip:SetOwner(self,"ANCHOR_RIGHT");
-	--GameTooltip:ClearLines();
-	local name,link = GetItemInfo(self.item);
+function mog.itemTooltip(self)
+	local item = self.item;
+	if not item then return end;
+	GameTooltip:SetOwner(self,"ANCHOR_NONE");
+	
+	local name,link,_,_,_,_,_,_,_,texture = GetItemInfo(item);
 	--GameTooltip:AddLine(self.display,1,1,1);
 	--GameTooltip:AddLine(" ");
-	GameTooltip:AddDoubleLine(link or ("["..(name or UNKNOWN).."]"),((type(self.list) == "table") and L["Item %d/%d"]:format(self.cycle,#self.list)),1,0,0,1,0,0);
-	if mog.filters.source[self.item] then
-		GameTooltip:AddDoubleLine(L["Source:"],mog.source[mog.filters.source[self.item]],nil,nil,nil,1,1,1);
-		if mog.filters.source[self.item] == 1 then -- Drop
-			if mog.bosses[mog.filters.sourceid[self.item]] then
-				GameTooltip:AddDoubleLine(BOSS..":",mog.bosses[mog.filters.sourceid[self.item]],nil,nil,nil,1,1,1);
+	GameTooltip:AddDoubleLine((texture and "\124T"..texture..":18\124t " or "")..(link or ("["..(name or UNKNOWN).."]")),(type(self.list) == "table") and (#self.list > 1) and L["Item %d/%d"]:format(self.cycle,#self.list),1,0,0,1,0,0);
+	if mog.filters.source[item] then
+		GameTooltip:AddDoubleLine(L["Source:"],mog.source[mog.filters.source[item]],nil,nil,nil,1,1,1);
+		if mog.filters.source[item] == 1 then -- Drop
+			if mog.bosses[mog.filters.sourceid[item]] then
+				GameTooltip:AddDoubleLine(BOSS..":",mog.bosses[mog.filters.sourceid[item]],nil,nil,nil,1,1,1);
 			end
 		--elseif mog.filters.source[self.item] == 3 then -- Quest
-		elseif mog.filters.source[self.item] == 5 then -- Crafted
-			if mog.filters.sourceinfo[self.item] then
-				GameTooltip:AddDoubleLine(L["Profession:"],mog.professions[mog.filters.sourceinfo[self.item]],nil,nil,nil,1,1,1);
+		elseif mog.filters.source[item] == 5 then -- Crafted
+			if mog.filters.sourceinfo[item] then
+				GameTooltip:AddDoubleLine(L["Profession:"],mog.professions[mog.filters.sourceinfo[item]],nil,nil,nil,1,1,1);
 			end
-		elseif mog.filters.source[self.item] == 6 then -- Achievement
-			if mog.filters.sourceid[self.item] then
-				local _,name = GetAchievementInfo(mog.filters.sourceid[self.item]);
+		elseif mog.filters.source[item] == 6 then -- Achievement
+			if mog.filters.sourceid[item] then
+				local _,name,_,complete = GetAchievementInfo(mog.filters.sourceid[item]);
 				GameTooltip:AddDoubleLine(L["Achievement"]..":",name,nil,nil,nil,1,1,1);
+				GameTooltip:AddDoubleLine(STATUS..":",complete and COMPLETE or INCOMPLETE,nil,nil,nil,1,1,1);
 			end
 		end
 	end
-	if mog.filters.zone[self.item] then
-		local zone = GetMapNameByID(mog.filters.zone[self.item]);
-		if mog.filters.source[self.item] == 1 and mog.diffs[mog.filters.sourceinfo[self.item]] then
-			zone = zone.." ("..mog.diffs[mog.filters.sourceinfo[self.item]]..")";
+	if mog.filters.zone[item] then
+		local zone = GetMapNameByID(mog.filters.zone[item]);
+		if zone then
+			if mog.filters.source[item] == 1 and mog.diffs[mog.filters.sourceinfo[item]] then
+				zone = zone.." ("..mog.diffs[mog.filters.sourceinfo[item]]..")";
+			end
+			GameTooltip:AddDoubleLine(ZONE..":",zone,nil,nil,nil,1,1,1);
 		end
-		GameTooltip:AddDoubleLine(ZONE..":",zone,nil,nil,nil,1,1,1);
 	end
 	
 	GameTooltip:AddLine(" ");
-	GameTooltip:AddDoubleLine(ID..":",self.item,nil,nil,nil,1,1,1);
-	if mog.filters.lvl[self.item] then
-		GameTooltip:AddDoubleLine(LEVEL..":",mog.filters.lvl[self.item],nil,nil,nil,1,1,1);
+	GameTooltip:AddDoubleLine(ID..":",item,nil,nil,nil,1,1,1);
+	if mog.filters.lvl[item] then
+		GameTooltip:AddDoubleLine(LEVEL..":",mog.filters.lvl[item],nil,nil,nil,1,1,1);
 	end
-	if mog.filters.faction[self.item] then
-		GameTooltip:AddDoubleLine(FACTION..":",(mog.filters.faction[self.item] == 1 and FACTION_ALLIANCE or FACTION_HORDE),nil,nil,nil,1,1,1);
+	if mog.filters.faction[item] then
+		GameTooltip:AddDoubleLine(FACTION..":",(mog.filters.faction[item] == 1 and FACTION_ALLIANCE or FACTION_HORDE),nil,nil,nil,1,1,1);
 	end
-	if mog.filters.class[self.item] and mog.filters.class[self.item] > 0 then
+	if mog.filters.class[item] and mog.filters.class[item] > 0 then
 		local str;
 		for k,v in pairs(mog.classBits) do
-			if band(mog.filters.class[self.item],v) > 0 then
+			if band(mog.filters.class[item],v) > 0 then
 				if str then
 					str = str..", "..string.format("\124cff%.2x%.2x%.2x",RAID_CLASS_COLORS[k].r*255,RAID_CLASS_COLORS[k].g*255,RAID_CLASS_COLORS[k].b*255)..mog.classes[k].."\124r";
 				else
@@ -644,20 +687,11 @@ function mog.updateTooltip(self)
 		end
 		GameTooltip:AddDoubleLine(CLASS..":",str,nil,nil,nil,1,1,1);
 	end
-	if mog.filters.slot[self.item] then
-		GameTooltip:AddDoubleLine(L["Slot:"],mog.slots[mog.filters.slot[self.item]],nil,nil,nil,1,1,1);
+	if mog.filters.slot[item] then
+		GameTooltip:AddDoubleLine(L["Slot:"],mog.slots[mog.filters.slot[item]],nil,nil,nil,1,1,1);
 	end
 	
-	GameTooltip:AddLine(" ");
-	GameTooltip:AddLine(CONTROLS_LABEL);
-	GameTooltip:AddDoubleLine(L["Scroll through list"],L["Scroll wheel"],0,1,0,1,1,1);
-	GameTooltip:AddDoubleLine(L["Change item"],L["Left click"],0,1,0,1,1,1);
-	GameTooltip:AddDoubleLine(L["Chat link"],L["Shift + Left click"],0,1,0,1,1,1);
-	GameTooltip:AddDoubleLine(L["Try on"],L["Ctrl + Left click"],0,1,0,1,1,1);
-	GameTooltip:AddDoubleLine(mog.wishlist.display[self.display] and L["Delete from wishlist"] or L["Add to wishlist"],L["Right click"],0,1,0,1,1,1);
-	GameTooltip:AddDoubleLine(L["Item URL"],L["Shift + Right click"],0,1,0,1,1,1);
-	GameTooltip:AddDoubleLine(L["Add to control model"],L["Ctrl + Right click"],0,1,0,1,1,1);
 	GameTooltip:Show();
 	GameTooltip:ClearAllPoints();
-	GameTooltip:SetPoint("TOPRIGHT",mog.frame,"BOTTOMRIGHT",0,-35);
+	GameTooltip:SetPoint("TOPRIGHT",mog.frame,"BOTTOMRIGHT",0,-5);
 end

@@ -8,7 +8,6 @@ mog.view = CreateFrame("Frame","MogItPreview",mog.container,"BasicFrameTemplate"
 mog.view:Hide();
 mog.view:SetPoint("CENTER",UIParent,"CENTER");
 mog.view:SetSize(310,313);
-mog.view:SetFrameLevel(10);
 mog.view:SetToplevel(true);
 mog.view:SetClampedToScreen(true);
 mog.view:EnableMouse(true);
@@ -17,11 +16,11 @@ mog.view:SetResizable(true);
 mog.view:SetUserPlaced(true);
 mog.view:SetScript("OnMouseDown",mog.view.StartMoving);
 mog.view:SetScript("OnMouseUp",mog.view.StopMovingOrSizing);
-MogItPreviewTitleText:SetText("Preview");
+MogItPreviewTitleText:SetText(L["Preview"]);
 
 mog.view.resize = CreateFrame("Frame",nil,mog.view);
 mog.view.resize:SetSize(16,16);
-mog.view.resize:SetPoint("BOTTOMRIGHT",mog.view,"BOTTOMRIGHT");
+mog.view.resize:SetPoint("BOTTOMRIGHT",mog.view,"BOTTOMRIGHT",-1,0);
 mog.view.resize:EnableMouse(true);
 mog.view.resize:SetScript("OnMouseDown",function(self)
 	mog.view:SetMinResize(310,313);
@@ -39,7 +38,7 @@ mog.view.resize.texture:SetPoint("BOTTOMRIGHT",mog.view.resize,"BOTTOMRIGHT",-3,
 
 mog.view.btnAdd = CreateFrame("Button","MogItViewBtnAdd",mog.view,"UIPanelButtonTemplate2");
 mog.view.btnAdd:SetSize(110,22);
-mog.view.btnAdd:SetText("Add Item");
+mog.view.btnAdd:SetText(L["Add Item"]);
 mog.view.btnAdd:SetPoint("TOPRIGHT",mog.view,"TOP",0,-23);
 mog.view.btnAdd:SetScript("OnClick",function(self)
 	StaticPopup_Show("MOGIT_PREVIEW_ADDITEM");
@@ -47,7 +46,7 @@ end);
 
 mog.view.btnImport = CreateFrame("Button","MogItViewBtnImport",mog.view,"UIPanelButtonTemplate2");
 mog.view.btnImport:SetSize(110,22);
-mog.view.btnImport:SetText("Import/Export");
+mog.view.btnImport:SetText(L["Import/Export"]);
 mog.view.btnImport:SetPoint("TOPLEFT",mog.view,"TOP",0,-23);
 mog.view.btnImport:SetScript("OnClick",function(self)
 	StaticPopup_Show("MOGIT_PREVIEW_IMPORT");
@@ -55,24 +54,33 @@ end);
 
 mog.view.btnSave = CreateFrame("Button","MogItViewBtnSave",mog.view,"UIPanelButtonTemplate2");
 mog.view.btnSave:SetSize(110,22);
-mog.view.btnSave:SetText("Save");
+mog.view.btnSave:SetText(SAVE);
 mog.view.btnSave:SetPoint("BOTTOMRIGHT",mog.view,"BOTTOM",0,4);
+mog.view.btnSave:SetScript("OnClick",function(self)
+	ToggleDropDownMenu(nil,nil,mog.view.btnSaveDD,self,0,0);
+end);
+mog.view.btnSaveDD = CreateFrame("Frame");
+mog.view.btnSaveDD.displayMode = "MENU";
+mog.view.btnSaveDD.wlSave = true;
+mog.view.btnSaveDD.initialize = mog.wlMenu;
 
 mog.view.btnClear = CreateFrame("Button","MogItViewBtnClear",mog.view,"UIPanelButtonTemplate2");
 mog.view.btnClear:SetSize(110,22);
-mog.view.btnClear:SetText("Clear");
+mog.view.btnClear:SetText(L["Clear"]);
 mog.view.btnClear:SetPoint("BOTTOMLEFT",mog.view,"BOTTOM",0,4);
 mog.view.btnClear:SetScript("OnClick",function(self)
-	mog.view.model:Undress();
+	mog.view.model.model:Undress();
 	for k,v in ipairs(mog.view.slots) do
-		mog.view.delItem(k);
+		wipe(v.list);
+		v.item = nil;
+		mog.view.setTexture(k);
 	end
 	if mog.global.gridDress then
 		mog.scroll:update();
 	end
 end);
 
-local itemSlots = {
+mog.itemSlots = {
 	"HeadSlot",
 	"ShoulderSlot",
 	"BackSlot",
@@ -88,7 +96,8 @@ local itemSlots = {
 	"SecondaryHandSlot",
 	"RangedSlot",
 };
-local invSlots = {
+
+mog.invSlots = {
 	INVTYPE_HEAD = 1,
 	INVTYPE_SHOULDER = 2,
 	INVTYPE_CLOAK = 3,
@@ -111,11 +120,10 @@ local invSlots = {
 	INVTYPE_TABARD = 6,
 	INVTYPE_BODY = 5,
 };
+
 mog.view.slots = {};
-for k,v in ipairs(itemSlots) do
+for k,v in ipairs(mog.itemSlots) do
 	mog.view.slots[k] = CreateFrame("Button","MogItPreview"..v,mog.view,"ItemButtonTemplate");
-	mog.view.slots[k]:RegisterForClicks("AnyUp");
-	mog.view.slots[k].bg = mog.view.slots[k]:CreateTexture(nil,"BACKGROUND","Char-LeftSlot",-1);
 	if k == 1 then
 		mog.view.slots[k]:SetPoint("TOPLEFT",mog.view,"TOPLEFT",5,-24);
 	elseif k == 8 then
@@ -123,10 +131,29 @@ for k,v in ipairs(itemSlots) do
 	else
 		mog.view.slots[k]:SetPoint("TOP",mog.view.slots[k-1],"BOTTOM",0,-4);
 	end
+	
 	local id,texture = GetInventorySlotInfo(v);
 	SetItemButtonTexture(mog.view.slots[k],texture);
+	
+	mog.view.slots[k]:RegisterForClicks("AnyUp");
 	mog.view.slots[k]:SetScript("OnClick",mog.itemClick);
+	mog.view.slots[k]:SetScript("OnEnter",function(self)
+		if self.item then
+			--GameTooltip:SetItemByID(self.item);
+			mog.itemTooltip(self);
+		else
+			GameTooltip:SetOwner(self,"ANCHOR_RIGHT");
+			GameTooltip:SetText(_G[strupper(mog.itemSlots[self.slot])]);
+		end
+	end);
+	mog.view.slots[k]:SetScript("OnLeave",function(self)
+		GameTooltip:Hide();
+	end);
+	
+	mog.view.slots[k].list = {};
+	mog.view.slots[k].cycle = 1;
 	mog.view.slots[k].slot = k;
+	mog.view.slots[k].MogItSlot = true;
 end
 
 mog.view.model = mog.addModel(true);
@@ -143,6 +170,11 @@ end);
 
 mog.view.waitList = {};
 mog.view.waitCount = {};
+
+function mog.view.setTexture(slot,texture)
+	SetItemButtonTexture(mog.view.slots[slot],texture or select(2,GetInventorySlotInfo(mog.itemSlots[slot])));
+end
+
 function mog.view.addItem(item,set)
 	if not item then return end;
 	local slot,texture = select(9,GetItemInfo(item));
@@ -151,14 +183,16 @@ function mog.view.addItem(item,set)
 		mog.view.waitCount[item] = (mog.view.waitCount[item] or 0) + 1;
 		return;
 	end
-	if invSlots[slot] then
+	if mog.invSlots[slot] then
 		local id;
 		if type(item) == "string" then
 			id = item:match("|Hitem:([^:]+)");
 		end
 		id = id and tonumber(id) or item;
 		
-		-- fix (inc titans grip, dw?, warriors?)
+		if slot == "INVTYPE_2HWEAPON" and select(2,UnitClass("PLAYER")) == "WARRIOR" and (select(5,GetTalentInfo(2,20)) or 0) > 0 then
+			slot = "INVTYPE_WEAPON";
+		end
 		if slot == "INVTYPE_2HWEAPON" then
 			mog.view.delItem(13);
 			mog.view.th = true;
@@ -168,24 +202,27 @@ function mog.view.addItem(item,set)
 			end
 			mog.view.th = nil;
 		elseif slot == "INVTYPE_WEAPON" then
-			if mog.view.slots[12].item == id then
+			if mog.view.slots[12].item and (not mog.view.slots[13].item) or mog.view.slots[12].item == id then
 				slot = "INVTYPE_WEAPONOFFHAND";
 			end
 			mog.view.th = nil;
 		elseif slot == "INVTYPE_WEAPONMAINHAND" then
 			mog.view.th = nil;
 		end
-		mog.view.slots[invSlots[slot]].item = id;
-		if texture then
-			SetItemButtonTexture(mog.view.slots[invSlots[slot]],texture);
-		end
+		
+		mog.view.slots[mog.invSlots[slot]].item = id;
+		table.insert(mog.view.slots[mog.invSlots[slot]].list,id);
+		mog.view.slots[mog.invSlots[slot]].cycle = #mog.view.slots[mog.invSlots[slot]].list;
+		mog.view.setTexture(mog.invSlots[slot],texture);
+		
 		if not mog.container:IsShown() then
 			ShowUIPanel(mog.container);
 		end
 		if not mog.view:IsShown() then
 			mog.view:Show();
 		end
-		mog.view.model:TryOn(item);
+		
+		mog.view.model.model:TryOn(item);
 		if (not set) and mog.global.gridDress then
 			mog.scroll:update();
 		end
@@ -193,10 +230,33 @@ function mog.view.addItem(item,set)
 end
 
 function mog.view.delItem(slot)
-	if itemSlots[slot] then
-		local id,texture = GetInventorySlotInfo(itemSlots[slot]);
-		SetItemButtonTexture(mog.view.slots[slot],texture);
-		mog.view.slots[slot].item = nil;
+	if mog.itemSlots[slot] then
+		table.remove(mog.view.slots[slot].list,mog.view.slots[slot].cycle);
+		mog.view.slots[slot].cycle = mog.view.slots[slot].cycle > #mog.view.slots[slot].list and 1 or mog.view.slots[slot].cycle;
+		mog.view.slots[slot].item = mog.view.slots[slot].list[mog.view.slots[slot].cycle];
+		if mog.view.slots[slot].item then
+			local texture = select(10,GetItemInfo(mog.view.slots[slot].item));
+			mog.view.setTexture(slot,texture);
+			mog.itemTooltip(mog.view.slots[slot]);
+		else
+			mog.view.setTexture(slot);
+			if GameTooltip:GetOwner() == mog.view.slots[slot] then
+				GameTooltip:Hide();
+			end
+		end
+	end
+end
+
+function mog.view.saveSet(set)
+	if not set then return end;
+	for k,v in ipairs(mog.view.slots) do
+		set[k] = nil;
+		for x,y in ipairs(v.list) do
+			if not set[k] then
+				set[k] = {};
+			end
+			table.insert(set[k],y);
+		end
 	end
 end
 
@@ -209,7 +269,7 @@ hooksecurefunc("HandleModifiedItemClick",function(link)
 end);
 
 StaticPopupDialogs["MOGIT_PREVIEW_ADDITEM"] = {
-	text = L["Type the item ID in the text box below"],
+	text = L["Type the item ID or url in the text box below"],
 	button1 = ADD,
 	button2 = CANCEL,
 	hasEditBox = 1,
@@ -219,12 +279,16 @@ StaticPopupDialogs["MOGIT_PREVIEW_ADDITEM"] = {
 		self.editBox:SetFocus();
 	end,
 	OnAccept = function(self)
-		mog.view.addItem(self.editBox:GetText());
+		local text = self.editBox:GetText();
+		text = text and text:match("(%d+).-$");
+		mog.view.addItem(text);
 	end,
 	OnCancel = function(self) end,
 	EditBoxOnEnterPressed = function(self)
+		local text = self:GetText();
+		text = text and text:match("(%d+).-$");
 		self:GetParent():Hide();
-		mog.view.addItem(self:GetText());
+		mog.view.addItem(text);
 	end,
 	EditBoxOnEscapePressed = function(self)
 		self:GetParent():Hide();
@@ -249,7 +313,7 @@ StaticPopupDialogs["MOGIT_PREVIEW_IMPORT"] = {
 				if str then
 					str = str..":"..v.item;
 				else
-					str = L["http://www.wowhead.com/compare?items="]..v.item;
+					str = L["http://www.wowhead.com/"].."compare?items="..v.item;
 				end
 			end
 		end
@@ -261,7 +325,7 @@ StaticPopupDialogs["MOGIT_PREVIEW_IMPORT"] = {
 		local items = self.editBox:GetText();
 		items = items and items:match("compare%?items=([^;#]+)");
 		if items then
-			mog.view.model:Undress();
+			mog.view.model.model:Undress();
 			for k,v in ipairs(mog.view.slots) do
 				mog.view.delItem(k);
 			end
@@ -282,7 +346,7 @@ StaticPopupDialogs["MOGIT_PREVIEW_IMPORT"] = {
 		local items = self:GetText();
 		items = items and items:match("compare%?items=([^;#]+)");
 		if items then
-			mog.view.model:Undress();
+			mog.view.model.model:Undress();
 			for k,v in ipairs(mog.view.slots) do
 				mog.view.delItem(k);
 			end

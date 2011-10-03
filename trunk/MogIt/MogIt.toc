@@ -1,7 +1,7 @@
 ﻿## Interface: 40200
 ## Title: MogIt
 ## Author: Aelobin (The Maelstrom EU)
-## Version: 1.1
+## Version: 1.2
 ## SavedVariables: MogIt_Global
 ## SavedVariablesPerCharacter: MogIt_Character
 
