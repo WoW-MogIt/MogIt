@@ -36,3 +36,4 @@ move-folders:
 
 ignore:
     - .pkgmeta
+    - Changelog.txt
