@@ -86,7 +86,7 @@ end);
 mog.filt.faction = mog.filt.frame:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall");
 mog.filt.faction:SetPoint("TOPLEFT",mog.filt.lvl,"BOTTOMLEFT",0,-35);
 mog.filt.faction:SetPoint("RIGHT",mog.filt.frame,"RIGHT",-5,0);
-mog.filt.faction:SetText(L["Faction Items:"]);
+mog.filt.faction:SetText(L["Faction Items"]..":");
 mog.filt.faction:SetJustifyH("LEFT");
 
 mog.filt.factionAlliance = CreateFrame("CheckButton","MogItFiltersFactionAlliance",mog.filt.frame,"UICheckButtonTemplate");
@@ -108,7 +108,7 @@ end);
 mog.filt.class = mog.filt.frame:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall");
 mog.filt.class:SetPoint("TOPLEFT",mog.filt.faction,"BOTTOMLEFT",0,-64);
 mog.filt.class:SetPoint("RIGHT",mog.filt.frame,"RIGHT",0,-5);
-mog.filt.class:SetText(L["Class Items:"]);
+mog.filt.class:SetText(L["Class Items"]..":");
 mog.filt.class:SetJustifyH("LEFT");
 
 local classCoords = CLASS_ICON_TCOORDS;
@@ -255,7 +255,7 @@ end
 mog.filt.slot = mog.filt.frame:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall");
 mog.filt.slot:SetPoint("TOPLEFT",mog.filt.source,"BOTTOMLEFT",0,-40);
 mog.filt.slot:SetPoint("RIGHT",mog.filt.frame,"RIGHT",0,-5);
-mog.filt.slot:SetText(L["One-Hand Slot:"]);
+mog.filt.slot:SetText(L["One-Hand Slot"]..":");
 mog.filt.slot:SetJustifyH("LEFT");
 
 local slotNum = 0;

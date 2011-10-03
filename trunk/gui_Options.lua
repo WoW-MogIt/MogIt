@@ -102,7 +102,7 @@ end
 
 mog.opt.rows = mog.opt.frame:CreateFontString(nil,"ARTWORK","GameFontNormalSmall");
 mog.opt.rows:SetPoint("TOPLEFT",mog.opt.cnaked,"BOTTOMLEFT",0,-2);
-mog.opt.rows:SetText(L["Rows:"]);
+mog.opt.rows:SetText(L["Rows"]..":");
 
 mog.opt.delrows = CreateFrame("Button","MogItOptionsDelRows",mog.opt.frame,"UIPanelButtonTemplate2");
 mog.opt.delrows:SetNormalTexture("Interface\\Buttons\\UI-MinusButton-Up");
@@ -138,7 +138,7 @@ end);
 
 mog.opt.columns = mog.opt.frame:CreateFontString(nil,"ARTWORK","GameFontNormalSmall");
 mog.opt.columns:SetPoint("TOPLEFT",mog.opt.rows,"BOTTOMLEFT",0,-12);
-mog.opt.columns:SetText(L["Columns:"]);
+mog.opt.columns:SetText(L["Columns"]..":");
 
 mog.opt.delcolumns = CreateFrame("Button","MogItOptionsDelColumns",mog.opt.frame,"UIPanelButtonTemplate2");
 mog.opt.delcolumns:SetNormalTexture("Interface\\Buttons\\UI-MinusButton-Up");
@@ -254,7 +254,7 @@ end);
 
 mog.opt.tmodifier = mog.opt.frame:CreateFontString(nil,"ARTWORK","GameFontNormalSmall");
 mog.opt.tmodifier:SetPoint("TOPLEFT",mog.opt.mog,"BOTTOMLEFT",4,-10);
-mog.opt.tmodifier:SetText(L["Only show if modifier is pressed:"]);
+mog.opt.tmodifier:SetText(L["Only show if modifier is pressed"]..":");
 mog.opt.tmodifier:SetJustifyH("LEFT");
 
 mog.opt.tmod = CreateFrame("Frame","MogItOptionsTModDropdown",mog.opt.frame,"UIDropDownMenuTemplate");

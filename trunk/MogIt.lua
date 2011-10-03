@@ -289,16 +289,16 @@ mog.help:SetScript("OnEnter",function(self)
 	GameTooltip:AddDoubleLine(L["Change item"],L["Left click"],0,1,0,1,1,1);
 	GameTooltip:AddDoubleLine(L["Chat link"],L["Shift + Left click"],0,1,0,1,1,1);
 	GameTooltip:AddDoubleLine(L["Try on"],L["Ctrl + Left click"],0,1,0,1,1,1);
-	GameTooltip:AddDoubleLine(L["Add/Delete from wishlist"],L["Right click"],0,1,0,1,1,1);
+	GameTooltip:AddDoubleLine(L["Add to/Delete from wishlist"],L["Right click"],0,1,0,1,1,1);
 	GameTooltip:AddDoubleLine(L["Item URL"],L["Shift + Right click"],0,1,0,1,1,1);
-	GameTooltip:AddDoubleLine(L["Add/Dele from preview"],L["Ctrl + Right click"],0,1,0,1,1,1);
+	GameTooltip:AddDoubleLine(L["Add to/Delete from preview"],L["Ctrl + Right click"],0,1,0,1,1,1);
 	
 	GameTooltip:AddLine(" ");
 	GameTooltip:AddLine(L["Positioning Controls"]);
-	GameTooltip:AddDoubleLine(L["Rotate"],L["Left click + horizontal drag"],0,1,0,1,1,1);
-	GameTooltip:AddDoubleLine(L["Zoom"],L["Left click + vertical drag"],0,1,0,1,1,1);
-	GameTooltip:AddDoubleLine(L["Move"],L["Right click + drag"],0,1,0,1,1,1);
-	GameTooltip:AddDoubleLine(L["Resize"],L["Click bottom right corner + drag"],0,1,0,1,1,1);
+	GameTooltip:AddDoubleLine(L["Rotate"],L["Left click and horizontal drag"],0,1,0,1,1,1);
+	GameTooltip:AddDoubleLine(L["Zoom"],L["Left click and vertical drag"],0,1,0,1,1,1);
+	GameTooltip:AddDoubleLine(L["Move"],L["Right click and drag"],0,1,0,1,1,1);
+	GameTooltip:AddDoubleLine(L["Resize"],L["Click bottom right corner and drag"],0,1,0,1,1,1);
 	
 	GameTooltip:Show();
 	GameTooltip:ClearAllPoints();
