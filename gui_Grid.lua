@@ -577,7 +577,7 @@ end
 
 mog.grid.sorting = mog.grid.topbar:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall");
 mog.grid.sorting:SetPoint("RIGHT",mog.grid.topbar,"RIGHT",-145,0);
-mog.grid.sorting:SetText(L["Sort by:"]);
+mog.grid.sorting:SetText(L["Sort by"]..":");
 mog.grid.sorting:Hide();
 
 mog.cR,mog.cG,mog.cB = 255,255,255;
@@ -646,7 +646,7 @@ function mog.itemTooltip(self)
 		--elseif mog.filters.source[self.item] == 3 then -- Quest
 		elseif mog.filters.source[item] == 5 then -- Crafted
 			if mog.filters.sourceinfo[item] then
-				GameTooltip:AddDoubleLine(L["Profession:"],mog.professions[mog.filters.sourceinfo[item]],nil,nil,nil,1,1,1);
+				GameTooltip:AddDoubleLine(L["Profession"]..":",mog.professions[mog.filters.sourceinfo[item]],nil,nil,nil,1,1,1);
 			end
 		elseif mog.filters.source[item] == 6 then -- Achievement
 			if mog.filters.sourceid[item] then
@@ -688,7 +688,7 @@ function mog.itemTooltip(self)
 		GameTooltip:AddDoubleLine(CLASS..":",str,nil,nil,nil,1,1,1);
 	end
 	if mog.filters.slot[item] then
-		GameTooltip:AddDoubleLine(L["Slot:"],mog.slots[mog.filters.slot[item]],nil,nil,nil,1,1,1);
+		GameTooltip:AddDoubleLine(L["Slot"]..":",mog.slots[mog.filters.slot[item]],nil,nil,nil,1,1,1);
 	end
 	
 	GameTooltip:Show();
