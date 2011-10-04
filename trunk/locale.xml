@@ -11,5 +11,6 @@
 <Script file="Locale\koKR.lua"/>
 <Script file="Locale\zhTW.lua"/>
 <Script file="Locale\zhCN.lua"/>
+<Script file="Locale\ptBR.lua"/>
 
 </Ui>
