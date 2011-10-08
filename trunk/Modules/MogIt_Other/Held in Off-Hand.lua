@@ -1,4 +1,4 @@
-local a,t=MogIt.addItem,MogIt.register("Held in Off-Hand",...)
+local a,t=MogIt.sub.AddItem,MogIt.sub.AddSlot("Held in Off-Hand",...)
 a(t,13371,76463,3,48,nil,nil,nil,1,nil,721,1)
 a(t,7685,28291,3,26,nil,nil,nil,1,4543,762,1)
 a(t,55963,79864,3,27,2,nil,nil,3,nil,101,nil)

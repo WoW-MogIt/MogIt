@@ -1,4 +1,4 @@
-local a,t=MogIt.addItem,MogIt.register("Gun",...)
+local a,t=MogIt.sub.AddItem,MogIt.sub.AddSlot("Gun",...)
 a(t,13137,28786,3,29,nil,nil,nil,1,nil,nil,nil)
 a(t,7729,44661,3,28,nil,nil,nil,1,nil,762,nil)
 a(t,9456,30809,3,24,nil,nil,nil,1,6228,691,1)

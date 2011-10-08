@@ -1,4 +1,4 @@
-local b=MogIt.addBoss
+local b=MogIt.sub.AddBoss
 b(6487,"Arcanist Doan")
 b(-169243,"Chest of The Seven")
 b(1853,"Darkmaster Gandling")

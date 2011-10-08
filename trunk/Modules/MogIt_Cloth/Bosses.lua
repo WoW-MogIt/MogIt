@@ -1,4 +1,4 @@
-local b=MogIt.addBoss
+local b=MogIt.sub.AddBoss
 b(7800,"Mekgineer Thermaplugg")
 b(9156,"Ambassador Flamelash")
 b(16042,"Lord Valthalak")

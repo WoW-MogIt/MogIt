@@ -1,4 +1,4 @@
-local b=MogIt.addBoss
+local b=MogIt.sub.AddBoss
 b(6488,"Fallen Champion")
 b(4829,"Aku'mai")
 b(10363,"General Drakkisath")
