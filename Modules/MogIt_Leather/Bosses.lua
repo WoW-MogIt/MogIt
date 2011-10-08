@@ -1,4 +1,4 @@
-local b=MogIt.addBoss
+local b=MogIt.sub.AddBoss
 b(10429,"Warchief Rend Blackhand")
 b(10339,"Gyth")
 b(9537,"Hurley Blackbreath")

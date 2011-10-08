@@ -18,11 +18,9 @@ embeds.xml
 locale.xml
 
 MogIt.lua
-MogIt.xml
+GUI.lua
+Filters.lua
+URL.lua
 
-gui_Grid.lua
-gui_Control.lua
-gui_Filters.lua
-gui_Options.lua
-
-Tooltip.lua
+Modules\Modules.lua
+Modules\Filters.lua

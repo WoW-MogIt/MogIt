@@ -1,4 +1,4 @@
-local b=MogIt.addBoss
+local b=MogIt.sub.AddBoss
 b(4831,"Lady Sarevess")
 b(3673,"Lord Serpentis")
 b(9236,"Shadow Hunter Vosh'gajin")

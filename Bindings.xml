@@ -1,6 +1,6 @@
 <Bindings>
 	<Binding name="MogIt" header="MogIt">
-		MogIt.toggle()
+		MogIt.toggleFrame()
 	</Binding>
 	<Binding name="MogIt_TooltipScrollUp" hidden="true">
 		MogIt.tooltip.model:SetFacing(MogIt.tooltip.model:GetFacing()+0.3);
