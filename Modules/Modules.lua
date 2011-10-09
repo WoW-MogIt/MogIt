@@ -403,7 +403,7 @@ for k,v in ipairs(mog.sub.addons) do
 			Unlist = mog.sub.Unlist,
 			addon = v,
 			slots = {},
-		});
+		},true);
 	end
 end
 mog.sub.addons = nil;

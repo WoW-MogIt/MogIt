@@ -67,9 +67,37 @@ function mog.dropdown:initialize(tier)
 	end
 	
 	if tier == 1 then
-		for k,v in ipairs(mog.modules) do
+		local info;
+		info = UIDropDownMenu_CreateInfo();
+		info.text = L["Base Modules"];
+		info.isTitle = true;
+		info.notCheckable = true;
+		info.justifyH = "CENTER";
+		UIDropDownMenu_AddButton(info,tier);
+		
+		for k,v in ipairs(mog.modules.base) do
 			if v.Dropdown then
 				v:Dropdown(tier);
+			end
+		end
+		
+		if #mog.modules.extra > 0 then
+			info = UIDropDownMenu_CreateInfo();
+			info.isTitle = true;
+			info.notCheckable = true;
+			UIDropDownMenu_AddButton(info,tier);
+			
+			info = UIDropDownMenu_CreateInfo();
+			info.text = L["Extra Modules"];
+			info.isTitle = true;
+			info.notCheckable = true;
+			info.justifyH = "CENTER";
+			UIDropDownMenu_AddButton(info,tier);
+		
+			for k,v in ipairs(mog.modules.extra) do
+				if v.Dropdown then
+					v:Dropdown(tier);
+				end
 			end
 		end
 	elseif tier1.Dropdown then
@@ -240,6 +268,10 @@ function mog.addModel()
 		f = CreateFrame("Button",nil,mog.frame);
 		f:Hide();
 		f.MogItModel = true;
+		
+		if f:GetFrameLevel() <= mog.frame:GetFrameLevel() then
+			f:SetFrameLevel(mog.frame:GetFrameLevel()+1);
+		end
 		
 		f:SetScript("OnShow",function(self,...)
 			self.model:SetPosition(mog.posZ,mog.posX,mog.posY);
