@@ -1,7 +1,7 @@
 local MogIt,mog = ...;
 local L = mog.L;
 
-local f = mog:AddFilter("level_range");
+local f = mog:AddFilter("level");
 local minlvl;
 local maxlvl;
 
@@ -11,7 +11,7 @@ f.label:SetPoint("RIGHT",f,"RIGHT",0,0);
 f.label:SetText(LEVEL_RANGE..":");
 f.label:SetJustifyH("LEFT");
 
-f.min = CreateFrame("EditBox","MogItFiltersLevelRangeMin",f,"InputBoxTemplate");
+f.min = CreateFrame("EditBox","MogItFiltersLevelMin",f,"InputBoxTemplate");
 f.min:SetSize(25,16);
 f.min:SetPoint("TOPLEFT",f.label,"BOTTOMLEFT",8,-5);
 f.min:SetNumeric(true);
@@ -34,7 +34,7 @@ f.dash = f:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall");
 f.dash:SetPoint("LEFT",f.min,"RIGHT",0,1);
 f.dash:SetText("-");
 
-f.max = CreateFrame("EditBox","MogItFiltersLevelRangeMax",f,"InputBoxTemplate");
+f.max = CreateFrame("EditBox","MogItFiltersLevelMax",f,"InputBoxTemplate");
 f.max:SetSize(25,16);
 f.max:SetPoint("LEFT",f.min,"RIGHT",12,0);
 f.max:SetNumeric(true);
