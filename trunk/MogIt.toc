@@ -14,8 +14,8 @@
 ## Notes-zhTW: 塑形 助理
 ## Notes-zhCN: 物品幻化系统 助理
 
-embeds.xml
-locale.xml
+Libs\embeds.xml
+Locale\locale.xml
 
 MogIt.lua
 GUI.lua
