@@ -7,7 +7,10 @@ mog.LBI = LibStub("LibBabble-Inventory-3.0"):GetUnstrictLookupTable();
 mog.LDB = LibStub("LibDataBroker-1.1");
 mog.LDBI = LibStub("LibDBIcon-1.0");
 
-mog.modules = {};
+mog.modules = {
+	base = {},
+	extra = {},
+};
 mog.list = {};
 mog.models = {};
 mog.bin = {};
@@ -26,8 +29,12 @@ mog.face = 0;
 -- :Gets?
 -- Sort/Filter/URL
 
-function mog:RegisterModule(data)
-	table.insert(mog.modules,data);
+function mog:RegisterModule(data,base)
+	if base then
+		table.insert(mog.modules.base,data);
+	else
+		table.insert(mog.modules.extra,data);
+	end
 	if UIDropDownMenu_GetCurrentDropDown() == mog.dropdown and DropDownList1 and DropDownList1:IsShown() then
 		HideDropDownMenu(1);
 		ToggleDropDownMenu(1,data,mog.dropdown);
