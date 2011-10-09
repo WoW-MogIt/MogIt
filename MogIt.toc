@@ -22,6 +22,6 @@ GUI.lua
 Filters.lua
 URL.lua
 
+Filters\Filters.xml
 Modules\Modules.lua
-Modules\Filters.lua
 Modules\Wishlist.lua
