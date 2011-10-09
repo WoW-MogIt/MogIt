@@ -22,8 +22,8 @@ f.min:SetScript("OnTabPressed",function(self)
 	f.max:SetFocus();
 end);
 f.min:SetScript("OnTextChanged",function(self,user)
-	minlvl = self:GetNumber() or 0;
 	if user then
+		minlvl = self:GetNumber() or 0;
 		if f.data.MinLevel then
 			f.data.MinLevel(f.module,self,f);
 		end
@@ -45,8 +45,8 @@ f.max:SetScript("OnTabPressed",function(self)
 	f.min:SetFocus();
 end);
 f.max:SetScript("OnTextChanged",function(self,user)
-	maxlvl = self:GetNumber() or PLAYER_MAX_LEVEL;
 	if user then
+		maxlvl = self:GetNumber() or PLAYER_MAX_LEVEL;
 		if f.data.MaxLevel then
 			f.data.MaxLevel(f.module,self,f);
 		end
@@ -67,7 +67,9 @@ function f.Filter(lvl,min,max)
 end
 
 function f.Default()
-	f.min:SetNumber(0);
-	f.max:SetNumber(UnitLevel("PLAYER"));
+	minlvl = 0;
+	f.min:SetNumber(minlvl);
+	maxlvl = UnitLevel("PLAYER");
+	f.max:SetNumber(maxlvl);
 end
 f.Default();
