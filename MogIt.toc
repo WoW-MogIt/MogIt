@@ -21,8 +21,8 @@ MogIt.lua
 GUI.lua
 URL.lua
 
-Filters\Filters.lua
-Filters\Filters.xml
-
 Modules\Modules.lua
 Modules\Wishlist.lua
+
+Filters\Filters.lua
+Filters\Filters.xml
