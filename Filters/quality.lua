@@ -2,9 +2,12 @@ local MogIt,mog = ...;
 local L = mog.L;
 
 local f = mog:AddFilter("quality");
+local colours = ITEM_QUALITY_COLORS;
 local selected;
 local num;
 local all;
+
+f:SetSize(220,80);
 
 f.quality = f:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall");
 f.quality:SetPoint("TOPLEFT",f,"TOPLEFT",0,0);
@@ -13,7 +16,7 @@ f.quality:SetText(QUALITY..":");
 f.quality:SetJustifyH("LEFT");
 
 f.dd = CreateFrame("Frame","MogItFiltersQualityDropdown",f,"UIDropDownMenuTemplate");
-f.dd:SetPoint("TOPLEFT",f.slot,"BOTTOMLEFT",-16,-2);
+f.dd:SetPoint("TOPLEFT",f.quality,"BOTTOMLEFT",-16,-2);
 UIDropDownMenu_SetWidth(f.dd,125);
 UIDropDownMenu_SetButtonWidth(f.dd,140);
 UIDropDownMenu_JustifyText(f.dd,"LEFT");
@@ -39,8 +42,9 @@ function f.dd.initialize(self)
 	
 	for k,v in ipairs(mog.sub.quality) do
 		info = UIDropDownMenu_CreateInfo();
-		info.text =	v;
-		info.value = k;
+		info.text =	_G["ITEM_QUALITY"..v.."_DESC"];
+		info.value = v;
+		info.colorCode = colours[v].hex;
 		info.func = function(self)
 			if selected[self.value] and (not self.checked) then
 				num = num - 1;

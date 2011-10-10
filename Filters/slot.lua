@@ -6,6 +6,8 @@ local selected;
 local num;
 local all;
 
+f:SetSize(220,80);
+
 f.slot = f:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall");
 f.slot:SetPoint("TOPLEFT",f,"TOPLEFT",0,0);
 f.slot:SetPoint("RIGHT",f,"RIGHT",0,0);
