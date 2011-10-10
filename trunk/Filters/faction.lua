@@ -5,7 +5,7 @@ local f = mog:AddFilter("faction");
 local alliance;
 local horde;
 
-f:SetSize(220,80);
+f:SetHeight(69);
 
 f.faction = f:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall");
 f.faction:SetPoint("TOPLEFT",f,"TOPLEFT",0,0);
@@ -21,6 +21,9 @@ f.alliance:SetScript("OnClick",function(self)
 	if f.data.Alliance then
 		f.data.Alliance(f.module,self,f);
 	end
+	if f.module.FilterUpdate then
+		f.module:FilterUpdate(f);
+	end
 end);
 
 f.horde = CreateFrame("CheckButton","MogItFiltersFactionHorde",f,"UICheckButtonTemplate");
@@ -30,6 +33,9 @@ f.horde:SetScript("OnClick",function(self)
 	horde = self:GetChecked();
 	if f.data.Horde then
 		f.data.Horde(f.module,self,f);
+	end
+	if f.module.FilterUpdate then
+		f.module:FilterUpdate(f);
 	end
 end);
 
