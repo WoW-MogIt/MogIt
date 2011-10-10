@@ -336,7 +336,7 @@ function mog.sub.BuildList(module,tbl,top)
 	module = module or mog.selected;
 	tbl = tbl or mog.sub.selected.items;
 	for k,v in ipairs(tbl) do
-		if mog.sub.filterLevel(v) and mog.sub.filterFaction(v) and mog.sub.filterClass(v) and mog.sub.filterSlot(v) and mog.sub.filterSource(v) and mog.sub.filterQuality(v) then
+		--if mog.sub.filterLevel(v) and mog.sub.filterFaction(v) and mog.sub.filterClass(v) and mog.sub.filterSlot(v) and mog.sub.filterSource(v) and mog.sub.filterQuality(v) then
 			local disp = mog.sub.filters.display[v];
 			if not mog.sub.display[disp] then
 				mog.sub.display[disp] = v;
@@ -346,48 +346,9 @@ function mog.sub.BuildList(module,tbl,top)
 			else
 				mog.sub.display[disp] = {mog.sub.display[disp],v};
 			end
-		end
+		--end
 	end
 	mog:SetList(module,mog.sub.list,top);
-end
-
-function mog.sub.filterLevel(v)
-	return ((mog.sub.filters.lvl[v] or 0) >= mog.sub.filt._minlvl) and ((mog.sub.filters.lvl[v] or 0) <= mog.sub.filt._maxlvl);
-end
-
-function mog.sub.filterFaction(v)
-	return (not mog.sub.filters.faction[v]) or (mog.sub.filters.faction[v] == 1 and mog.sub.filt._alliance) or (mog.sub.filters.faction[v] == 2 and mog.sub.filt._horde);
-end
-
-function mog.sub.filterClass(v)
-	return (not mog.sub.filters.class[v]) or (bit.band(mog.sub.filters.class[v],mog.sub.filt._class) > 0); 
-end
-
-function mog.sub.filterSlot(v)
-	return (not mog.sub.filters.slot[v]) or mog.sub.filt._slots[mog.sub.filters.slot[v]];
-end
-
-function mog.sub.filterSource(v)
-	if not mog.sub.filters.source[v] then
-		return true;
-	elseif mog.sub.filt._sources[mog.sub.filters.source[v]] then
-		if mog.sub.filters.source[v] == 1 then
-			if not mog.sub.filters.sourceinfo[v] then
-				return mog.sub.filt._sourceSub[1][7];
-			elseif mog.sub.filters.sourceinfo[v] == 7 then
-				return mog.sub.filt._sourceSub[1][3] or mog.sub.filt._sourceSub[1][5];
-			elseif mog.sub.filters.sourceinfo[v] == 8 then
-				return mog.sub.filt._sourceSub[1][4] or mog.sub.filt._sourceSub[1][6];
-			else
-				return mog.sub.filt._sourceSub[1][mog.sub.filters.sourceinfo[v]];
-			end
-		end
-		return true;
-	end
-end
-
-function mog.sub.filterQuality(v)
-	return (not mog.sub.filters.quality[v]) or mog.sub.filt._quality[mog.sub.filters.quality[v]];
 end
 
 for k,v in ipairs(mog.sub.addons) do
