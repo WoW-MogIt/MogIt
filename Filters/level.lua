@@ -5,7 +5,7 @@ local f = mog:AddFilter("level");
 local minlvl;
 local maxlvl;
 
-f:SetSize(220,80);
+f:SetHeight(35);
 
 f.label = f:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall");
 f.label:SetPoint("TOPLEFT",f,"TOPLEFT",0,0);
@@ -29,6 +29,9 @@ f.min:SetScript("OnTextChanged",function(self,user)
 		if f.data.MinLevel then
 			f.data.MinLevel(f.module,self,f);
 		end
+		if f.module.FilterUpdate then
+			f.module:FilterUpdate(f);
+		end
 	end
 end);
 
@@ -51,6 +54,9 @@ f.max:SetScript("OnTextChanged",function(self,user)
 		maxlvl = self:GetNumber() or PLAYER_MAX_LEVEL;
 		if f.data.MaxLevel then
 			f.data.MaxLevel(f.module,self,f);
+		end
+		if f.module.FilterUpdate then
+			f.module:FilterUpdate(f);
 		end
 	end
 end);

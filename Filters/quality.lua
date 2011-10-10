@@ -7,7 +7,7 @@ local selected;
 local num;
 local all;
 
-f:SetSize(220,80);
+f:SetHeight(41);
 
 f.quality = f:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall");
 f.quality:SetPoint("TOPLEFT",f,"TOPLEFT",0,0);
@@ -36,6 +36,9 @@ function f.dd.initialize(self)
 		if f.data.Dropdown then
 			f.data.Dropdown(f.module,self,f);
 		end
+		if f.module.FilterUpdate then
+			f.module:FilterUpdate(f);
+		end
 	end
 	info.notCheckable = true;
 	UIDropDownMenu_AddButton(info);
@@ -55,6 +58,9 @@ function f.dd.initialize(self)
 			UIDropDownMenu_SetText(f.dd,L["%d selected"]:format(num));
 			if f.data.Dropdown then
 				f.data.Dropdown(f.module,self,f);
+			end
+			if f.module.FilterUpdate then
+				f.module:FilterUpdate(f);
 			end
 		end
 		info.keepShownOnClick = true;
