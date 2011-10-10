@@ -51,6 +51,7 @@ function mog:SetList(module,list,top)
 	--sorting
 	--showfilter
 	mog.scroll:update(top and 1);
+	mog:FilterUpdate();
 end
 
 function mog.toggleFrame()
