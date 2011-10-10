@@ -19,45 +19,44 @@ UIDropDownMenu_SetButtonWidth(f.dd,140);
 UIDropDownMenu_JustifyText(f.dd,"LEFT");
 function f.dd.initialize(self)
 	local info;
+	info = UIDropDownMenu_CreateInfo();
+	info.text =	all and L["Select All"] or L["Select None"];
+	info.func = function(self)
+		num = 0;
+		for k,v in ipairs(mog.sub.slots) do
+			selected[k] = all;
+			num = num + (all and 1 or 0);
+		end
+		all = not all;
+		UIDropDownMenu_SetText(f.dd,L["%d selected"]:format(num));
+		ToggleDropDownMenu(1,nil,f.dd);
+		if f.data.Dropdown then
+			f.data.Dropdown(f.module,self,f);
+		end
+	end
+	info.notCheckable = true;
+	UIDropDownMenu_AddButton(info);
+	
+	for k,v in ipairs(mog.sub.slots) do
 		info = UIDropDownMenu_CreateInfo();
-		info.text =	all and L["Select All"] or L["Select None"];
+		info.text =	v;
+		info.value = k;
 		info.func = function(self)
-			num = 0;
-			for k,v in ipairs(mog.sub.slots) do
-				selected[k] = all;
-				num = num + (all and 1 or 0);
+			if selected[self.value] and (not self.checked) then
+				num = num - 1;
+			elseif (not selected[self.value]) and self.checked then
+				num = num + 1;
 			end
-			all = not all;
+			selected[self.value] = self.checked;
 			UIDropDownMenu_SetText(f.dd,L["%d selected"]:format(num));
-			ToggleDropDownMenu(1,nil,f.dd);
 			if f.data.Dropdown then
 				f.data.Dropdown(f.module,self,f);
 			end
 		end
-		info.notCheckable = true;
+		info.keepShownOnClick = true;
+		info.isNotRadio = true;
+		info.checked = selected[k];
 		UIDropDownMenu_AddButton(info);
-		
-		for k,v in ipairs(mog.sub.slots) do
-			info = UIDropDownMenu_CreateInfo();
-			info.text =	v;
-			info.value = k;
-			info.func = function(self)
-				if selected[self.value] and (not self.checked) then
-					num = num - 1;
-				elseif (not selected[self.value]) and self.checked then
-					num = num + 1;
-				end
-				selected[self.value] = self.checked;
-				UIDropDownMenu_SetText(f.dd,L["%d selected"]:format(num));
-				if f.data.Dropdown then
-					f.data.Dropdown(f.module,self,f);
-				end
-			end
-			info.keepShownOnClick = true;
-			info.isNotRadio = true;
-			info.checked = selected[k];
-			UIDropDownMenu_AddButton(info);
-		end
 	end
 end
 

@@ -93,7 +93,7 @@ end);
 function f.Filter(src1,sub1)
 	if not src1 then
 		return true;
-	if selected[src1] then
+	elseif selected[src1] then
 		if src1 == 1 then
 			if not sub1 then
 				return sub[1][7];
