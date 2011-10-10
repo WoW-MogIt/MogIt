@@ -9,6 +9,8 @@ local selected;
 local num;
 local all;
 
+f:SetSize(220,80);
+
 f.class = f:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall");
 f.class:SetPoint("TOPLEFT",f,"TOPLEFT",0,0);
 f.class:SetPoint("RIGHT",f,"RIGHT",0,0);
@@ -46,7 +48,7 @@ function f.dd.initialize(self)
 		info = UIDropDownMenu_CreateInfo();
 		info.text =	v;
 		info.value = k;
-		info.colorCode = string.format("\124cff%.2x%.2x%.2x",classColours[k].r*255,classColours[k].g*255,classColours[k].b*255);
+		info.colorCode = string.format("\124cff%.2x%.2x%.2x",colours[k].r*255,colours[k].g*255,colours[k].b*255);
 		info.func = function(self)
 			if selected[self.value] and (not self.checked) then
 				class = class - mog.sub.classBits[self.value];

@@ -7,6 +7,8 @@ local sub;
 local num;
 local all;
 
+f:SetSize(220,80);
+
 f.source = f:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall");
 f.source:SetPoint("TOPLEFT",f,"TOPLEFT",0,0);
 f.source:SetPoint("RIGHT",f,"RIGHT",0,0);

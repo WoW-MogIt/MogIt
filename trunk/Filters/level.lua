@@ -5,6 +5,8 @@ local f = mog:AddFilter("level");
 local minlvl;
 local maxlvl;
 
+f:SetSize(220,80);
+
 f.label = f:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall");
 f.label:SetPoint("TOPLEFT",f,"TOPLEFT",0,0);
 f.label:SetPoint("RIGHT",f,"RIGHT",0,0);

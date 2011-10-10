@@ -5,6 +5,8 @@ local f = mog:AddFilter("faction");
 local alliance;
 local horde;
 
+f:SetSize(220,80);
+
 f.faction = f:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall");
 f.faction:SetPoint("TOPLEFT",f,"TOPLEFT",0,0);
 f.faction:SetPoint("RIGHT",f,"RIGHT",0,0);
