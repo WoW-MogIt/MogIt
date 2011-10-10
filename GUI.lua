@@ -123,6 +123,13 @@ mog.frame.filters = CreateFrame("Button","MogItFrameFiltersButton",mog.frame,"Ma
 mog.frame.filters:SetPoint("BOTTOMLEFT",mog.frame,"BOTTOMLEFT",5,5);
 mog.frame.filters:SetWidth(100);
 mog.frame.filters:SetText(FILTERS);
+mog.frame.filters:SetScript("OnClick",function(self,btn)
+	if mog.filt:IsShown() then
+		mog.filt:Hide();
+	else
+		mog.filt:Show();
+	end
+end);
 
 mog.frame.preview = CreateFrame("Button","MogItFramePreviewButton",mog.frame,"MagicButtonTemplate");
 mog.frame.preview:SetPoint("TOPLEFT",mog.frame.filters,"TOPRIGHT");
