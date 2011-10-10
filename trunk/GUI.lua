@@ -327,6 +327,12 @@ function mog.addModel()
 		f.bg:SetTexture(0.3,0.3,0.3,0.2);
 		
 		f.data = {};
+		--[[f.frames = {};
+		for k,v in ipairs(mog.modules) do
+			if v.AddModel then
+				v:AddModel(f);
+			end
+		end--]]
 	end
 	tinsert(mog.models,f);
 	return f;
@@ -460,7 +466,7 @@ mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 			ToggleDropDownMenu(nil,nil,mog.sub.LeftClick,"cursor",0,0,mog.sub.LeftClick.menuList);
 		end
 	elseif event == "ADDON_LOADED" then
-		if mog.sub.modules[arg1] then
+		if mog.sub and mog.sub.modules[arg1] then
 			mog.sub.modules[arg1].loaded = true;
 			if UIDropDownMenu_GetCurrentDropDown() == mog.dropdown and DropDownList1 and DropDownList1:IsShown() then
 				HideDropDownMenu(1);
