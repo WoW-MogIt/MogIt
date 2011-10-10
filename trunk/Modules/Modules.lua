@@ -199,7 +199,6 @@ function mog.sub.OnEnter(module,self)
 	end
 	
 	GameTooltip:AddLine(" ");
-	GameTooltip:AddDoubleLine(ID..":",item,nil,nil,nil,1,1,1);
 	if mog.sub.filters.lvl[item] then
 		GameTooltip:AddDoubleLine(LEVEL..":",mog.sub.filters.lvl[item],nil,nil,nil,1,1,1);
 	end
@@ -222,6 +221,9 @@ function mog.sub.OnEnter(module,self)
 	if mog.sub.filters.slot[item] then
 		GameTooltip:AddDoubleLine(L["Slot"]..":",mog.sub.slots[mog.sub.filters.slot[item]],nil,nil,nil,1,1,1);
 	end
+	
+	GameTooltip:AddLine(" ");
+	GameTooltip:AddDoubleLine(ID..":",item,nil,nil,nil,1,1,1);
 	
 	GameTooltip:Show();
 	--GameTooltip:ClearAllPoints();
@@ -362,6 +364,14 @@ for k,v in ipairs(mog.sub.addons) do
 			OnClick = mog.sub.OnClick,
 			OnScroll = mog.sub.OnScroll,
 			Unlist = mog.sub.Unlist,
+			filters = {
+				"level",
+				"faction",
+				"class",
+				"source",
+				"slot",
+				"quality",
+			},
 			addon = v,
 			slots = {},
 		},true);
