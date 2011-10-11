@@ -2,6 +2,7 @@ local MogIt,mog = ...;
 _G["MogIt"] = mog;
 local L = mog.L;
 
+mog.LBB = LibStub("LibBabble-Boss-3.0"):GetUnstrictLookupTable();
 mog.LBI = LibStub("LibBabble-Inventory-3.0"):GetUnstrictLookupTable();
 mog.LDB = LibStub("LibDataBroker-1.1");
 mog.LDBI = LibStub("LibDBIcon-1.0");
