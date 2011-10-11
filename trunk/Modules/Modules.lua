@@ -93,9 +93,13 @@ mog.sub = {
 		[15] = GetSpellInfo(7620), -- Fishing
 	},
 	quality = {
+		0, -- Poor
+		1, -- Common
 		2, -- Uncommon
 		3, -- Rare
 		4, -- Epic
+		5, -- Legendary
+		--6, -- Artifact
 		7, -- Heirloom
 	},
 	classBits = {
@@ -111,6 +115,12 @@ mog.sub = {
 		WARRIOR = 1,
 	},
 	classes = {},
+	bind = {
+		[0] = NONE,
+		[1] = ITEM_BIND_ON_PICKUP,
+		[2] = ITEM_BIND_ON_EQUIP,
+		[5] = ITEM_BIND_TO_BNETACCOUNT,
+	},
 };
 FillLocalizedClassList(mog.sub.classes,UnitSex("PLAYER")==3);
 
