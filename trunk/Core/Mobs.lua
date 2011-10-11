@@ -2,13 +2,13 @@ local MogIt,mog = ...;
 local L = mog.L;
 
 local LBB = LibStub("LibBabble-Boss-3.0"):GetUnstrictLookupTable();
-local bosses = {};
+local mobs = {};
 
-local tooltip = CreateFrame("GameTooltip","MogItBossesTooltip");
+local tooltip = CreateFrame("GameTooltip","MogItMobsTooltip");
 local text = tooltip:CreateFontString();
 tooltip:AddFontStrings(text,tooltip:CreateFontString());
 
-local function CachedBoss(id)
+local function CachedMob(id)
 	tooltip:SetOwner(WorldFrame,"ANCHOR_NONE");
 	tooltip:SetHyperlink(("unit:0xF53%05X00000000"):format(id));
 	if (tooltip:IsShown()) then
@@ -16,18 +16,18 @@ local function CachedBoss(id)
 	end
 end
 
-function mog.AddBoss(id,name)
-	if not (bosses[id] or CachedBoss(id)) then
-		bosses[id] = LBB[name] or name;
+function mog.AddMob(id,name)
+	if not (mobs[id] or CachedMob(id)) then
+		mobs[id] = LBB[name] or name;
 	end
 end
 
-function mog.GetBoss(id)
-	local name = CachedBoss(id);
+function mog.GetMob(id)
+	local name = CachedMob(id);
 	if name then
-		bosses[id] = nil;
+		mobs[id] = nil;
 		return name;
 	else
-		return bosses[id];
+		return mobs[id];
 	end
 end
