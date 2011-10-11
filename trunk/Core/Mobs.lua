@@ -23,11 +23,5 @@ function mog.AddMob(id,name)
 end
 
 function mog.GetMob(id)
-	local name = CachedMob(id);
-	if name then
-		mobs[id] = nil;
-		return name;
-	else
-		return mobs[id];
-	end
+	return mobs[id] or CachedMob(id);
 end
