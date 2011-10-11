@@ -14,12 +14,9 @@
 ## Notes-zhTW: 塑形 助理
 ## Notes-zhCN: 物品幻化系统 助理
 
-embeds.xml
-locale.xml
+Libs\Embeds.xml
+Locale\Locale.xml
 
-MogIt.lua
-GUI.lua
-URL.lua
-
-modules.xml
-filters.xml
+Core\Core.xml
+Modules\Modules.xml
+Filters\Filters.xml
