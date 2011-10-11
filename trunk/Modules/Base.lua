@@ -14,12 +14,6 @@ mog.sub = {
 		"MogIt_Other",
 		"MogIt_Accessories",
 	},
-	extras = {
-		"MogIt_Sets",
-		"MogIt_Mounts",
-		"MogIt_Companions",
-		"MogIt_Pets",
-	},
 	list = {},
 	display = {},
 	filters = {
@@ -428,37 +422,6 @@ for k,v in ipairs(mog.sub.addons) do
 	end
 end
 mog.sub.addons = nil;
-
-function mog.sub.temp(module,tier)
-	local info;
-	if tier == 1 then
-		info = UIDropDownMenu_CreateInfo();
-		info.text = module.name..(module.loaded and "" or " \124cFFFFFFFF("..L["Click to load addon"]..")");
-		info.value = module;
-		info.colorCode = "\124cFF"..(module.loaded and "00FF00" or "FF0000");
-		info.hasArrow = module.loaded;
-		info.keepShownOnClick = true;
-		info.notCheckable = true;
-		info.func = function(self)
-			if not self.value.loaded then
-				LoadAddOn(self.value.addon);
-			end
-		end
-		UIDropDownMenu_AddButton(info,tier);
-	end
-end
-
-for k,v in ipairs(mog.sub.extras) do
-	local _,title,_,_,loadable = GetAddOnInfo(v);
-	if loadable then
-		mog.sub.modules[v] = mog:RegisterModule({
-			name = title:match("MogIt_(.+)") or title,
-			Dropdown = mog.sub.temp,
-			addon = v,
-		});
-	end
-end
-mog.sub.extras = nil;
 
 -- addon loader (and edit data.lua)
 -- buildlist/setlist
