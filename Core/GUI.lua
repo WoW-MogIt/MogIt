@@ -473,6 +473,9 @@ mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 			ToggleDropDownMenu(nil,nil,mog.sub.LeftClick,"cursor",0,0,mog.sub.LeftClick.menuList);
 		end
 	elseif event == "ADDON_LOADED" then
+		if arg1 == MogIt then
+		end
+		
 		if mog.sub and mog.sub.modules[arg1] then
 			mog.sub.modules[arg1].loaded = true;
 			if UIDropDownMenu_GetCurrentDropDown() == mog.dropdown and DropDownList1 and DropDownList1:IsShown() then
