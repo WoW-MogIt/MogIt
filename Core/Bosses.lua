@@ -27,7 +27,7 @@ function mog:GetBoss(id)
 end
 
 function mog:AddBoss(id,name)
-	if not mog:GetBoss(id) then
+	if not (bosses[id] or mog:GetBoss(id)) then
 		bosses[id] = LBB[name] or name;
 	end
 end
