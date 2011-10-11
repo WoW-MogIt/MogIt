@@ -8,7 +8,7 @@ local tooltip = CreateFrame("GameTooltip","MogItBossesTooltip");
 local text = tooltip:CreateFontString();
 tooltip:AddFontStrings(text,tooltip:CreateFontString());
 
-local function CachedName(id)
+local function CachedBoss(id)
 	tooltip:SetOwner(WorldFrame,"ANCHOR_NONE");
 	tooltip:SetHyperlink(("unit:0xF53%05X00000000"):format(id));
 	if (tooltip:IsShown()) then
@@ -17,13 +17,13 @@ local function CachedName(id)
 end
 
 function mog.AddBoss(id,name)
-	if not (bosses[id] or CachedName(id)) then
+	if not (bosses[id] or CachedBoss(id)) then
 		bosses[id] = LBB[name] or name;
 	end
 end
 
 function mog.GetBoss(id)
-	local name = CachedName(id);
+	local name = CachedBoss(id);
 	if name then
 		bosses[id] = nil;
 		return name;
