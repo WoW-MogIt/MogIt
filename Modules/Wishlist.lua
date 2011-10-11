@@ -5,12 +5,15 @@ local db = {}
 local wishlist = {}
 
 local menu = CreateFrame("Frame")
+menu.point = "TOPLEFT"
+menu.relativePoint = "TOPRIGHT"
 function menu:initialize(level, menulist)
 	if type(menulist) == "table" then
 		for k, v in pairs(menulist) do
 			if v[1] then
 				local info = UIDropDownMenu_CreateInfo()
 				info.text = GetItemInfo(v[1])
+				info.notCheckable = true
 				UIDropDownMenu_AddButton(info, level)
 			end
 		end
@@ -21,7 +24,7 @@ function wishlist:Dropdown(level)
 	if level == 1 then
 		local info = UIDropDownMenu_CreateInfo()
 		info.text = "Wishlist"
-		info.value = module
+		info.value = self
 		-- info.colorCode = "|cFF"..(module.loaded and "00FF00" or "FF0000")
 		-- info.hasArrow = module.loaded
 		info.keepShownOnClick = true
@@ -75,16 +78,53 @@ function wishlist:OnEnter(self)
 	-- GameTooltip:SetOwner(self, "ANCHOR_NONE")
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 	
-	local source = mog.sub.filters.source
+	local sources = mog.sub.filters.source
 	-- if data.type == "set" then
 	if type(value) == "table" then
 		GameTooltip:AddLine(value.name)
 		for slot, itemID in pairs(value) do
 		-- for slot, itemID in pairs(entry.items) do
-			if itemID[1] then
-				local name, link, _, _, _, _, _, _, _, texture = GetItemInfo(itemID[1])
-				GameTooltip:AddDoubleLine(link, mog.sub.source[source[itemID[1]]])
-				GameTooltip:AddTexture(GetItemIcon(itemID[1]))
+			local itemID = tonumber(itemID[1])
+			if itemID then
+				local name, link, _, _, _, _, _, _, _, texture = GetItemInfo(itemID)
+				local source = sources[itemID]
+				local sourceID = mog.sub.filters.sourceid[itemID]
+				local sourceInfo = mog.sub.filters.sourceinfo[itemID]
+				local info = mog.sub.source[source]
+				local extraInfo
+				if source == 1 then -- Drop
+					if sourceID then
+						extraInfo = mog.sub.bosses[sourceID]
+					end
+				--elseif source == 3 then -- Quest
+				elseif source == 5 then -- Crafted
+					if sourceInfo then
+						extraInfo = mog.sub.professions[sourceInfo]
+					end
+				-- elseif source == 6 then -- Achievement
+					-- if mog.sub.filters.sourceid[item] then
+						-- local _,name,_,complete = GetAchievementInfo(mog.sub.filters.sourceid[item]);
+						-- GameTooltip:AddDoubleLine(L["Achievement"]..":",name,nil,nil,nil,1,1,1);
+						-- GameTooltip:AddDoubleLine(STATUS..":",complete and COMPLETE or INCOMPLETE,nil,nil,nil,1,1,1);
+					-- end
+				end
+				local zone
+				if mog.sub.filters.zone[itemID] then
+					zone = GetMapNameByID(mog.sub.filters.zone[itemID])
+					if zone then
+						if source == 1 and extraInfo then
+							if mog.sub.diffs[sourceInfo] then
+								zone = zone.." ("..mog.sub.diffs[sourceInfo]..")"
+							end
+							info = zone
+							-- extraInfo = 
+						else
+							extraInfo = zone
+						end
+					end
+				end
+				GameTooltip:AddDoubleLine(link, source and strjoin(", ", info, extraInfo or ""))
+				GameTooltip:AddTexture(GetItemIcon(itemID))
 			end
 		end
 	else
@@ -95,7 +135,7 @@ function wishlist:OnEnter(self)
 		-- for i = 1, #items do
 			-- local item, source = items[i]
 			-- local source = sources[item.id]
-			GameTooltip:AddDoubleLine(link, mog.sub.source[source[value]])
+			GameTooltip:AddDoubleLine(link, mog.sub.source[sources[value]])
 		-- end
 	end
 	
