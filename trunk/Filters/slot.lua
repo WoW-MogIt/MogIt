@@ -11,7 +11,7 @@ f:SetHeight(41);
 f.slot = f:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall");
 f.slot:SetPoint("TOPLEFT",f,"TOPLEFT",0,0);
 f.slot:SetPoint("RIGHT",f,"RIGHT",0,0);
-f.slot:SetText(L["Slot"]..":");
+f.slot:SetText(TRADESKILL_FILTER_SLOTS..":");
 f.slot:SetJustifyH("LEFT");
 
 f.dd = CreateFrame("Frame","MogItFiltersSlotDropdown",f,"UIDropDownMenuTemplate");
