@@ -10,6 +10,7 @@ local text = tooltip:CreateFontString();
 tooltip:AddFontStrings(text,tooltip:CreateFontString());
 
 local function CachedMob(id)
+	if not id then return end;
 	tooltip:SetOwner(WorldFrame,"ANCHOR_NONE");
 	tooltip:SetHyperlink(("unit:0xF53%05X00000000"):format(id));
 	if (tooltip:IsShown()) then
