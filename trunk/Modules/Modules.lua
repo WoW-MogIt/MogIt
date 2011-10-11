@@ -332,13 +332,40 @@ function mog.sub.AddColours(id,c1,c2,c3)
 	end
 end
 
+function mog.sub.GetFilterArgs(filter,item)
+	if filter == "level" then
+		return mog.sub.filters.lvl[item];
+	elseif filter == "faction" then
+		return mog.sub.filters.faction[item];
+	elseif filter == "class" then
+		return mog.sub.filters.class[item];
+	elseif filter == "source" then
+		return mog.sub.filters.source[item],mog.sub.filters.sourceinfo[item];
+	elseif filter == "quality" then
+		return mog.sub.filters.quality[item];
+	elseif filter == "slot" then
+		return mog.sub.filters.slot[item];
+	end
+end
+
+function mog.sub.FilterUpdate(module,filter)
+	mog.sub.BuildList();
+end
+
 function mog.sub.BuildList(module,tbl,top)
 	wipe(mog.sub.list);
 	wipe(mog.sub.display);
 	module = module or mog.selected;
 	tbl = tbl or mog.sub.selected.items;
 	for k,v in ipairs(tbl) do
-		--if mog.sub.filterLevel(v) and mog.sub.filterFaction(v) and mog.sub.filterClass(v) and mog.sub.filterSlot(v) and mog.sub.filterSource(v) and mog.sub.filterQuality(v) then
+		local state = true;
+		for x,y in ipairs(module.filters) do
+			if not mog.filters[y.name].Filter(mog.sub.GetFilterArgs(y.name,v)) then
+				state = false;
+				break;
+			end
+		end
+		if state then
 			local disp = mog.sub.filters.display[v];
 			if not mog.sub.display[disp] then
 				mog.sub.display[disp] = v;
@@ -348,7 +375,7 @@ function mog.sub.BuildList(module,tbl,top)
 			else
 				mog.sub.display[disp] = {mog.sub.display[disp],v};
 			end
-		--end
+		end
 	end
 	mog:SetList(module,mog.sub.list,top);
 end
@@ -360,17 +387,30 @@ for k,v in ipairs(mog.sub.addons) do
 			name = title:match("MogIt_(.+)") or title,
 			Dropdown = mog.sub.Dropdown,
 			FrameUpdate = mog.sub.FrameUpdate,
+			FilterUpdate = mog.sub.FilterUpdate,
 			OnEnter = mog.sub.OnEnter,
 			OnClick = mog.sub.OnClick,
 			OnScroll = mog.sub.OnScroll,
 			Unlist = mog.sub.Unlist,
 			filters = {
-				"level",
-				"faction",
-				"class",
-				"source",
-				"slot",
-				"quality",
+				{
+					name = "level",
+				},
+				{
+					name = "faction",
+				},
+				{
+					name = "class",
+				},
+				{
+					name = "source",
+				},
+				{
+					name = "quality",
+				},
+				(v == "MogIt_OneHanded" and {
+					name = "slot",
+				}) or nil,
 			},
 			addon = v,
 			slots = {},
