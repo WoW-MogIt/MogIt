@@ -3,9 +3,8 @@ local L = mog.L;
 
 local LBB = LibStub("LibBabble-Boss-3.0"):GetUnstrictLookupTable();
 local mobs = {};
-local objects = {};
 
-local tooltip = CreateFrame("GameTooltip","MogItMobsTooltip");
+--[[local tooltip = CreateFrame("GameTooltip","MogItMobsTooltip");
 local text = tooltip:CreateFontString();
 tooltip:AddFontStrings(text,tooltip:CreateFontString());
 
@@ -16,22 +15,16 @@ local function CachedMob(id)
 	if (tooltip:IsShown()) then
 		return text:GetText();
 	end
-end
+end--]]
 
 function mog.AddMob(id,name)
-	if not (mobs[id] or CachedMob(id)) then
+	--if not (mobs[id] or CachedMob(id)) then
+	if not mobs[id] then
 		mobs[id] = LBB[name] or name;
 	end
 end
 
 function mog.GetMob(id)
-	return mobs[id] or CachedMob(id);
-end
-
-function mog.AddObject(id,name)
-	objects[id] = LBB[name] or name;
-end
-
-function mog.GetObject(id)
-	return objects[id];
+	--return mobs[id] or CachedMob(id);
+	return mobs[id];
 end
