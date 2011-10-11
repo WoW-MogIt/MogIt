@@ -28,7 +28,6 @@ mog.sub = {
 		sourceinfo = {},
 		zone = {},
 	},
-	bosses = {},
 	colours = {
 		[1] = {},
 		[2] = {},
@@ -176,8 +175,8 @@ function mog.sub.OnEnter(module,self)
 	if mog.sub.filters.source[item] then
 		GameTooltip:AddDoubleLine(L["Source"]..":",mog.sub.source[mog.sub.filters.source[item]],nil,nil,nil,1,1,1);
 		if mog.sub.filters.source[item] == 1 then -- Drop
-			if mog.sub.bosses[mog.sub.filters.sourceid[item]] then
-				GameTooltip:AddDoubleLine(BOSS..":",mog.sub.bosses[mog.sub.filters.sourceid[item]],nil,nil,nil,1,1,1);
+			if mog.GetMob(mog.sub.filters.sourceid[item]) then
+				GameTooltip:AddDoubleLine(BOSS..":",mog.GetMob(mog.sub.filters.sourceid[item]),nil,nil,nil,1,1,1);
 			end
 		--elseif mog.filters.source[self.item] == 3 then -- Quest
 		elseif mog.sub.filters.source[item] == 5 then -- Crafted
@@ -320,12 +319,6 @@ function mog.sub.AddItem(tbl,id,display,quality,lvl,faction,class,slot,source,so
 	mog.sub.filters.sourceid[id] = sourceid;
 	mog.sub.filters.sourceinfo[id] = sourceinfo;
 	mog.sub.filters.zone[id] = zone;
-end
-
-function mog.sub.AddBoss(id,name)
-	if not mog.sub.bosses[id] then
-		mog.sub.bosses[id] = mog.LBB[name] or name;
-	end
 end
 
 function mog.sub.AddColours(id,c1,c2,c3)
