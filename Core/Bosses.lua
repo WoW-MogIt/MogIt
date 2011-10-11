@@ -16,6 +16,12 @@ local function CachedName(id)
 	end
 end
 
+function mog:AddBoss(id,name)
+	if not (bosses[id] or CachedName(id)) then
+		bosses[id] = LBB[name] or name;
+	end
+end
+
 function mog:GetBoss(id)
 	local name = CachedName(id);
 	if name then
@@ -23,11 +29,5 @@ function mog:GetBoss(id)
 		return name;
 	else
 		return bosses[id];
-	end
-end
-
-function mog:AddBoss(id,name)
-	if not (bosses[id] or mog:GetBoss(id)) then
-		bosses[id] = LBB[name] or name;
 	end
 end
