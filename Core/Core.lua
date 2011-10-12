@@ -180,18 +180,18 @@ mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 			mog.LDBI:Register(MogIt,mog.mmb,mog.db.profile.minimap);
 			
 			-- fire every module's "init" method (if they have one)
-			for i, module in ipairs(mog.modules.base) do
+			for name,module in pairs(mog.modules.lookup) do
 				if module.AddonLoaded then
 					module:AddonLoaded()
 				end
 			end
 		end
 		
-		if mog.sub and mog.sub.modules[arg1] then
-			mog.sub.modules[arg1].loaded = true;
+		if mog.modules.lookup[arg1] then
+			mog.modules.lookup[arg1].loaded = true;
 			if UIDropDownMenu_GetCurrentDropDown() == mog.dropdown and DropDownList1 and DropDownList1:IsShown() then
 				HideDropDownMenu(1);
-				ToggleDropDownMenu(1,mog.sub.modules[arg1],mog.dropdown);
+				ToggleDropDownMenu(1,mog.modules.lookup[arg1],mog.dropdown);
 			end
 		end
 	end

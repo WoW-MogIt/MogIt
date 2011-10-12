@@ -15,8 +15,8 @@ local addons = {
 	"MogIt_Accessories",
 };
 
-local list = {},
-local display = {},
+local list = {};
+local display = {};
 
 mog.sub.filters = {
 	display = {},
