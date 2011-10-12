@@ -76,6 +76,9 @@
  loaded
 -> Description: If the module's name is the same as an addon, loaded will be set to true when the addon loads (boolean)
 
+ addon
+-> Description: The addon associated with the module, if it begins with "MogIt_" (string)
+
  Dropdown
 -> Description: Initialize function for showing the module in the MogIt dropdown menu
 -> Usage: .Dropdown(module,tier)
