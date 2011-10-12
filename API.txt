@@ -45,6 +45,10 @@
 -> Returns
 ---> frame: The filter frame, or nil if no filter exists (frame)
 
+ FilterUpdate
+-> Description: Updates the filter frame
+-> Usage: MogIt:FilterUpdate()
+
  Sort
 -> Description: Sorts the list
 -> Usage: MogIt:Sort(func)
