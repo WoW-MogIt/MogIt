@@ -387,24 +387,6 @@ function mog.updateGUI(resize)
 	end
 end
 
-mog.mmb = mog.LDB:NewDataObject("MogIt",{
-	type = "launcher",
-	icon = "Interface\\Icons\\INV_Enchant_EssenceCosmicGreater",
-	OnClick = function(self,btn)
-		if btn == "RightButton" then
-			mog.togglePreview();
-		else
-			mog.toggleFrame();
-		end
-	end,
-	OnTooltipShow = function(self)
-		if not self or not self.AddLine then return end
-		self:AddLine("MogIt");
-		self:AddLine(mog.frame:IsShown() and L["Left click to close MogIt"] or L["Left click to open MogIt"],1,1,1);
-		--self:AddLine(mog.preview:IsShown() and L["Right click to close the MogIt preview"] or L["Right click to close the MogIt preview"],1,1,1);
-	end,
-});
-
 local defaults = {
 	profile = {
 		tooltip = true,
