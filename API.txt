@@ -71,7 +71,10 @@
 --[[ Module Object ]]--
 
  name
--> Description: Localized name to display in the dropdown menu, if no .Dropdown function is defined (string)
+-> Description: Localized name to display in the dropdown menu, if addon name begins with "MogIt_" and the .Dropdown function hasn't been changed (string)
+
+ loaded
+-> Description: If the module's name is the same as an addon, loaded will be set to true when the addon loads (boolean)
 
  Dropdown
 -> Description: Initialize function for showing the module in the MogIt dropdown menu
