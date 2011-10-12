@@ -23,7 +23,7 @@ function wishlist:Dropdown(level)
 		local info = UIDropDownMenu_CreateInfo()
 		info.text = "Wishlist"
 		info.value = self
-		-- info.colorCode = "|cFF"..(module.loaded and "00FF00" or "FF0000")
+		info.colorCode = "|cFFFFFF00"
 		-- info.hasArrow = module.loaded
 		info.keepShownOnClick = true
 		info.notCheckable = true
