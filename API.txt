@@ -51,6 +51,12 @@
 -> Args
 ---> func: (Optional) Function to pass to table.sort, or use previous function if nil (function)
 
+ GetSort
+-> Description: Gets the last used sort function
+-> Usage: sort = MogIt:GetSort()
+-> Returns
+---> sort: The last used sort (function)
+
  AddMob
 -> Description: Adds a mob name by id
 -> Usage: MogIt.AddMob(id,name)
@@ -122,6 +128,13 @@
 ---> module: The module object (table)
 -> Returns
 ---> list: An array to display in the list (table)
+
+ Unlist
+-> Description: Function called when a different module becomes active
+-> Usage: .Unlist(module,new)
+-> Args
+---> module: The module object (table)
+---> new: The new module object (table)
 
  FilterUpdate
 -> Description: Function called when a filter used by the module is changed
