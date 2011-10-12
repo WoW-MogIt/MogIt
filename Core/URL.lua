@@ -4,7 +4,7 @@ local L = mog.L;
 mog.url = {};
 
 function mog:ShowURL(id,sub,url)
-	url = url or mog.global and mog.global.url;
+	url = url or mog.db.profile.url;
 	sub = sub or "item";
 	if mog.url[url] and mog.url[url][sub] then
 		StaticPopup_Show("MOGIT_URL",mog.url[url].fav and "\124TInterface\\AddOns\\MogIt\\Images\\"..mog.url[url].fav..":18:18\124t " or "",url,mog.url[url][sub]:format(id));

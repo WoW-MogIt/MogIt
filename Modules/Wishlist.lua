@@ -9,13 +9,11 @@ menu.point = "TOPLEFT"
 menu.relativePoint = "TOPRIGHT"
 function menu:initialize(level, menulist)
 	if type(menulist) == "table" then
-		for k, v in pairs(menulist) do
-			if v[1] then
-				local info = UIDropDownMenu_CreateInfo()
-				info.text = GetItemInfo(v[1])
-				info.notCheckable = true
-				UIDropDownMenu_AddButton(info, level)
-			end
+		for k, v in pairs(menulist.items) do
+			local info = UIDropDownMenu_CreateInfo()
+			info.text = GetItemInfo(v)
+			info.notCheckable = true
+			UIDropDownMenu_AddButton(info, level)
 		end
 	end
 end
@@ -60,10 +58,8 @@ function wishlist:FrameUpdate(self, value)
 	self.model:Undress()
 	-- if data.type == "set" then
 	if type(value) == "table" then
-		for slot, itemID in pairs(value) do
-			if itemID[1] then
-				self.model:TryOn(itemID[1])
-			end
+		for slot, itemID in pairs(value.items) do
+			self.model:TryOn(itemID)
 		end
 	else
 		-- data.item = value.itemID
@@ -82,50 +78,46 @@ function wishlist:OnEnter(self)
 	-- if data.type == "set" then
 	if type(value) == "table" then
 		GameTooltip:AddLine(value.name)
-		for slot, itemID in pairs(value) do
-		-- for slot, itemID in pairs(entry.items) do
-			local itemID = tonumber(itemID[1])
-			if itemID then
-				local name, link, _, _, _, _, _, _, _, texture = GetItemInfo(itemID)
-				local source = sources[itemID]
-				local sourceID = mog.sub.filters.sourceid[itemID]
-				local sourceInfo = mog.sub.filters.sourceinfo[itemID]
-				local info = mog.sub.source[source]
-				local extraInfo
-				if source == 1 then -- Drop
-					if sourceID then
-						extraInfo = mog.sub.bosses[sourceID]
-					end
-				--elseif source == 3 then -- Quest
-				elseif source == 5 then -- Crafted
-					if sourceInfo then
-						extraInfo = mog.sub.professions[sourceInfo]
-					end
-				-- elseif source == 6 then -- Achievement
-					-- if mog.sub.filters.sourceid[item] then
-						-- local _,name,_,complete = GetAchievementInfo(mog.sub.filters.sourceid[item]);
-						-- GameTooltip:AddDoubleLine(L["Achievement"]..":",name,nil,nil,nil,1,1,1);
-						-- GameTooltip:AddDoubleLine(STATUS..":",complete and COMPLETE or INCOMPLETE,nil,nil,nil,1,1,1);
-					-- end
+		for slot, itemID in pairs(value.items) do
+			local name, link, _, _, _, _, _, _, _, texture = GetItemInfo(itemID)
+			local source = sources[itemID]
+			local sourceID = mog.sub.filters.sourceid[itemID]
+			local sourceInfo = mog.sub.filters.sourceinfo[itemID]
+			local info = mog.sub.source[source]
+			local extraInfo
+			if source == 1 then -- Drop
+				if sourceID then
+					extraInfo = mog.sub.bosses[sourceID]
 				end
-				local zone
-				if mog.sub.filters.zone[itemID] then
-					zone = GetMapNameByID(mog.sub.filters.zone[itemID])
-					if zone then
-						if source == 1 and extraInfo then
-							if mog.sub.diffs[sourceInfo] then
-								zone = zone.." ("..mog.sub.diffs[sourceInfo]..")"
-							end
-							info = zone
-							-- extraInfo = 
-						else
-							extraInfo = zone
-						end
-					end
+			--elseif source == 3 then -- Quest
+			elseif source == 5 then -- Crafted
+				if sourceInfo then
+					extraInfo = mog.sub.professions[sourceInfo]
 				end
-				GameTooltip:AddDoubleLine(link, source and strjoin(", ", info, extraInfo or ""))
-				GameTooltip:AddTexture(GetItemIcon(itemID))
+			-- elseif source == 6 then -- Achievement
+				-- if mog.sub.filters.sourceid[item] then
+					-- local _,name,_,complete = GetAchievementInfo(mog.sub.filters.sourceid[item]);
+					-- GameTooltip:AddDoubleLine(L["Achievement"]..":",name,nil,nil,nil,1,1,1);
+					-- GameTooltip:AddDoubleLine(STATUS..":",complete and COMPLETE or INCOMPLETE,nil,nil,nil,1,1,1);
+				-- end
 			end
+			local zone
+			if mog.sub.filters.zone[itemID] then
+				zone = GetMapNameByID(mog.sub.filters.zone[itemID])
+				if zone then
+					if source == 1 and extraInfo then
+						if mog.sub.diffs[sourceInfo] then
+							zone = zone.." ("..mog.sub.diffs[sourceInfo]..")"
+						end
+						info = zone
+						-- extraInfo = 
+					else
+						extraInfo = zone
+					end
+				end
+			end
+			GameTooltip:AddDoubleLine(link, source and strjoin(", ", info, extraInfo or ""))
+			GameTooltip:AddTexture(GetItemIcon(itemID))
 		end
 	else
 		local name, link, _, _, _, _, _, _, _, texture = GetItemInfo(value)
@@ -210,12 +202,9 @@ function wishlist:OnClick(self, button)
 			local value = self.data.value
 			if type(value) == "table" then
 				DressUpModel:Undress()
-				for slot, itemID in pairs(value) do
-				-- for slot, itemID in pairs(entry.items) do
-					if itemID[1] then
-						local name, link, _, _, _, _, _, _, _, texture = GetItemInfo(itemID[1])
-						DressUpItemLink(itemID[1])
-					end
+				for slot, itemID in pairs(value.items) do
+					local name, link, _, _, _, _, _, _, _, texture = GetItemInfo(itemID)
+					DressUpItemLink(itemID)
 				end
 			else
 				local name, link, _, _, _, _, _, _, _, texture = GetItemInfo(value)
@@ -259,7 +248,43 @@ function mog.sub.OnScroll(module)
 end
 ]==]
 
-mog:RegisterModule(wishlist)
+mog:RegisterModule(wishlist, true)
+
+local defaults = {
+	profile = {
+		items = {},
+		sets = {},
+	}
+}
+
+function wishlist:AddonLoaded()
+	local AceDB = LibStub("AceDB-3.0")
+	local db = AceDB:New("MogItWishlist", defaults)
+	self.db = db
+	
+	-- convert old database
+	if MogIt_Character then
+		db.profile.items = MogIt_Character.wishlist.items
+		db.profile.sets = MogIt_Character.wishlist.sets
+		for i, itemID in ipairs(db.profile.items) do
+			db.profile.items[i] = tonumber(itemID)
+		end
+		for i, set in ipairs(db.profile.sets) do
+			set.items = {}
+			for slotID, items in pairs(set) do
+				if type(slotID) == "number" then
+					local itemID = tonumber(items[1])
+					set.items[slotID] = itemID
+					set[slotID] = nil
+				end
+			end
+		end
+	end
+	
+	-- db.RegisterCallback(self, "OnProfileChanged", "LoadSettings")
+	-- db.RegisterCallback(self, "OnProfileCopied", "LoadSettings")
+	-- db.RegisterCallback(self, "OnProfileReset", "LoadSettings")
+end
 
 function wishlist:BuildList()
 	-- wipe(mog.sub.list);
@@ -280,7 +305,7 @@ function wishlist:BuildList()
 		-- end
 	-- end
 	local list = {}
-	local db = mog.char.wishlist
+	local db = self.db.profile
 	for i, v in ipairs(db.sets) do
 		list[#list + 1] = v
 	end

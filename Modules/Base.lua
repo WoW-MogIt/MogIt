@@ -255,7 +255,7 @@ function mog.sub.OnClick(module,self,btn)
 			--[[if self.MogItSlot then
 				mog.view.delItem(self.slot);
 				mog.dressModel(mog.view.model.model);
-				if mog.global.gridDress then
+				if mog.db.profile.gridDress then
 					mog.scroll:update();
 				end
 			else

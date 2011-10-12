@@ -35,8 +35,8 @@ mog.frame.resize:SetScript("OnMouseDown",function(self)
 	mog.frame:SetMaxResize(GetScreenWidth(),GetScreenHeight());
 	mog.frame:StartSizing();
 	self:SetScript("OnUpdate",function(self)
-		mog.global.width = floor((mog.frame:GetWidth()+5-(4+10)-(10+18+4))/mog.global.columns)-5;
-		mog.global.height = floor((mog.frame:GetHeight()+5-(60+10)-(10+26))/mog.global.rows)-5;
+		mog.db.profile.width = floor((mog.frame:GetWidth()+5-(4+10)-(10+18+4))/mog.db.profile.columns)-5;
+		mog.db.profile.height = floor((mog.frame:GetHeight()+5-(60+10)-(10+26))/mog.db.profile.rows)-5;
 		mog.updateGUI(true);
 	end);
 end);
@@ -352,10 +352,10 @@ function mog.delModel(f)
 end
 
 function mog.updateGUI(resize)
-	local rows,columns = mog.global.rows,mog.global.columns;
+	local rows,columns = mog.db.profile.rows,mog.db.profile.columns;
 	local total = rows*columns;
 	local current = #mog.models;
-	local width,height = mog.global.width,mog.global.height;
+	local width,height = mog.db.profile.width,mog.db.profile.height;
 	
 	if not resize then
 		if current > total then
@@ -405,64 +405,37 @@ mog.mmb = mog.LDB:NewDataObject("MogIt",{
 	end,
 });
 
+local defaults = {
+	profile = {
+		tooltip = true,
+		tooltipMouse = false,
+		tooltipDress = false,
+		tooltipRotate = true,
+		tooltipMog = true,
+		gridDress = true,
+		noAnim = false,
+		minimap = {},
+		url = "Battle.net",
+		--tooltipWidth = 300,
+		--tooltipHeight = 300,
+		width = 200,
+		height = 200,
+		rows = 2;
+		columns = 3,
+	}
+}
+
 mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 	if event == "PLAYER_LOGIN" then
-		if not MogIt_Global then
-			MogIt_Global = {
-				tooltip = true,
-				tooltipMouse = false,
-				tooltipDress = false,
-				tooltipRotate = true,
-				tooltipMog = true,
-				gridDress = true,
-				noAnim = false;
-			};
-		end
-		mog.global = MogIt_Global;
-		--mog.global.wishlist = mog.global.wishlist or {};
-		--mog.global.wishlist.sets = mog.global.wishlist.sets or {};
-		--mog.global.wishlist.items = mog.global.wishlist.items or {};
-		mog.global.minimap = mog.global.minimap or {};
-		mog.global.url = mog.global.url or "Battle.net";
-		--mog.global.tooltipWidth = mog.global.tooltipWidth or 300;
-		--mog.global.tooltipHeight = mog.global.tooltipHeight or 300;
-		mog.global.width = mog.global.width or 200;
-		mog.global.height = mog.global.height or 200;
-		mog.global.rows = mog.global.rows or 2;
-		mog.global.columns = mog.global.columns or 3;
-		if not mog.global.version then
-			DEFAULT_CHAT_FRAME:AddMessage(L["MogIt has loaded! Type \"/mog\" to open it."]);
-		end
-		mog.global.version = GetAddOnMetadata(MogIt,"Version");
-		
-		if not MogIt_Character then
-			MogIt_Character = {};
-		end
-		mog.char = MogIt_Character;
-		--mog.char.wishlist = mog.char.wishlist or {};
-		--mog.char.wishlist.sets = mog.char.wishlist.sets or {};
-		--mog.char.wishlist.items = mog.char.wishlist.items or {};
-		if not mog.char.version then
-			--if MogIt_Wishlist then
-			--	for k,v in pairs(MogIt_Wishlist.display) do
-			--		table.insert(mog.char.wishlist.items,type(v) == "table" and v[1] or v);
-			--	end
-			--end
-		end
-		mog.char.version = GetAddOnMetadata(MogIt,"Version");
-		
 		--mog.view.model.model:SetUnit("PLAYER");
 		mog.updateGUI();
 		--mog.updateModels();
 		
 		--[[mog.tooltip.model:SetUnit("PLAYER");
-		mog.tooltip:SetSize(mog.global.tooltipWidth,mog.global.tooltipHeight);
-		if mog.global.tooltipRotate then
+		mog.tooltip:SetSize(mog.db.profile.tooltipWidth,mog.db.profile.tooltipHeight);
+		if mog.db.profile.tooltipRotate then
 			mog.tooltip.rotate:Show();
 		end--]]
-		
-		mog.LDBI:Register(MogIt,mog.mmb,mog.global.minimap);
-		mog.frame:UnregisterEvent("PLAYER_LOGIN");
 	elseif event == "GET_ITEM_INFO_RECEIVED" then
 		local owner = GameTooltip:IsShown() and GameTooltip:GetOwner();
 		if owner and owner.MogItModel and mog.selected and mog.selected.OnEnter then
@@ -474,6 +447,38 @@ mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 		end
 	elseif event == "ADDON_LOADED" then
 		if arg1 == MogIt then
+			print(MogIt_Character)
+			local AceDB = LibStub("AceDB-3.0")
+			
+			local db = AceDB:New("MogItDB", defaults, true)
+			mog.db = db
+			
+			-- deal with old saved variables
+			if MogIt_Global then
+				MogIt_Global.wishlist = nil
+				for k, v in pairs (MogIt_Global) do
+					db.profile[k] = v
+				end
+				-- MogIt_Global = nil
+			end
+			
+			-- db.RegisterCallback(self, "OnProfileChanged", "LoadSettings")
+			-- db.RegisterCallback(self, "OnProfileCopied", "LoadSettings")
+			-- db.RegisterCallback(self, "OnProfileReset", "LoadSettings")
+			
+			if not mog.db.global.version then
+				DEFAULT_CHAT_FRAME:AddMessage(L["MogIt has loaded! Type \"/mog\" to open it."]);
+			end
+			mog.db.global.version = GetAddOnMetadata(MogIt,"Version");
+			
+			mog.LDBI:Register(MogIt,mog.mmb,mog.db.profile.minimap);
+			
+			-- fire every module's "init" method (if they have one)
+			for i, module in ipairs(mog.modules.base) do
+				if module.AddonLoaded then
+					module:AddonLoaded()
+				end
+			end
 		end
 		
 		if mog.sub and mog.sub.modules[arg1] then
