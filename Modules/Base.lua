@@ -311,7 +311,8 @@ end
 
 function mog.sub.AddSlot(label,addon)
 	local items = {};
-	table.insert(mog.sub.modules[addon].slots,{label = LBI[label] or label,items = items});
+	local module = mog:GetModule(addon);
+	table.insert(module.slots,{label = LBI[label] or label,items = items});
 	return items;
 end
 
