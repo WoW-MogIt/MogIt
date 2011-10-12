@@ -27,7 +27,7 @@ mog.face = 0;
 -- Sort/Filter/URL
 
 function mog:RegisterModule(name,data,base)
-	if mog.modules.lookup[name] then return end;
+	if mog.modules.lookup[name] then return mog.modules.lookup[name] end;
 	mog.modules.lookup[name] = data;
 	table.insert(base and mog.modules.base or mog.modules.extra,data);
 	if UIDropDownMenu_GetCurrentDropDown() == mog.dropdown and DropDownList1 and DropDownList1:IsShown() then
