@@ -2,43 +2,12 @@ local MogIt,mog = ...;
 _G["MogIt"] = mog;
 local L = mog.L;
 
-local LBB = LibStub("LibBabble-Boss-3.0"):GetUnstrictLookupTable();
-local mobs = {};
-
---[[local tooltip = CreateFrame("GameTooltip","MogItMobsTooltip");
-local text = tooltip:CreateFontString();
-tooltip:AddFontStrings(text,tooltip:CreateFontString());
-
-local function CachedMob(id)
-	if not id then return end;
-	tooltip:SetOwner(WorldFrame,"ANCHOR_NONE");
-	tooltip:SetHyperlink(("unit:0xF53%05X00000000"):format(id));
-	if (tooltip:IsShown()) then
-		return text:GetText();
-	end
-end--]]
-
-function mog.AddMob(id,name)
-	--if not (mobs[id] or CachedMob(id)) then
-	if not mobs[id] then
-		mobs[id] = LBB[name] or name;
-	end
-end
-
-function mog.GetMob(id)
-	--return mobs[id] or CachedMob(id);
-	return mobs[id];
-end
-
-mog.LBB = LibStub("LibBabble-Boss-3.0"):GetUnstrictLookupTable();
-mog.LBI = LibStub("LibBabble-Inventory-3.0"):GetUnstrictLookupTable();
-mog.LDB = LibStub("LibDataBroker-1.1");
-mog.LDBI = LibStub("LibDBIcon-1.0");
-
 mog.modules = {
 	base = {},
 	extra = {},
+	lookup = {},
 };
+mog.sub = {};
 mog.list = {};
 mog.models = {};
 mog.bin = {};
@@ -57,17 +26,19 @@ mog.face = 0;
 -- :Gets?
 -- Sort/Filter/URL
 
-function mog:RegisterModule(data,base)
-	if base then
-		table.insert(mog.modules.base,data);
-	else
-		table.insert(mog.modules.extra,data);
-	end
+function mog:RegisterModule(name,data,base)
+	if mog.modules.lookup[name] then return end;
+	mog.modules.lookup[name] = data;
+	table.insert(base and mog.modules.base or mog.modules.extras,data);
 	if UIDropDownMenu_GetCurrentDropDown() == mog.dropdown and DropDownList1 and DropDownList1:IsShown() then
 		HideDropDownMenu(1);
 		ToggleDropDownMenu(1,data,mog.dropdown);
 	end
 	return data;
+end
+
+function mog:GetModule(name)
+	return mog.modules.lookup[name];
 end
 
 function mog:SetList(module,list,top)
@@ -118,3 +89,52 @@ end--]]
 
 BINDING_HEADER_MogIt = "MogIt";
 BINDING_NAME_MogIt = L["Toggle Mogit"];
+
+local LDB = LibStub("LibDataBroker-1.1");
+mog.LDBI = LibStub("LibDBIcon-1.0");
+mog.mmb = LDB:NewDataObject("MogIt",{
+	type = "launcher",
+	icon = "Interface\\Icons\\INV_Enchant_EssenceCosmicGreater",
+	OnClick = function(self,btn)
+		if btn == "RightButton" then
+			mog.togglePreview();
+		else
+			mog.toggleFrame();
+		end
+	end,
+	OnTooltipShow = function(self)
+		if not self or not self.AddLine then return end
+		self:AddLine("MogIt");
+		self:AddLine(mog.frame:IsShown() and L["Left click to close MogIt"] or L["Left click to open MogIt"],1,1,1);
+		--self:AddLine(mog.preview:IsShown() and L["Right click to close the MogIt preview"] or L["Right click to close the MogIt preview"],1,1,1);
+	end,
+});
+
+
+local LBB = LibStub("LibBabble-Boss-3.0"):GetUnstrictLookupTable();
+local mobs = {};
+
+--[[local tooltip = CreateFrame("GameTooltip","MogItMobsTooltip");
+local text = tooltip:CreateFontString();
+tooltip:AddFontStrings(text,tooltip:CreateFontString());
+
+local function CachedMob(id)
+	if not id then return end;
+	tooltip:SetOwner(WorldFrame,"ANCHOR_NONE");
+	tooltip:SetHyperlink(("unit:0xF53%05X00000000"):format(id));
+	if (tooltip:IsShown()) then
+		return text:GetText();
+	end
+end--]]
+
+function mog.AddMob(id,name)
+	--if not (mobs[id] or CachedMob(id)) then
+	if not mobs[id] then
+		mobs[id] = LBB[name] or name;
+	end
+end
+
+function mog.GetMob(id)
+	--return mobs[id] or CachedMob(id);
+	return mobs[id];
+end

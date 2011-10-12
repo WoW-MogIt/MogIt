@@ -29,7 +29,7 @@ function f.dd.initialize(self)
 	info.func = function(self)
 		num = 0;
 		class = 0;
-		for k,v in pairs(mog.sub.classes) do
+		for k,v in pairs(LOCALIZED_CLASS_NAMES_MALE) do
 			selected[k] = all;
 			num = num + (all and 1 or 0);
 			class = class + (all and mog.sub.classBits[k] or 0);
@@ -47,7 +47,7 @@ function f.dd.initialize(self)
 	info.notCheckable = true;
 	UIDropDownMenu_AddButton(info);
 	
-	for k,v in pairs(mog.sub.classes) do
+	for k,v in pairs(LOCALIZED_CLASS_NAMES_MALE) do
 		info = UIDropDownMenu_CreateInfo();
 		info.text =	v;
 		info.value = k;
