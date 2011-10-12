@@ -17,6 +17,10 @@ function mog:AddFilter(name,frame)
 	return frame;
 end
 
+function mog:GetFilter(name)
+	return mog.filters[name];
+end
+
 mog.filt = CreateFrame("Frame","MogItFilters",mog.frame,"BasicFrameTemplateWithInset");
 mog.filt:Hide();
 mog.filt:SetPoint("TOPLEFT",mog.frame,"TOPRIGHT")--,5,-35);
