@@ -184,9 +184,8 @@ mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 					module:AddonLoaded()
 				end
 			end
-		end
-		
-		if mog.modules.lookup[arg1] then
+		elseif mog.modules.lookup[arg1] then
+			collectgarbage("collect");
 			mog.modules.lookup[arg1].loaded = true;
 			if UIDropDownMenu_GetCurrentDropDown() == mog.dropdown and DropDownList1 and DropDownList1:IsShown() then
 				HideDropDownMenu(1);
