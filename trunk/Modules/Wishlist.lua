@@ -248,7 +248,7 @@ function mog.sub.OnScroll(module)
 end
 ]==]
 
-mog:RegisterModule(wishlist, true)
+mog:RegisterModule("Wishlist", wishlist, true)
 
 local defaults = {
 	profile = {
