@@ -153,7 +153,6 @@ mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 		end
 	elseif event == "ADDON_LOADED" then
 		if arg1 == MogIt then
-			print(MogIt_Character)
 			local AceDB = LibStub("AceDB-3.0")
 			
 			mog.db = AceDB:New("MogItDB", defaults, true)
