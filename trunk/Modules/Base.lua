@@ -18,7 +18,7 @@ local addons = {
 local list = {};
 local display = {};
 
-mog.sub.filters = {
+mog.sub.data = {
 	display = {},
 	quality = {},
 	lvl = {},
@@ -180,46 +180,46 @@ local function OnEnter(module,self)
 	--GameTooltip:AddLine(self.display,1,1,1);
 	--GameTooltip:AddLine(" ");
 	GameTooltip:AddDoubleLine((texture and "\124T"..texture..":18\124t " or "")..(link or name or ""),(type(self.data.items) == "table") and (#self.data.items > 1) and L["Item %d/%d"]:format(self.data.cycle,#self.data.items),nil,nil,nil,1,0,0);
-	if mog.sub.filters.source[item] then
-		GameTooltip:AddDoubleLine(L["Source"]..":",mog.sub.source[mog.sub.filters.source[item]],nil,nil,nil,1,1,1);
-		if mog.sub.filters.source[item] == 1 then -- Drop
-			if mog.GetMob(mog.sub.filters.sourceid[item]) then
-				GameTooltip:AddDoubleLine(BOSS..":",mog.GetMob(mog.sub.filters.sourceid[item]),nil,nil,nil,1,1,1);
+	if mog.sub.data.source[item] then
+		GameTooltip:AddDoubleLine(L["Source"]..":",mog.sub.source[mog.sub.data.source[item]],nil,nil,nil,1,1,1);
+		if mog.sub.data.source[item] == 1 then -- Drop
+			if mog.GetMob(mog.sub.data.sourceid[item]) then
+				GameTooltip:AddDoubleLine(BOSS..":",mog.GetMob(mog.sub.data.sourceid[item]),nil,nil,nil,1,1,1);
 			end
-		--elseif mog.filters.source[self.item] == 3 then -- Quest
-		elseif mog.sub.filters.source[item] == 5 then -- Crafted
-			if mog.sub.filters.sourceinfo[item] then
-				GameTooltip:AddDoubleLine(L["Profession"]..":",mog.sub.professions[mog.sub.filters.sourceinfo[item]],nil,nil,nil,1,1,1);
+		--elseif mog.data.source[self.item] == 3 then -- Quest
+		elseif mog.sub.data.source[item] == 5 then -- Crafted
+			if mog.sub.data.sourceinfo[item] then
+				GameTooltip:AddDoubleLine(L["Profession"]..":",mog.sub.professions[mog.sub.data.sourceinfo[item]],nil,nil,nil,1,1,1);
 			end
-		elseif mog.sub.filters.source[item] == 6 then -- Achievement
-			if mog.sub.filters.sourceid[item] then
-				local _,name,_,complete = GetAchievementInfo(mog.sub.filters.sourceid[item]);
+		elseif mog.sub.data.source[item] == 6 then -- Achievement
+			if mog.sub.data.sourceid[item] then
+				local _,name,_,complete = GetAchievementInfo(mog.sub.data.sourceid[item]);
 				GameTooltip:AddDoubleLine(L["Achievement"]..":",name,nil,nil,nil,1,1,1);
 				GameTooltip:AddDoubleLine(STATUS..":",complete and COMPLETE or INCOMPLETE,nil,nil,nil,1,1,1);
 			end
 		end
 	end
-	if mog.sub.filters.zone[item] then
-		local zone = GetMapNameByID(mog.sub.filters.zone[item]);
+	if mog.sub.data.zone[item] then
+		local zone = GetMapNameByID(mog.sub.data.zone[item]);
 		if zone then
-			if mog.sub.filters.source[item] == 1 and mog.sub.diffs[mog.sub.filters.sourceinfo[item]] then
-				zone = zone.." ("..mog.sub.diffs[mog.sub.filters.sourceinfo[item]]..")";
+			if mog.sub.data.source[item] == 1 and mog.sub.diffs[mog.sub.data.sourceinfo[item]] then
+				zone = zone.." ("..mog.sub.diffs[mog.sub.data.sourceinfo[item]]..")";
 			end
 			GameTooltip:AddDoubleLine(ZONE..":",zone,nil,nil,nil,1,1,1);
 		end
 	end
 	
 	GameTooltip:AddLine(" ");
-	if mog.sub.filters.lvl[item] then
-		GameTooltip:AddDoubleLine(LEVEL..":",mog.sub.filters.lvl[item],nil,nil,nil,1,1,1);
+	if mog.sub.data.lvl[item] then
+		GameTooltip:AddDoubleLine(LEVEL..":",mog.sub.data.lvl[item],nil,nil,nil,1,1,1);
 	end
-	if mog.sub.filters.faction[item] then
-		GameTooltip:AddDoubleLine(FACTION..":",(mog.sub.filters.faction[item] == 1 and FACTION_ALLIANCE or FACTION_HORDE),nil,nil,nil,1,1,1);
+	if mog.sub.data.faction[item] then
+		GameTooltip:AddDoubleLine(FACTION..":",(mog.sub.data.faction[item] == 1 and FACTION_ALLIANCE or FACTION_HORDE),nil,nil,nil,1,1,1);
 	end
-	if mog.sub.filters.class[item] and mog.sub.filters.class[item] > 0 then
+	if mog.sub.data.class[item] and mog.sub.data.class[item] > 0 then
 		local str;
 		for k,v in pairs(mog.sub.classBits) do
-			if bit.band(mog.sub.filters.class[item],v) > 0 then
+			if bit.band(mog.sub.data.class[item],v) > 0 then
 				if str then
 					str = str..", "..string.format("\124cff%.2x%.2x%.2x",RAID_CLASS_COLORS[k].r*255,RAID_CLASS_COLORS[k].g*255,RAID_CLASS_COLORS[k].b*255)..LOCALIZED_CLASS_NAMES_MALE[k].."\124r";
 				else
@@ -229,8 +229,8 @@ local function OnEnter(module,self)
 		end
 		GameTooltip:AddDoubleLine(CLASS..":",str,nil,nil,nil,1,1,1);
 	end
-	if mog.sub.filters.slot[item] then
-		GameTooltip:AddDoubleLine(L["Slot"]..":",mog.sub.slots[mog.sub.filters.slot[item]],nil,nil,nil,1,1,1);
+	if mog.sub.data.slot[item] then
+		GameTooltip:AddDoubleLine(L["Slot"]..":",mog.sub.slots[mog.sub.data.slot[item]],nil,nil,nil,1,1,1);
 	end
 	
 	GameTooltip:AddLine(" ");
@@ -318,16 +318,16 @@ end
 
 function mog.sub.AddItem(tbl,id,display,quality,lvl,faction,class,slot,source,sourceid,zone,sourceinfo)
 	table.insert(tbl,id);
-	mog.sub.filters.display[id] = display;
-	mog.sub.filters.quality[id] = quality;
-	mog.sub.filters.lvl[id] = lvl;
-	mog.sub.filters.faction[id] = faction;
-	mog.sub.filters.class[id] = class;
-	mog.sub.filters.slot[id] = slot;
-	mog.sub.filters.source[id] = source;
-	mog.sub.filters.sourceid[id] = sourceid;
-	mog.sub.filters.sourceinfo[id] = sourceinfo;
-	mog.sub.filters.zone[id] = zone;
+	mog.sub.data.display[id] = display;
+	mog.sub.data.quality[id] = quality;
+	mog.sub.data.lvl[id] = lvl;
+	mog.sub.data.faction[id] = faction;
+	mog.sub.data.class[id] = class;
+	mog.sub.data.slot[id] = slot;
+	mog.sub.data.source[id] = source;
+	mog.sub.data.sourceid[id] = sourceid;
+	mog.sub.data.sourceinfo[id] = sourceinfo;
+	mog.sub.data.zone[id] = zone;
 end
 
 function mog.sub.AddColours(id,c1,c2,c3)
@@ -340,17 +340,17 @@ end
 
 function mog.sub.GetFilterArgs(filter,item)
 	if filter == "level" then
-		return mog.sub.filters.lvl[item];
+		return mog.sub.data.lvl[item];
 	elseif filter == "faction" then
-		return mog.sub.filters.faction[item];
+		return mog.sub.data.faction[item];
 	elseif filter == "class" then
-		return mog.sub.filters.class[item];
+		return mog.sub.data.class[item];
 	elseif filter == "source" then
-		return mog.sub.filters.source[item],mog.sub.filters.sourceinfo[item];
+		return mog.sub.data.source[item],mog.sub.data.sourceinfo[item];
 	elseif filter == "quality" then
-		return mog.sub.filters.quality[item];
+		return mog.sub.data.quality[item];
 	elseif filter == "slot" then
-		return mog.sub.filters.slot[item];
+		return mog.sub.data.slot[item];
 	end
 end
 
@@ -366,13 +366,13 @@ function mog.sub.BuildList(module,tbl,top)
 	for k,v in ipairs(tbl) do
 		local state = true;
 		for x,y in ipairs(module.filters) do
-			if not mog.filters[y.name].Filter(mog.sub.GetFilterArgs(y.name,v)) then
+			if not mog:GetFilter(y.name).Filter(mog.sub.GetFilterArgs(y.name,v)) then
 				state = false;
 				break;
 			end
 		end
 		if state then
-			local disp = mog.sub.filters.display[v];
+			local disp = mog.sub.data.display[v];
 			if not display[disp] then
 				display[disp] = v;
 				tinsert(list,disp);
