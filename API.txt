@@ -1,0 +1,104 @@
+--[[ MogIt API ]]--
+
+ RegisterModule
+-> Description: Registers a module
+-> Usage: module = MogIt:RegisterModule(name,data,base)
+-> Args
+---> name: Unique name of the module (string)
+---> data: This acts as the module object, containing its functions/variables (table)
+---> base: (Optional) Whether it is a base module (boolean)
+-> Returns
+----> module: The module object, same as the data arg (table)
+
+ GetModule
+-> Description: Gets a module object
+-> Usage: module = MogIt:GetModule(name)
+-> Args
+---> name: Name of the module (string)
+-> Returns
+---> module: The module object, or nil if no module exists (table)
+
+ SetModule
+-> Description: Sets the active module
+-> Usage: MogIt:SetModule(module)
+-> Args
+---> module: The module object (table)
+
+ BuildList
+-> Description: Rebuilds the list
+-> Usage: MogIt:BuildList()
+
+ AddFilter
+-> Description: Adds a filter
+-> Usage: frame = MogIt:AddFilter(name,frame)
+-> Args
+---> name: Unique name for the filter (string)
+---> frame: (Optional) Frame to use for the filter (frame)
+-> Returns
+---> frame: The filter's frame (frame)
+
+ GetFilter
+-> Description: Gets a filter frame
+-> Usage: frame = MogIt:GetFilter(name)
+-> Args
+---> name: Name of the filter (string)
+-> Returns
+---> frame: The filter frame, or nil if no filter exists (frame)
+
+ AddMob
+-> Description: Adds a mob name by id
+-> Usage: MogIt.AddMob(id,name)
+-> Args
+---> id: NPC id (number)
+---> name: NPC name (string)
+
+ GetMob
+-> Description: Gets a mob name by id
+-> Usage: name = MOgIt.GetMob(id)
+-> Args
+---> id: NPC id (number)
+-> Returns
+---> name: NPC name (string)
+
+
+
+--[[ Module Object ]]--
+
+ .name
+-> Description: Localized name to display in the dropdown menu, if no .Dropdown function is defined (string)
+
+ .Dropdown
+-> Description: Initialize function for showing the module in the MogIt dropdown menu
+-> Usage: .Dropdown(module,tier)
+-> Args
+---> module: The module object (table)
+---> tier: The dropdown tier (number)
+
+ .FrameUpdate
+-> Description: The function called when displaying a list item
+-> Usage: .FrameUpdate(module,frame,value)
+-> Args
+---> module: The module object (table)
+---> frame: The list frame being updated (frame)
+---> value: The list value
+
+ .OnEnter
+-> Description: The function called when a list frame's OnEnter fires
+-> Usage: .OnEnter(module,frame)
+-> Args
+---> module: The module object (table)
+---> frame: The list frame (frame)
+
+ .OnClick
+-> Description: The function called when a list frame's OnClick fires
+-> Usage: .OnClick(module,frame,button)
+-> Args
+---> module: The module object (table)
+---> frame: The list frame (frame)
+---> button: The mouse button pressed (string)
+
+ .OnScroll
+-> Description: The function called when the list's scroll value is changed
+-> Usage: .OnScroll(module)
+-> Args
+---> module: The module object (table)
