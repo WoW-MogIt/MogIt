@@ -28,6 +28,7 @@ externals:
 ignore:
     - .pkgmeta
     - Changelog.txt
+    - API.txt
 
 move-folders:
     MogIt/Modules/MogIt_Accessories: MogIt_Accessories
