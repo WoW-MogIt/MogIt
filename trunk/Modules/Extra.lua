@@ -30,7 +30,7 @@ end
 for k,v in ipairs(extras) do
 	local _,title,_,_,loadable = GetAddOnInfo(v);
 	if loadable then
-		mog.sub.modules[v] = mog:RegisterModule({
+		mog:RegisterModule(v,{
 			name = title:match("MogIt_(.+)") or title,
 			Dropdown = temp,
 			addon = v,
