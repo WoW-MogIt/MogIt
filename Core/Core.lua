@@ -156,14 +156,13 @@ mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 			print(MogIt_Character)
 			local AceDB = LibStub("AceDB-3.0")
 			
-			local db = AceDB:New("MogItDB", defaults, true)
-			mog.db = db
+			mog.db = AceDB:New("MogItDB", defaults, true)
 			
 			-- deal with old saved variables
 			if MogIt_Global then
 				MogIt_Global.wishlist = nil
 				for k, v in pairs (MogIt_Global) do
-					db.profile[k] = v
+					mog.db.profile[k] = v
 				end
 				-- MogIt_Global = nil
 			end
