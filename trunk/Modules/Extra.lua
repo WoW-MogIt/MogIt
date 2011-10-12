@@ -1,13 +1,6 @@
 local MogIt,mog = ...;
 local L = mog.L;
 
-local extras = {
-	"MogIt_Sets",
-	"MogIt_Mounts",
-	"MogIt_Companions",
-	"MogIt_Pets",
-};
-
 local function temp(module,tier)
 	local info;
 	if tier == 1 then
@@ -27,13 +20,25 @@ local function temp(module,tier)
 	end
 end
 
-for k,v in ipairs(extras) do
-	local _,title,_,_,loadable = GetAddOnInfo(v);
-	if loadable then
-		mog:RegisterModule(v,{
-			name = title:match("MogIt_(.+)") or title,
+local base = {
+	MogIt_Cloth = true,
+	MogIt_Leather = true,
+	MogIt_Mail = true,
+	MogIt_Plate = true,
+	MogIt_OneHanded = true,
+	MogIt_TwoHanded = true,
+	MogIt_Ranged = true,
+	MogIt_Other = true,
+	MogIt_Accessories = true,
+};
+
+for i=1,GetNumAddOns() do
+	local name,title,_,_,loadable = GetAddOnInfo(i);
+	if loadable and (not base[name]) and name:find("^MogIt_") then
+		mog:RegisterModule(name,{
+			name = title:match("^MogIt_(.+)") or title,
 			Dropdown = temp,
-			addon = v,
+			addon = name,
 		});
 	end
 end
