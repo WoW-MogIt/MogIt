@@ -20,9 +20,10 @@
 
  SetModule
 -> Description: Sets the active module
--> Usage: MogIt:SetModule(module)
+-> Usage: MogIt:SetModule(module,text)
 -> Args
 ---> module: The module object (table)
+---> text: (Optional) Text to set on the dropdown menu (string)
 
  GetActiveModule
 -> Description: Gets the active module
