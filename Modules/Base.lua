@@ -15,7 +15,6 @@ local addons = {
 	"MogIt_Accessories",
 };
 
-local list = {};
 local display = {};
 
 mog.sub.data = {
@@ -148,9 +147,8 @@ local function Dropdown(module,tier)
 			info.value = v;
 			info.notCheckable = true;
 			info.func = function(self)
-				UIDropDownMenu_SetText(mog.dropdown,self.arg1.name.." - "..self.value.label);
-				mog.sub.selected = self.value;
-				mog.sub.BuildList(self.arg1,self.value.items,true);
+				module.active = self.value;
+				mog:SetModule(self.value,self.arg1.name.." - "..self.value.label);
 				CloseDropDownMenus();
 			end
 			info.arg1 = module;
@@ -302,11 +300,8 @@ function LeftClick:initialize(tier,self)
 	end
 end
 
-local function Unlist(module,new,list)
-	if list ~= list then
-		wipe(list);
-		wipe(display);
-	end
+local function Unlist(module)
+	wipe(display);
 end
 
 function mog.sub.AddSlot(label,addon)
@@ -354,19 +349,13 @@ function mog.sub.GetFilterArgs(filter,item)
 	end
 end
 
-local function FilterUpdate(module,filter)
-	mog.sub.BuildList();
-end
-
-function mog.sub.BuildList(module,tbl,top)
-	wipe(list);
+local function BuildList(module)
 	wipe(display);
-	module = module or mog.selected;
-	tbl = tbl or mog.sub.selected.items;
-	for k,v in ipairs(tbl) do
+	local list = {};
+	for k,v in ipairs(module.active) do
 		local state = true;
 		for x,y in ipairs(module.filters) do
-			if not mog:GetFilter(y.name).Filter(mog.sub.GetFilterArgs(y.name,v)) then
+			if not mog:GetFilter(y).Filter(mog.sub.GetFilterArgs(y,v)) then
 				state = false;
 				break;
 			end
@@ -383,7 +372,7 @@ function mog.sub.BuildList(module,tbl,top)
 			end
 		end
 	end
-	mog:SetList(module,list,top);
+	return list;
 end
 
 for k,v in ipairs(addons) do
@@ -392,31 +381,19 @@ for k,v in ipairs(addons) do
 		mog:RegisterModule(v,{
 			name = title:match("MogIt_(.+)") or title,
 			Dropdown = Dropdown,
+			BuildList = BuildList,
 			FrameUpdate = FrameUpdate,
-			FilterUpdate = FilterUpdate,
 			OnEnter = OnEnter,
 			OnClick = OnClick,
 			OnScroll = OnScroll,
 			Unlist = Unlist,
 			filters = {
-				{
-					name = "level",
-				},
-				{
-					name = "faction",
-				},
-				{
-					name = "class",
-				},
-				{
-					name = "source",
-				},
-				{
-					name = "quality",
-				},
-				(v == "MogIt_OneHanded" and {
-					name = "slot",
-				}) or nil,
+				"level",
+				"faction",
+				"class",
+				"source",
+				"quality",
+				(v == "MogIt_OneHanded" and "slot") or nil,
 			},
 			addon = v,
 			slots = {},
