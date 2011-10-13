@@ -452,4 +452,24 @@ mog.itemSlots = {
 	"SecondaryHandSlot",
 	"RangedSlot",
 };
+
+		if slot == "INVTYPE_2HWEAPON" and select(2,UnitClass("PLAYER")) == "WARRIOR" and (select(5,GetTalentInfo(2,20)) or 0) > 0 then
+			slot = "INVTYPE_WEAPON";
+		end
+		if slot == "INVTYPE_2HWEAPON" then
+			mog.view.delItem(13);
+			mog.view.th = true;
+		elseif slot == "INVTYPE_WEAPONOFFHAND" then
+			if mog.view.th then
+				mog.view.delItem(12);
+			end
+			mog.view.th = nil;
+		elseif slot == "INVTYPE_WEAPON" then
+			if mog.view.slots[12].item and (not mog.view.slots[13].item) or mog.view.slots[12].item == id then
+				slot = "INVTYPE_WEAPONOFFHAND";
+			end
+			mog.view.th = nil;
+		elseif slot == "INVTYPE_WEAPONMAINHAND" then
+			mog.view.th = nil;
+		end
 --]]
