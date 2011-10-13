@@ -304,6 +304,32 @@ local function Unlist(module)
 	wipe(display);
 end
 
+local function BuildList(module)
+	wipe(display);
+	local list = {};
+	for k,v in ipairs(module.active) do
+		local state = true;
+		for x,y in ipairs(module.filters) do
+			if not mog:GetFilter(y).Filter(mog.sub.GetFilterArgs(y,v)) then
+				state = false;
+				break;
+			end
+		end
+		if state then
+			local disp = mog.sub.data.display[v];
+			if not display[disp] then
+				display[disp] = v;
+				tinsert(list,disp);
+			elseif type(display[disp]) == "table" then
+				tinsert(display[disp],v);
+			else
+				display[disp] = {display[disp],v};
+			end
+		end
+	end
+	return list;
+end
+
 function mog.sub.AddSlot(label,addon)
 	local items = {};
 	local module = mog:GetModule(addon);
@@ -347,32 +373,6 @@ function mog.sub.GetFilterArgs(filter,item)
 	elseif filter == "slot" then
 		return mog.sub.data.slot[item];
 	end
-end
-
-local function BuildList(module)
-	wipe(display);
-	local list = {};
-	for k,v in ipairs(module.active) do
-		local state = true;
-		for x,y in ipairs(module.filters) do
-			if not mog:GetFilter(y).Filter(mog.sub.GetFilterArgs(y,v)) then
-				state = false;
-				break;
-			end
-		end
-		if state then
-			local disp = mog.sub.data.display[v];
-			if not display[disp] then
-				display[disp] = v;
-				tinsert(list,disp);
-			elseif type(display[disp]) == "table" then
-				tinsert(display[disp],v);
-			else
-				display[disp] = {display[disp],v};
-			end
-		end
-	end
-	return list;
 end
 
 for k,v in ipairs(addons) do
