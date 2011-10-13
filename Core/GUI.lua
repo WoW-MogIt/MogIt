@@ -105,10 +105,12 @@ function mog.dropdown:initialize(tier)
 end
 
 mog.frame.sorting = mog.frame:CreateFontString(nil,"ARTWORK","GameFontNormal");
+mog.frame.sorting:Hide();
 mog.frame.sorting:SetPoint("TOPRIGHT",mog.frame,"TOPRIGHT",-142,-35);
 mog.frame.sorting:SetText(L["Sort by"]..":");
 
 mog.sorting = CreateFrame("Frame","MogItSorting",mog.frame,"UIDropDownMenuTemplate");
+mog.sorting:Hide();
 mog.sorting:SetPoint("LEFT",mog.frame.sorting,"RIGHT",-12,-3);
 UIDropDownMenu_SetWidth(mog.sorting,110);
 UIDropDownMenu_SetButtonWidth(mog.sorting,125);

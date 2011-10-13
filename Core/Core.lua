@@ -47,8 +47,10 @@ function mog:SetModule(module,text)
 	mog:BuildList(true);
 	mog:FilterUpdate();
 	if module.Sorting then
+		mog.frame.sorting:Show();
 		mog.sorting:Show();
 	else
+		mog.frame.sorting:Hide();
 		mog.sorting:Hide();
 	end
 end
