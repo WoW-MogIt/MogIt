@@ -35,12 +35,15 @@ function mog:GetActiveModule()
 	return mog.active;
 end
 
-function mog:SetModule(module)
+function mog:SetModule(module,text)
 	if not module then return end;
 	if mog.active and mog.active.Unlist then
 		mog.active:Unlist(module);
 	end
 	mog.active = module;
+	if text then
+		UIDropDownMenu_SetText(mog.dropdown,text);
+	end
 	mog:BuildList(true);
 	mog:FilterUpdate();
 	if module.Sorting then
