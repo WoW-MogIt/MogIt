@@ -222,7 +222,7 @@ function mog.scroll.update(self,page,offset)
 			end
 			frame:Show();
 			if owner == frame and mog.active.OnEnter then
-				mog.selected:OnEnter(frame);
+				mog.active:OnEnter(frame);
 			end
 		else
 			frame:Hide();
@@ -305,8 +305,8 @@ function mog.addModel()
 		end);
 		f:RegisterForClicks("AnyUp");
 		f:SetScript("OnClick",function(self,...)
-			if mog.selected and mog.selected.OnClick then
-				mog.selected:OnClick(self,...);
+			if mog.active and mog.active.OnClick then
+				mog.active:OnClick(self,...);
 			end
 		end);
 		f:RegisterForDrag("LeftButton","RightButton");
@@ -322,8 +322,8 @@ function mog.addModel()
 			mog.modelUpdater.model = nil;
 		end);
 		f:SetScript("OnEnter",function(self,...)
-			if mog.selected and mog.selected.OnEnter then
-				mog.selected:OnEnter(self,...);
+			if mog.active and mog.active.OnEnter then
+				mog.active:OnEnter(self,...);
 			end
 		end);
 		f:SetScript("OnLeave",function(self)
