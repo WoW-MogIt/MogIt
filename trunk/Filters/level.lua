@@ -26,12 +26,7 @@ end);
 f.min:SetScript("OnTextChanged",function(self,user)
 	if user then
 		minlvl = self:GetNumber() or 0;
-		if f.data.MinLevel then
-			f.data.MinLevel(f.module,self,f);
-		end
-		if f.module.FilterUpdate then
-			f.module:FilterUpdate(f);
-		end
+		mog:BuildList();
 	end
 end);
 
@@ -52,26 +47,13 @@ end);
 f.max:SetScript("OnTextChanged",function(self,user)
 	if user then
 		maxlvl = self:GetNumber() or PLAYER_MAX_LEVEL;
-		if f.data.MaxLevel then
-			f.data.MaxLevel(f.module,self,f);
-		end
-		if f.module.FilterUpdate then
-			f.module:FilterUpdate(f);
-		end
+		mog:BuildList();
 	end
 end);
 
-f:SetScript("OnShow",function(self)
-	if f.data.OnShow then
-		f.data.OnShow(f.module,f);
-	end
-end);
-
-function f.Filter(lvl,min,max)
-	min = min or minlvl or 0;
-	max = max or maxlvl or MAX_PLAYER_LEVEL;
+function f.Filter(lvl)
 	lvl = lvl or 0;
-	return (lvl >= min) and (lvl <= max);
+	return (lvl >= minlvl) and (lvl <= maxlvl);
 end
 
 function f.Default()
@@ -79,5 +61,6 @@ function f.Default()
 	f.min:SetNumber(minlvl);
 	maxlvl = UnitLevel("PLAYER");
 	f.max:SetNumber(maxlvl);
+	mog:BuildList();
 end
 f.Default();

@@ -32,12 +32,7 @@ function f.dd.initialize(self)
 		all = not all;
 		UIDropDownMenu_SetText(f.dd,L["%d selected"]:format(num));
 		ToggleDropDownMenu(1,nil,f.dd);
-		if f.data.Dropdown then
-			f.data.Dropdown(f.module,self,f);
-		end
-		if f.module.FilterUpdate then
-			f.module:FilterUpdate(f);
-		end
+		mog:BuildList();
 	end
 	info.notCheckable = true;
 	UIDropDownMenu_AddButton(info);
@@ -54,12 +49,7 @@ function f.dd.initialize(self)
 			end
 			selected[self.value] = self.checked;
 			UIDropDownMenu_SetText(f.dd,L["%d selected"]:format(num));
-			if f.data.Dropdown then
-				f.data.Dropdown(f.module,self,f);
-			end
-			if f.module.FilterUpdate then
-				f.module:FilterUpdate(f);
-			end
+			mog:BuildList();
 		end
 		info.keepShownOnClick = true;
 		info.isNotRadio = true;
@@ -68,26 +58,19 @@ function f.dd.initialize(self)
 	end
 end
 
-f:SetScript("OnShow",function(self)
-	if f.data.OnShow then
-		f.data.OnShow(f.module,f);
-	end
-end);
-
-function f.Filter(slot1)
-	return (not slot1) or selected[slot1];
+function f.Filter(slot)
+	return (not slot) or selected[slot];
 end
 
 function f.Default()
 	selected = {};
 	num = 0;
 	all = nil;
-	
 	for k,v in ipairs(mog.sub.slots) do
 		selected[k] = true;
 		num = num + 1;
 	end
-
 	UIDropDownMenu_SetText(f.dd,L["%d selected"]:format(num));
+	mog:BuildList();
 end
 f.Default();

@@ -18,12 +18,7 @@ MogItFiltersFactionAllianceText:SetText(FACTION_ALLIANCE);
 f.alliance:SetPoint("TOPLEFT",f.faction,"BOTTOMLEFT",0,0);
 f.alliance:SetScript("OnClick",function(self)
 	alliance = self:GetChecked();
-	if f.data.Alliance then
-		f.data.Alliance(f.module,self,f);
-	end
-	if f.module.FilterUpdate then
-		f.module:FilterUpdate(f);
-	end
+	mog:BuildList();
 end);
 
 f.horde = CreateFrame("CheckButton","MogItFiltersFactionHorde",f,"UICheckButtonTemplate");
@@ -31,24 +26,11 @@ MogItFiltersFactionHordeText:SetText(FACTION_HORDE);
 f.horde:SetPoint("TOPLEFT",f.alliance,"BOTTOMLEFT",0,0);
 f.horde:SetScript("OnClick",function(self)
 	horde = self:GetChecked();
-	if f.data.Horde then
-		f.data.Horde(f.module,self,f);
-	end
-	if f.module.FilterUpdate then
-		f.module:FilterUpdate(f);
-	end
+	mog:BuildList();
 end);
 
-f:SetScript("OnShow",function(self)
-	if f.data.OnShow then
-		f.data.OnShow(f.module,f);
-	end
-end);
-
-function f.Filter(faction,a,h)
-	a = a or alliance;
-	h = h or horde;
-	return (not faction) or (faction == 1 and a) or (faction == 2 and h);
+function f.Filter(faction)
+	return (not faction) or (faction == 1 and alliance) or (faction == 2 and horde);
 end
 
 function f.Default()
@@ -56,5 +38,6 @@ function f.Default()
 	f.alliance:SetChecked(alliance);
 	horde = UnitFactionGroup("PLAYER") == "Horde";
 	f.horde:SetChecked(horde);
+	mog:BuildList();
 end
 f.Default();
