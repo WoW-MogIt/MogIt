@@ -408,3 +408,48 @@ end
 -- buildlist/setlist
 -- filters/sort?
 -- click etc
+
+
+
+--[[
+mog.invSlots = {
+	INVTYPE_HEAD = 1,
+	INVTYPE_SHOULDER = 2,
+	INVTYPE_CLOAK = 3,
+	INVTYPE_CHEST = 4,
+	INVTYPE_ROBE = 4,
+	INVTYPE_WRIST = 7,
+	INVTYPE_2HWEAPON = 12,
+	INVTYPE_WEAPON = 12,
+	INVTYPE_WEAPONMAINHAND = 12,
+	INVTYPE_WEAPONOFFHAND = 13,
+	INVTYPE_SHIELD = 13,
+	INVTYPE_HOLDABLE = 13,
+	INVTYPE_RANGED = 14,
+	INVTYPE_RANGEDRIGHT = 14,
+	INVTYPE_THROWN = 14,
+	INVTYPE_HAND = 8,
+	INVTYPE_WAIST = 9,
+	INVTYPE_LEGS = 10,
+	INVTYPE_FEET = 11,
+	INVTYPE_TABARD = 6,
+	INVTYPE_BODY = 5,
+};
+
+mog.itemSlots = {
+	"HeadSlot",
+	"ShoulderSlot",
+	"BackSlot",
+	"ChestSlot",
+	"ShirtSlot",
+	"TabardSlot",
+	"WristSlot",
+	"HandsSlot",
+	"WaistSlot",
+	"LegsSlot",
+	"FeetSlot",
+	"MainHandSlot",
+	"SecondaryHandSlot",
+	"RangedSlot",
+};
+--]]
