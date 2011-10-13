@@ -112,7 +112,7 @@ mog.mmb = LDB:NewDataObject("MogIt",{
 		if not self or not self.AddLine then return end
 		self:AddLine("MogIt");
 		self:AddLine(L["Left click to toggle MogIt"],1,1,1);
-		self:AddLine(L["Right click to toggle the MogIt preview"],1,1,1);
+		self:AddLine(L["Right click to toggle the preview"],1,1,1);
 	end,
 });
 
@@ -150,8 +150,8 @@ mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 		end--]]
 	elseif event == "GET_ITEM_INFO_RECEIVED" then
 		local owner = GameTooltip:IsShown() and GameTooltip:GetOwner();
-		if owner and owner.MogItModel and mog.selected and mog.selected.OnEnter then
-			mog.selected:OnEnter(owner);
+		if owner and owner.MogItModel and mog.active and mog.active.OnEnter then
+			mog.active:OnEnter(owner);
 		end
 		if UIDropDownMenu_GetCurrentDropDown() == mog.sub.LeftClick and DropDownList1 and DropDownList1:IsShown() then
 			HideDropDownMenu(1);
