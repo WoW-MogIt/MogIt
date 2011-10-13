@@ -1,6 +1,6 @@
 ﻿## Interface: 40200
 ## Author: Aelobin (The Maelstrom EU)
-## Version: 1.2
+## Version: 2.0
 ## LoadOnDemand: 1
 ## RequiredDeps: MogIt
 
