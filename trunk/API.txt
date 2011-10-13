@@ -24,9 +24,17 @@
 -> Args
 ---> module: The module object (table)
 
+ GetActiveModule
+-> Description: Gets the active module
+-> Usage: module = MogIt:GetActiveModule()
+-> Returns
+---> module: The active module object (table)
+
  BuildList
 -> Description: Rebuilds the list
--> Usage: MogIt:BuildList()
+-> Usage: MogIt:BuildList(top)
+-> Args
+---> top: True to scroll the list back to the top (boolean)
 
  AddFilter
 -> Description: Adds a filter
@@ -98,11 +106,12 @@
 
  FrameUpdate
 -> Description: Function called when displaying a list item
--> Usage: .FrameUpdate(module,frame,value)
+-> Usage: .FrameUpdate(module,frame,value,index)
 -> Args
 ---> module: The module object (table)
 ---> frame: The list frame being updated (frame)
 ---> value: The list value
+---> index: The list index (number)
 
  OnEnter
 -> Description: Function called when a list frame's OnEnter fires
@@ -140,6 +149,10 @@
 ---> module: The module object (table)
 ---> new: The new module object (table)
 
+ filters
+-> Description: Array of filter names to show
+
+// REMOVED //
  FilterUpdate
 -> Description: Function called when a filter used by the module is changed
 -> Usage: .FilterUpdate(module,filter,...)
