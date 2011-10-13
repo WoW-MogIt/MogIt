@@ -218,13 +218,17 @@ function mog.scroll.update(self,page,offset)
 	for id,frame in ipairs(mog.models) do
 		index = ((page-1)*models)+id;
 		if mog.list[index] then
+			frame.index = index;
 			wipe(frame.data);
-			if mog.active.FrameUpdate then
-				mog.active:FrameUpdate(frame,mog.list[index],index);
-			end
-			frame:Show();
-			if owner == frame and mog.active.OnEnter then
-				mog.active:OnEnter(frame);
+			if frame:IsShown() then
+				if mog.active.FrameUpdate then
+					mog.active:FrameUpdate(frame,mog.list[index],index);
+				end
+				if owner == frame and mog.active.OnEnter then
+					mog.active:OnEnter(frame);
+				end
+			else
+				frame:Show();
 			end
 		else
 			frame:Hide();
@@ -286,14 +290,14 @@ function mog.addModel()
 		f:Hide();
 		f.MogItModel = true;
 		
-		if f:GetFrameLevel() <= mog.frame:GetFrameLevel() then
-			f:SetFrameLevel(mog.frame:GetFrameLevel()+1);
-		end
-		
 		f:SetScript("OnShow",function(self,...)
 			self.model:SetPosition(mog.posZ,mog.posX,mog.posY);
-			--if mog.selected and mog.selected.OnShow then
-			--mog.dressModel(self.model);
+			if self:GetFrameLevel() <= mog.frame:GetFrameLevel() then
+				self:SetFrameLevel(mog.frame:GetFrameLevel()+1);
+			end
+			if mog.active and mog.active.FrameUpdate then
+				mog.active:FrameUpdate(self,mog.list[self.index],self.index);
+			end
 		end);
 		f:SetScript("OnHide",function(self)
 			if mog.modelUpdater.model == self then
