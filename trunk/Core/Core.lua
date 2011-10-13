@@ -16,16 +16,6 @@ mog.posY = 0;
 mog.posZ = 0;
 mog.face = 0;
 
--- dropdown()
--- setlist()
--- update()
--- mouseover()
--- onclick()
-
--- UnsetList?
--- :Gets?
--- Sort/Filter/URL
-
 function mog:RegisterModule(name,data,base)
 	if mog.modules.lookup[name] then return end;
 	mog.modules.lookup[name] = data;
@@ -41,16 +31,29 @@ function mog:GetModule(name)
 	return mog.modules.lookup[name];
 end
 
-function mog:SetList(module,list,top)
-	if mog.selected and mog.selected.Unlist then
-		mog.selected:Unlist(module,list);
+function mog:GetActiveModule()
+	return mog.active;
+end
+
+function mog:SetModule(module)
+	if not module then return end;
+	if mog.active and mog.active.Unlist then
+		mog.active:Unlist(module);
 	end
-	mog.selected = module;
-	mog.list = list;
-	--sorting
-	--showfilter
+	mog.active = module;
+	mog:BuildList(true);
+	mog:FilterUpdate();
+	if module.Sorting then
+		mog.sorting:Show();
+	else
+		mog.sorting:Hide();
+	end
+end
+
+function mog:BuildList(top)
+	if not mog.active then return end;
+	mog.list = mog.active:BuildList();
 	mog.scroll:update(top and 1);
-	mog:FilterUpdate(); -- dont update if list isnt updated
 end
 
 function mog.toggleFrame()
@@ -105,8 +108,8 @@ mog.mmb = LDB:NewDataObject("MogIt",{
 	OnTooltipShow = function(self)
 		if not self or not self.AddLine then return end
 		self:AddLine("MogIt");
-		self:AddLine(mog.frame:IsShown() and L["Left click to close MogIt"] or L["Left click to open MogIt"],1,1,1);
-		--self:AddLine(mog.preview:IsShown() and L["Right click to close the MogIt preview"] or L["Right click to close the MogIt preview"],1,1,1);
+		self:AddLine(L["Left click to toggle MogIt"],1,1,1);
+		self:AddLine(L["Right click to toggle the MogIt preview"],1,1,1);
 	end,
 });
 

@@ -115,7 +115,9 @@ UIDropDownMenu_SetButtonWidth(mog.sorting,125);
 UIDropDownMenu_JustifyText(mog.sorting,"LEFT");
 UIDropDownMenu_SetText(mog.sorting,L["Level"]);
 function mog.sorting:initialize(tier)
-	local info;
+	if mog.active and mog.active.Sorting then
+		mog.active:Sorting(tier);
+	end
 end
 
 mog.frame.filters = CreateFrame("Button","MogItFrameFiltersButton",mog.frame,"MagicButtonTemplate");
@@ -134,6 +136,13 @@ mog.frame.preview = CreateFrame("Button","MogItFramePreviewButton",mog.frame,"Ma
 mog.frame.preview:SetPoint("TOPLEFT",mog.frame.filters,"TOPRIGHT");
 mog.frame.preview:SetWidth(100);
 mog.frame.preview:SetText(L["Preview"]);
+mog.frame.preview:SetScript("OnClick",function(self,btn)
+	if mog.view:IsShown() then
+		mog.view:Hide();
+	else
+		mog.view:Show();
+	end
+end);
 
 mog.frame.options = CreateFrame("Button","MogItFrameOptionsButton",mog.frame,"MagicButtonTemplate");
 mog.frame.options:SetPoint("TOPLEFT",mog.frame.preview,"TOPRIGHT");
@@ -199,8 +208,8 @@ function mog.scroll.update(self,page,offset)
 		self.down:Enable();
 	end
 	
-	if mog.selected and mog.selected.OnScroll then
-		mog.selected:OnScroll();
+	if mog.active and mog.active.OnScroll then
+		mog.active:OnScroll();
 	end
 	
 	local id,frame,index;
@@ -208,11 +217,11 @@ function mog.scroll.update(self,page,offset)
 		index = ((page-1)*models)+id;
 		if mog.list[index] then
 			wipe(frame.data);
-			if mog.selected.FrameUpdate then
-				mog.selected:FrameUpdate(frame,mog.list[index],index);
+			if mog.active.FrameUpdate then
+				mog.active:FrameUpdate(frame,mog.list[index],index);
 			end
 			frame:Show();
-			if owner == frame and mog.selected.OnEnter then
+			if owner == frame and mog.active.OnEnter then
 				mog.selected:OnEnter(frame);
 			end
 		else
