@@ -148,7 +148,7 @@ local function Dropdown(module,tier)
 			info.notCheckable = true;
 			info.func = function(self)
 				module.active = self.value;
-				mog:SetModule(self.value,self.arg1.name.." - "..self.value.label);
+				mog:SetModule(self.arg1,self.arg1.name.." - "..self.value.label);
 				CloseDropDownMenus();
 			end
 			info.arg1 = module;
