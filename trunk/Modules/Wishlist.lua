@@ -4,18 +4,35 @@ local L = mog.L
 local db = {}
 local wishlist = {}
 
+local levels = {
+	[1] = function(menu, level)
+		if type(menu) == "table" then
+			for k, v in pairs(menu.items) do
+				local info = UIDropDownMenu_CreateInfo()
+				info.text = GetItemInfo(v)
+				info.hasArrow = true
+				info.notCheckable = true
+				
+				UIDropDownMenu_AddButton(info, level)
+			end
+		end
+	end,
+	[2] = function(menu, level)
+		-- for k, v in pairs(menu) do
+			local info = UIDropDownMenu_CreateInfo()
+			info.text = "Delete dis"
+			-- info.hasArrow = true
+			info.notCheckable = true
+			UIDropDownMenu_AddButton(info, level)
+		-- end
+	end,
+}
+
 local menu = CreateFrame("Frame")
 menu.point = "TOPLEFT"
 menu.relativePoint = "TOPRIGHT"
 function menu:initialize(level, menulist)
-	if type(menulist) == "table" then
-		for k, v in pairs(menulist.items) do
-			local info = UIDropDownMenu_CreateInfo()
-			info.text = GetItemInfo(v)
-			info.notCheckable = true
-			UIDropDownMenu_AddButton(info, level)
-		end
-	end
+	levels[level](menulist, level)
 end
 
 function wishlist:Dropdown(level)
@@ -28,7 +45,7 @@ function wishlist:Dropdown(level)
 		info.keepShownOnClick = true
 		info.notCheckable = true
 		info.func = function(self)
-			wishlist:BuildList()
+			mog:SetModule(wishlist)
 		end
 		UIDropDownMenu_AddButton(info, level)
 	-- elseif level == 2 then
@@ -74,20 +91,20 @@ function wishlist:OnEnter(self)
 	-- GameTooltip:SetOwner(self, "ANCHOR_NONE")
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 	
-	local sources = mog.sub.filters.source
+	local data = mog.sub.data
 	-- if data.type == "set" then
 	if type(value) == "table" then
 		GameTooltip:AddLine(value.name)
 		for slot, itemID in pairs(value.items) do
 			local name, link, _, _, _, _, _, _, _, texture = GetItemInfo(itemID)
-			local source = sources[itemID]
-			local sourceID = mog.sub.filters.sourceid[itemID]
-			local sourceInfo = mog.sub.filters.sourceinfo[itemID]
+			local source = data.source[itemID]
+			local sourceID = data.sourceid[itemID]
+			local sourceInfo = data.sourceinfo[itemID]
 			local info = mog.sub.source[source]
 			local extraInfo
 			if source == 1 then -- Drop
 				if sourceID then
-					extraInfo = mog.sub.bosses[sourceID]
+					extraInfo = mog.GetMob(sourceID)
 				end
 			--elseif source == 3 then -- Quest
 			elseif source == 5 then -- Crafted
@@ -102,8 +119,8 @@ function wishlist:OnEnter(self)
 				-- end
 			end
 			local zone
-			if mog.sub.filters.zone[itemID] then
-				zone = GetMapNameByID(mog.sub.filters.zone[itemID])
+			if data.zone[itemID] then
+				zone = GetMapNameByID(data.zone[itemID])
 				if zone then
 					if source == 1 and extraInfo then
 						if mog.sub.diffs[sourceInfo] then
@@ -127,7 +144,7 @@ function wishlist:OnEnter(self)
 		-- for i = 1, #items do
 			-- local item, source = items[i]
 			-- local source = sources[item.id]
-			GameTooltip:AddDoubleLine(link, mog.sub.source[sources[value]])
+			GameTooltip:AddDoubleLine(link, mog.sub.source[data.source[value]])
 		-- end
 	end
 	
@@ -286,25 +303,10 @@ function wishlist:AddonLoaded()
 	-- db.RegisterCallback(self, "OnProfileReset", "LoadSettings")
 end
 
+local list = {}
+
 function wishlist:BuildList()
-	-- wipe(mog.sub.list);
-	-- wipe(mog.sub.display);
-	-- module = module or mog.selected;
-	-- tbl = tbl or mog.sub.selected.items;
-	-- for k,v in ipairs(tbl) do
-		-- if mog.sub.filterLevel(v) and mog.sub.filterFaction(v) and mog.sub.filterClass(v) and mog.sub.filterSlot(v) and mog.sub.filterSource(v) and mog.sub.filterQuality(v) then
-			-- local disp = mog.sub.filters.display[v];
-			-- if not mog.sub.display[disp] then
-				-- mog.sub.display[disp] = v;
-				-- tinsert(mog.sub.list,disp);
-			-- elseif type(mog.sub.display[disp]) == "table" then
-				-- tinsert(mog.sub.display[disp],v);
-			-- else
-				-- mog.sub.display[disp] = {mog.sub.display[disp],v};
-			-- end
-		-- end
-	-- end
-	local list = {}
+	wipe(list)
 	local db = self.db.profile
 	for i, v in ipairs(db.sets) do
 		list[#list + 1] = v
@@ -312,5 +314,28 @@ function wishlist:BuildList()
 	for i, v in ipairs(db.items) do
 		list[#list + 1] = v
 	end
-	mog:SetList(wishlist, list, top)
+	return list
+end
+
+function wishlist:IsItemInWishlist(itemID)
+	for i, v in ipairs(self.db.profile.items) do
+		if v == itemID then
+			return true
+		end
+	end
+	return false
+end
+
+function wishlist:AddItem(itemID, setName)
+	if setName then
+		for i, set in ipairs(self.db.profile.sets) do
+			if set.name == setName then
+				-- ???
+				break
+			end
+		end
+	else
+		tinsert(self.db.profile.items, itemID)
+	end
+	self:BuildList()
 end

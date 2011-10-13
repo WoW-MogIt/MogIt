@@ -270,7 +270,10 @@ local function OnClick(module,self,btn)
 		elseif IsShiftKeyDown() then
 			mog:ShowURL(self.data.item);
 		else
-			
+			local wishlist = mog:GetModule("Wishlist")
+			if not wishlist:IsItemInWishlist(self.data.item) then
+				wishlist:AddItem(self.data.item)
+			end
 		end
 	end
 end
@@ -281,9 +284,9 @@ local function OnScroll(module)
 	end
 end
 
-local LeftClick = CreateFrame("Frame",nil,mog.frame);
-LeftClick.displayMode = "MENU";
-function LeftClick:initialize(tier,self)
+mog.sub.LeftClick = CreateFrame("Frame",nil,mog.frame);
+mog.sub.LeftClick.displayMode = "MENU";
+function mog.sub.LeftClick:initialize(tier,self)
 	local info;
 	for k,v in ipairs(self.data.items) do
 		local name,link,_,_,_,_,_,_,_,texture = GetItemInfo(v);
