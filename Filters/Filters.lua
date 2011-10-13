@@ -5,14 +5,12 @@ local filters = {};
 
 function mog:AddFilter(name,frame)
 	if filters[name] then return end;
-	
 	if frame then
 		frame:SetParent(mog.filt.frame);
 	else
 		frame = CreateFrame("Frame",nil,mog.filt.frame);
 	end
 	frame:Hide();
-	frame.name = name;
 	filters[name] = frame;
 	return frame;
 end
