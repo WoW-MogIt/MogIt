@@ -147,7 +147,7 @@ local function Dropdown(module,tier)
 			info.value = v;
 			info.notCheckable = true;
 			info.func = function(self)
-				module.active = self.value;
+				self.arg1.active = self.value;
 				mog:SetModule(self.arg1,self.arg1.name.." - "..self.value.label);
 				CloseDropDownMenus();
 			end
@@ -307,7 +307,7 @@ end
 local function BuildList(module)
 	wipe(display);
 	local list = {};
-	for k,v in ipairs(module.active) do
+	for k,v in ipairs(module.active.items) do
 		local state = true;
 		for x,y in ipairs(module.filters) do
 			if not mog:GetFilter(y).Filter(mog.sub.GetFilterArgs(y,v)) then
