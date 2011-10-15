@@ -45,8 +45,9 @@ local itemSlots = {
 }
 
 local dropdown = CreateFrame("Frame")
-dropdown.point = "TOPLEFT"
-dropdown.relativePoint = "TOPRIGHT"
+dropdown.displayMode = "MENU"
+--dropdown.point = "TOPLEFT"
+--dropdown.relativePoint = "TOPRIGHT"
 function dropdown:initialize(level, menuList)
 	self.menu[menuList.type][level](menuList, level)
 end
@@ -195,7 +196,7 @@ function wishlist:Dropdown(level)
 		info.keepShownOnClick = true
 		info.notCheckable = true
 		info.func = function(self)
-			mog:SetModule(wishlist)
+			mog:SetModule(wishlist,L["Wishlist"])
 		end
 		UIDropDownMenu_AddButton(info, level)
 	elseif level == 2 then
@@ -415,7 +416,7 @@ function wishlist:OnClick(self, button)
 		elseif IsShiftKeyDown() then
 			mog:ShowURL(self.data.item)
 		else
-			ToggleDropDownMenu(nil, nil, dropdown, self, 0, 0, self.data)
+			ToggleDropDownMenu(nil, nil, dropdown, "cursor", 0, 0, self.data) -- replaced self with "cursor"
 		end
 	end
 end
@@ -441,6 +442,10 @@ function wishlist:BuildList()
 	end
 	return list
 end
+
+--[=[function wishlist:Unlist()
+	wipe(list);
+end--]=]
 
 function wishlist:AddItem(itemID, setName)
 	if setName then
