@@ -1,6 +1,6 @@
 local a,t=MogIt.sub.AddItem,MogIt.sub.AddSlot("Hands",...)
-a(t,51960,56579,3,nil,nil,nil,nil,1,nil,nil,nil)
-a(t,51965,56579,3,nil,nil,nil,nil,1,nil,nil,nil)
+a(t,51960,56579,3,61,nil,nil,nil,1,nil,nil,nil)
+a(t,51965,56579,3,26,nil,nil,nil,1,nil,nil,nil)
 a(t,7756,15894,3,29,nil,nil,nil,1,3974,762,1)
 a(t,7690,27635,3,26,nil,nil,nil,1,6488,762,1)
 a(t,65964,73758,3,26,1,nil,nil,3,nil,762,nil)
