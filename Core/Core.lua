@@ -59,6 +59,7 @@ function mog:BuildList(top)
 	if not mog.active then return end;
 	mog.list = mog.active:BuildList();
 	mog.scroll:update(top and 1);
+	mog.filt.models:SetText(#mog.list);
 end
 
 function mog.toggleFrame()
