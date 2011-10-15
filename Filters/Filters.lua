@@ -19,22 +19,42 @@ function mog:GetFilter(name)
 	return filters[name];
 end
 
-mog.filt = CreateFrame("Frame","MogItFilters",mog.frame,"BasicFrameTemplateWithInset");
+mog.filt = CreateFrame("Frame","MogItFilters",mog.frame,"ButtonFrameTemplate");
 mog.filt:Hide();
 mog.filt:SetPoint("TOPLEFT",mog.frame,"TOPRIGHT")--,5,-35);
-mog.filt:SetSize(150,300);
+mog.filt:SetSize(200,300);
 MogItFiltersCloseButton:SetNormalTexture("Interface\\BUTTONS\\UI-Panel-HideButton-Up");
 MogItFiltersCloseButton:SetPushedTexture("Interface\\BUTTONS\\UI-Panel-HideButton-Down");
 MogItFiltersBg:SetVertexColor(0.8,0.3,0.8);
 MogItFiltersTitleText:SetText(FILTERS);
+mog.filt.portraitFrame:Hide();
+mog.filt.topLeftCorner:Show();
+mog.filt.topBorderBar:SetPoint("TOPLEFT",mog.filt.topLeftCorner,"TOPRIGHT",0,0);
+mog.filt.leftBorderBar:SetPoint("TOPLEFT",mog.filt.topLeftCorner,"TOPLEFT",0,0);
+
+mog.filt.results = mog.filt:CreateFontString(nil,"ARTWORK","GameFontNormal");
+mog.filt.results:SetPoint("TOPLEFT",mog.filt,"TOPLEFT",10,-35);
+mog.filt.results:SetText(L["Results"]..":");
+
+mog.filt.models = mog.filt:CreateFontString(nil,"ARTWORK","GameFontHighlight");
+mog.filt.models:SetPoint("LEFT",mog.filt.results,"RIGHT",5,0);
+mog.filt.models:SetText(1337);
+
+mog.filt.defaults = CreateFrame("Button","MogItFrameFiltersDefaults",mog.filt,"MagicButtonTemplate");
+mog.filt.defaults:SetPoint("BOTTOMLEFT",mog.filt,"BOTTOMLEFT",5,5);
+mog.filt.defaults:SetWidth(100);
+mog.filt.defaults:SetText(DEFAULTS);
+mog.filt.defaults:SetScript("OnClick",function(self,btn)
+	
+end);
 
 mog.filt.scroll = CreateFrame("ScrollFrame","MogItFiltersScroll",mog.filt,"UIPanelScrollFrameTemplate");
-mog.filt.scroll:SetPoint("TOPLEFT",mog.filt.InsetBorderTopLeft,"TOPLEFT",0,0);
-mog.filt.scroll:SetPoint("BOTTOMRIGHT",mog.filt.InsetBorderBottomRight,"BOTTOMRIGHT",-21,0);
+mog.filt.scroll:SetPoint("TOPLEFT",mog.filt.Inset,"TOPLEFT",0,0);
+mog.filt.scroll:SetPoint("BOTTOMRIGHT",mog.filt.Inset,"BOTTOMRIGHT",-21,0);
 
 mog.filt.frame = CreateFrame("Frame","MogItFiltersScrollFrame",mog.filt);
 mog.filt.scroll:SetScrollChild(mog.filt.frame);
-mog.filt.frame:SetWidth(150);
+mog.filt.frame:SetWidth(mog.filt:GetWidth()-20);
 
 function mog:FilterUpdate()	
 	for k,v in pairs(filters) do
@@ -48,22 +68,20 @@ function mog:FilterUpdate()
 		if filters[v] then
 			filters[v]:ClearAllPoints();
 			if k == 1 then
-				filters[v]:SetPoint("TOPLEFT",mog.filt.frame,"TOPLEFT",10,-10);
+				filters[v]:SetPoint("TOPLEFT",mog.filt.frame,"TOPLEFT",14,-14);
 			else
-				filters[v]:SetPoint("TOPLEFT",filters[mog.active.filters[k-1]],"BOTTOMLEFT",0,-5);
+				filters[v]:SetPoint("TOPLEFT",filters[mog.active.filters[k-1]],"BOTTOMLEFT",0,-14);
 			end
-			filters[v]:SetPoint("RIGHT",mog.filt.frame,"RIGHT",-10,0);
+			filters[v]:SetPoint("RIGHT",mog.filt.frame,"RIGHT",-14,0);
 			last = filters[v];
+			if not filters[v].bg then
+				filters[v].bg = filters[v]:CreateTexture(nil,"BACKGROUND");
+				filters[v].bg:SetPoint("TOPLEFT",filters[v],"TOPLEFT",-5,5);
+				filters[v].bg:SetPoint("BOTTOMRIGHT",filters[v],"BOTTOMRIGHT",5,-5);
+				filters[v].bg:SetTexture(0.3,0.3,0.3,0.2);
+			end
 			filters[v]:Show();
-			--filters[v].module = mog.active;
 			height = height + (filters[v]:GetHeight() or 0) + 5;
-			--[[if not mog.filters[v].bg then
-				mog.filters[v].bg = mog.filters[v]:CreateTexture(nil,"BACKGROUND");
-				mog.filters[v].bg:SetPoint("TOPLEFT",mog.filters[v],"TOPLEFT");
-				mog.filters[v].bg:SetPoint("BOTTOMLEFT",mog.filters[v],"BOTTOMLEFT");
-				mog.filters[v].bg:SetPoint("RIGHT",mog.filt.frame,"RIGHT",-5,0);
-				mog.filters[v].bg:SetTexture(0.3,0.3,0.3,0.2);
-			end--]]
 		end
 	end
 	mog.filt.frame:SetHeight(height+20-5);
