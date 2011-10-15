@@ -64,3 +64,36 @@ function f.Default()
 	mog:BuildList();
 end
 f.Default();
+
+
+--[[
+f.min:SetScript("OnEnterPressed",function(self)
+	self:ClearFocus();
+	minlvl = self:GetNumber() or 0;
+	mog:BuildList();
+end);
+f.min:SetScript("OnEscapePressed",function(self)
+	self:ClearFocus();
+	self:SetNumber(minlvl);
+end);
+f.min:SetScript("OnTabPressed",function(self)
+	f.max:SetFocus();
+	minlvl = self:GetNumber() or 0;
+	mog:BuildList();
+end);
+
+f.max:SetScript("OnEnterPressed",function(self)
+	self:ClearFocus();
+	maxlvl = self:GetNumber() or MAX_PLAYER_LEVEL;
+	mog:BuildList();
+end);
+f.max:SetScript("OnEscapePressed",function(self)
+	self:ClearFocus();
+	self:SetNumber(maxlvl);
+end);
+f.max:SetScript("OnTabPressed",function(self)
+	f.min:SetFocus();
+	maxlvl = self:GetNumber() or MAX_PLAYER_LEVEL;
+	mog:BuildList();
+end);
+--]]
