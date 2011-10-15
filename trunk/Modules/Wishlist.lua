@@ -44,7 +44,14 @@ local itemSlots = {
 	"RangedSlot",
 }
 
-local menuListItem = {
+local dropdown = CreateFrame("Frame")
+dropdown.point = "TOPLEFT"
+dropdown.relativePoint = "TOPRIGHT"
+function dropdown:initialize(level, menuList)
+	self.menu[menuList.type][level](menuList, level)
+end
+
+local itemMenu = {
 	{
 		text = "Add to set",
 		hasArrow = true,
@@ -56,81 +63,73 @@ local menuListItem = {
 			tremove(wishlist.db.profile.items, self.value)
 			mog:BuildList()
 		end,
-		-- hasArrow = true,
 		notCheckable = true,
 	},
 }
 
-local menuIndex
-
-local levels = {
-	[1] = function(menu, level)
-		if type(menu.value) == "table" then
-			menuIndex = menu.index
-			for k, v in ipairs(itemSlots) do
-				local v = menu.value.items[v]
-				if v then
-					local info = UIDropDownMenu_CreateInfo()
-					info.text = GetItemInfo(v)
-					info.value = v
-					info.hasArrow = true
-					info.notCheckable = true
-					UIDropDownMenu_AddButton(info, level)
-				end
-			end
-			local info = UIDropDownMenu_CreateInfo()
-			info.text = "Delete dis set"
-			info.func = function(self)
-				tremove(wishlist.db.profile.sets, menu.index)
-				mog:BuildList()
-			end
-			info.notCheckable = true
-			UIDropDownMenu_AddButton(info, level)
-		else
-			for k, v in pairs(menuListItem) do
-				-- local info = UIDropDownMenu_CreateInfo()
-				-- info.text = GetItemInfo(v)
-				-- info.hasArrow = true
-				-- info.notCheckable = true
-				v.value = menu.index - #wishlist.db.profile.sets
-				v.menuList = menu.value
+dropdown.menu = {
+	-- menu used for single items
+	item = {
+		-- top level menu
+		[1] = function(menuList, level)
+			for k, v in pairs(itemMenu) do
+				v.value = menuList.index - #wishlist.db.profile.sets
+				v.menuList = menuList
 				UIDropDownMenu_AddButton(v, level)
 			end
-		end
-	end,
-	[2] = function(menu, level)
-		if menu then
-			for k, set in ipairs(wishlist.db.profile.sets) do
+		end,
+		-- second level menu
+		[2] = function(menuList, level)
+			for i, set in ipairs(wishlist.db.profile.sets) do
 				local info = UIDropDownMenu_CreateInfo()
 				info.text = set.name
 				info.func = function(self)
-					wishlist:AddItem(menu, self.value)
+					wishlist:AddItem(menuList.value, self.value)
 					mog:BuildList()
 				end
 				info.notCheckable = true
 				UIDropDownMenu_AddButton(info, level)
 			end
-		else
-		-- for k, v in pairs(menu) do
+		end,
+	},
+	-- menu used for sets
+	set = {
+		[1] = function(menuList, level)
+			for i, slot in ipairs(itemSlots) do
+				local itemID = menuList.value.items[slot]
+				if itemID then
+					local info = UIDropDownMenu_CreateInfo()
+					info.text = GetItemInfo(itemID)
+					info.value = itemID
+					info.hasArrow = true
+					info.notCheckable = true
+					info.menuList = menuList
+					UIDropDownMenu_AddButton(info, level)
+				end
+			end
 			local info = UIDropDownMenu_CreateInfo()
-			info.text = "Delete dis"
+			info.text = "Delete set"
+			info.value = menuList.index
 			info.func = function(self)
-				wishlist.db.profile.sets[menuIndex].items[invSlots[select(9, GetItemInfo(UIDROPDOWNMENU_MENU_VALUE))]] = nil
+				tremove(wishlist.db.profile.sets, self.value)
 				mog:BuildList()
 			end
 			info.notCheckable = true
 			UIDropDownMenu_AddButton(info, level)
-		-- end
-		end
-	end,
+		end,
+		[2] = function(menuList, level)
+			local info = UIDropDownMenu_CreateInfo()
+			info.text = "Delete"
+			-- info.value = 
+			info.func = function(self)
+				wishlist.db.profile.sets[menuList.index].items[invSlots[select(9, GetItemInfo(UIDROPDOWNMENU_MENU_VALUE))]] = nil
+				mog:BuildList()
+			end
+			info.notCheckable = true
+			UIDropDownMenu_AddButton(info, level)
+		end,
+	}
 }
-
-local menu = CreateFrame("Frame")
-menu.point = "TOPLEFT"
-menu.relativePoint = "TOPRIGHT"
-function menu:initialize(level, menulist)
-	levels[level](menulist, level)
-end
 
 local defaults = {
 	profile = {
@@ -234,11 +233,11 @@ end
 
 function wishlist:FrameUpdate(self, value, index)
 	local data = self.data
+	data.type = type(value) == "table" and "set" or "item"
 	data.value = value
 	data.index = index
 	self.model:Undress()
-	-- if data.type == "set" then
-	if type(value) == "table" then
+	if data.type == "set" then
 		for slot, itemID in pairs(value.items) do
 			self.model:TryOn(itemID)
 		end
@@ -249,58 +248,61 @@ function wishlist:FrameUpdate(self, value, index)
 end
 
 function wishlist:OnEnter(self)
-	if not self then return end
+	-- if not self then return end
 	local data = self.data
 	local value = data.value
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 	-- GameTooltip:SetOwner(self, "ANCHOR_NONE")
-	--GameTooltip:ClearAllPoints()
-	--GameTooltip:SetPoint("TOPLEFT",mog.frame,"TOPRIGHT",5,0)
+	-- GameTooltip:ClearAllPoints()
+	-- GameTooltip:SetPoint("TOPLEFT",mog.frame,"TOPRIGHT",5,0)
 	
 	local data = mog.sub.data
 	-- if data.type == "set" then
-	if type(value) == "table" then
+	if self.data.type == "set" then
 		GameTooltip:AddLine(value.name)
-		for slot, itemID in pairs(value.items) do
-			local name, link, _, _, _, _, _, _, _, texture = GetItemInfo(itemID)
-			local source = data.source[itemID]
-			local sourceID = data.sourceid[itemID]
-			local sourceInfo = data.sourceinfo[itemID]
-			local info = mog.sub.source[source]
-			local extraInfo
-			if source == 1 then -- Drop
-				if sourceID then
-					extraInfo = mog.GetMob(sourceID)
+		for i, slot in ipairs(itemSlots) do
+			local itemID = value.items[slot]
+			if itemID then
+				local name, link, _, _, _, _, _, _, _, texture = GetItemInfo(itemID)
+				local source = data.source[itemID]
+				local sourceID = data.sourceid[itemID]
+				local sourceInfo = data.sourceinfo[itemID]
+				local info = mog.sub.source[source]
+				local extraInfo
+				if source == 1 then -- Drop
+					if sourceID then
+						extraInfo = mog.GetMob(sourceID)
+					end
+				--elseif source == 3 then -- Quest
+				elseif source == 5 then -- Crafted
+					if sourceInfo then
+						extraInfo = mog.sub.professions[sourceInfo]
+					end
+				-- elseif source == 6 then -- Achievement
+					-- if mog.sub.filters.sourceid[item] then
+						-- local _,name,_,complete = GetAchievementInfo(mog.sub.filters.sourceid[item]);
+						-- GameTooltip:AddDoubleLine(L["Achievement"]..":",name,nil,nil,nil,1,1,1);
+						-- GameTooltip:AddDoubleLine(STATUS..":",complete and COMPLETE or INCOMPLETE,nil,nil,nil,1,1,1);
+					-- end
 				end
-			--elseif source == 3 then -- Quest
-			elseif source == 5 then -- Crafted
-				if sourceInfo then
-					extraInfo = mog.sub.professions[sourceInfo]
-				end
-			-- elseif source == 6 then -- Achievement
-				-- if mog.sub.filters.sourceid[item] then
-					-- local _,name,_,complete = GetAchievementInfo(mog.sub.filters.sourceid[item]);
-					-- GameTooltip:AddDoubleLine(L["Achievement"]..":",name,nil,nil,nil,1,1,1);
-					-- GameTooltip:AddDoubleLine(STATUS..":",complete and COMPLETE or INCOMPLETE,nil,nil,nil,1,1,1);
-				-- end
-			end
-			local zone
-			if data.zone[itemID] then
-				zone = GetMapNameByID(data.zone[itemID])
-				if zone then
-					if source == 1 and extraInfo then
-						if mog.sub.diffs[sourceInfo] then
-							zone = zone.." ("..mog.sub.diffs[sourceInfo]..")"
+				local zone
+				if data.zone[itemID] then
+					zone = GetMapNameByID(data.zone[itemID])
+					if zone then
+						if source == 1 and extraInfo then
+							if mog.sub.diffs[sourceInfo] then
+								zone = zone.." ("..mog.sub.diffs[sourceInfo]..")"
+							end
+							info = zone
+							-- extraInfo = 
+						else
+							extraInfo = zone
 						end
-						info = zone
-						-- extraInfo = 
-					else
-						extraInfo = zone
 					end
 				end
+				GameTooltip:AddDoubleLine(link, source and (extraInfo and strjoin(", ", info, extraInfo or "") or info))
+				GameTooltip:AddTexture(GetItemIcon(itemID))
 			end
-			GameTooltip:AddDoubleLine(link, source and strjoin(", ", info, extraInfo or ""))
-			GameTooltip:AddTexture(GetItemIcon(itemID))
 		end
 	else
 		local name, link, _, _, _, _, _, _, _, texture = GetItemInfo(value)
@@ -413,7 +415,7 @@ function wishlist:OnClick(self, button)
 		elseif IsShiftKeyDown() then
 			mog:ShowURL(self.data.item)
 		else
-			ToggleDropDownMenu(nil, nil, menu, self, 0, 0, self.data)
+			ToggleDropDownMenu(nil, nil, dropdown, self, 0, 0, self.data)
 		end
 	end
 end
