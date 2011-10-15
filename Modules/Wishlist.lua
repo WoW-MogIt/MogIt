@@ -1,30 +1,127 @@
 local MogIt, mog = ...
 local L = mog.L
 
-local db = {}
-local wishlist = {}
+local wishlist = mog:RegisterModule("Wishlist", {}, true)
+
+local invSlots = {
+	INVTYPE_HEAD = "HeadSlot",
+	INVTYPE_SHOULDER = "ShoulderSlot",
+	INVTYPE_BODY = "ShirtSlot",
+	INVTYPE_CLOAK = "BackSlot",
+	INVTYPE_CHEST = "ChestSlot",
+	INVTYPE_ROBE = "ChestSlot",
+	INVTYPE_WAIST = "WaistSlot",
+	INVTYPE_LEGS = "LegsSlot",
+	INVTYPE_FEET = "FeetSlot",
+	INVTYPE_WRIST = "WristSlot",
+	INVTYPE_2HWEAPON = "MainHandSlot",
+	INVTYPE_WEAPON = "MainHandSlot",
+	INVTYPE_WEAPONMAINHAND = "MainHandSlot",
+	INVTYPE_WEAPONOFFHAND = "SecondaryHandSlot",
+	INVTYPE_SHIELD = "SecondaryHandSlot",
+	INVTYPE_HOLDABLE = "SecondaryHandSlot",
+	INVTYPE_RANGED = "RangedSlot",
+	INVTYPE_RANGEDRIGHT = "RangedSlot",
+	INVTYPE_THROWN = "RangedSlot",
+	INVTYPE_HAND = "HandsSlot",
+	INVTYPE_TABARD = "TabardSlot",
+}
+
+local itemSlots = {
+	"HeadSlot",
+	"ShoulderSlot",
+	"BackSlot",
+	"ChestSlot",
+	"ShirtSlot",
+	"TabardSlot",
+	"WristSlot",
+	"HandsSlot",
+	"WaistSlot",
+	"LegsSlot",
+	"FeetSlot",
+	"MainHandSlot",
+	"SecondaryHandSlot",
+	"RangedSlot",
+}
+
+local menuListItem = {
+	{
+		text = "Add to set",
+		hasArrow = true,
+		notCheckable = true,
+	},
+	{
+		text = "Delete",
+		func = function(self)
+			tremove(wishlist.db.profile.items, self.value)
+			mog:BuildList()
+		end,
+		-- hasArrow = true,
+		notCheckable = true,
+	},
+}
+
+local menuIndex
 
 local levels = {
 	[1] = function(menu, level)
-		if type(menu) == "table" then
-			for k, v in pairs(menu.items) do
-				local info = UIDropDownMenu_CreateInfo()
-				info.text = GetItemInfo(v)
-				info.hasArrow = true
-				info.notCheckable = true
-				
-				UIDropDownMenu_AddButton(info, level)
+		if type(menu.value) == "table" then
+			menuIndex = menu.index
+			for k, v in ipairs(itemSlots) do
+				local v = menu.value.items[v]
+				if v then
+					local info = UIDropDownMenu_CreateInfo()
+					info.text = GetItemInfo(v)
+					info.value = v
+					info.hasArrow = true
+					info.notCheckable = true
+					UIDropDownMenu_AddButton(info, level)
+				end
+			end
+			local info = UIDropDownMenu_CreateInfo()
+			info.text = "Delete dis set"
+			info.func = function(self)
+				tremove(wishlist.db.profile.sets, menu.index)
+				mog:BuildList()
+			end
+			info.notCheckable = true
+			UIDropDownMenu_AddButton(info, level)
+		else
+			for k, v in pairs(menuListItem) do
+				-- local info = UIDropDownMenu_CreateInfo()
+				-- info.text = GetItemInfo(v)
+				-- info.hasArrow = true
+				-- info.notCheckable = true
+				v.value = menu.index - #wishlist.db.profile.sets
+				v.menuList = menu.value
+				UIDropDownMenu_AddButton(v, level)
 			end
 		end
 	end,
 	[2] = function(menu, level)
+		if menu then
+			for k, set in ipairs(wishlist.db.profile.sets) do
+				local info = UIDropDownMenu_CreateInfo()
+				info.text = set.name
+				info.func = function(self)
+					wishlist:AddItem(menu, self.value)
+					mog:BuildList()
+				end
+				info.notCheckable = true
+				UIDropDownMenu_AddButton(info, level)
+			end
+		else
 		-- for k, v in pairs(menu) do
 			local info = UIDropDownMenu_CreateInfo()
 			info.text = "Delete dis"
-			-- info.hasArrow = true
+			info.func = function(self)
+				wishlist.db.profile.sets[menuIndex].items[invSlots[select(9, GetItemInfo(UIDROPDOWNMENU_MENU_VALUE))]] = nil
+				mog:BuildList()
+			end
 			info.notCheckable = true
 			UIDropDownMenu_AddButton(info, level)
 		-- end
+		end
 	end,
 }
 
@@ -35,20 +132,89 @@ function menu:initialize(level, menulist)
 	levels[level](menulist, level)
 end
 
+local defaults = {
+	profile = {
+		items = {},
+		sets = {},
+	}
+}
+
+function wishlist:AddonLoaded()
+	local AceDB = LibStub("AceDB-3.0")
+	local db = AceDB:New("MogItWishlist", defaults)
+	self.db = db
+	
+	-- convert old database
+	if MogIt_Character then
+		db.profile.items = MogIt_Character.wishlist.items
+		db.profile.sets = MogIt_Character.wishlist.sets
+		for i, itemID in ipairs(db.profile.items) do
+			db.profile.items[i] = tonumber(itemID)
+		end
+		for i, set in ipairs(db.profile.sets) do
+			set.items = {}
+			for slotID, items in pairs(set) do
+				if type(slotID) == "number" then
+					local itemID = tonumber(items[1])
+					set.items[itemSlots[slotID]] = itemID
+					set[slotID] = nil
+				end
+			end
+		end
+	end
+	
+	for key, profile in pairs(db.profiles) do
+		if profile.sets then
+			for i, set in ipairs(profile.sets) do
+				if type(next(set.items)) == "string" then
+					break
+				end
+				for slotID = 1, #itemSlots do
+					local itemID = set.items[slotID]
+					local slotName = itemID and itemSlots[slotID]
+					if slotName then
+						set.items[slotName] = itemID
+						set.items[slotID] = nil
+					end
+				end
+			end
+		end
+	end
+	
+	-- db.RegisterCallback(self, "OnProfileChanged", "LoadSettings")
+	-- db.RegisterCallback(self, "OnProfileCopied", "LoadSettings")
+	-- db.RegisterCallback(self, "OnProfileReset", "LoadSettings")
+end
+
 function wishlist:Dropdown(level)
 	if level == 1 then
 		local info = UIDropDownMenu_CreateInfo()
 		info.text = "Wishlist"
 		info.value = self
-		info.colorCode = "|cFFFFFF00"
-		-- info.hasArrow = module.loaded
+		info.colorCode = "|cffffff00"
+		info.hasArrow = true
 		info.keepShownOnClick = true
 		info.notCheckable = true
 		info.func = function(self)
 			mog:SetModule(wishlist)
 		end
 		UIDropDownMenu_AddButton(info, level)
-	-- elseif level == 2 then
+	elseif level == 2 then
+		local info = UIDropDownMenu_CreateInfo()
+		info.text = "New set"
+		-- info.value = v
+		info.func = function(self)
+			-- UIDropDownMenu_SetText(mog.dropdown,self.arg1.name.." - "..self.value.label)
+			-- mog.sub.selected = self.value
+			-- mog.sub.BuildList(self.arg1,self.value.items,true)
+			-- CloseDropDownMenus()
+			wishlist:CreateSet("Set "..(#wishlist.db.profile.sets + 1))
+			mog:BuildList()
+		end
+		info.notCheckable = true
+		-- info.arg1 = module
+		UIDropDownMenu_AddButton(info, level)
+		
 		-- for k,v in ipairs(module.slots) do
 			-- info = UIDropDownMenu_CreateInfo();
 			-- info.text = v.label;
@@ -66,12 +232,10 @@ function wishlist:Dropdown(level)
 	end
 end
 
-function wishlist:FrameUpdate(self, value)
+function wishlist:FrameUpdate(self, value, index)
 	local data = self.data
-	-- self.data.display = value;
-	-- self.data.items = mog.sub.display[value];
-	-- data.type = value.type
 	data.value = value
+	data.index = index
 	self.model:Undress()
 	-- if data.type == "set" then
 	if type(value) == "table" then
@@ -88,8 +252,10 @@ function wishlist:OnEnter(self)
 	if not self then return end
 	local data = self.data
 	local value = data.value
-	-- GameTooltip:SetOwner(self, "ANCHOR_NONE")
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+	-- GameTooltip:SetOwner(self, "ANCHOR_NONE")
+	--GameTooltip:ClearAllPoints()
+	--GameTooltip:SetPoint("TOPLEFT",mog.frame,"TOPRIGHT",5,0)
 	
 	local data = mog.sub.data
 	-- if data.type == "set" then
@@ -204,8 +370,6 @@ function wishlist:OnEnter(self)
 	end
 	]=]
 	GameTooltip:Show()
-	--GameTooltip:ClearAllPoints()
-	--GameTooltip:SetPoint("TOPLEFT",mog.frame,"TOPRIGHT",5,0)
 end
 
 function wishlist:OnClick(self, button)
@@ -249,59 +413,18 @@ function wishlist:OnClick(self, button)
 		elseif IsShiftKeyDown() then
 			mog:ShowURL(self.data.item)
 		else
-			ToggleDropDownMenu(nil, nil, menu, self, 0, 0, self.data.value)
+			ToggleDropDownMenu(nil, nil, menu, self, 0, 0, self.data)
 		end
 	end
 end
---[==[
-function wishlist:AddItem(item)
-	self:BuildList()
-end
 
+--[==[
 function mog.sub.OnScroll(module)
 	if UIDropDownMenu_GetCurrentDropDown() == mog.sub.LeftClick and DropDownList1 and DropDownList1:IsShown() then
 		HideDropDownMenu(1);
 	end
 end
 ]==]
-
-mog:RegisterModule("Wishlist", wishlist, true)
-
-local defaults = {
-	profile = {
-		items = {},
-		sets = {},
-	}
-}
-
-function wishlist:AddonLoaded()
-	local AceDB = LibStub("AceDB-3.0")
-	local db = AceDB:New("MogItWishlist", defaults)
-	self.db = db
-	
-	-- convert old database
-	if MogIt_Character then
-		db.profile.items = MogIt_Character.wishlist.items
-		db.profile.sets = MogIt_Character.wishlist.sets
-		for i, itemID in ipairs(db.profile.items) do
-			db.profile.items[i] = tonumber(itemID)
-		end
-		for i, set in ipairs(db.profile.sets) do
-			set.items = {}
-			for slotID, items in pairs(set) do
-				if type(slotID) == "number" then
-					local itemID = tonumber(items[1])
-					set.items[slotID] = itemID
-					set[slotID] = nil
-				end
-			end
-		end
-	end
-	
-	-- db.RegisterCallback(self, "OnProfileChanged", "LoadSettings")
-	-- db.RegisterCallback(self, "OnProfileCopied", "LoadSettings")
-	-- db.RegisterCallback(self, "OnProfileReset", "LoadSettings")
-end
 
 local list = {}
 
@@ -317,6 +440,25 @@ function wishlist:BuildList()
 	return list
 end
 
+function wishlist:AddItem(itemID, setName)
+	if setName then
+		for i, set in ipairs(self.db.profile.sets) do
+			if set.name == setName then
+				local slot = invSlots[select(9, GetItemInfo(itemID))]
+				set.items[slot] = itemID
+				break
+			end
+		end
+	else
+		tinsert(self.db.profile.items, itemID)
+	end
+	self:BuildList()
+end
+
+function wishlist:CreateSet(name)
+	tinsert(self.db.profile.sets, {name = name, items = {}})
+end
+
 function wishlist:IsItemInWishlist(itemID)
 	for i, v in ipairs(self.db.profile.items) do
 		if v == itemID then
@@ -326,16 +468,11 @@ function wishlist:IsItemInWishlist(itemID)
 	return false
 end
 
-function wishlist:AddItem(itemID, setName)
-	if setName then
-		for i, set in ipairs(self.db.profile.sets) do
-			if set.name == setName then
-				-- ???
-				break
-			end
+function wishlist:IsSetInWishlist(setName)
+	for i, set in ipairs(self.db.profile.sets) do
+		if set.name == setName then
+			return true
 		end
-	else
-		tinsert(self.db.profile.items, itemID)
 	end
-	self:BuildList()
+	return false
 end
