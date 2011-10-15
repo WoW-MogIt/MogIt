@@ -38,7 +38,6 @@ mog.filt.results:SetText(L["Results"]..":");
 
 mog.filt.models = mog.filt:CreateFontString(nil,"ARTWORK","GameFontHighlight");
 mog.filt.models:SetPoint("LEFT",mog.filt.results,"RIGHT",5,0);
-mog.filt.models:SetText(1337);
 
 mog.filt.defaults = CreateFrame("Button","MogItFrameFiltersDefaults",mog.filt,"MagicButtonTemplate");
 mog.filt.defaults:SetPoint("BOTTOMLEFT",mog.filt,"BOTTOMLEFT",5,5);
