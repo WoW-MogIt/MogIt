@@ -44,7 +44,14 @@ mog.filt.defaults:SetPoint("BOTTOMLEFT",mog.filt,"BOTTOMLEFT",5,5);
 mog.filt.defaults:SetWidth(100);
 mog.filt.defaults:SetText(DEFAULTS);
 mog.filt.defaults:SetScript("OnClick",function(self,btn)
-	
+	if mog.active and mog.active.filters then
+		for k,v in ipairs(mog.active.filters) do
+			if filters[v] and filters[v].Default then
+				filters[v].Default();
+			end
+		end
+		mog:BuildList();
+	end
 end);
 
 mog.filt.scroll = CreateFrame("ScrollFrame","MogItFiltersScroll",mog.filt,"UIPanelScrollFrameTemplate");
