@@ -55,8 +55,26 @@ mog.filt.defaults:SetScript("OnClick",function(self,btn)
 end);
 
 mog.filt.scroll = CreateFrame("ScrollFrame","MogItFiltersScroll",mog.filt,"UIPanelScrollFrameTemplate");
-mog.filt.scroll:SetPoint("TOPLEFT",mog.filt.Inset,"TOPLEFT",0,0);
-mog.filt.scroll:SetPoint("BOTTOMRIGHT",mog.filt.Inset,"BOTTOMRIGHT",-21,0);
+mog.filt.scroll:SetPoint("TOPLEFT",mog.filt.Inset,"TOPLEFT",0,-2);
+mog.filt.scroll:SetPoint("BOTTOMRIGHT",mog.filt.Inset,"BOTTOMRIGHT",-23,2);
+
+mog.filt.scroll.ScrollBar.top = mog.filt.scroll.ScrollBar:CreateTexture(nil,"ARTWORK");
+mog.filt.scroll.ScrollBar.top:SetTexture("Interface\\PaperDollInfoFrame\\UI-Character-ScrollBar");
+mog.filt.scroll.ScrollBar.top:SetSize(24,48);
+mog.filt.scroll.ScrollBar.top:SetPoint("TOPLEFT",mog.filt.scroll.ScrollBar,"TOPLEFT",-6,19);
+mog.filt.scroll.ScrollBar.top:SetTexCoord(0,0.45,0,0.2);
+
+mog.filt.scroll.ScrollBar.bottom = mog.filt.scroll.ScrollBar:CreateTexture(nil,"ARTWORK");
+mog.filt.scroll.ScrollBar.bottom:SetTexture("Interface\\PaperDollInfoFrame\\UI-Character-ScrollBar");
+mog.filt.scroll.ScrollBar.bottom:SetSize(24,64);
+mog.filt.scroll.ScrollBar.bottom:SetPoint("BOTTOMLEFT",mog.filt.scroll.ScrollBar,"BOTTOMLEFT",-6,-17);
+mog.filt.scroll.ScrollBar.bottom:SetTexCoord(0.515625,0.97,0.1440625,0.4140625);
+
+mog.filt.scroll.ScrollBar.middle = mog.filt.scroll.ScrollBar:CreateTexture(nil,"ARTWORK");
+mog.filt.scroll.ScrollBar.middle:SetTexture("Interface\\PaperDollInfoFrame\\UI-Character-ScrollBar");
+mog.filt.scroll.ScrollBar.middle:SetPoint("TOPLEFT",mog.filt.scroll.ScrollBar.top,"BOTTOMLEFT");
+mog.filt.scroll.ScrollBar.middle:SetPoint("BOTTOMRIGHT",mog.filt.scroll.ScrollBar.bottom,"TOPRIGHT");
+mog.filt.scroll.ScrollBar.middle:SetTexCoord(0,0.45,0.1640625,1);
 
 mog.filt.frame = CreateFrame("Frame","MogItFiltersScrollFrame",mog.filt);
 mog.filt.scroll:SetScrollChild(mog.filt.frame);
