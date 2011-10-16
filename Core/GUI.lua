@@ -177,7 +177,9 @@ function mog.scroll.update(self,value,offset,onscroll)
 	if onscroll then
 		value = onscroll;
 	else
-		self:SetMinMaxValues(1,total);
+		if total > 0 then
+			self:SetMinMaxValues(1,total);
+		end
 		if total > 1 then
 			self:Show();
 		else
