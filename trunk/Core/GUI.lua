@@ -159,7 +159,6 @@ mog.scroll:SetPoint("TOPRIGHT",mog.frame.Inset,"TOPRIGHT",1,-17);
 mog.scroll:SetPoint("BOTTOMRIGHT",mog.frame.Inset,"BOTTOMRIGHT",1,16);
 mog.scroll:SetValueStep(1);
 mog.scroll:SetScript("OnValueChanged",function(self,value)
-	print("onscroll: "..value);
 	self:update(nil,nil,value);
 end);
 mog.scroll.up = MogItScrollScrollUpButton;
