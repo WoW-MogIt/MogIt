@@ -105,17 +105,16 @@ function mog.dropdown:initialize(tier)
 end
 
 mog.frame.sorting = mog.frame:CreateFontString(nil,"ARTWORK","GameFontNormal");
-mog.frame.sorting:Hide();
 mog.frame.sorting:SetPoint("TOPRIGHT",mog.frame,"TOPRIGHT",-142,-35);
 mog.frame.sorting:SetText(L["Sort by"]..":");
 
 mog.sorting = CreateFrame("Frame","MogItSorting",mog.frame,"UIDropDownMenuTemplate");
-mog.sorting:Hide();
 mog.sorting:SetPoint("LEFT",mog.frame.sorting,"RIGHT",-12,-3);
 UIDropDownMenu_SetWidth(mog.sorting,110);
 UIDropDownMenu_SetButtonWidth(mog.sorting,125);
 UIDropDownMenu_JustifyText(mog.sorting,"LEFT");
-UIDropDownMenu_SetText(mog.sorting,L["Level"]);
+UIDropDownMenu_SetText(mog.sorting,NONE);
+UIDropDownMenu_DisableDropDown(mog.sorting);
 function mog.sorting:initialize(tier)
 	if mog.active and mog.active.Sorting then
 		mog.active:Sorting(tier);
@@ -158,11 +157,11 @@ mog.scroll = CreateFrame("Slider","MogItScroll",mog.frame,"UIPanelScrollBarTrimT
 mog.scroll:Hide();
 mog.scroll:SetPoint("TOPRIGHT",mog.frame.Inset,"TOPRIGHT",1,-17);
 mog.scroll:SetPoint("BOTTOMRIGHT",mog.frame.Inset,"BOTTOMRIGHT",1,16);
-mog.scroll:SetScript("OnValueChanged",function(self,value)
-	mog.scroll:update(value);
-end);
 mog.scroll:SetValueStep(1);
-mog.scroll:SetValue(1);
+mog.scroll:SetScript("OnValueChanged",function(self,value)
+	print("onscroll: "..value);
+	self:update(nil,nil,value);
+end);
 mog.scroll.up = MogItScrollScrollUpButton;
 mog.scroll.down = MogItScrollScrollDownButton;
 mog.scroll.up:SetScript("OnClick",function(self)
@@ -172,39 +171,34 @@ mog.scroll.down:SetScript("OnClick",function(self)
 	mog.scroll:update(nil,1);
 end);
 
-function mog.scroll.update(self,page,offset)
+function mog.scroll.update(self,value,offset,onscroll)
 	local models = #mog.models;
 	local total = ceil(#mog.list/models);
-	local owner = GameTooltip:IsShown() and GameTooltip:GetOwner();
 	
-	if total > 1 then
-		self:SetMinMaxValues(1,total);
-		self:Show();
+	if onscroll then
+		value = onscroll;
 	else
-		self:Hide();
+		self:SetMinMaxValues(1,total);
+		if total > 1 then
+			self:Show();
+		else
+			self:Hide();
+		end
+		
+		local old = self:GetValue();
+		value = (value or old or 1) + (offset or 0);
+		if value ~= old then
+			self:SetValue(value);
+			return;
+		end
 	end
-	
-	if not page then
-		page = self:GetValue() or 1;
-	end
-	
-	if offset then
-		page = page + offset;
-	end
-	
-	if page < 1 then
-		page = 1;
-	elseif page > total then
-		page = total;
-	end
-	self:SetValue(page);
-	
-	if page == 1 then
+
+	if value == 1 then
 		self.up:Disable();
 	else
 		self.up:Enable();
 	end
-	if page == total then
+	if value == total then
 		self.down:Disable();
 	else
 		self.down:Enable();
@@ -214,9 +208,10 @@ function mog.scroll.update(self,page,offset)
 		mog.active:OnScroll();
 	end
 	
+	local owner = GameTooltip:IsShown() and GameTooltip:GetOwner();	
 	local id,frame,index;
 	for id,frame in ipairs(mog.models) do
-		index = ((page-1)*models)+id;
+		index = ((value-1)*models)+id;
 		if mog.list[index] then
 			frame.index = index;
 			wipe(frame.data);
@@ -234,8 +229,9 @@ function mog.scroll.update(self,page,offset)
 			frame:Hide();
 		end
 	end
+	
 	if total > 0 then
-		mog.frame.page:SetText(MERCHANT_PAGE_NUMBER:format(page,total));
+		mog.frame.page:SetText(MERCHANT_PAGE_NUMBER:format(value,total));
 		mog.frame.page:Show();
 	else
 		mog.frame.page:Hide();
@@ -243,13 +239,14 @@ function mog.scroll.update(self,page,offset)
 end
 
 mog.frame:SetScript("OnMouseWheel",function(self,offset)
-	local value = mog.scroll:GetValue();
+	mog.scroll:update(nil,offset > 0 and -1 or 1);
+	--[[local value = mog.scroll:GetValue();
 	local low,high = mog.scroll:GetMinMaxValues();
 	if (offset > 0 and value > low) then
 		mog.scroll:update(nil,-1);
 	elseif (offset < 0 and value < high) then
 		mog.scroll:update(nil,1);
-	end
+	end--]]
 end);
 
 function mog.updateModels()
