@@ -44,6 +44,31 @@ local itemSlots = {
 	"RangedSlot",
 }
 
+-- "create set" popup
+StaticPopupDialogs["MOGIT_WISHLIST_CREATE_SET"] = {
+	text = L["Enter set name"],
+	button1 = ACCEPT,
+	button2 = CANCEL,
+	hasEditBox = true,
+	OnAccept = function(self)
+		local text = self.editBox:GetText()
+		wishlist:CreateSet(text)
+		mog:BuildList()
+	end,
+	EditBoxOnEnterPressed = function(self)
+		local text = self:GetParent().editBox:GetText()
+		wishlist:CreateSet(text)
+		mog:BuildList()
+		self:GetParent():Hide()
+	end,
+	OnShow = function(self)
+		self.editBox:SetText("Set "..(#wishlist.db.profile.sets + 1))
+		self.editBox:SetFocus()
+	end,
+	whileDead = true,
+	timeout = 0,
+}
+
 local dropdown = CreateFrame("Frame")
 dropdown.displayMode = "MENU"
 --dropdown.point = "TOPLEFT"
@@ -196,7 +221,7 @@ function wishlist:Dropdown(level)
 		info.keepShownOnClick = true
 		info.notCheckable = true
 		info.func = function(self)
-			mog:SetModule(wishlist,L["Wishlist"])
+			mog:SetModule(wishlist, L["Wishlist"])
 		end
 		UIDropDownMenu_AddButton(info, level)
 	elseif level == 2 then
@@ -208,8 +233,7 @@ function wishlist:Dropdown(level)
 			-- mog.sub.selected = self.value
 			-- mog.sub.BuildList(self.arg1,self.value.items,true)
 			-- CloseDropDownMenus()
-			wishlist:CreateSet("Set "..(#wishlist.db.profile.sets + 1))
-			mog:BuildList()
+			StaticPopup_Show("MOGIT_WISHLIST_CREATE_SET")
 		end
 		info.notCheckable = true
 		-- info.arg1 = module
