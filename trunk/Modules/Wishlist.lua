@@ -154,9 +154,9 @@ dropdown.menu = {
 					local info = UIDropDownMenu_CreateInfo()
 					info.text = itemName
 					info.value = itemID
-					info.icon = GetItemIcon(itemID)
+					-- info.icon = GetItemIcon(itemID)
 					info.hasArrow = true
-					info.colorCode = "|c"..GetItemQualityColor(itemQuality)
+					info.colorCode = "|c"..select(4, GetItemQualityColor(itemQuality))
 					info.notCheckable = true
 					info.menuList = menuList
 					UIDropDownMenu_AddButton(info, level)
@@ -243,17 +243,17 @@ end
 
 local level3 = {
 	{
-		text = "Delete set",
+		text = "Rename set",
 		func = function(self)
-			tremove(wishlist.db.profile.sets, self.value)
-			mog:BuildList()
+			StaticPopup_Show("MOGIT_WISHLIST_RENAME_SET", nil, nil, wishlist.db.profile.sets[self.value])
 			CloseDropDownMenus()
 		end,
 	},
 	{
-		text = "Rename set",
+		text = "Delete set",
 		func = function(self)
-			StaticPopup_Show("MOGIT_WISHLIST_RENAME_SET", nil, nil, wishlist.db.profile.sets[self.value])
+			tremove(wishlist.db.profile.sets, self.value)
+			mog:BuildList()
 			CloseDropDownMenus()
 		end,
 	},
@@ -520,7 +520,7 @@ end
 end--]=]
 
 function wishlist:AddItem(itemID, setName)
-	if self:IsItemInWishlist(itemID) then
+	if not setName and self:IsItemInWishlist(itemID) then
 		return false
 	end
 	if setName then
