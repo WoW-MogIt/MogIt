@@ -68,7 +68,10 @@ local old_SetItemRef = SetItemRef;
 function SetItemRef(link,...)
 	if link:find("^MogIt") then
 		for k,v in ipairs(mog:LinkToSet(link)) do
-			print(k,v);
+			mog:AddToPreview(v,true);
+			if mog.db.profile.gridDress then
+				mog.scroll:update();
+			end
 		end
 	else
 		return old_SetItemRef(link,...);
