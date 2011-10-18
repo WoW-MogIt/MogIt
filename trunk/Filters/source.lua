@@ -116,6 +116,5 @@ function f.Default()
 		sub[1][k] = true;
 	end
 	UIDropDownMenu_SetText(f.dd,L["%d selected"]:format(num));
-	mog:BuildList();
 end
 f.Default();

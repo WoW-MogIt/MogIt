@@ -61,7 +61,6 @@ function f.Default()
 	f.min:SetNumber(minlvl);
 	maxlvl = UnitLevel("PLAYER");
 	f.max:SetNumber(maxlvl);
-	mog:BuildList();
 end
 f.Default();
 
