@@ -264,8 +264,9 @@ local function OnClick(module,self,btn)
 			mog:ShowURL(self.data.item);
 		else
 			local wishlist = mog:GetModule("Wishlist")
-			if not wishlist:IsItemInWishlist(self.data.item) then
-				wishlist:AddItem(self.data.item)
+			local add = wishlist:AddItem(self.data.item)
+			if not add then
+				-- print("Item was already on wishlist")
 			end
 		end
 	end

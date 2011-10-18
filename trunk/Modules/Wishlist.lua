@@ -150,10 +150,13 @@ dropdown.menu = {
 			for i, slot in ipairs(itemSlots) do
 				local itemID = menuList.value.items[slot]
 				if itemID then
+					local itemName, _, itemQuality = GetItemInfo(itemID)
 					local info = UIDropDownMenu_CreateInfo()
-					info.text = GetItemInfo(itemID)
+					info.text = itemName
 					info.value = itemID
+					info.icon = GetItemIcon(itemID)
 					info.hasArrow = true
+					info.colorCode = "|c"..GetItemQualityColor(itemQuality)
 					info.notCheckable = true
 					info.menuList = menuList
 					UIDropDownMenu_AddButton(info, level)
@@ -517,6 +520,9 @@ end
 end--]=]
 
 function wishlist:AddItem(itemID, setName)
+	if self:IsItemInWishlist(itemID) then
+		return false
+	end
 	if setName then
 		for i, set in ipairs(self.db.profile.sets) do
 			if set.name == setName then
@@ -529,10 +535,15 @@ function wishlist:AddItem(itemID, setName)
 		tinsert(self.db.profile.items, itemID)
 	end
 	self:BuildList()
+	return true
 end
 
 function wishlist:CreateSet(name)
+	if self:IsSetInWishlist(name) then
+		return false
+	end
 	tinsert(self.db.profile.sets, {name = name, items = {}})
+	return true
 end
 
 function wishlist:IsItemInWishlist(itemID)
