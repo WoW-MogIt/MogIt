@@ -174,6 +174,25 @@ dropdown.menu = {
 		end,
 		[2] = function(menuList, level)
 			local info = UIDropDownMenu_CreateInfo()
+			info.text = "Add to set"
+			info.value = UIDROPDOWNMENU_MENU_VALUE
+			info.hasArrow = true
+			info.notCheckable = true
+			info.menuList = menuList
+			UIDropDownMenu_AddButton(info, level)
+			
+			local info = UIDropDownMenu_CreateInfo()
+			info.text = "Add as single item"
+			info.value = UIDROPDOWNMENU_MENU_VALUE
+			info.func = function(self)
+				wishlist:AddItem(self.value)
+				mog:BuildList()
+				CloseDropDownMenus()
+			end
+			info.notCheckable = true
+			UIDropDownMenu_AddButton(info, level)
+			
+			local info = UIDropDownMenu_CreateInfo()
 			info.text = "Delete"
 			-- info.value = 
 			info.func = function(self)
@@ -183,6 +202,20 @@ dropdown.menu = {
 			end
 			info.notCheckable = true
 			UIDropDownMenu_AddButton(info, level)
+		end,
+		[3] = function(menuList, level)
+			for i, set in ipairs(wishlist.db.profile.sets) do
+				local info = UIDropDownMenu_CreateInfo()
+				info.text = set.name
+				info.func = function(self, arg1)
+					wishlist:AddItem(arg1, self.value)
+					mog:BuildList()
+					CloseDropDownMenus()
+				end
+				info.notCheckable = true
+				info.arg1 = UIDROPDOWNMENU_MENU_VALUE
+				UIDropDownMenu_AddButton(info, level)
+			end
 		end,
 	}
 }
