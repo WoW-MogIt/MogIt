@@ -1,6 +1,23 @@
 local MogIt,mog = ...;
 local L = mog.L;
 
+local slots = {
+	"HeadSlot",
+	"ShoulderSlot",
+	"BackSlot",
+	"ChestSlot",
+	"ShirtSlot",
+	"TabardSlot",
+	"WristSlot",
+	"HandsSlot",
+	"WaistSlot",
+	"LegsSlot",
+	"FeetSlot",
+	"MainHandSlot",
+	"SecondaryHandSlot",
+	"RangedSlot",
+};
+
 mog.view = CreateFrame("Frame","MogItPreview",UIParent,"ButtonFrameTemplate");
 mog.view:SetPoint("CENTER",UIParent,"CENTER");
 mog.view:SetSize(369,369);
@@ -87,22 +104,19 @@ mog.view.model.bg = mog.view.model:CreateTexture(nil,"BACKGROUND");
 mog.view.model.bg:SetAllPoints(mog.view.model);
 mog.view.model.bg:SetTexture(0.3,0.3,0.3,0.2);
 
-local slots = {
-	"HeadSlot",
-	"ShoulderSlot",
-	"BackSlot",
-	"ChestSlot",
-	"ShirtSlot",
-	"TabardSlot",
-	"WristSlot",
-	"HandsSlot",
-	"WaistSlot",
-	"LegsSlot",
-	"FeetSlot",
-	"MainHandSlot",
-	"SecondaryHandSlot",
-	"RangedSlot",
-};
+mog.view.link = CreateFrame("Button","MogItFramePreviewLink",mog.view,"MagicButtonTemplate");
+mog.view.link:SetPoint("BOTTOMLEFT",mog.view,"BOTTOMLEFT",5,5);
+mog.view.link:SetWidth(100);
+mog.view.link:SetText(L["Chat Link"]);
+mog.view.link:SetScript("OnClick",function(self,btn)
+	local tbl = {};
+	for k,v in pairs(mog.view.slots) do
+		if v.item then
+			table.insert(tbl,v.item);
+		end
+	end
+	ChatEdit_InsertLink(mog:SetToLink(tbl));
+end);
 
 function mog.view.setTexture(slot,texture)
 	SetItemButtonTexture(mog.view.slots[slot],texture or select(2,GetInventorySlotInfo(slot)));
