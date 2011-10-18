@@ -1,7 +1,7 @@
 local MogIt,mog = ...;
 local L = mog.L;
 
-local f = mog:AddFilter("source");
+local f = mog:CreateFilter("source");
 local selected;
 local sub;
 local num;

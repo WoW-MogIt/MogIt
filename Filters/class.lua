@@ -1,7 +1,7 @@
 local MogIt,mog = ...;
 local L = mog.L;
 
-local f = mog:AddFilter("class");
+local f = mog:CreateFilter("class");
 local coords = CLASS_ICON_TCOORDS;
 local colours = RAID_CLASS_COLORS;
 local class;

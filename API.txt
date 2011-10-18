@@ -37,9 +37,9 @@
 -> Args
 ---> top: True to scroll the list back to the top (boolean)
 
- AddFilter
+ CreateFilter
 -> Description: Adds a filter
--> Usage: frame = MogIt:AddFilter(name,frame)
+-> Usage: frame = MogIt:CreateFilter(name,frame)
 -> Args
 ---> name: Unique name for the filter (string)
 ---> frame: (Optional) Frame to use for the filter (frame)
