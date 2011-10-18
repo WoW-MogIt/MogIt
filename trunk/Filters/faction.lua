@@ -1,7 +1,7 @@
 local MogIt,mog = ...;
 local L = mog.L;
 
-local f = mog:AddFilter("faction");
+local f = mog:CreateFilter("faction");
 local alliance;
 local horde;
 

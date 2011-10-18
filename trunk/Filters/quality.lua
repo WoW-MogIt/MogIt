@@ -1,7 +1,7 @@
 local MogIt,mog = ...;
 local L = mog.L;
 
-local f = mog:AddFilter("quality");
+local f = mog:CreateFilter("quality");
 local colours = ITEM_QUALITY_COLORS;
 local selected;
 local num;

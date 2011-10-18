@@ -1,7 +1,7 @@
 local MogIt,mog = ...;
 local L = mog.L;
 
-local f = mog:AddFilter("level");
+local f = mog:CreateFilter("level");
 local minlvl;
 local maxlvl;
 
