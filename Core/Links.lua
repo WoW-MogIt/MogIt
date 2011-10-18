@@ -33,9 +33,44 @@ end
 
 function mog:LinkToSet(link)
 	local set = {};
-	local items = link:match("%[MogIt:(.-)%]");
+	local items = link:match("MogIt:([^%]:]+)");
 	for i=1,#items/maxlen do
 		table.insert(set,fromBase(items:sub((i-1)*maxlen+1,i*maxlen)));
 	end
 	return set;
+end
+
+local function filter(self,event,msg,...)
+	msg = msg:gsub("%[(MogIt[^%]]+)%]","|cFFCC99FF|H%1|h[MogIt]|h|r");
+	return false, msg, ...;
+end
+ChatFrame_AddMessageEventFilter("CHAT_MSG_SAY",filter);
+ChatFrame_AddMessageEventFilter("CHAT_MSG_YELL",filter);
+ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD",filter);
+ChatFrame_AddMessageEventFilter("CHAT_MSG_EMOTE",filter);
+ChatFrame_AddMessageEventFilter("CHAT_MSG_PARTY",filter);
+ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID",filter);
+ChatFrame_AddMessageEventFilter("CHAT_MSG_BATTLEGROUND",filter);
+ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER",filter);
+ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL",filter);
+ChatFrame_AddMessageEventFilter("CHAT_MSG_BATTLEGROUND_LEADER",filter);
+ChatFrame_AddMessageEventFilter("CHAT_MSG_OFFICER",filter);
+ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID_LEADER",filter);
+ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID_WARNING",filter);
+ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM",filter);
+ChatFrame_AddMessageEventFilter("CHAT_MSG_BN_WHISPER",filter);
+ChatFrame_AddMessageEventFilter("CHAT_MSG_BN_WHISPER_INFORM",filter);
+ChatFrame_AddMessageEventFilter("CHAT_MSG_BN_CONVERSATION",filter);
+ChatFrame_AddMessageEventFilter("CHAT_MSG_BN_INLINE_TOAST_BROADCAST",filter);
+ChatFrame_AddMessageEventFilter("CHAT_MSG_BN_INLINE_TOAST_BROADCAST_INFORM",filter);
+
+local old_SetItemRef = SetItemRef;
+function SetItemRef(link,...)
+	if link:find("^MogIt") then
+		for k,v in ipairs(mog:LinkToSet(link)) do
+			print(k,v);
+		end
+	else
+		return old_SetItemRef(link,...);
+	end
 end
