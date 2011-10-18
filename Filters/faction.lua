@@ -38,6 +38,5 @@ function f.Default()
 	f.alliance:SetChecked(alliance);
 	horde = UnitFactionGroup("PLAYER") == "Horde";
 	f.horde:SetChecked(horde);
-	mog:BuildList();
 end
 f.Default();

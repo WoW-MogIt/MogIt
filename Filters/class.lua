@@ -81,6 +81,5 @@ function f.Default()
 	num = 1;
 	all = true;
 	UIDropDownMenu_SetText(f.dd,L["%d selected"]:format(num));
-	mog:BuildList();
 end
 f.Default();
