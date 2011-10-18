@@ -11,10 +11,35 @@ mog.sub = {};
 mog.list = {};
 mog.models = {};
 mog.bin = {};
+
 mog.posX = 0;
 mog.posY = 0;
 mog.posZ = 0;
 mog.face = 0;
+
+mog.invSlots = {
+	INVTYPE_HEAD = "HeadSlot",
+	INVTYPE_SHOULDER = "ShoulderSlot",
+	INVTYPE_BODY = "ShirtSlot",
+	INVTYPE_CLOAK = "BackSlot",
+	INVTYPE_CHEST = "ChestSlot",
+	INVTYPE_ROBE = "ChestSlot",
+	INVTYPE_WAIST = "WaistSlot",
+	INVTYPE_LEGS = "LegsSlot",
+	INVTYPE_FEET = "FeetSlot",
+	INVTYPE_WRIST = "WristSlot",
+	INVTYPE_2HWEAPON = "MainHandSlot",
+	INVTYPE_WEAPON = "MainHandSlot",
+	INVTYPE_WEAPONMAINHAND = "MainHandSlot",
+	INVTYPE_WEAPONOFFHAND = "SecondaryHandSlot",
+	INVTYPE_SHIELD = "SecondaryHandSlot",
+	INVTYPE_HOLDABLE = "SecondaryHandSlot",
+	INVTYPE_RANGED = "RangedSlot",
+	INVTYPE_RANGEDRIGHT = "RangedSlot",
+	INVTYPE_THROWN = "RangedSlot",
+	INVTYPE_HAND = "HandsSlot",
+	INVTYPE_TABARD = "TabardSlot",
+};
 
 function mog:RegisterModule(name,data,base)
 	if mog.modules.lookup[name] then return end;
@@ -69,10 +94,10 @@ function mog.toggleFrame()
 end
 
 function mog.togglePreview()
-	if mog.preview:IsShown() then
-		HideUIPanel(mog.preview);
+	if mog.view:IsShown() then
+		HideUIPanel(mog.view);
 	else
-		ShowUIPanel(mog.preview);
+		ShowUIPanel(mog.view);
 	end
 end
 
@@ -140,9 +165,8 @@ local defaults = {
 mog.frame = CreateFrame("Frame","MogItFrame",UIParent,"ButtonFrameTemplate");
 mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 	if event == "PLAYER_LOGIN" then
-		--mog.view.model.model:SetUnit("PLAYER");
+		mog.view.model.model:SetUnit("PLAYER");
 		mog.updateGUI();
-		--mog.updateModels();
 		
 		--[[mog.tooltip.model:SetUnit("PLAYER");
 		mog.tooltip:SetSize(mog.db.profile.tooltipWidth,mog.db.profile.tooltipHeight);
@@ -157,6 +181,14 @@ mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 		if UIDropDownMenu_GetCurrentDropDown() == mog.sub.LeftClick and DropDownList1 and DropDownList1:IsShown() then
 			HideDropDownMenu(1);
 			ToggleDropDownMenu(nil,nil,mog.sub.LeftClick,"cursor",0,0,mog.sub.LeftClick.menuList);
+		end
+		for k,v in pairs(mog.view.wait) do
+			if select(9,GetItemInfo(k)) then
+				for i=1,v do
+					mog:AddToPreview(k);
+				end
+				mog.view.wait[k] = nil;
+			end
 		end
 	elseif event == "ADDON_LOADED" then
 		if arg1 == MogIt then

@@ -21,10 +21,12 @@ end
 
 mog.filt = CreateFrame("Frame","MogItFilters",mog.frame,"ButtonFrameTemplate");
 mog.filt:Hide();
-mog.filt:SetPoint("TOPLEFT",mog.frame,"TOPRIGHT")--,5,-35);
+mog.filt:SetPoint("TOPLEFT",mog.frame,"TOPRIGHT");
 mog.filt:SetSize(200,300);
-MogItFiltersCloseButton:SetNormalTexture("Interface\\BUTTONS\\UI-Panel-HideButton-Up");
-MogItFiltersCloseButton:SetPushedTexture("Interface\\BUTTONS\\UI-Panel-HideButton-Down");
+mog.filt:SetClampedToScreen(true);
+mog.filt:EnableMouse(true);
+--MogItFiltersCloseButton:SetNormalTexture("Interface\\BUTTONS\\UI-Panel-HideButton-Up");
+--MogItFiltersCloseButton:SetPushedTexture("Interface\\BUTTONS\\UI-Panel-HideButton-Down");
 MogItFiltersBg:SetVertexColor(0.8,0.3,0.8);
 MogItFiltersTitleText:SetText(FILTERS);
 mog.filt.portraitFrame:Hide();
@@ -130,3 +132,26 @@ function mog:FilterUpdate()
 	end
 	mog.filt.frame:SetHeight(height);
 end
+
+
+--[[
+VENDOR?
+Valor Points
+Justice Points
+Conquest Points
+Honor Points
+Tier Tokens
+--> Tier 1
+--> Tier 2
+--> etc
+Gold
+Other
+
+ZONES
+-- current zone
+
+NAME
+
+QUEST/ACHI
+- complete?
+--]]

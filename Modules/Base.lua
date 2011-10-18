@@ -164,6 +164,7 @@ local function FrameUpdate(module,self,value)
 	self.data.item = type(self.data.items) ~= "table" and self.data.items or self.data.items[self.data.cycle];
 	
 	self.model:Undress();
+	mog:DressModel(self.model);
 	self.model:TryOn(self.data.item);
 end
 
@@ -258,15 +259,7 @@ local function OnClick(module,self,btn)
 		end
 	elseif btn == "RightButton" then
 		if IsControlKeyDown() then
-			--[[if self.MogItSlot then
-				mog.view.delItem(self.slot);
-				mog.dressModel(mog.view.model.model);
-				if mog.db.profile.gridDress then
-					mog.scroll:update();
-				end
-			else
-				mog.view.addItem(self.item);
-			end--]]
+			mog:AddToPreview(self.data.item);
 		elseif IsShiftKeyDown() then
 			mog:ShowURL(self.data.item);
 		else

@@ -139,9 +139,9 @@ mog.frame.preview:SetWidth(100);
 mog.frame.preview:SetText(L["Preview"]);
 mog.frame.preview:SetScript("OnClick",function(self,btn)
 	if mog.view:IsShown() then
-		mog.view:Hide();
+		HideUIPanel(mog.view);
 	else
-		mog.view:Show();
+		ShowUIPanel(mog.view);
 	end
 end);
 
@@ -251,10 +251,10 @@ mog.frame:SetScript("OnMouseWheel",function(self,offset)
 end);
 
 function mog.updateModels()
-	--mog.view.model.model:SetFacing(mog.face);
-	--if mog.view.model.model:IsVisible() then
-	--	mog.view.model.model:SetPosition(mog.posZ,mog.posX,mog.posY);
-	--end
+	mog.view.model.model:SetFacing(mog.face);
+	if mog.view.model.model:IsVisible() then
+		mog.view.model.model:SetPosition(mog.posZ,mog.posX,mog.posY);
+	end
 	for k,v in ipairs(mog.models) do
 		v.model:SetFacing(mog.face);
 		if v.model:IsVisible() then
@@ -263,7 +263,7 @@ function mog.updateModels()
 	end
 end
 
-mog.modelUpdater = CreateFrame("Frame",nil,mog.frame);
+mog.modelUpdater = CreateFrame("Frame",nil,UIParent);
 mog.modelUpdater:Hide();
 mog.modelUpdater:SetScript("OnUpdate",function(self,elapsed)
 	local currentx,currenty = GetCursorPosition();
