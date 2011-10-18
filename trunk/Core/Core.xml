@@ -6,5 +6,6 @@
 <Script file="GUI.lua"/>
 <Script file="Preview.lua"/>
 <Script file="URL.lua"/>
+<Script file="Links.lua"/>
 
 </Ui>

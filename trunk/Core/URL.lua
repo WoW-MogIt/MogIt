@@ -1,13 +1,14 @@
 local MogIt,mog = ...;
 local L = mog.L;
 
-mog.url = {};
+local sites = {};
 
 function mog:ShowURL(id,sub,url)
 	url = url or mog.db.profile.url;
 	sub = sub or "item";
-	if mog.url[url] and mog.url[url][sub] then
-		StaticPopup_Show("MOGIT_URL",mog.url[url].fav and "\124TInterface\\AddOns\\MogIt\\Images\\"..mog.url[url].fav..":18:18\124t " or "",url,mog.url[url][sub]:format(id));
+	if sites[url] and sites[url][sub] then
+		StaticPopup_Show("MOGIT_URL",sites[url].fav and "\124TInterface\\AddOns\\MogIt\\Images\\"..sites[url].fav..":18:18\124t " or "",url,sites[url][sub]:format(id));
+		return true;
 	end
 end
 
@@ -34,13 +35,13 @@ StaticPopupDialogs["MOGIT_URL"] = {
 	hideOnEscape = 1
 };
 
-mog.url["Battle.net"] = {
+sites["Battle.net"] = {
 	fav = "fav_wow",
 	--url = L["http://eu.battle.net/wow/en/"],
 	item = L["http://eu.battle.net/wow/en/"].."item/%d",
 };
 
-mog.url["Wowhead"] = {
+sites["Wowhead"] = {
 	fav = "fav_wh",
 	--url = L["http://www.wowhead.com/"],
 	item = L["http://www.wowhead.com/"].."item=%d",
@@ -49,7 +50,7 @@ mog.url["Wowhead"] = {
 	spell = L["http://www.wowhead.com/"].."spell=%d",
 };
 
-mog.url["MMO-Champion"] = {
+sites["MMO-Champion"] = {
 	fav = "fav_mmo",
 	--url = "http://db.mmo-champion.com/",
 	item = "http://db.mmo-champion.com/i/%d/",
@@ -58,7 +59,7 @@ mog.url["MMO-Champion"] = {
 	spell = "http://db.mmo-champion.com/s/%d/",
 };
 
-mog.url["Wowpedia"] = {
+sites["Wowpedia"] = {
 	fav = "fav_wp",
 	--url = "http://www.wowpedia.org/"
 	item = "http://www.wowpedia.org/index.php?search=\"{{elinks-item|%d}}\"",
@@ -67,7 +68,7 @@ mog.url["Wowpedia"] = {
 	spell = "http://www.wowpedia.org/index.php?search=\"{{elinks-spell|%d}}\"",
 };
 
-mog.url["Thottbot"] = {
+sites["Thottbot"] = {
 	fav = "fav_tb",
 	--url = "http://thottbot.com/"
 	item = "http://thottbot.com/item=%d",
@@ -76,7 +77,7 @@ mog.url["Thottbot"] = {
 	spell = "http://thottbot.com/spell=%d",
 };
 
-mog.url["Buffed.de"] = {
+sites["Buffed.de"] = {
 	fav = "fav_buff",
 	--url = "http://wowdata.buffed.de/"
 	item = "http://wowdata.buffed.de/?i=%d",
@@ -85,7 +86,7 @@ mog.url["Buffed.de"] = {
 	spell = "http://wowdata.buffed.de/?s=%d",
 };
 
-mog.url["JudgeHype"] = {
+sites["JudgeHype"] = {
 	fav = "fav_jh",
 	--url = "http://worldofwarcraft.judgehype.com/"
 	item = "http://worldofwarcraft.judgehype.com/?page=objet&w=%d",
