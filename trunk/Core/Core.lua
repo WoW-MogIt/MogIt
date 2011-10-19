@@ -179,9 +179,8 @@ mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 		if owner and owner.MogItModel and mog.active and mog.active.OnEnter then
 			mog.active:OnEnter(owner);
 		end
-		if UIDropDownMenu_GetCurrentDropDown() == mog.sub.LeftClick and DropDownList1 and DropDownList1:IsShown() then
-			HideDropDownMenu(1);
-			ToggleDropDownMenu(nil,nil,mog.sub.LeftClick,"cursor",0,0,mog.sub.LeftClick.menuList);
+		if mog.active and mog.active.GET_ITEM_INFO_RECEIVED then
+			mog.active:GET_ITEM_INFO_RECEIVED();
 		end
 	elseif event == "ADDON_LOADED" then
 		if arg1 == MogIt then

@@ -20,7 +20,7 @@ local slots = {
 
 mog.view = CreateFrame("Frame","MogItPreview",UIParent,"ButtonFrameTemplate");
 mog.view:SetPoint("CENTER",UIParent,"CENTER");
-mog.view:SetSize(369,369);
+mog.view:SetSize(335,385);
 mog.view:SetToplevel(true);
 mog.view:SetClampedToScreen(true);
 mog.view:EnableMouse(true);
@@ -37,15 +37,15 @@ mog.view.portraitFrame:Hide();
 mog.view.topLeftCorner:Show();
 mog.view.topBorderBar:SetPoint("TOPLEFT",mog.view.topLeftCorner,"TOPRIGHT",0,0);
 mog.view.leftBorderBar:SetPoint("TOPLEFT",mog.view.topLeftCorner,"BOTTOMLEFT",0,0);
-mog.view.Inset:SetPoint("TOPLEFT",mog.view,"TOPLEFT",44,-60);
-mog.view.Inset:SetPoint("BOTTOMRIGHT",mog.view,"BOTTOMRIGHT",-47,26);
+--mog.view.Inset:SetPoint("TOPLEFT",mog.view,"TOPLEFT",44,-60);
+--mog.view.Inset:SetPoint("BOTTOMRIGHT",mog.view,"BOTTOMRIGHT",-47,26);
 
 mog.view.resize = CreateFrame("Frame",nil,mog.view);
 mog.view.resize:SetSize(16,16);
 mog.view.resize:SetPoint("BOTTOMRIGHT",mog.view,"BOTTOMRIGHT",-4,3);
 mog.view.resize:EnableMouse(true);
 mog.view.resize:SetScript("OnMouseDown",function(self)
-	mog.view:SetMinResize(369,369);
+	mog.view:SetMinResize(335,385);
 	mog.view:SetMaxResize(GetScreenWidth(),GetScreenHeight());
 	mog.view:StartSizing();
 end);
@@ -60,8 +60,8 @@ mog.view.resize.texture:SetTexture("Interface\\AddOns\\MogIt\\Images\\Resize");
 mog.view.resize.texture:SetAllPoints(mog.view.resize);
 
 mog.view.model = CreateFrame("Button",nil,mog.view);
-mog.view.model:SetPoint("TOPLEFT",mog.view.Inset,"TOPLEFT",10,-10);
-mog.view.model:SetPoint("BOTTOMRIGHT",mog.view.Inset,"BOTTOMRIGHT",-10,10);
+mog.view.model:SetPoint("TOPLEFT",mog.view.Inset,"TOPLEFT",49,-8);
+mog.view.model:SetPoint("BOTTOMRIGHT",mog.view.Inset,"BOTTOMRIGHT",-49,8);
 mog.view.model:EnableMouseWheel(true);
 mog.view.model:SetScript("OnMouseWheel",function(self,v)
 	mog.posZ = mog.posZ + ((v > 0 and 0.6) or -0.6);
@@ -153,9 +153,11 @@ for k,v in ipairs(slots) do
 	mog.view.slots[v] = CreateFrame("Button","MogItPreview"..v,mog.view,"ItemButtonTemplate");
 	mog.view.slots[v].slot = v;
 	if k == 1 then
-		mog.view.slots[v]:SetPoint("TOPLEFT",mog.view,"TOPLEFT",5,-60);
+		--mog.view.slots[v]:SetPoint("TOPLEFT",mog.view,"TOPLEFT",5,-60);
+		mog.view.slots[v]:SetPoint("TOPLEFT",mog.view.Inset,"TOPLEFT",8,-8);
 	elseif k == 8 then
-		mog.view.slots[v]:SetPoint("TOPRIGHT",mog.view,"TOPRIGHT",-7,-60);
+		--mog.view.slots[v]:SetPoint("TOPRIGHT",mog.view,"TOPRIGHT",-7,-60);
+		mog.view.slots[v]:SetPoint("TOPRIGHT",mog.view.Inset,"TOPRIGHT",-7,-8);
 	else
 		mog.view.slots[v]:SetPoint("TOP",mog.view.slots[slots[k-1]],"BOTTOM",0,-4);
 	end
@@ -206,6 +208,9 @@ end
 
 mog.view.wait = {};
 function mog:AddToPreview(item,set)
+	if type(item) == "string" then
+		item = tonumber(item:match("item:(%d+)"));
+	end
 	if not item then return end;
 	local slot,texture = select(9,GetItemInfo(item));
 	if not slot then
@@ -321,20 +326,6 @@ if GuildBankFrame then
 	hookGuildBankUI();
 end
 
-local function hookALB()
-	local old = AphesLootBrowser.ItemClick;
-	function AphesLootBrowser.ItemClick(self,item,btn,...)
-		if type(item) == "number" and btn == "RightButton" and IsControlKeyDown() then
-			mog:AddToPreview(item);
-		else
-			return old(self,item,btn,...);
-		end
-	end
-end
-if AphesLootBrowser then
-	hookALB();
-end
-
 local old_SetItemRef = SetItemRef;
 function SetItemRef(link,text,btn,...)
 	local id = tonumber(link:match("^item:(%d+)"));
@@ -346,15 +337,7 @@ function SetItemRef(link,text,btn,...)
 end
 
 mog.view:SetScript("OnEvent",function(self,event,arg1,...)
-	if event == "ADDON_LOADED" then
-		if arg1 == "Blizzard_InspectUI" then
-			hookInspectUI();
-		elseif arg1 == "Blizzard_GuildBankUI" then
-			hookGuildBankUI();
-		elseif arg1 == "AphesLootBrowser" then
-			hookALB();
-		end
-	elseif event == "GET_ITEM_INFO_RECEIVED" then
+	if event == "GET_ITEM_INFO_RECEIVED" then
 		for k,v in pairs(mog.view.wait) do
 			if select(9,GetItemInfo(k)) then
 				for i=1,v do
@@ -362,6 +345,12 @@ mog.view:SetScript("OnEvent",function(self,event,arg1,...)
 				end
 				mog.view.wait[k] = nil;
 			end
+		end
+	elseif event == "ADDON_LOADED" then
+		if arg1 == "Blizzard_InspectUI" then
+			hookInspectUI();
+		elseif arg1 == "Blizzard_GuildBankUI" then
+			hookGuildBankUI();
 		end
 	end
 end);
