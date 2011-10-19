@@ -63,7 +63,7 @@ end
 
 function mog:SetModule(module,text)
 	if not module then return end;
-	if mog.active and mog.active.Unlist then
+	if mog.active and mog.active.Unlist and mog.active ~= module then
 		mog.active:Unlist(module);
 	end
 	mog.active = module;
