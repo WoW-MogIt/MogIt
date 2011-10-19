@@ -8,7 +8,6 @@ local function temp(module,tier)
 		info.text = module.name..(module.loaded and "" or " \124cFFFFFFFF("..L["Click to load addon"]..")");
 		info.value = module;
 		info.colorCode = "\124cFF"..(module.loaded and "00FF00" or "FF0000");
-		info.hasArrow = module.loaded;
 		info.keepShownOnClick = true;
 		info.notCheckable = true;
 		info.func = function(self)
