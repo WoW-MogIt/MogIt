@@ -104,6 +104,16 @@ mog.view.model.bg = mog.view.model:CreateTexture(nil,"BACKGROUND");
 mog.view.model.bg:SetAllPoints(mog.view.model);
 mog.view.model.bg:SetTexture(0.3,0.3,0.3,0.2);
 
+mog.view.clear = CreateFrame("Button","MogItFramePreviewClear",mog.view,"UIPanelButtonTemplate2");
+mog.view.clear:SetPoint("TOPRIGHT",mog.view,"TOPRIGHT",-10,-30);
+mog.view.clear:SetWidth(100);
+mog.view.clear:SetText(L["Clear"]);
+mog.view.clear:SetScript("OnClick",function(self,btn)
+	for k,v in pairs(mog.view.slots) do
+		mog.view.delItem(k);
+	end
+end);
+
 mog.view.link = CreateFrame("Button","MogItFramePreviewLink",mog.view,"MagicButtonTemplate");
 mog.view.link:SetPoint("BOTTOMLEFT",mog.view,"BOTTOMLEFT",5,5);
 mog.view.link:SetWidth(100);
@@ -116,6 +126,22 @@ mog.view.link:SetScript("OnClick",function(self,btn)
 		end
 	end
 	ChatEdit_InsertLink(mog:SetToLink(tbl));
+end);
+
+mog.view.add = CreateFrame("Button","MogItFramePreviewAddItem",mog.view,"MagicButtonTemplate");
+mog.view.add:SetPoint("TOPLEFT",mog.view.link,"TOPRIGHT");
+mog.view.add:SetWidth(100);
+mog.view.add:SetText(L["Add Item"]);
+mog.view.add:SetScript("OnClick",function(self,btn)
+	StaticPopup_Show("MOGIT_PREVIEW_ADDITEM");
+end);
+
+mog.view.import = CreateFrame("Button","MogItFramePreviewImport",mog.view,"MagicButtonTemplate");
+mog.view.import:SetPoint("TOPLEFT",mog.view.add,"TOPRIGHT");
+mog.view.import:SetWidth(100);
+mog.view.import:SetText(L["Import"]);
+mog.view.import:SetScript("OnClick",function(self,btn)
+	StaticPopup_Show("MOGIT_PREVIEW_IMPORT");
 end);
 
 function mog.view.setTexture(slot,texture)
@@ -230,7 +256,7 @@ end
 function mog.view.delItem(slot)
 	mog.view.slots[slot].item = nil;
 	mog.view.setTexture(slot);
-	mog.view.model.model:Undress();
+	mog.view.model.model:Undress(); -- <--
 	mog:DressModel(mog.view.model.model);
 	--[=[if GameTooltip:GetOwner() == mog.view.slots[slot] then
 		GameTooltip:Hide();
@@ -257,3 +283,97 @@ hooksecurefunc("HandleModifiedItemClick",function(link)
 		end
 	end
 end);
+
+StaticPopupDialogs["MOGIT_PREVIEW_ADDITEM"] = {
+	text = L["Type the item ID or url in the text box below"],
+	button1 = ADD,
+	button2 = CANCEL,
+	hasEditBox = 1,
+	maxLetters = 512,
+	editBoxWidth = 260,
+	OnShow = function(self,item)
+		self.editBox:SetFocus();
+	end,
+	OnAccept = function(self)
+		local text = self.editBox:GetText();
+		text = text and text:match("(%d+).-$");
+		mog:AddToPreview(tonumber(text));
+	end,
+	OnCancel = function(self) end,
+	EditBoxOnEnterPressed = function(self)
+		local text = self:GetText();
+		text = text and text:match("(%d+).-$");
+		mog:AddToPreview(tonumber(text));
+		self:GetParent():Hide();
+	end,
+	EditBoxOnEscapePressed = function(self)
+		self:GetParent():Hide();
+	end,
+	timeout = 0,
+	exclusive = 1,
+	whileDead = 1,
+	hideOnEscape = 1
+};
+
+StaticPopupDialogs["MOGIT_PREVIEW_IMPORT"] = {
+	text = L["Copy and paste a Wowhead Compare URL into the text box below to import"],
+	button1 = L["Import"],
+	button2 = CANCEL,
+	hasEditBox = 1,
+	maxLetters = 512,
+	editBoxWidth = 260,
+	OnShow = function(self,item)
+		local str;
+		for k,v in pairs(mog.view.slots) do
+			if v.item then
+				if str then
+					str = str..":"..v.item;
+				else
+					str = L["http://www.wowhead.com/"].."compare?items="..v.item;
+				end
+			end
+		end
+		self.editBox:SetText(str or "");
+		self.editBox:SetFocus();
+		self.editBox:HighlightText();
+	end,
+	OnAccept = function(self)
+		local items = self.editBox:GetText();
+		items = items and items:match("compare%?items=([^;#]+)");
+		if items then
+			for item in items:gmatch("([^:]+)") do
+				item = item:match("^(%d+)");
+				if item then
+					mog:AddToPreview(tonumber(item),true);
+				end
+			end
+			if mog.db.profile.gridDress then
+				mog.scroll:update();
+			end
+		end
+	end,
+	OnCancel = function(self) end,
+	EditBoxOnEnterPressed = function(self)
+		self:GetParent():Hide();
+		local items = self:GetText();
+		items = items and items:match("compare%?items=([^;#]+)");
+		if items then
+			for item in items:gmatch("([^:]+)") do
+				item = item:match("^(%d+)");
+				if item then
+					mog:AddToPreview(tonumber(item),true);
+				end
+			end
+			if mog.db.profile.gridDress then
+				mog.scroll:update();
+			end
+		end
+	end,
+	EditBoxOnEscapePressed = function(self)
+		self:GetParent():Hide();
+	end,
+	timeout = 0,
+	exclusive = 1,
+	whileDead = 1,
+	hideOnEscape = 1
+};
