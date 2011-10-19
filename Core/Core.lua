@@ -183,14 +183,6 @@ mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 			HideDropDownMenu(1);
 			ToggleDropDownMenu(nil,nil,mog.sub.LeftClick,"cursor",0,0,mog.sub.LeftClick.menuList);
 		end
-		for k,v in pairs(mog.view.wait) do
-			if select(9,GetItemInfo(k)) then
-				for i=1,v do
-					mog:AddToPreview(k);
-				end
-				mog.view.wait[k] = nil;
-			end
-		end
 	elseif event == "ADDON_LOADED" then
 		if arg1 == MogIt then
 			local AceDB = LibStub("AceDB-3.0")
