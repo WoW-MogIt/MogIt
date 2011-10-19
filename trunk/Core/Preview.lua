@@ -114,22 +114,8 @@ mog.view.clear:SetScript("OnClick",function(self,btn)
 	end
 end);
 
-mog.view.link = CreateFrame("Button","MogItFramePreviewLink",mog.view,"MagicButtonTemplate");
-mog.view.link:SetPoint("BOTTOMLEFT",mog.view,"BOTTOMLEFT",5,5);
-mog.view.link:SetWidth(100);
-mog.view.link:SetText(L["Chat Link"]);
-mog.view.link:SetScript("OnClick",function(self,btn)
-	local tbl = {};
-	for k,v in pairs(mog.view.slots) do
-		if v.item then
-			table.insert(tbl,v.item);
-		end
-	end
-	ChatEdit_InsertLink(mog:SetToLink(tbl));
-end);
-
 mog.view.add = CreateFrame("Button","MogItFramePreviewAddItem",mog.view,"MagicButtonTemplate");
-mog.view.add:SetPoint("TOPLEFT",mog.view.link,"TOPRIGHT");
+mog.view.add:SetPoint("BOTTOMLEFT",mog.view,"BOTTOMLEFT",5,5);
 mog.view.add:SetWidth(100);
 mog.view.add:SetText(L["Add Item"]);
 mog.view.add:SetScript("OnClick",function(self,btn)
@@ -142,6 +128,20 @@ mog.view.import:SetWidth(100);
 mog.view.import:SetText(L["Import"]);
 mog.view.import:SetScript("OnClick",function(self,btn)
 	StaticPopup_Show("MOGIT_PREVIEW_IMPORT");
+end);
+
+mog.view.link = CreateFrame("Button","MogItFramePreviewLink",mog.view,"MagicButtonTemplate");
+mog.view.link:SetPoint("TOPLEFT",mog.view.import,"TOPRIGHT");
+mog.view.link:SetWidth(100);
+mog.view.link:SetText(L["Chat Link"]);
+mog.view.link:SetScript("OnClick",function(self,btn)
+	local tbl = {};
+	for k,v in pairs(mog.view.slots) do
+		if v.item then
+			table.insert(tbl,v.item);
+		end
+	end
+	ChatEdit_InsertLink(mog:SetToLink(tbl));
 end);
 
 function mog.view.setTexture(slot,texture)
