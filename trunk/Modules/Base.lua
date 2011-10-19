@@ -251,6 +251,11 @@ local function OnClick(module,self,btn)
 		elseif IsControlKeyDown() then
 			DressUpItemLink(self.data.item);
 		else
+			if type(self.data.items) == "table" then
+				self.data.cycle = (self.data.cycle < #self.data.items and (self.data.cycle + 1)) or 1;
+				self.data.item = self.data.items[self.data.cycle];
+				module:OnEnter(self);
+			end
 		end
 	elseif btn == "RightButton" then
 		if IsControlKeyDown() then
