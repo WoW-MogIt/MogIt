@@ -296,6 +296,12 @@ function mog.sub.LeftClick:initialize(tier,self)
 		UIDropDownMenu_AddButton(info,tier);
 	end
 end
+local function GET_ITEM_INFO_RECEIVED()
+	if UIDropDownMenu_GetCurrentDropDown() == mog.sub.LeftClick and DropDownList1 and DropDownList1:IsShown() then
+		HideDropDownMenu(1);
+		ToggleDropDownMenu(nil,nil,mog.sub.LeftClick,"cursor",0,0,mog.sub.LeftClick.menuList);
+	end
+end
 
 local function Unlist(module)
 	wipe(display);
@@ -392,6 +398,7 @@ for k,v in ipairs(addons) do
 				"quality",
 				(v == "MogIt_OneHanded" and "slot") or nil,
 			},
+			GET_ITEM_INFO_RECEIVED = GET_ITEM_INFO_RECEIVED,
 			addon = v,
 			slots = {},
 		},true);
