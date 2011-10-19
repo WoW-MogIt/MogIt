@@ -596,3 +596,7 @@ function wishlist:IsSetInWishlist(setName)
 	end
 	return false
 end
+
+function wishlist:GetSets()
+	return self.db.profile.sets
+end

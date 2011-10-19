@@ -250,12 +250,6 @@ local function OnClick(module,self,btn)
 		elseif IsControlKeyDown() then
 			DressUpItemLink(self.data.item);
 		else
-			if UIDropDownMenu_GetCurrentDropDown() == mog.sub.LeftClick and mog.sub.LeftClick.menuList ~= self and DropDownList1 and DropDownList1:IsShown() then
-				HideDropDownMenu(1);
-			end
-			if type(self.data.items) == "table" then
-				ToggleDropDownMenu(nil,nil,mog.sub.LeftClick,"cursor",0,0,self);
-			end
 		end
 	elseif btn == "RightButton" then
 		if IsControlKeyDown() then
@@ -263,11 +257,10 @@ local function OnClick(module,self,btn)
 		elseif IsShiftKeyDown() then
 			mog:ShowURL(self.data.item);
 		else
-			local wishlist = mog:GetModule("Wishlist")
-			local add = wishlist:AddItem(self.data.item)
-			if not add then
-				-- print("Item was already on wishlist")
+			if UIDropDownMenu_GetCurrentDropDown() == mog.sub.LeftClick and mog.sub.LeftClick.menuList ~= self and DropDownList1 and DropDownList1:IsShown() then
+				HideDropDownMenu(1);
 			end
+			ToggleDropDownMenu(nil,nil,mog.sub.LeftClick,"cursor",0,0,self);
 		end
 	end
 end
@@ -278,24 +271,80 @@ local function OnScroll(module)
 	end
 end
 
-mog.sub.LeftClick = CreateFrame("Frame",nil,mog.frame);
-mog.sub.LeftClick.displayMode = "MENU";
-function mog.sub.LeftClick:initialize(tier,self)
-	local info;
-	for k,v in ipairs(self.data.items) do
-		local name,link,_,_,_,_,_,_,_,texture = GetItemInfo(v);
-		info = UIDropDownMenu_CreateInfo();
+do
+	local function menuAddItem(self, itemID, index)
+		local name,link,_,_,_,_,_,_,_,texture = GetItemInfo(itemID);
+		local info = UIDropDownMenu_CreateInfo();
 		info.text = (texture and "\124T"..texture..":18\124t " or "")..(link or name or "");
-		info.value = k;
-		info.func = function(self)
-			self.arg1.data.cycle = self.value;
-			self.arg1.data.item = self.arg1.data.items[self.value];
-		end
-		info.checked = self.data.cycle == k;
+		info.value = itemID;
+		info.func = onClick;
+		info.checked = self.data.cycle == index;
+		info.hasArrow = true;
 		info.arg1 = self;
+		info.arg2 = index;
 		UIDropDownMenu_AddButton(info,tier);
 	end
+	
+	local function onClick(self, arg1, arg2)
+		arg1.data.cycle = arg2;
+		arg1.data.item = arg1.data.items[arg2];
+	end
+	
+	local function setOnClick(self, set)
+		mog:GetModule("Wishlist"):AddItem(self.value, set);
+		CloseDropDownMenus();
+	end
+	
+	local menu = {
+		{
+			text = "Add to wishlist",
+			func = function(self)
+				mog:GetModule("Wishlist"):AddItem(self.value);
+				CloseDropDownMenus();
+			end,
+		},
+		{
+			text = "Add to set",
+			hasArrow = true,
+		},
+	}
+	
+	mog.sub.LeftClick = CreateFrame("Frame",nil,mog.frame);
+	mog.sub.LeftClick.displayMode = "MENU";
+	function mog.sub.LeftClick:initialize(tier,self)
+		if tier == 1 then
+			local items = self.data.items;
+			if type(items) == "table" then
+				for i,itemID in ipairs(items) do
+					menuAddItem(self, itemID, i);
+				end
+			else
+				menuAddItem(self, items, index);
+			end
+		elseif tier == 2 then
+			for i, info in ipairs(menu) do
+				-- local info = UIDropDownMenu_CreateInfo();
+				-- info.text = set.name;
+				info.value = UIDROPDOWNMENU_MENU_VALUE;
+				-- info.func = setOnClick;
+				info.notCheckable = true;
+				-- info.arg1 = set.items;
+				UIDropDownMenu_AddButton(info, tier);
+			end
+		elseif tier == 3 then
+			for i, set in ipairs(mog:GetModule("Wishlist"):GetSets()) do
+				local info = UIDropDownMenu_CreateInfo();
+				info.text = set.name;
+				info.value = UIDROPDOWNMENU_MENU_VALUE;
+				info.func = setOnClick;
+				info.notCheckable = true;
+				info.arg1 = set.name;
+				UIDropDownMenu_AddButton(info, tier);
+			end
+		end
+	end
 end
+
 local function GET_ITEM_INFO_RECEIVED()
 	if UIDropDownMenu_GetCurrentDropDown() == mog.sub.LeftClick and DropDownList1 and DropDownList1:IsShown() then
 		HideDropDownMenu(1);
