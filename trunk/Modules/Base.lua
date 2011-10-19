@@ -15,6 +15,7 @@ local addons = {
 	"MogIt_Accessories",
 };
 
+local list = {};
 local display = {};
 
 mog.sub.data = {
@@ -353,12 +354,13 @@ local function GET_ITEM_INFO_RECEIVED()
 end
 
 local function Unlist(module)
+	wipe(list);
 	wipe(display);
 end
 
 local function BuildList(module)
+	wipe(list);
 	wipe(display);
-	local list = {};
 	for k,v in ipairs(module.active.items) do
 		local state = true;
 		for x,y in ipairs(module.filters) do
