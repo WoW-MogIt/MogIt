@@ -29,6 +29,8 @@ ignore:
     - .pkgmeta
     - Changelog.txt
     - API.txt
+    - LocaleExtractor.lua
+    - LocaleList.lua
 
 move-folders:
     MogIt/Modules/MogIt_Accessories: MogIt_Accessories
