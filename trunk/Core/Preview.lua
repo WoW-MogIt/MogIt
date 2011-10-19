@@ -284,6 +284,90 @@ hooksecurefunc("HandleModifiedItemClick",function(link)
 	end
 end);
 
+local function hookInspectUI()
+	for k,v in ipairs(slots) do
+		_G["Inspect"..v].slot = v;
+		_G["Inspect"..v]:RegisterForClicks("AnyUp");
+		_G["Inspect"..v]:HookScript("OnClick",function(self,btn)
+			if InspectFrame.unit and self.hasItem then
+				if btn == "RightButton" and IsControlKeyDown() then
+					mog:AddToPreview(GetInventoryItemID(InspectFrame.unit,GetInventorySlotInfo(self.slot)));
+				end
+			end
+		end);
+	end
+end
+if InspectFrame then
+	hookInspectUI();
+end
+
+local function hookGuildBankUI()
+	for column=1,NUM_GUILDBANK_COLUMNS do
+		for row=1,NUM_SLOTS_PER_GUILDBANK_GROUP do
+			local old = _G["GuildBankColumn"..column.."Button"..row]:GetScript("OnClick");
+			_G["GuildBankColumn"..column.."Button"..row]:SetScript("OnClick",function(self,btn,...)
+				if btn == "RightButton" and IsControlKeyDown() then
+					local link = GetGuildBankItemLink(GetCurrentGuildBankTab(),self:GetID());
+					link = link and link:match("item:(%d+)");
+					mog:AddToPreview(tonumber(link));
+				else
+					return old(self,btn,...);
+				end
+			end);
+		end
+	end
+end
+if GuildBankFrame then
+	hookGuildBankUI();
+end
+
+local function hookALB()
+	local old = AphesLootBrowser.ItemClick;
+	function AphesLootBrowser.ItemClick(self,item,btn,...)
+		if type(item) == "number" and btn == "RightButton" and IsControlKeyDown() then
+			mog:AddToPreview(item);
+		else
+			return old(self,item,btn,...);
+		end
+	end
+end
+if AphesLootBrowser then
+	hookALB();
+end
+
+local old_SetItemRef = SetItemRef;
+function SetItemRef(link,text,btn,...)
+	local id = tonumber(link:match("^item:(%d+)"));
+	if id and btn == "RightButton" and IsControlKeyDown() then
+		mog:AddToPreview(id);
+	else
+		return old_SetItemRef(link,text,btn,...);
+	end
+end
+
+mog.view:SetScript("OnEvent",function(self,event,arg1,...)
+	if event == "ADDON_LOADED" then
+		if arg1 == "Blizzard_InspectUI" then
+			hookInspectUI();
+		elseif arg1 == "Blizzard_GuildBankUI" then
+			hookGuildBankUI();
+		elseif arg1 == "AphesLootBrowser" then
+			hookALB();
+		end
+	elseif event == "GET_ITEM_INFO_RECEIVED" then
+		for k,v in pairs(mog.view.wait) do
+			if select(9,GetItemInfo(k)) then
+				for i=1,v do
+					mog:AddToPreview(k);
+				end
+				mog.view.wait[k] = nil;
+			end
+		end
+	end
+end);
+mog.view:RegisterEvent("ADDON_LOADED");
+mog.view:RegisterEvent("GET_ITEM_INFO_RECEIVED");
+
 StaticPopupDialogs["MOGIT_PREVIEW_ADDITEM"] = {
 	text = L["Type the item ID or url in the text box below"],
 	button1 = ADD,
