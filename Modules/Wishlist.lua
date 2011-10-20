@@ -498,12 +498,18 @@ function wishlist:OnEnter(self)
 end
 
 function wishlist:OnClick(self, button)
+	-- local type = 
 	if button == "LeftButton" then
 		if IsShiftKeyDown() then
-			local _, link = GetItemInfo(self.data.item)
-			if link then
-				ChatEdit_InsertLink(link)
+			local link
+			if self.data.type == "set" then
+				link = mog:SetToLink(self.data.value.items)
+			else
+				link = select(2, GetItemInfo(self.data.value))
 			end
+			-- if link then
+				ChatEdit_InsertLink(link)
+			-- end
 		elseif IsControlKeyDown() then
 			local value = self.data.value
 			if type(value) == "table" then
@@ -526,17 +532,9 @@ function wishlist:OnClick(self, button)
 		end
 	elseif button == "RightButton" then
 		if IsControlKeyDown() then
-			--[[if self.MogItSlot then
-				mog.view.delItem(self.slot)
-				mog.dressModel(mog.view.model.model)
-				if mog.global.gridDress then
-					mog.scroll:update()
-				end
-			else
-				mog.view.addItem(self.item)
-			end--]]
+			mog:AddToPreview(self.data.type == "set" and self.data.value.items or self.data.value)
 		elseif IsShiftKeyDown() then
-			mog:ShowURL(self.data.item)
+			mog:ShowURL(self.data.type == "set" and self.data.value.items or self.data.value, self.data.type == "set" and "compare")
 		else
 			ToggleDropDownMenu(nil, nil, dropdown, "cursor", 0, 0, self.data) -- replaced self with "cursor"
 		end
