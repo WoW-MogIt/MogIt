@@ -11,7 +11,7 @@ do
 	end
 	
 	function template.OnEnter(module,self)
-		if not self and self.data then return end;
+		if not self then return end;
 		local item = self.data.item;
 		if not item then return end;
 		
