@@ -1,12 +1,6 @@
 local MogIt,mog = ...;
 local L = mog.L;
 
-local function tempOnClick(self)
-	if not self.value.loaded then
-		LoadAddOn(self.value.addon);
-	end
-end
-
 local function temp(module,tier)
 	local info;
 	if tier == 1 then
@@ -16,7 +10,7 @@ local function temp(module,tier)
 		info.colorCode = "\124cFF"..(module.loaded and "00FF00" or "FF0000");
 		info.keepShownOnClick = true;
 		info.notCheckable = true;
-		info.func = tempOnClick;
+		info.func = mog.sub.DropdownTier1;
 		UIDropDownMenu_AddButton(info,tier);
 	end
 end

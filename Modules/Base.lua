@@ -125,6 +125,18 @@ mog.sub.bind = {
 	[5] = ITEM_BIND_TO_BNETACCOUNT,
 };
 
+function mog.sub.DropdownTier1(self)
+	if not self.value.loaded then
+		LoadAddOn(self.value.addon);
+	end
+end
+
+function mog.sub.DropdownTier2(self)
+	self.arg1.active = self.value;
+	mog:SetModule(self.arg1,self.arg1.name.." - "..self.value.label);
+	CloseDropDownMenus();
+end
+
 function mog.sub.Dropdown(module,tier)
 	local info;
 	if tier == 1 then
@@ -135,11 +147,7 @@ function mog.sub.Dropdown(module,tier)
 		info.hasArrow = module.loaded;
 		info.keepShownOnClick = true;
 		info.notCheckable = true;
-		info.func = function(self)
-			if not self.value.loaded then
-				LoadAddOn(self.value.addon);
-			end
-		end
+		info.func = mog.sub.DropdownTier1;
 		UIDropDownMenu_AddButton(info,tier);
 	elseif tier == 2 then
 		for k,v in ipairs(module.slots) do
@@ -147,11 +155,7 @@ function mog.sub.Dropdown(module,tier)
 			info.text = v.label;
 			info.value = v;
 			info.notCheckable = true;
-			info.func = function(self)
-				self.arg1.active = self.value;
-				mog:SetModule(self.arg1,self.arg1.name.." - "..self.value.label);
-				CloseDropDownMenus();
-			end
+			info.func = mog.sub.DropdownTier2;
 			info.arg1 = module;
 			UIDropDownMenu_AddButton(info,tier);
 		end
