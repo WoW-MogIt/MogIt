@@ -22,23 +22,39 @@ f.dd:SetPoint("TOPLEFT",f.class,"BOTTOMLEFT",-16,-2);
 UIDropDownMenu_SetWidth(f.dd,125);
 UIDropDownMenu_SetButtonWidth(f.dd,140);
 UIDropDownMenu_JustifyText(f.dd,"LEFT");
+
+local function SelectAll(self)
+	num = 0;
+	class = 0;
+	for k,v in pairs(LOCALIZED_CLASS_NAMES_MALE) do
+		selected[k] = all;
+		num = num + (all and 1 or 0);
+		class = class + (all and mog.sub.classBits[k] or 0);
+	end
+	all = not all;
+	UIDropDownMenu_SetText(f.dd,L["%d selected"]:format(num));
+	ToggleDropDownMenu(1,nil,f.dd);
+	mog:BuildList();
+end
+
+local function ddTier1(self)
+	if selected[self.value] and (not self.checked) then
+		class = class - mog.sub.classBits[self.value];
+		num = num - 1;
+	elseif (not selected[self.value]) and self.checked then
+		class = class + mog.sub.classBits[self.value];
+		num = num + 1;
+	end
+	selected[self.value] = self.checked;
+	UIDropDownMenu_SetText(f.dd,L["%d selected"]:format(num));
+	mog:BuildList();
+end
+
 function f.dd.initialize(self)
 	local info;
 	info = UIDropDownMenu_CreateInfo();
 	info.text =	all and L["Select All"] or L["Select None"];
-	info.func = function(self)
-		num = 0;
-		class = 0;
-		for k,v in pairs(LOCALIZED_CLASS_NAMES_MALE) do
-			selected[k] = all;
-			num = num + (all and 1 or 0);
-			class = class + (all and mog.sub.classBits[k] or 0);
-		end
-		all = not all;
-		UIDropDownMenu_SetText(f.dd,L["%d selected"]:format(num));
-		ToggleDropDownMenu(1,nil,f.dd);
-		mog:BuildList();
-	end
+	info.func = SelectAll;
 	info.notCheckable = true;
 	UIDropDownMenu_AddButton(info);
 	
@@ -47,18 +63,7 @@ function f.dd.initialize(self)
 		info.text =	v;
 		info.value = k;
 		info.colorCode = string.format("\124cff%.2x%.2x%.2x",colours[k].r*255,colours[k].g*255,colours[k].b*255);
-		info.func = function(self)
-			if selected[self.value] and (not self.checked) then
-				class = class - mog.sub.classBits[self.value];
-				num = num - 1;
-			elseif (not selected[self.value]) and self.checked then
-				class = class + mog.sub.classBits[self.value];
-				num = num + 1;
-			end
-			selected[self.value] = self.checked;
-			UIDropDownMenu_SetText(f.dd,L["%d selected"]:format(num));
-			mog:BuildList();
-		end
+		info.func = ddTier1;
 		info.keepShownOnClick = true;
 		info.isNotRadio = true;
 		info.checked = selected[k];
