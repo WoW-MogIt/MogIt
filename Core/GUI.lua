@@ -218,11 +218,9 @@ function mog.scroll.update(self,value,offset,onscroll)
 			frame.index = index;
 			wipe(frame.data);
 			if frame:IsShown() then
-				if mog.active.FrameUpdate then
-					mog.active:FrameUpdate(frame,mog.list[index],index);
-				end
-				if owner == frame and mog.active.OnEnter then
-					mog.active:OnEnter(frame);
+				mog.FrameUpdate(frame,index);
+				if owner == frame then
+					mog.OnEnter(frame);
 				end
 			else
 				frame:Show();
@@ -279,64 +277,6 @@ mog.modelUpdater:SetScript("OnUpdate",function(self,elapsed)
 	self.prevx,self.prevy = currentx,currenty;
 end);
 
-local function model_OnShow(self)
-	self.model:SetPosition(mog.posZ,mog.posX,mog.posY);
-	if self:GetFrameLevel() <= mog.frame:GetFrameLevel() then
-		self:SetFrameLevel(mog.frame:GetFrameLevel()+1);
-	end
-	if mog.active and mog.active.FrameUpdate then
-		mog.active:FrameUpdate(self,mog.list[self.index],self.index);
-	end
-end
-
-local function model_OnHide(self)
-	if mog.modelUpdater.model == self then
-		self:GetScript("OnDragStop")(self);
-	end
-	self.model:SetPosition(0,0,0);
-end
-
---56, 108, 237, 238, 239, 243, 249, 250, 251, 252, 253, 254, 255
-local function model_OnUpdate(self)
-	if mog.db.profile.noAnim then
-		self.model:SetSequence(254);
-	end
-	--autorotate?
-end
-
-local function model_OnClick(self,...)
-	if mog.active and mog.active.OnClick then
-		mog.active:OnClick(self,...);
-	end
-end
-
-local function model_OnDragStart(self,btn)
-	mog.modelUpdater.btn = btn;
-	mog.modelUpdater.model = self;
-	mog.modelUpdater.prevx,mog.modelUpdater.prevy = GetCursorPosition();
-	mog.modelUpdater:Show();
-end
-
-local function model_OnDragStop(self,btn)
-	mog.modelUpdater:Hide();
-	mog.modelUpdater.btn = nil;
-	mog.modelUpdater.model = nil;
-end
-
-local function model_OnEnter(self,...)
-	if mog.active and mog.active.OnEnter then
-		mog.active:OnEnter(self,...);
-	end
-end
-
-local function model_OnLeave(self,...)
-	if mog.active and mog.active.OnLeave then
-		mog.active:OnLeave(self,...);
-	else
-		GameTooltip:Hide();
-	end
-end
-
 function mog.addModel()
 	local f;
 	if mog.bin[1] then
@@ -347,19 +287,19 @@ function mog.addModel()
 		f:Hide();
 		f.MogItModel = true;
 		
-		f:SetScript("OnShow",model_OnShow);
-		f:SetScript("OnHide",model_OnHide);
-		f:SetScript("OnUpdate",model_OnUpdate);
+		f:SetScript("OnShow",mog.OnShow);
+		f:SetScript("OnHide",mog.OnHide);
+		f:SetScript("OnUpdate",mog.OnUpdate);
 		
 		f:RegisterForClicks("AnyUp");
-		f:SetScript("OnClick",model_OnClick);
+		f:SetScript("OnClick",mog.OnClick);
 		
 		f:RegisterForDrag("LeftButton","RightButton");
-		f:SetScript("OnDragStart",model_OnDragStart);
-		f:SetScript("OnDragStop",model_OnDragStop);
+		f:SetScript("OnDragStart",mog.OnDragStart);
+		f:SetScript("OnDragStop",mog.OnDragStop);
 		
-		f:SetScript("OnEnter",model_OnEnter);
-		f:SetScript("OnLeave",model_OnLeave);
+		f:SetScript("OnEnter",mog.OnEnter);
+		f:SetScript("OnLeave",mog.OnLeave);
 		
 		f.model = CreateFrame("DressUpModel",nil,f);
 		f.model:SetUnit("PLAYER");
@@ -425,3 +365,123 @@ function mog.updateGUI(resize)
 		end
 	end
 end
+
+function mog.FrameUpdate(frame,index)
+	if not mog.active then return end;
+	local state;
+	if mog.active.FrameUpdate then
+		state = mog.active:FrameUpdate(frame,mog.list[index],index);
+	end
+	if not state then
+		local template = mog:GetTemplate(frame.template or mog.active.template);
+		if template and template.FrameUpdate then
+			template.FrameUpdate(mog.active,frame,mog.list[index],index);
+		end
+	end
+end
+
+function mog.OnShow(self)
+	self.model:SetPosition(mog.posZ,mog.posX,mog.posY);
+	if self:GetFrameLevel() <= mog.frame:GetFrameLevel() then
+		self:SetFrameLevel(mog.frame:GetFrameLevel()+1);
+	end
+	mog.FrameUpdate(self,self.index);
+end
+
+function mog.OnHide(self)
+	if mog.modelUpdater.model == self then
+		self:GetScript("OnDragStop")(self);
+	end
+	self.model:SetPosition(0,0,0);
+end
+
+--56, 108, 237, 238, 239, 243, 249, 250, 251, 252, 253, 254, 255
+function mog.OnUpdate(self)
+	if mog.db.profile.noAnim then
+		self.model:SetSequence(254);
+	end
+	--autorotate?
+end
+
+function mog.OnClick(frame,btn,...)
+	if not mog.active then return end;
+	local state;
+	if mog.active.OnClick then
+		state = mog.active:OnClick(frame,btn,...);
+	end
+	if not state then
+		local template = mog:GetTemplate(frame.template or mog.active.template);
+		if template and template.OnClick then
+			template.OnClick(mog.active,frame,btn,...);
+		end
+	end
+end
+
+function mog.OnDragStart(self,btn)
+	mog.modelUpdater.btn = btn;
+	mog.modelUpdater.model = self;
+	mog.modelUpdater.prevx,mog.modelUpdater.prevy = GetCursorPosition();
+	mog.modelUpdater:Show();
+end
+
+function mog.OnDragStop(self,btn)
+	mog.modelUpdater:Hide();
+	mog.modelUpdater.btn = nil;
+	mog.modelUpdater.model = nil;
+end
+
+function mog.OnEnter(frame,...)
+	if not mog.active then return end;
+	local state;
+	if mog.active.OnEnter then
+		state = mog.active:OnEnter(frame,...);
+	end
+	if not state then
+		local template = mog:GetTemplate(frame.template or mog.active.template);
+		if template and template.OnEnter then
+			template.OnEnter(mog.active,frame,...);
+		end
+	end
+end
+
+function mog.OnLeave(frame,...)
+	if not mog.active then return end;
+	local state;
+	if mog.active.OnLeave then
+		state = mog.active:OnLeave(frame,...);
+	end
+	if not state then
+		local template = mog:GetTemplate(frame.template or mog.active.template);
+		if template and template.OnLeave then
+			template.OnLeave(mog.active,frame,...);
+		end
+	end
+end
+
+function mog.GET_ITEM_INFO_RECEIVED(...)
+	if not mog.active then return end;
+	local state;
+	if mog.active.GET_ITEM_INFO_RECEIVED then
+		state = mog.active:GET_ITEM_INFO_RECEIVED(...);
+	end
+	if not state then
+		local template = mog:GetTemplate(mog.active.template);
+		if template and template.GET_ITEM_INFO_RECEIVED then
+			template.GET_ITEM_INFO_RECEIVED(...);
+		end
+	end
+end
+
+--[=[function mog.execute(cmd,frame,...)
+	if not mog.active then return end;
+	local state;
+	if mog.active[cmd] then
+		state = mog.active[cmd](mog.active,frame,...);
+	end
+	if not state then
+		local template = mog:GetTemplate((type(frame) == "table" and frame.template) or mog.active.template);
+		if template and template[cmd] then
+			template[cmd](mog.active,frame,...);
+		end
+	end
+end--]=]
