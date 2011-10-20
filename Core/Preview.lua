@@ -223,10 +223,7 @@ for k,v in ipairs(slots) do
 end
 
 mog.view.wait = {};
-function mog:AddToPreview(item,set)
-	if type(item) == "string" then
-		item = tonumber(item:match("item:(%d+)"));
-	end
+function mog.view.addItem(item)
 	if not item then return end;
 	local slot,texture = select(9,GetItemInfo(item));
 	if not slot then
@@ -267,10 +264,21 @@ function mog:AddToPreview(item,set)
 		else
 			ShowUIPanel(mog.view);
 		end
-		
-		if (not set) and mog.db.profile.gridDress then
-			mog.scroll:update();
+	end
+end
+
+function mog:AddToPreview(item)
+	if type(item) == "number" then
+		mog.view.addItem(item);
+	elseif type(item) == "string" then
+		mog.view.addItem(tonumber(item:match("item:(%d+)")));
+	elseif type(item) == "table" then
+		for k,v in pairs(item) do
+			mog.view.addItem(v);
 		end
+	end
+	if mog.db.profile.gridDress then
+		mog.scroll:update();
 	end
 end
 
