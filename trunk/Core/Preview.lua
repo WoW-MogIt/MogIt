@@ -51,7 +51,6 @@ mog.view.resize:SetScript("OnMouseDown",function(self)
 end);
 mog.view.resize:SetScript("OnMouseUp",function(self)
 	mog.view:StopMovingOrSizing();
-	self:SetScript("OnUpdate",nil);
 end);
 mog.view.resize:SetScript("OnHide",mog.view.resize:GetScript("OnMouseUp"));
 mog.view.resize.texture = mog.view.resize:CreateTexture(nil,"OVERLAY");
@@ -80,6 +79,11 @@ mog.view.model:SetScript("OnHide",function(self)
 		self:GetScript("OnDragStop")(self);
 	end
 	self.model:SetPosition(0,0,0);
+end);
+mog.view.model:SetScript("OnUpdate",function(self)
+	if mog.db.profile.noAnim then
+		self.model:SetSequence(254);
+	end
 end);
 mog.view.model:RegisterForDrag("LeftButton","RightButton");
 mog.view.model:SetScript("OnDragStart",function(self,btn)
@@ -148,6 +152,41 @@ function mog.view.setTexture(slot,texture)
 	SetItemButtonTexture(mog.view.slots[slot],texture or select(2,GetInventorySlotInfo(slot)));
 end
 
+local function slot_OnClick(self,btn)
+	if not self.item then return end;
+	if btn == "LeftButton" then
+		if IsShiftKeyDown() then
+			local _,link = GetItemInfo(self.item);
+			if link then
+				ChatEdit_InsertLink(link);
+			end
+		elseif IsControlKeyDown() then
+			DressUpItemLink(self.item);
+		else
+			
+		end
+	elseif btn == "RightButton" then
+		if IsControlKeyDown() then
+			mog.view.delItem(self.slot);
+			if mog.db.profile.gridDress then
+				mog.scroll:update();
+			end
+		elseif IsShiftKeyDown() then
+			mog:ShowURL(self.item);
+		else
+			
+		end
+	end
+end
+
+local function slot_OnEnter(self)
+	mog.sub.OnEnter(nil,self);
+end
+
+local function slot_OnLeave(self)
+	GameTooltip:Hide();
+end
+
 mog.view.slots = {};
 for k,v in ipairs(slots) do
 	mog.view.slots[v] = CreateFrame("Button","MogItPreview"..v,mog.view,"ItemButtonTemplate");
@@ -166,32 +205,9 @@ for k,v in ipairs(slots) do
 	mog.view.setTexture(v);
 	
 	mog.view.slots[v]:RegisterForClicks("AnyUp");
-	mog.view.slots[v]:SetScript("OnClick",function(self,btn)
-		if not self.item then return end;
-		if btn == "LeftButton" then
-			if IsShiftKeyDown() then
-				local _,link = GetItemInfo(self.item);
-				if link then
-					ChatEdit_InsertLink(link);
-				end
-			elseif IsControlKeyDown() then
-				DressUpItemLink(self.item);
-			else
-				
-			end
-		elseif btn == "RightButton" then
-			if IsControlKeyDown() then
-				mog.view.delItem(self.slot);
-				if mog.db.profile.gridDress then
-					mog.scroll:update();
-				end
-			elseif IsShiftKeyDown() then
-				mog:ShowURL(self.item);
-			else
-				
-			end
-		end
-	end);
+	mog.view.slots[v]:SetScript("OnClick",slot_OnClick);
+	mog.view.slots[v]:SetScript("OnEnter",slot_OnEnter);
+	mog.view.slots[v]:SetScript("OnLeave",slot_OnLeave);
 	--[=[mog.view.slots[k]:SetScript("OnEnter",function(self)
 		if self.item then
 			--GameTooltip:SetItemByID(self.item);
@@ -290,37 +306,41 @@ hooksecurefunc("HandleModifiedItemClick",function(link)
 end);
 
 local function hookInspectUI()
+	local function inspect_OnClick(self,btn)
+		if InspectFrame.unit and self.hasItem then
+			if btn == "RightButton" and IsControlKeyDown() then
+				mog:AddToPreview(GetInventoryItemID(InspectFrame.unit,GetInventorySlotInfo(self.slot)));
+			end
+		end
+	end
 	for k,v in ipairs(slots) do
 		_G["Inspect"..v].slot = v;
 		_G["Inspect"..v]:RegisterForClicks("AnyUp");
-		_G["Inspect"..v]:HookScript("OnClick",function(self,btn)
-			if InspectFrame.unit and self.hasItem then
-				if btn == "RightButton" and IsControlKeyDown() then
-					mog:AddToPreview(GetInventoryItemID(InspectFrame.unit,GetInventorySlotInfo(self.slot)));
-				end
-			end
-		end);
+		_G["Inspect"..v]:HookScript("OnClick",inspect_OnClick);
 	end
+	hookInspectUI = nil;
 end
 if InspectFrame then
 	hookInspectUI();
 end
 
 local function hookGuildBankUI()
-	for column=1,NUM_GUILDBANK_COLUMNS do
-		for row=1,NUM_SLOTS_PER_GUILDBANK_GROUP do
-			local old = _G["GuildBankColumn"..column.."Button"..row]:GetScript("OnClick");
-			_G["GuildBankColumn"..column.."Button"..row]:SetScript("OnClick",function(self,btn,...)
-				if btn == "RightButton" and IsControlKeyDown() then
-					local link = GetGuildBankItemLink(GetCurrentGuildBankTab(),self:GetID());
-					link = link and link:match("item:(%d+)");
-					mog:AddToPreview(tonumber(link));
-				else
-					return old(self,btn,...);
-				end
-			end);
+	local old = GuildBankColumn1Button1:GetScript("OnClick");
+	local function guildbank_OnClick(self,btn,...)
+		if btn == "RightButton" and IsControlKeyDown() then
+			local link = GetGuildBankItemLink(GetCurrentGuildBankTab(),self:GetID());
+			link = link and link:match("item:(%d+)");
+			mog:AddToPreview(tonumber(link));
+		else
+			return old(self,btn,...);
 		end
 	end
+	for column=1,NUM_GUILDBANK_COLUMNS do
+		for row=1,NUM_SLOTS_PER_GUILDBANK_GROUP do
+			_G["GuildBankColumn"..column.."Button"..row]:SetScript("OnClick",guildbank_OnClick);
+		end
+	end
+	hookGuildBankUI = nil;
 end
 if GuildBankFrame then
 	hookGuildBankUI();
