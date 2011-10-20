@@ -29,15 +29,16 @@ mog.frame.resize = CreateFrame("Frame",nil,mog.frame);
 mog.frame.resize:SetSize(16,16);
 mog.frame.resize:SetPoint("BOTTOMRIGHT",mog.frame,"BOTTOMRIGHT",-4,3);
 mog.frame.resize:EnableMouse(true);
+function mog.frame.resize.update(self)
+	mog.db.profile.width = floor((mog.frame:GetWidth()+5-(4+10)-(10+18+4))/mog.db.profile.columns)-5;
+	mog.db.profile.height = floor((mog.frame:GetHeight()+5-(60+10)-(10+26))/mog.db.profile.rows)-5;
+	mog.updateGUI(true);
+end
 mog.frame.resize:SetScript("OnMouseDown",function(self)
 	mog.frame:SetMinResize(510,350);
 	mog.frame:SetMaxResize(GetScreenWidth(),GetScreenHeight());
 	mog.frame:StartSizing();
-	self:SetScript("OnUpdate",function(self)
-		mog.db.profile.width = floor((mog.frame:GetWidth()+5-(4+10)-(10+18+4))/mog.db.profile.columns)-5;
-		mog.db.profile.height = floor((mog.frame:GetHeight()+5-(60+10)-(10+26))/mog.db.profile.rows)-5;
-		mog.updateGUI(true);
-	end);
+	self:SetScript("OnUpdate",self.update);
 end);
 mog.frame.resize:SetScript("OnMouseUp",function(self)
 	mog.frame:StopMovingOrSizing();
@@ -278,6 +279,64 @@ mog.modelUpdater:SetScript("OnUpdate",function(self,elapsed)
 	self.prevx,self.prevy = currentx,currenty;
 end);
 
+local function model_OnShow(self)
+	self.model:SetPosition(mog.posZ,mog.posX,mog.posY);
+	if self:GetFrameLevel() <= mog.frame:GetFrameLevel() then
+		self:SetFrameLevel(mog.frame:GetFrameLevel()+1);
+	end
+	if mog.active and mog.active.FrameUpdate then
+		mog.active:FrameUpdate(self,mog.list[self.index],self.index);
+	end
+end
+
+local function model_OnHide(self)
+	if mog.modelUpdater.model == self then
+		self:GetScript("OnDragStop")(self);
+	end
+	self.model:SetPosition(0,0,0);
+end
+
+--56, 108, 237, 238, 239, 243, 249, 250, 251, 252, 253, 254, 255
+local function model_OnUpdate(self)
+	if mog.db.profile.noAnim then
+		self.model:SetSequence(254);
+	end
+	--autorotate?
+end
+
+local function model_OnClick(self,...)
+	if mog.active and mog.active.OnClick then
+		mog.active:OnClick(self,...);
+	end
+end
+
+local function model_OnDragStart(self,btn)
+	mog.modelUpdater.btn = btn;
+	mog.modelUpdater.model = self;
+	mog.modelUpdater.prevx,mog.modelUpdater.prevy = GetCursorPosition();
+	mog.modelUpdater:Show();
+end
+
+local function model_OnDragStop(self,btn)
+	mog.modelUpdater:Hide();
+	mog.modelUpdater.btn = nil;
+	mog.modelUpdater.model = nil;
+end
+
+local function model_OnEnter(self,...)
+	if mog.active and mog.active.OnEnter then
+		mog.active:OnEnter(self,...);
+	end
+end
+
+local function model_OnLeave(self,...)
+	if mog.active and mog.active.OnLeave then
+		mog.active:OnLeave(self,...);
+	else
+		GameTooltip:Hide();
+	end
+end
+
 function mog.addModel()
 	local f;
 	if mog.bin[1] then
@@ -288,51 +347,19 @@ function mog.addModel()
 		f:Hide();
 		f.MogItModel = true;
 		
-		f:SetScript("OnShow",function(self,...)
-			self.model:SetPosition(mog.posZ,mog.posX,mog.posY);
-			if self:GetFrameLevel() <= mog.frame:GetFrameLevel() then
-				self:SetFrameLevel(mog.frame:GetFrameLevel()+1);
-			end
-			if mog.active and mog.active.FrameUpdate then
-				mog.active:FrameUpdate(self,mog.list[self.index],self.index);
-			end
-		end);
-		f:SetScript("OnHide",function(self)
-			if mog.modelUpdater.model == self then
-				self:GetScript("OnDragStop")(self);
-			end
-			self.model:SetPosition(0,0,0);
-		end);
-		f:SetScript("OnUpdate",function(self)
-			--noAnim
-			--autorotate
-		end);
+		f:SetScript("OnShow",model_OnShow);
+		f:SetScript("OnHide",model_OnHide);
+		f:SetScript("OnUpdate",model_OnUpdate);
+		
 		f:RegisterForClicks("AnyUp");
-		f:SetScript("OnClick",function(self,...)
-			if mog.active and mog.active.OnClick then
-				mog.active:OnClick(self,...);
-			end
-		end);
+		f:SetScript("OnClick",model_OnClick);
+		
 		f:RegisterForDrag("LeftButton","RightButton");
-		f:SetScript("OnDragStart",function(self,btn)
-			mog.modelUpdater.btn = btn;
-			mog.modelUpdater.model = self;
-			mog.modelUpdater.prevx,mog.modelUpdater.prevy = GetCursorPosition();
-			mog.modelUpdater:Show();
-		end);
-		f:SetScript("OnDragStop",function(self,btn)
-			mog.modelUpdater:Hide();
-			mog.modelUpdater.btn = nil;
-			mog.modelUpdater.model = nil;
-		end);
-		f:SetScript("OnEnter",function(self,...)
-			if mog.active and mog.active.OnEnter then
-				mog.active:OnEnter(self,...);
-			end
-		end);
-		f:SetScript("OnLeave",function(self)
-			GameTooltip:Hide();
-		end);
+		f:SetScript("OnDragStart",model_OnDragStart);
+		f:SetScript("OnDragStop",model_OnDragStop);
+		
+		f:SetScript("OnEnter",model_OnEnter);
+		f:SetScript("OnLeave",model_OnLeave);
 		
 		f.model = CreateFrame("DressUpModel",nil,f);
 		f.model:SetUnit("PLAYER");
