@@ -15,8 +15,16 @@ function mog:ShowURL(id,sub,url,force)
 		url = "Wowhead";
 	end
 	if mog.url[url] and mog.url[url][sub] then
-		StaticPopup_Show("MOGIT_URL",mog.url[url].fav and "\124T"..mog.url[url].fav..":18:18\124t " or "",url,mog.url[url][sub]:format(id));
-		return true;
+		local text;
+		if type(mog.url[url][sub]) == "function" then
+			text = mog.url[url][sub](id);
+		else
+			text = mog.url[url][sub]:format(id);
+		end
+		if text then
+			StaticPopup_Show("MOGIT_URL",mog.url[url].fav and "\124T"..mog.url[url].fav..":18:18\124t " or "",url,text);
+			return true;
+		end
 	end
 end
 
@@ -54,6 +62,17 @@ mog:AddURL("Wowhead",{
 	set = L["http://www.wowhead.com/"].."itemset=%d",
 	npc = L["http://www.wowhead.com/"].."npc=%d",
 	spell = L["http://www.wowhead.com/"].."spell=%d",
+	compare = function(tbl)
+		local str;
+		for k,v in pairs(tbl) do
+			if str then
+				str = str..":"..v;
+			else
+				str = L["http://www.wowhead.com/"].."compare?items="..v;
+			end
+		end
+		return str;
+	end,
 });
 
 mog:AddURL("MMO-Champion",{
@@ -86,6 +105,17 @@ mog:AddURL("Buffed.de",{
 	set = "http://wowdata.buffed.de/?set=%d",
 	npc = "http://wowdata.buffed.de/?n=%d",
 	spell = "http://wowdata.buffed.de/?s=%d",
+	compare = function(tbl)
+		local str;
+		for k,v in pairs(tbl) do
+			if str then
+				str = str..v..";";
+			else
+				str = "http://wowdata.buffed.de/itemcompare#"..v..";";
+			end
+		end
+		return str;
+	end,
 });
 
 mog:AddURL("JudgeHype",{
