@@ -175,7 +175,12 @@ end
 
 function mog.sub.OnEnter(module,self)
 	if not self then return end;
-	local item = self.data.item;
+	local item;
+	if self.MogItModel then
+		item = self.data.item;
+	elseif self.slot then
+		item = self.item;
+	end
 	if not item then return end;
 	--GameTooltip:SetOwner(self,"ANCHOR_NONE");
 	GameTooltip:SetOwner(self,"ANCHOR_RIGHT");
@@ -183,7 +188,7 @@ function mog.sub.OnEnter(module,self)
 	local name,link,_,_,_,_,_,_,_,texture = GetItemInfo(item);
 	--GameTooltip:AddLine(self.display,1,1,1);
 	--GameTooltip:AddLine(" ");
-	GameTooltip:AddDoubleLine((texture and "\124T"..texture..":18\124t " or "")..(link or name or ""),(type(self.data.items) == "table") and (#self.data.items > 1) and L["Item %d/%d"]:format(self.data.cycle,#self.data.items),nil,nil,nil,1,0,0);
+	GameTooltip:AddDoubleLine((texture and "\124T"..texture..":18\124t " or "")..(link or name or ""),self.data and (type(self.data.items) == "table") and (#self.data.items > 1) and L["Item %d/%d"]:format(self.data.cycle,#self.data.items),nil,nil,nil,1,0,0);
 	if mog.sub.data.source[item] then
 		GameTooltip:AddDoubleLine(L["Source"]..":",mog.sub.source[mog.sub.data.source[item]],nil,nil,nil,1,1,1);
 		if mog.sub.data.source[item] == 1 then -- Drop
