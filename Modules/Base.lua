@@ -288,7 +288,7 @@ do
 		info.text = (texture and "\124T"..texture..":18\124t " or "")..(link or name or "");
 		info.value = itemID;
 		info.func = onClick;
-		info.checked = self.data.cycle == index;
+		info.checked = not index or self.data.cycle == index;
 		info.hasArrow = true;
 		info.arg1 = self;
 		info.arg2 = index;
@@ -302,6 +302,12 @@ do
 	
 	local function setOnClick(self, set)
 		mog:GetModule("Wishlist"):AddItem(self.value, set);
+		CloseDropDownMenus();
+	end
+	
+	-- create a new set and add the item to it
+	local function newSetOnClick(self)
+		StaticPopup_Show("MOGIT_WISHLIST_CREATE_SET", nil, nil, self.value);
 		CloseDropDownMenus();
 	end
 	
@@ -351,6 +357,14 @@ do
 				info.arg1 = set.name;
 				UIDropDownMenu_AddButton(info, tier);
 			end
+			
+			local info = UIDropDownMenu_CreateInfo();
+			info.text = "New set";
+			info.value = UIDROPDOWNMENU_MENU_VALUE;
+			info.func = newSetOnClick;
+			info.notCheckable = true;
+			-- info.arg1 = set.name;
+			UIDropDownMenu_AddButton(info, tier);
 		end
 	end
 end

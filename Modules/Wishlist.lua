@@ -53,11 +53,17 @@ StaticPopupDialogs["MOGIT_WISHLIST_CREATE_SET"] = {
 	OnAccept = function(self)
 		local text = self.editBox:GetText()
 		wishlist:CreateSet(text)
+		if self.data then
+			wishlist:AddItem(self.data, text)
+		end
 		mog:BuildList()
 	end,
 	EditBoxOnEnterPressed = function(self)
-		local text = self:GetParent().editBox:GetText()
+		local text = self:GetText()
 		wishlist:CreateSet(text)
+		if self:GetParent().data then
+			wishlist:AddItem(self:GetParent().data, text)
+		end
 		mog:BuildList()
 		self:GetParent():Hide()
 	end,
@@ -81,7 +87,7 @@ StaticPopupDialogs["MOGIT_WISHLIST_RENAME_SET"] = {
 		-- mog:BuildList()
 	end,
 	EditBoxOnEnterPressed = function(self)
-		local text = self:GetParent().editBox:GetText()
+		local text = self:GetText()
 		self:GetParent().data.name = text
 		-- mog:BuildList()
 		self:GetParent():Hide()
@@ -162,6 +168,17 @@ dropdown.menu = {
 					UIDropDownMenu_AddButton(info, level)
 				end
 			end
+			
+			local info = UIDropDownMenu_CreateInfo()
+			info.text = "Rename set"
+			info.value = menuList.index
+			info.func = function(self)
+				StaticPopup_Show("MOGIT_WISHLIST_RENAME_SET", nil, nil, wishlist.db.profile.sets[self.value])
+				mog:BuildList()
+			end
+			info.notCheckable = true
+			UIDropDownMenu_AddButton(info, level)
+			
 			local info = UIDropDownMenu_CreateInfo()
 			info.text = "Delete set"
 			info.value = menuList.index
