@@ -3,30 +3,6 @@ local L = mog.L
 
 local wishlist = mog:RegisterModule("Wishlist", {}, true)
 
-local invSlots = {
-	INVTYPE_HEAD = "HeadSlot",
-	INVTYPE_SHOULDER = "ShoulderSlot",
-	INVTYPE_BODY = "ShirtSlot",
-	INVTYPE_CLOAK = "BackSlot",
-	INVTYPE_CHEST = "ChestSlot",
-	INVTYPE_ROBE = "ChestSlot",
-	INVTYPE_WAIST = "WaistSlot",
-	INVTYPE_LEGS = "LegsSlot",
-	INVTYPE_FEET = "FeetSlot",
-	INVTYPE_WRIST = "WristSlot",
-	INVTYPE_2HWEAPON = "MainHandSlot",
-	INVTYPE_WEAPON = "MainHandSlot",
-	INVTYPE_WEAPONMAINHAND = "MainHandSlot",
-	INVTYPE_WEAPONOFFHAND = "SecondaryHandSlot",
-	INVTYPE_SHIELD = "SecondaryHandSlot",
-	INVTYPE_HOLDABLE = "SecondaryHandSlot",
-	INVTYPE_RANGED = "RangedSlot",
-	INVTYPE_RANGEDRIGHT = "RangedSlot",
-	INVTYPE_THROWN = "RangedSlot",
-	INVTYPE_HAND = "HandsSlot",
-	INVTYPE_TABARD = "TabardSlot",
-}
-
 local itemSlots = {
 	"HeadSlot",
 	"ShoulderSlot",
@@ -213,7 +189,7 @@ dropdown.menu = {
 			info.text = "Delete"
 			-- info.value = 
 			info.func = function(self)
-				wishlist.db.profile.sets[menuList.index].items[invSlots[select(9, GetItemInfo(UIDROPDOWNMENU_MENU_VALUE))]] = nil
+				wishlist.db.profile.sets[menuList.index].items[mog.invSlots[select(9, GetItemInfo(UIDROPDOWNMENU_MENU_VALUE))]] = nil
 				mog:BuildList()
 				CloseDropDownMenus()
 			end
@@ -536,7 +512,7 @@ function wishlist:OnClick(self, button)
 		elseif IsShiftKeyDown() then
 			mog:ShowURL(self.data.type == "set" and self.data.value.items or self.data.value, self.data.type == "set" and "compare")
 		else
-			ToggleDropDownMenu(nil, nil, dropdown, "cursor", 0, 0, self.data) -- replaced self with "cursor"
+			ToggleDropDownMenu(nil, nil, dropdown, "cursor", 0, 0, self.data)
 		end
 	end
 end
@@ -574,7 +550,7 @@ function wishlist:AddItem(itemID, setName)
 	if setName then
 		for i, set in ipairs(self.db.profile.sets) do
 			if set.name == setName then
-				local slot = invSlots[select(9, GetItemInfo(itemID))]
+				local slot = mog.invSlots[select(9, GetItemInfo(itemID))]
 				set.items[slot] = itemID
 				break
 			end
