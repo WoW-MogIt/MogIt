@@ -339,12 +339,8 @@ do
 			end
 		elseif tier == 2 then
 			for i, info in ipairs(menu) do
-				-- local info = UIDropDownMenu_CreateInfo();
-				-- info.text = set.name;
 				info.value = UIDROPDOWNMENU_MENU_VALUE;
-				-- info.func = setOnClick;
 				info.notCheckable = true;
-				-- info.arg1 = set.items;
 				UIDropDownMenu_AddButton(info, tier);
 			end
 		elseif tier == 3 then
@@ -363,7 +359,6 @@ do
 			info.value = UIDROPDOWNMENU_MENU_VALUE;
 			info.func = newSetOnClick;
 			info.notCheckable = true;
-			-- info.arg1 = set.name;
 			UIDropDownMenu_AddButton(info, tier);
 		end
 	end
