@@ -261,8 +261,6 @@ function mog.view.addItem(item)
 		mog.view.setTexture(mog.invSlots[slot],texture);
 		if mog.view:IsShown() then
 			mog.view.model.model:TryOn(item);
-		else
-			ShowUIPanel(mog.view);
 		end
 	end
 end
@@ -277,6 +275,7 @@ function mog:AddToPreview(item)
 			mog.view.addItem(v);
 		end
 	end
+	ShowUIPanel(mog.view);
 	if mog.db.profile.gridDress then
 		mog.scroll:update();
 	end
