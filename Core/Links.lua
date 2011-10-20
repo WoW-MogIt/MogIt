@@ -69,12 +69,7 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_BN_INLINE_TOAST_BROADCAST_INFORM",filt
 local old_SetItemRef = SetItemRef;
 function SetItemRef(link,...)
 	if link:find("^MogIt") then
-		for k,v in ipairs(mog:LinkToSet(link)) do
-			mog:AddToPreview(v,true);
-			if mog.db.profile.gridDress then
-				mog.scroll:update();
-			end
-		end
+		mog:AddToPreview(mog:LinkToSet(link));
 	else
 		return old_SetItemRef(link,...);
 	end
