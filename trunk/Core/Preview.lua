@@ -159,12 +159,12 @@ local function slot_OnClick(self,btn)
 			mog.scroll:update();
 		end
 	else
-		mog:GetTemplate("item").OnClick(nil,self,btn);
+		mog.templates.item.OnClick(nil,self,btn);
 	end
 end
 
 local function slot_OnEnter(self)
-	mog:GetTemplate("item").OnEnter(nil,self);
+	mog.templates.item.OnEnter(nil,self);
 end
 
 local function slot_OnLeave(self)
