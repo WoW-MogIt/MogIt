@@ -125,7 +125,7 @@ mog.sub.bind = {
 	[5] = ITEM_BIND_TO_BNETACCOUNT,
 };
 
-local function Dropdown(module,tier)
+function mog.sub.Dropdown(module,tier)
 	local info;
 	if tier == 1 then
 		info = UIDropDownMenu_CreateInfo();
@@ -158,7 +158,7 @@ local function Dropdown(module,tier)
 	end
 end
 
-local function FrameUpdate(module,self,value)
+function mog.sub.FrameUpdate(module,self,value)
 	self.data.display = value;
 	self.data.items = display[value];
 	self.data.cycle = 1;
@@ -169,7 +169,7 @@ local function FrameUpdate(module,self,value)
 	self.model:TryOn(self.data.item);
 end
 
-local function OnEnter(module,self)
+function mog.sub.OnEnter(module,self)
 	if not self then return end;
 	local item = self.data.item;
 	if not item then return end;
@@ -241,7 +241,7 @@ local function OnEnter(module,self)
 	--GameTooltip:SetPoint("TOPLEFT",mog.frame,"TOPRIGHT",5,0);
 end
 
-local function OnClick(module,self,btn)
+function mog.sub.OnClick(module,self,btn)
 	if btn == "LeftButton" then
 		if IsShiftKeyDown() then
 			local _,link = GetItemInfo(self.data.item);
@@ -263,16 +263,16 @@ local function OnClick(module,self,btn)
 		elseif IsShiftKeyDown() then
 			mog:ShowURL(self.data.item);
 		else
-			if UIDropDownMenu_GetCurrentDropDown() == mog.sub.LeftClick and mog.sub.LeftClick.menuList ~= self and DropDownList1 and DropDownList1:IsShown() then
+			if UIDropDownMenu_GetCurrentDropDown() == mog.sub.ItemMenu and mog.sub.ItemMenu.menuList ~= self and DropDownList1 and DropDownList1:IsShown() then
 				HideDropDownMenu(1);
 			end
-			ToggleDropDownMenu(nil,nil,mog.sub.LeftClick,"cursor",0,0,self);
+			ToggleDropDownMenu(nil,nil,mog.sub.ItemMenu,"cursor",0,0,self);
 		end
 	end
 end
 
-local function OnScroll(module)
-	if UIDropDownMenu_GetCurrentDropDown() == mog.sub.LeftClick and DropDownList1 and DropDownList1:IsShown() then
+function mog.sub.OnScroll(module)
+	if UIDropDownMenu_GetCurrentDropDown() == mog.sub.ItemMenu and DropDownList1 and DropDownList1:IsShown() then
 		HideDropDownMenu(1);
 	end
 end
@@ -315,9 +315,9 @@ do
 		},
 	}
 	
-	mog.sub.LeftClick = CreateFrame("Frame",nil,mog.frame);
-	mog.sub.LeftClick.displayMode = "MENU";
-	function mog.sub.LeftClick:initialize(tier,self)
+	mog.sub.ItemMenu = CreateFrame("Frame",nil,mog.frame);
+	mog.sub.ItemMenu.displayMode = "MENU";
+	function mog.sub.ItemMenu:initialize(tier,self)
 		if tier == 1 then
 			local items = self.data.items;
 			if type(items) == "table" then
@@ -351,19 +351,19 @@ do
 	end
 end
 
-local function GET_ITEM_INFO_RECEIVED()
-	if UIDropDownMenu_GetCurrentDropDown() == mog.sub.LeftClick and DropDownList1 and DropDownList1:IsShown() then
+function mog.sub.GET_ITEM_INFO_RECEIVED()
+	if UIDropDownMenu_GetCurrentDropDown() == mog.sub.ItemMenu and DropDownList1 and DropDownList1:IsShown() then
 		HideDropDownMenu(1);
-		ToggleDropDownMenu(nil,nil,mog.sub.LeftClick,"cursor",0,0,mog.sub.LeftClick.menuList);
+		ToggleDropDownMenu(nil,nil,mog.sub.ItemMenu,"cursor",0,0,mog.sub.ItemMenu.menuList);
 	end
 end
 
-local function Unlist(module)
+function mog.sub.Unlist(module)
 	wipe(list);
 	wipe(display);
 end
 
-local function BuildList(module)
+function mog.sub.BuildList(module)
 	wipe(list);
 	wipe(display);
 	for k,v in ipairs(module.active.items) do
@@ -439,13 +439,14 @@ for k,v in ipairs(addons) do
 	if loadable then
 		mog:RegisterModule(v,{
 			name = title:match("MogIt_(.+)") or title,
-			Dropdown = Dropdown,
-			BuildList = BuildList,
-			FrameUpdate = FrameUpdate,
-			OnEnter = OnEnter,
-			OnClick = OnClick,
-			OnScroll = OnScroll,
-			Unlist = Unlist,
+			Dropdown = mog.sub.Dropdown,
+			BuildList = mog.sub.BuildList,
+			FrameUpdate = mog.sub.FrameUpdate,
+			OnEnter = mog.sub.OnEnter,
+			OnClick = mog.sub.OnClick,
+			OnScroll = mog.sub.OnScroll,
+			Unlist = mog.sub.Unlist,
+			GET_ITEM_INFO_RECEIVED = mog.sub.GET_ITEM_INFO_RECEIVED,
 			filters = {
 				"level",
 				"faction",
@@ -454,7 +455,6 @@ for k,v in ipairs(addons) do
 				"quality",
 				(v == "MogIt_OneHanded" and "slot") or nil,
 			},
-			GET_ITEM_INFO_RECEIVED = GET_ITEM_INFO_RECEIVED,
 			addon = v,
 			slots = {},
 		},true);
