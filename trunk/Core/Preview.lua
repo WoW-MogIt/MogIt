@@ -266,6 +266,7 @@ function mog.view.addItem(item)
 end
 
 function mog:AddToPreview(item)
+	if not item then return end;
 	if type(item) == "number" then
 		mog.view.addItem(item);
 	elseif type(item) == "string" then
@@ -304,9 +305,6 @@ end
 hooksecurefunc("HandleModifiedItemClick",function(link)
 	if link then
 		if (GetMouseButtonClicked() == "RightButton") and IsControlKeyDown() then
-			if type(link) == "string" then
-				link = tonumber(link:match("item:(%d+)"));
-			end
 			mog:AddToPreview(link);
 		end
 	end
@@ -335,9 +333,7 @@ local function hookGuildBankUI()
 	local old = GuildBankColumn1Button1:GetScript("OnClick");
 	local function guildbank_OnClick(self,btn,...)
 		if btn == "RightButton" and IsControlKeyDown() then
-			local link = GetGuildBankItemLink(GetCurrentGuildBankTab(),self:GetID());
-			link = link and link:match("item:(%d+)");
-			mog:AddToPreview(tonumber(link));
+			mog:AddToPreview(GetGuildBankItemLink(GetCurrentGuildBankTab(),self:GetID()));
 		else
 			return old(self,btn,...);
 		end
@@ -441,15 +437,12 @@ StaticPopupDialogs["MOGIT_PREVIEW_IMPORT"] = {
 		local items = self.editBox:GetText();
 		items = items and items:match("compare%?items=([^;#]+)");
 		if items then
+			local tbl = {};
 			for item in items:gmatch("([^:]+)") do
 				item = item:match("^(%d+)");
-				if item then
-					mog:AddToPreview(tonumber(item),true);
-				end
+				table.insert(tbl,tonumber(item));
 			end
-			if mog.db.profile.gridDress then
-				mog.scroll:update();
-			end
+			mog:AddToPreview(tbl);
 		end
 	end,
 	OnCancel = function(self) end,
@@ -458,15 +451,12 @@ StaticPopupDialogs["MOGIT_PREVIEW_IMPORT"] = {
 		local items = self:GetText();
 		items = items and items:match("compare%?items=([^;#]+)");
 		if items then
+			local tbl = {};
 			for item in items:gmatch("([^:]+)") do
 				item = item:match("^(%d+)");
-				if item then
-					mog:AddToPreview(tonumber(item),true);
-				end
+				table.insert(tbl,tonumber(item));
 			end
-			if mog.db.profile.gridDress then
-				mog.scroll:update();
-			end
+			mog:AddToPreview(tbl);
 		end
 	end,
 	EditBoxOnEscapePressed = function(self)
