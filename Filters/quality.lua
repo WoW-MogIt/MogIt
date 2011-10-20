@@ -21,7 +21,7 @@ UIDropDownMenu_SetWidth(f.dd,125);
 UIDropDownMenu_SetButtonWidth(f.dd,140);
 UIDropDownMenu_JustifyText(f.dd,"LEFT");
 
-local function SelectAll(self)
+function f.dd.SelectAll(self)
 	num = 0;
 	for k,v in ipairs(mog.sub.slots) do
 		selected[k] = all;
@@ -33,7 +33,7 @@ local function SelectAll(self)
 	mog:BuildList();
 end
 
-local function ddTier1(self)
+function f.dd.Tier1(self)
 	if selected[self.value] and (not self.checked) then
 		num = num - 1;
 	elseif (not selected[self.value]) and self.checked then
@@ -48,7 +48,7 @@ function f.dd.initialize(self)
 	local info;
 	info = UIDropDownMenu_CreateInfo();
 	info.text =	all and L["Select All"] or L["Select None"];
-	info.func = SelectAll;
+	info.func = f.dd.SelectAll;
 	info.notCheckable = true;
 	UIDropDownMenu_AddButton(info);
 	
@@ -57,7 +57,7 @@ function f.dd.initialize(self)
 		info.text =	_G["ITEM_QUALITY"..v.."_DESC"];
 		info.value = v;
 		info.colorCode = colours[v].hex;
-		info.func = ddTier1;
+		info.func = f.dd.Tier1;
 		info.keepShownOnClick = true;
 		info.isNotRadio = true;
 		info.checked = selected[k];
