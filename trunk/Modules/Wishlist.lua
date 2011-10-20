@@ -68,7 +68,7 @@ StaticPopupDialogs["MOGIT_WISHLIST_CREATE_SET"] = {
 		self:GetParent():Hide()
 	end,
 	OnShow = function(self)
-		self.editBox:SetText("Set "..(#wishlist.db.profile.sets + 1))
+		self.editBox:SetText("Set "..(#wishlist:GetSets() + 1))
 		self.editBox:SetFocus()
 	end,
 	whileDead = true,
