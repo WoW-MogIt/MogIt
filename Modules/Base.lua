@@ -287,19 +287,6 @@ function mog.sub.OnScroll(module)
 end
 
 do
-	local function menuAddItem(self, itemID, index)
-		local name,link,_,_,_,_,_,_,_,texture = GetItemInfo(itemID);
-		local info = UIDropDownMenu_CreateInfo();
-		info.text = (texture and "\124T"..texture..":18\124t " or "")..(link or name or "");
-		info.value = itemID;
-		info.func = onClick;
-		info.checked = not index or self.data.cycle == index;
-		info.hasArrow = true;
-		info.arg1 = self;
-		info.arg2 = index;
-		UIDropDownMenu_AddButton(info,tier);
-	end
-	
 	local function onClick(self, arg1, arg2)
 		arg1.data.cycle = arg2;
 		arg1.data.item = arg1.data.items[arg2];
@@ -314,6 +301,19 @@ do
 	local function newSetOnClick(self)
 		StaticPopup_Show("MOGIT_WISHLIST_CREATE_SET", nil, nil, self.value);
 		CloseDropDownMenus();
+	end
+	
+	local function menuAddItem(self, itemID, index)
+		local name,link,_,_,_,_,_,_,_,texture = GetItemInfo(itemID);
+		local info = UIDropDownMenu_CreateInfo();
+		info.text = (texture and "\124T"..texture..":18\124t " or "")..(link or name or "");
+		info.value = itemID;
+		info.func = onClick;
+		info.checked = not index or self.data.cycle == index;
+		info.hasArrow = true;
+		info.arg1 = self;
+		info.arg2 = index;
+		UIDropDownMenu_AddButton(info,tier);
 	end
 	
 	local menu = {
