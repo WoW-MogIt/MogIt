@@ -4,7 +4,7 @@ local L = mog.L;
 local filters = {};
 
 function mog:CreateFilter(name,frame)
-	if filters[name] then return end;
+	if not name or filters[name] then return end;
 	if frame then
 		frame:SetParent(mog.filt.frame);
 	else

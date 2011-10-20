@@ -167,123 +167,6 @@ function mog.sub.FrameUpdate(module,self,value)
 	self.data.items = display[value];
 	self.data.cycle = 1;
 	self.data.item = type(self.data.items) ~= "table" and self.data.items or self.data.items[self.data.cycle];
-	
-	self.model:Undress();
-	mog:DressModel(self.model);
-	self.model:TryOn(self.data.item);
-end
-
-function mog.sub.OnEnter(module,self)
-	if not self then return end;
-	local item;
-	if self.MogItModel then
-		item = self.data.item;
-	elseif self.slot then
-		item = self.item;
-	end
-	if not item then return end;
-	--GameTooltip:SetOwner(self,"ANCHOR_NONE");
-	GameTooltip:SetOwner(self,"ANCHOR_RIGHT");
-	
-	local name,link,_,_,_,_,_,_,_,texture = GetItemInfo(item);
-	--GameTooltip:AddLine(self.display,1,1,1);
-	--GameTooltip:AddLine(" ");
-	GameTooltip:AddDoubleLine((texture and "\124T"..texture..":18\124t " or "")..(link or name or ""),self.data and (type(self.data.items) == "table") and (#self.data.items > 1) and L["Item %d/%d"]:format(self.data.cycle,#self.data.items),nil,nil,nil,1,0,0);
-	if mog.sub.data.source[item] then
-		GameTooltip:AddDoubleLine(L["Source"]..":",mog.sub.source[mog.sub.data.source[item]],nil,nil,nil,1,1,1);
-		if mog.sub.data.source[item] == 1 then -- Drop
-			if mog.GetMob(mog.sub.data.sourceid[item]) then
-				GameTooltip:AddDoubleLine(BOSS..":",mog.GetMob(mog.sub.data.sourceid[item]),nil,nil,nil,1,1,1);
-			end
-		--elseif mog.data.source[self.item] == 3 then -- Quest
-		elseif mog.sub.data.source[item] == 5 then -- Crafted
-			if mog.sub.data.sourceinfo[item] then
-				GameTooltip:AddDoubleLine(L["Profession"]..":",mog.sub.professions[mog.sub.data.sourceinfo[item]],nil,nil,nil,1,1,1);
-			end
-		elseif mog.sub.data.source[item] == 6 then -- Achievement
-			if mog.sub.data.sourceid[item] then
-				local _,name,_,complete = GetAchievementInfo(mog.sub.data.sourceid[item]);
-				GameTooltip:AddDoubleLine(L["Achievement"]..":",name,nil,nil,nil,1,1,1);
-				GameTooltip:AddDoubleLine(STATUS..":",complete and COMPLETE or INCOMPLETE,nil,nil,nil,1,1,1);
-			end
-		end
-	end
-	if mog.sub.data.zone[item] then
-		local zone = GetMapNameByID(mog.sub.data.zone[item]);
-		if zone then
-			if mog.sub.data.source[item] == 1 and mog.sub.diffs[mog.sub.data.sourceinfo[item]] then
-				zone = zone.." ("..mog.sub.diffs[mog.sub.data.sourceinfo[item]]..")";
-			end
-			GameTooltip:AddDoubleLine(ZONE..":",zone,nil,nil,nil,1,1,1);
-		end
-	end
-	
-	GameTooltip:AddLine(" ");
-	if mog.sub.data.lvl[item] then
-		GameTooltip:AddDoubleLine(LEVEL..":",mog.sub.data.lvl[item],nil,nil,nil,1,1,1);
-	end
-	if mog.sub.data.faction[item] then
-		GameTooltip:AddDoubleLine(FACTION..":",(mog.sub.data.faction[item] == 1 and FACTION_ALLIANCE or FACTION_HORDE),nil,nil,nil,1,1,1);
-	end
-	if mog.sub.data.class[item] and mog.sub.data.class[item] > 0 then
-		local str;
-		for k,v in pairs(mog.sub.classBits) do
-			if bit.band(mog.sub.data.class[item],v) > 0 then
-				if str then
-					str = str..", "..string.format("\124cff%.2x%.2x%.2x",RAID_CLASS_COLORS[k].r*255,RAID_CLASS_COLORS[k].g*255,RAID_CLASS_COLORS[k].b*255)..LOCALIZED_CLASS_NAMES_MALE[k].."\124r";
-				else
-					str = string.format("\124cff%.2x%.2x%.2x",RAID_CLASS_COLORS[k].r*255,RAID_CLASS_COLORS[k].g*255,RAID_CLASS_COLORS[k].b*255)..LOCALIZED_CLASS_NAMES_MALE[k].."\124r";
-				end
-			end
-		end
-		GameTooltip:AddDoubleLine(CLASS..":",str,nil,nil,nil,1,1,1);
-	end
-	if mog.sub.data.slot[item] then
-		GameTooltip:AddDoubleLine(L["Slot"]..":",mog.sub.slots[mog.sub.data.slot[item]],nil,nil,nil,1,1,1);
-	end
-	
-	GameTooltip:AddLine(" ");
-	GameTooltip:AddDoubleLine(ID..":",item,nil,nil,nil,1,1,1);
-	
-	GameTooltip:Show();
-	--GameTooltip:ClearAllPoints();
-	--GameTooltip:SetPoint("TOPLEFT",mog.frame,"TOPRIGHT",5,0);
-end
-
-function mog.sub.OnClick(module,self,btn)
-	if btn == "LeftButton" then
-		if IsShiftKeyDown() then
-			local _,link = GetItemInfo(self.data.item);
-			if link then
-				ChatEdit_InsertLink(link);
-			end
-		elseif IsControlKeyDown() then
-			DressUpItemLink(self.data.item);
-		else
-			if type(self.data.items) == "table" then
-				self.data.cycle = (self.data.cycle < #self.data.items and (self.data.cycle + 1)) or 1;
-				self.data.item = self.data.items[self.data.cycle];
-				module:OnEnter(self);
-			end
-		end
-	elseif btn == "RightButton" then
-		if IsControlKeyDown() then
-			mog:AddToPreview(self.data.item);
-		elseif IsShiftKeyDown() then
-			mog:ShowURL(self.data.item);
-		else
-			if UIDropDownMenu_GetCurrentDropDown() == mog.sub.ItemMenu and mog.sub.ItemMenu.menuList ~= self and DropDownList1 and DropDownList1:IsShown() then
-				HideDropDownMenu(1);
-			end
-			ToggleDropDownMenu(nil,nil,mog.sub.ItemMenu,"cursor",0,0,self);
-		end
-	end
-end
-
-function mog.sub.OnScroll(module)
-	if UIDropDownMenu_GetCurrentDropDown() == mog.sub.ItemMenu and DropDownList1 and DropDownList1:IsShown() then
-		HideDropDownMenu(1);
-	end
 end
 
 do
@@ -369,13 +252,6 @@ do
 	end
 end
 
-function mog.sub.GET_ITEM_INFO_RECEIVED()
-	if UIDropDownMenu_GetCurrentDropDown() == mog.sub.ItemMenu and DropDownList1 and DropDownList1:IsShown() then
-		HideDropDownMenu(1);
-		ToggleDropDownMenu(nil,nil,mog.sub.ItemMenu,"cursor",0,0,mog.sub.ItemMenu.menuList);
-	end
-end
-
 function mog.sub.Unlist(module)
 	wipe(list);
 	wipe(display);
@@ -457,14 +333,11 @@ for k,v in ipairs(addons) do
 	if loadable then
 		mog:RegisterModule(v,{
 			name = title:match("MogIt_(.+)") or title,
+			template = "item",
 			Dropdown = mog.sub.Dropdown,
 			BuildList = mog.sub.BuildList,
 			FrameUpdate = mog.sub.FrameUpdate,
-			OnEnter = mog.sub.OnEnter,
-			OnClick = mog.sub.OnClick,
-			OnScroll = mog.sub.OnScroll,
 			Unlist = mog.sub.Unlist,
-			GET_ITEM_INFO_RECEIVED = mog.sub.GET_ITEM_INFO_RECEIVED,
 			filters = {
 				"level",
 				"faction",
@@ -483,68 +356,3 @@ end
 -- buildlist/setlist
 -- filters/sort?
 -- click etc
-
-
-
---[[
-mog.invSlots = {
-	INVTYPE_HEAD = 1,
-	INVTYPE_SHOULDER = 2,
-	INVTYPE_CLOAK = 3,
-	INVTYPE_CHEST = 4,
-	INVTYPE_ROBE = 4,
-	INVTYPE_WRIST = 7,
-	INVTYPE_2HWEAPON = 12,
-	INVTYPE_WEAPON = 12,
-	INVTYPE_WEAPONMAINHAND = 12,
-	INVTYPE_WEAPONOFFHAND = 13,
-	INVTYPE_SHIELD = 13,
-	INVTYPE_HOLDABLE = 13,
-	INVTYPE_RANGED = 14,
-	INVTYPE_RANGEDRIGHT = 14,
-	INVTYPE_THROWN = 14,
-	INVTYPE_HAND = 8,
-	INVTYPE_WAIST = 9,
-	INVTYPE_LEGS = 10,
-	INVTYPE_FEET = 11,
-	INVTYPE_TABARD = 6,
-	INVTYPE_BODY = 5,
-};
-
-mog.itemSlots = {
-	"HeadSlot",
-	"ShoulderSlot",
-	"BackSlot",
-	"ChestSlot",
-	"ShirtSlot",
-	"TabardSlot",
-	"WristSlot",
-	"HandsSlot",
-	"WaistSlot",
-	"LegsSlot",
-	"FeetSlot",
-	"MainHandSlot",
-	"SecondaryHandSlot",
-	"RangedSlot",
-};
-
-		if slot == "INVTYPE_2HWEAPON" and select(2,UnitClass("PLAYER")) == "WARRIOR" and (select(5,GetTalentInfo(2,20)) or 0) > 0 then
-			slot = "INVTYPE_WEAPON";
-		end
-		if slot == "INVTYPE_2HWEAPON" then
-			mog.view.delItem(13);
-			mog.view.th = true;
-		elseif slot == "INVTYPE_WEAPONOFFHAND" then
-			if mog.view.th then
-				mog.view.delItem(12);
-			end
-			mog.view.th = nil;
-		elseif slot == "INVTYPE_WEAPON" then
-			if mog.view.slots[12].item and (not mog.view.slots[13].item) or mog.view.slots[12].item == id then
-				slot = "INVTYPE_WEAPONOFFHAND";
-			end
-			mog.view.th = nil;
-		elseif slot == "INVTYPE_WEAPONMAINHAND" then
-			mog.view.th = nil;
-		end
---]]

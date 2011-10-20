@@ -176,12 +176,10 @@ mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 		end--]]
 	elseif event == "GET_ITEM_INFO_RECEIVED" then
 		local owner = GameTooltip:IsShown() and GameTooltip:GetOwner();
-		if owner and owner.MogItModel and mog.active and mog.active.OnEnter then
-			mog.active:OnEnter(owner);
+		if owner and owner.MogItModel then
+			mog.OnEnter(owner);
 		end
-		if mog.active and mog.active.GET_ITEM_INFO_RECEIVED then
-			mog.active:GET_ITEM_INFO_RECEIVED();
-		end
+		mog.GET_ITEM_INFO_RECEIVED();
 	elseif event == "ADDON_LOADED" then
 		if arg1 == MogIt then
 			local AceDB = LibStub("AceDB-3.0")
@@ -255,4 +253,16 @@ end
 function mog.GetMob(id)
 	--return mobs[id] or CachedMob(id);
 	return mobs[id];
+end
+
+local templates = {};
+function mog:CreateTemplate(name,data)
+	if not name or templates[name] then return end;
+	data = data or {};
+	templates[name] = data;
+	return data;
+end
+
+function mog:GetTemplate(name)
+	return templates[name];
 end
