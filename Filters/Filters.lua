@@ -1,22 +1,22 @@
 local MogIt,mog = ...;
 local L = mog.L;
 
-local filters = {};
+mog.filters = {};
 
 function mog:CreateFilter(name,frame)
-	if not name or filters[name] then return end;
+	if not name or mog.filters[name] then return end;
 	if frame then
 		frame:SetParent(mog.filt.frame);
 	else
 		frame = CreateFrame("Frame",nil,mog.filt.frame);
 	end
 	frame:Hide();
-	filters[name] = frame;
+	mog.filters[name] = frame;
 	return frame;
 end
 
 function mog:GetFilter(name)
-	return filters[name];
+	return mog.filters[name];
 end
 
 mog.filt = CreateFrame("Frame","MogItFilters",mog.frame,"ButtonFrameTemplate");
@@ -48,8 +48,8 @@ mog.filt.defaults:SetText(DEFAULTS);
 mog.filt.defaults:SetScript("OnClick",function(self,btn)
 	if mog.active and mog.active.filters then
 		for k,v in ipairs(mog.active.filters) do
-			if filters[v] and filters[v].Default then
-				filters[v].Default();
+			if mog.filters[v] and mog.filters[v].Default then
+				mog.filters[v].Default();
 			end
 		end
 		mog:BuildList();
@@ -104,30 +104,30 @@ function mog:FilterUpdate()
 	
 	mog.filt.scroll:Show();
 	mog.filt.error:Hide();
-	for k,v in pairs(filters) do
+	for k,v in pairs(mog.filters) do
 		v:Hide();
 	end
 	
 	local height = 20;
 	local last;
 	for k,v in ipairs(mog.active.filters) do
-		if filters[v] then
-			filters[v]:ClearAllPoints();
+		if mog.filters[v] then
+			mog.filters[v]:ClearAllPoints();
 			if last then
-				filters[v]:SetPoint("TOPLEFT",last,"BOTTOMLEFT",0,-14);
+				mog.filters[v]:SetPoint("TOPLEFT",last,"BOTTOMLEFT",0,-14);
 			else
-				filters[v]:SetPoint("TOPLEFT",mog.filt.frame,"TOPLEFT",12,-10);
+				mog.filters[v]:SetPoint("TOPLEFT",mog.filt.frame,"TOPLEFT",12,-10);
 			end
-			filters[v]:SetPoint("RIGHT",mog.filt.frame,"RIGHT",-19,0);
-			if not filters[v].bg then
-				filters[v].bg = filters[v]:CreateTexture(nil,"BACKGROUND");
-				filters[v].bg:SetPoint("TOPLEFT",filters[v],"TOPLEFT",-5,5);
-				filters[v].bg:SetPoint("BOTTOMRIGHT",filters[v],"BOTTOMRIGHT",5,-5);
-				filters[v].bg:SetTexture(0.3,0.3,0.3,0.2);
+			mog.filters[v]:SetPoint("RIGHT",mog.filt.frame,"RIGHT",-19,0);
+			if not mog.filters[v].bg then
+				mog.filters[v].bg = mog.filters[v]:CreateTexture(nil,"BACKGROUND");
+				mog.filters[v].bg:SetPoint("TOPLEFT",mog.filters[v],"TOPLEFT",-5,5);
+				mog.filters[v].bg:SetPoint("BOTTOMRIGHT",mog.filters[v],"BOTTOMRIGHT",5,-5);
+				mog.filters[v].bg:SetTexture(0.3,0.3,0.3,0.2);
 			end
-			height = height + filters[v]:GetHeight() + (last and 14 or 0);
-			last = filters[v];
-			filters[v]:Show();
+			height = height + mog.filters[v]:GetHeight() + (last and 14 or 0);
+			last = mog.filters[v];
+			mog.filters[v]:Show();
 		end
 	end
 	mog.filt.frame:SetHeight(height);

@@ -255,14 +255,14 @@ function mog.GetMob(id)
 	return mobs[id];
 end
 
-local templates = {};
+mog.templates = {};
 function mog:CreateTemplate(name,data)
-	if not name or templates[name] then return end;
+	if not name or mog.templates[name] then return end;
 	data = data or {};
-	templates[name] = data;
+	mog.templates[name] = data;
 	return data;
 end
 
 function mog:GetTemplate(name)
-	return templates[name];
+	return mog.templates[name];
 end
