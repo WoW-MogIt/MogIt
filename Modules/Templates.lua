@@ -1,12 +1,6 @@
 local MogIt,mog = ...;
 local L = mog.L;
 
---[=[
-function template.OnLeave(module,self)
-	GameTooltip:Hide();
-end
---]=]
-
 function mog.Item_FrameUpdate(self, data)
 	if not (self and data and data.item) then return end;
 	self.model:Undress();
@@ -116,8 +110,68 @@ function mog.Item_OnClick(self,btn,data)
 	end
 end
 
-mog.Item_Menu = CreateFrame("Frame",nil,mog.frame);
-mog.Item_Menu.displayMode = "MENU";
+--[=[
+function mog.ItemOnScroll()
+	if UIDropDownMenu_GetCurrentDropDown() == mog.sub.ItemMenu and DropDownList1 and DropDownList1:IsShown() then
+		HideDropDownMenu(1);
+	end
+end
+
+
+function mog.ItemGET_ITEM_INFO_RECEIVED()
+	if UIDropDownMenu_GetCurrentDropDown() == mog.sub.ItemMenu and DropDownList1 and DropDownList1:IsShown() then
+		HideDropDownMenu(1);
+		ToggleDropDownMenu(nil,nil,mog.sub.ItemMenu,"cursor",0,0,mog.sub.ItemMenu.menuList);
+	end
+end
+
+--]=]
+
+function mog.Set_FrameUpdate(self, data)
+	if not (self and data and data.items) then return end
+	self.model:Undress();
+	for k, v in pairs(data.items) do
+		self.model:TryOn(v);
+	end
+end
+
+function mog.Set_OnEnter(self, data)
+	if not (self and data and data.items) then return end;
+	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+	
+	GameTooltip:AddLine(data.name);
+	for k, v in pairs(data.items) do
+		local name,link,_,_,_,_,_,_,_,texture = GetItemInfo(v);
+		GameTooltip:AddLine((texture and "\124T"..texture..":18\124t " or "")..(link or name or ""));
+	end
+	
+	GameTooltip:Show();
+end
+
+function mog.Set_OnClick(self, btn, data)
+	if not (self and data and data.items) then return end;
+	if btn == "LeftButton" then
+		if IsShiftKeyDown() then
+			ChatEdit_InsertLink(mog:SetToLink(data.items));
+		elseif IsControlKeyDown() then
+			for k,v in pairs(data.items) do
+				DressUpItemLink(v);
+			end
+		end
+	elseif btn == "RightButton" then
+		if IsShiftKeyDown() then
+			mog:ShowURL(data.set, "set");
+		elseif IsControlKeyDown() then
+			mog:AddToPreview(data.items);
+		else
+			ToggleDropDownMenu(nil, nil, dropdown, "cursor", 0, 0, self.data)
+		end
+	end
+end
+
+mog.Frame_Menu = CreateFrame("Frame",nil,mog.frame);
+mog.Frame_Menu.displayMode = "MENU";
+
 do
 	local function onClick(self, arg1, arg2)
 		arg1.data.cycle = arg2;
@@ -199,73 +253,6 @@ do
 	end
 end
 
---[=[
-function mog.ItemOnScroll()
-	if UIDropDownMenu_GetCurrentDropDown() == mog.sub.ItemMenu and DropDownList1 and DropDownList1:IsShown() then
-		HideDropDownMenu(1);
-	end
-end
-
-
-function mog.ItemGET_ITEM_INFO_RECEIVED()
-	if UIDropDownMenu_GetCurrentDropDown() == mog.sub.ItemMenu and DropDownList1 and DropDownList1:IsShown() then
-		HideDropDownMenu(1);
-		ToggleDropDownMenu(nil,nil,mog.sub.ItemMenu,"cursor",0,0,mog.sub.ItemMenu.menuList);
-	end
-end
-
---]=]
-
-function mog.Set_FrameUpdate(self, data)
-	if not (self and data and data.items) then return end
-	self.model:Undress();
-	for k, v in pairs(data.items) do
-		self.model:TryOn(v);
-	end
-end
-
-function mog.Set_OnEnter(self, data)
-	if not (self and data and data.items) then return end;
-	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-	
-	GameTooltip:AddLine(data.name);
-	for k, v in pairs(data.items) do
-		local name,link,_,_,_,_,_,_,_,texture = GetItemInfo(v);
-		GameTooltip:AddLine((texture and "\124T"..texture..":18\124t " or "")..(link or name or ""));
-	end
-	
-	GameTooltip:Show();
-end
-
---[=[
-function template.OnLeave(module,self)
-	GameTooltip:Hide();
-end--]=]
-
-local dropdown = CreateFrame("Frame")
-function mog.Set_OnClick(self, btn, data)
-	if not (self and data and data.items) then return end;
-	if btn == "LeftButton" then
-		if IsShiftKeyDown() then
-			ChatEdit_InsertLink(mog:SetToLink(data.items));
-		elseif IsControlKeyDown() then
-			for k,v in pairs(data.items) do
-				DressUpItemLink(v);
-			end
-		end
-	elseif btn == "RightButton" then
-		if IsShiftKeyDown() then
-			mog:ShowURL(data.set, "set");
-		elseif IsControlKeyDown() then
-			mog:AddToPreview(data.items);
-		else
-			ToggleDropDownMenu(nil, nil, dropdown, "cursor", 0, 0, self.data)
-		end
-	end
-end
-
-mog.Set_Menu = CreateFrame("Frame",nil,mog.frame);
-mog.Set_Menu.displayMode = "MENU";
 do
 	local types = {
 		number = "item",
