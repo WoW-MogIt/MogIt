@@ -141,8 +141,8 @@ mog.view.link:SetText(L["Chat Link"]);
 mog.view.link:SetScript("OnClick",function(self,btn)
 	local tbl = {};
 	for k,v in pairs(mog.view.slots) do
-		if v.data.item then
-			table.insert(tbl,v.data.item);
+		if v.item then
+			table.insert(tbl,v.item);
 		end
 	end
 	ChatEdit_InsertLink(mog:SetToLink(tbl));
@@ -152,31 +152,35 @@ function mog.view.setTexture(slot,texture)
 	SetItemButtonTexture(mog.view.slots[slot],texture or select(2,GetInventorySlotInfo(slot)));
 end
 
-local function slot_OnClick(self,btn)
-	if btn == "RightButton" and IsControlKeyDown() then
-		mog.view.delItem(self.data.slot);
-		if mog.db.profile.gridDress then
-			mog.scroll:update();
-		end
-	else
-		mog.templates.item.OnClick(nil,self,btn);
-	end
-end
-
 local function slot_OnEnter(self)
-	mog.templates.item.OnEnter(nil,self);
+	if self.item then
+		mog.Item_OnEnter(self,self);
+	else
+		GameTooltip:SetOwner(self,"ANCHOR_RIGHT");
+		GameTooltip:SetText(_G[strupper(self.slot)]);
+	end
 end
 
 local function slot_OnLeave(self)
 	GameTooltip:Hide();
 end
 
+local function slot_OnClick(self,btn)
+	if btn == "RightButton" and IsControlKeyDown() then
+		mog.view.delItem(self.slot);
+		if mog.db.profile.gridDress then
+			mog.scroll:update();
+		end
+		slot_OnEnter(self);
+	else
+		mog.Item_OnClick(self,btn,self);
+	end
+end
+
 mog.view.slots = {};
 for k,v in ipairs(slots) do
 	mog.view.slots[v] = CreateFrame("Button","MogItPreview"..v,mog.view,"ItemButtonTemplate");
-	mog.view.slots[v].data = {
-		slot = v,
-	};
+	mog.view.slots[v].slot = v;
 	if k == 1 then
 		--mog.view.slots[v]:SetPoint("TOPLEFT",mog.view,"TOPLEFT",5,-60);
 		mog.view.slots[v]:SetPoint("TOPLEFT",mog.view.Inset,"TOPLEFT",8,-8);
@@ -223,7 +227,7 @@ function mog.view.addItem(item)
 			end
 		end
 		if slot == "INVTYPE_WEAPON" and not mog.view.twohand then
-			if mog.view.slots.MainHandSlot.data.item and ((not mog.view.slots.SecondaryHandSlot.data.item) or mog.view.slots.MainHandSlot.data.item == item) then
+			if mog.view.slots.MainHandSlot.item and ((not mog.view.slots.SecondaryHandSlot.item) or mog.view.slots.MainHandSlot.item == item) then
 				slot = "INVTYPE_WEAPONOFFHAND";
 			end
 		end
@@ -242,7 +246,7 @@ function mog.view.addItem(item)
 			mog.view.twohand = nil;
 		end
 		
-		mog.view.slots[mog.invSlots[slot]].data.item = item;
+		mog.view.slots[mog.invSlots[slot]].item = item;
 		-- item history
 		mog.view.setTexture(mog.invSlots[slot],texture);
 		if mog.view:IsShown() then
@@ -269,7 +273,7 @@ function mog:AddToPreview(item)
 end
 
 function mog.view.delItem(slot)
-	mog.view.slots[slot].data.item = nil;
+	mog.view.slots[slot].item = nil;
 	mog.view.setTexture(slot);
 	mog.view.model.model:Undress(); -- <--
 	mog:DressModel(mog.view.model.model);
@@ -281,8 +285,8 @@ end
 function mog:DressModel(model)
 	if mog.db.profile.gridDress or (model == mog.view.model.model) then
 		for k,v in pairs(mog.view.slots) do
-			if v.data.item then
-				model:TryOn(v.data.item);
+			if v.item then
+				model:TryOn(v.item);
 			end
 		end
 	end
@@ -407,11 +411,11 @@ StaticPopupDialogs["MOGIT_PREVIEW_IMPORT"] = {
 	OnShow = function(self,item)
 		local str;
 		for k,v in pairs(mog.view.slots) do
-			if v.data.item then
+			if v.item then
 				if str then
-					str = str..":"..v.data.item;
+					str = str..":"..v.item;
 				else
-					str = L["http://www.wowhead.com/"].."compare?items="..v.data.item;
+					str = L["http://www.wowhead.com/"].."compare?items="..v.item;
 				end
 			end
 		end
