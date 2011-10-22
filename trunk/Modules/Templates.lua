@@ -108,14 +108,16 @@ function mog.Item_OnClick(self,btn,data)
 		elseif IsShiftKeyDown() then
 			mog:ShowURL(item);
 		else
-			if UIDropDownMenu_GetCurrentDropDown() == mog.sub.ItemMenu and mog.sub.ItemMenu.menuList ~= self and DropDownList1 and DropDownList1:IsShown() then
+			if UIDropDownMenu_GetCurrentDropDown() == mog.Item_Menu and mog.Item_Menu.menuList ~= self and DropDownList1 and DropDownList1:IsShown() then
 				HideDropDownMenu(1);
 			end
-			ToggleDropDownMenu(nil,nil,mog.sub.ItemMenu,"cursor",0,0,self);
+			ToggleDropDownMenu(nil,nil,mog.Item_Menu,"cursor",0,0,self);
 		end
 	end
 end
 
+mog.Item_Menu = CreateFrame("Frame",nil,mog.frame);
+mog.Item_Menu.displayMode = "MENU";
 do
 	local function onClick(self, arg1, arg2)
 		arg1.data.cycle = arg2;
@@ -160,9 +162,7 @@ do
 		},
 	}
 	
-	mog.sub.ItemMenu = CreateFrame("Frame", nil, mog.frame);
-	mog.sub.ItemMenu.displayMode = "MENU";
-	function mog.sub.ItemMenu:initialize(tier, self)
+	function mog.Item_Menu:initialize(tier, self)
 		if tier == 1 then
 			local items = self.data.items;
 			if items then
@@ -264,143 +264,147 @@ function mog.Set_OnClick(self, btn, data)
 	end
 end
 
-local types = {
-	number = "item",
-	table = "set",
-}
+mog.Set_Menu = CreateFrame("Frame",nil,mog.frame);
+mog.Set_Menu.displayMode = "MENU";
+do
+	local types = {
+		number = "item",
+		table = "set",
+	}
 
-dropdown.displayMode = "MENU"
---dropdown.point = "TOPLEFT"
---dropdown.relativePoint = "TOPRIGHT"
-function dropdown:initialize(level, menuList)
-	self.menu[types[type(menuList)]][level](menuList, level)
-end
+	--dropdown.point = "TOPLEFT"
+	--dropdown.relativePoint = "TOPRIGHT"
+	
+	function mog.Set_Menu:initialize(level, menuList)
+		self.menu[types[type(menuList)]][level](menuList, level)
+	end
 
-local itemMenu = {
-	{
-		text = "Add to set",
-		hasArrow = true,
-		notCheckable = true,
-	},
-	{
-		text = "Delete",
-		func = function(self)
-			tremove(wishlist.db.profile.items, self.value)
-			mog:BuildList()
-		end,
-		notCheckable = true,
-	},
-}
+	local itemMenu = {
+		{
+			text = "Add to set",
+			hasArrow = true,
+			notCheckable = true,
+		},
+		{
+			text = "Delete",
+			func = function(self)
+				tremove(wishlist.db.profile.items, self.value)
+				mog:BuildList()
+			end,
+			notCheckable = true,
+		},
+	}
 
-dropdown.menu = {
-	-- menu used for single items
-	item = {
-		-- top level menu
-		[1] = function(menuList, level)
-			for k, v in pairs(itemMenu) do
-				v.value = menuList.index - #wishlist.db.profile.sets
-				v.menuList = menuList
-				UIDropDownMenu_AddButton(v, level)
-			end
-		end,
-		-- second level menu
-		[2] = function(menuList, level)
-			for i, set in ipairs(wishlist.db.profile.sets) do
-				local info = UIDropDownMenu_CreateInfo()
-				info.text = set.name
-				info.func = function(self)
-					wishlist:AddItem(menuList.item, self.value)
-					mog:BuildList()
-					CloseDropDownMenus()
+	mog.Set_Menu.menu = {
+		-- menu used for single items
+		item = {
+			-- top level menu
+			[1] = function(menuList, level)
+				for k, v in pairs(itemMenu) do
+					v.value = menuList.index - #wishlist.db.profile.sets
+					v.menuList = menuList
+					UIDropDownMenu_AddButton(v, level)
 				end
-				info.notCheckable = true
-				UIDropDownMenu_AddButton(info, level)
-			end
-		end,
-	},
-	-- menu used for sets
-	set = {
-		[1] = function(menuList, level)
-			for i, slot in ipairs(mog.itemSlots) do
-				local itemID = menuList.items[slot]
-				if itemID then
-					local itemName, _, itemQuality = GetItemInfo(itemID)
+			end,
+			-- second level menu
+			[2] = function(menuList, level)
+				for i, set in ipairs(wishlist.db.profile.sets) do
 					local info = UIDropDownMenu_CreateInfo()
-					info.text = itemName
-					info.value = itemID
-					-- info.icon = GetItemIcon(itemID)
-					info.hasArrow = true
-					info.colorCode = "|c"..select(4, GetItemQualityColor(itemQuality))
+					info.text = set.name
+					info.func = function(self)
+						wishlist:AddItem(menuList.item, self.value)
+						mog:BuildList()
+						CloseDropDownMenus()
+					end
 					info.notCheckable = true
-					info.menuList = menuList
 					UIDropDownMenu_AddButton(info, level)
 				end
-			end
-			
-			local info = UIDropDownMenu_CreateInfo()
-			info.text = "Rename set"
-			info.value = menuList.index
-			info.func = function(self)
-				StaticPopup_Show("MOGIT_WISHLIST_RENAME_SET", nil, nil, wishlist.db.profile.sets[self.value])
-				mog:BuildList()
-			end
-			info.notCheckable = true
-			UIDropDownMenu_AddButton(info, level)
-			
-			local info = UIDropDownMenu_CreateInfo()
-			info.text = "Delete set"
-			info.value = menuList.index
-			info.func = function(self)
-				tremove(wishlist.db.profile.sets, self.value)
-				mog:BuildList()
-			end
-			info.notCheckable = true
-			UIDropDownMenu_AddButton(info, level)
-		end,
-		[2] = function(menuList, level)
-			local info = UIDropDownMenu_CreateInfo()
-			info.text = "Add to set"
-			info.value = UIDROPDOWNMENU_MENU_VALUE
-			info.hasArrow = true
-			info.notCheckable = true
-			info.menuList = menuList
-			UIDropDownMenu_AddButton(info, level)
-			
-			local info = UIDropDownMenu_CreateInfo()
-			info.text = "Add as single item"
-			info.value = UIDROPDOWNMENU_MENU_VALUE
-			info.func = function(self)
-				wishlist:AddItem(self.value)
-				mog:BuildList()
-				CloseDropDownMenus()
-			end
-			info.notCheckable = true
-			UIDropDownMenu_AddButton(info, level)
-			
-			local info = UIDropDownMenu_CreateInfo()
-			info.text = "Delete"
-			-- info.value = 
-			info.func = function(self)
-				wishlist.db.profile.sets[menuList.index].items[mog.invSlots[select(9, GetItemInfo(UIDROPDOWNMENU_MENU_VALUE))]] = nil
-				mog:BuildList()
-				CloseDropDownMenus()
-			end
-			info.notCheckable = true
-			UIDropDownMenu_AddButton(info, level)
-		end,
-		[3] = function(menuList, level)
-			for i, set in ipairs(mog:GetModule("Wishlist"):GetSets()) do
+			end,
+		},
+		-- menu used for sets
+		set = {
+			[1] = function(menuList, level)
+				for i, slot in ipairs(mog.itemSlots) do
+					local itemID = menuList.items[slot]
+					if itemID then
+						local itemName, _, itemQuality = GetItemInfo(itemID)
+						local info = UIDropDownMenu_CreateInfo()
+						info.text = itemName
+						info.value = itemID
+						-- info.icon = GetItemIcon(itemID)
+						info.hasArrow = true
+						info.colorCode = "|c"..select(4, GetItemQualityColor(itemQuality))
+						info.notCheckable = true
+						info.menuList = menuList
+						UIDropDownMenu_AddButton(info, level)
+					end
+				end
+				
 				local info = UIDropDownMenu_CreateInfo()
-				info.text = set.name
-				info.func = function(self, arg1)
-					wishlist:AddItem(arg1, self.value)
+				info.text = "Rename set"
+				info.value = menuList.index
+				info.func = function(self)
+					StaticPopup_Show("MOGIT_WISHLIST_RENAME_SET", nil, nil, wishlist.db.profile.sets[self.value])
+					mog:BuildList()
+				end
+				info.notCheckable = true
+				UIDropDownMenu_AddButton(info, level)
+				
+				local info = UIDropDownMenu_CreateInfo()
+				info.text = "Delete set"
+				info.value = menuList.index
+				info.func = function(self)
+					tremove(wishlist.db.profile.sets, self.value)
+					mog:BuildList()
+				end
+				info.notCheckable = true
+				UIDropDownMenu_AddButton(info, level)
+			end,
+			[2] = function(menuList, level)
+				local info = UIDropDownMenu_CreateInfo()
+				info.text = "Add to set"
+				info.value = UIDROPDOWNMENU_MENU_VALUE
+				info.hasArrow = true
+				info.notCheckable = true
+				info.menuList = menuList
+				UIDropDownMenu_AddButton(info, level)
+				
+				local info = UIDropDownMenu_CreateInfo()
+				info.text = "Add as single item"
+				info.value = UIDROPDOWNMENU_MENU_VALUE
+				info.func = function(self)
+					wishlist:AddItem(self.value)
 					mog:BuildList()
 					CloseDropDownMenus()
 				end
 				info.notCheckable = true
-				info.arg1 = UIDROPDOWNMENU_MENU_VALUE
 				UIDropDownMenu_AddButton(info, level)
-			end
-		end,
+				
+				local info = UIDropDownMenu_CreateInfo()
+				info.text = "Delete"
+				-- info.value = 
+				info.func = function(self)
+					wishlist.db.profile.sets[menuList.index].items[mog.invSlots[select(9, GetItemInfo(UIDROPDOWNMENU_MENU_VALUE))]] = nil
+					mog:BuildList()
+					CloseDropDownMenus()
+				end
+				info.notCheckable = true
+				UIDropDownMenu_AddButton(info, level)
+			end,
+			[3] = function(menuList, level)
+				for i, set in ipairs(mog:GetModule("Wishlist"):GetSets()) do
+					local info = UIDropDownMenu_CreateInfo()
+					info.text = set.name
+					info.func = function(self, arg1)
+						wishlist:AddItem(arg1, self.value)
+						mog:BuildList()
+						CloseDropDownMenus()
+					end
+					info.notCheckable = true
+					info.arg1 = UIDROPDOWNMENU_MENU_VALUE
+					UIDropDownMenu_AddButton(info, level)
+				end
+			end,
+		}
 	}
-}
+end
