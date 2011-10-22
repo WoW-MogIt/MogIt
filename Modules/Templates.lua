@@ -7,7 +7,13 @@ function template.OnLeave(module,self)
 end
 --]=]
 
-function mog.Item_FrameUpdate(self,item)
+function mog.Item_FrameUpdate(self,items,cycle)
+	local item;
+	if type(items) == "table" then
+		item = items[cycle];
+	else
+		item = items;
+	end
 	self.model:Undress();
 	mog:DressModel(self.model);
 	self.model:TryOn(item);
@@ -17,6 +23,8 @@ function mog.Item_OnEnter(self,items,cycle)
 	local item;
 	if type(items) == "table" then
 		item = items[cycle];
+	else
+		item = items;
 	end
 	if not (self and item) then return end;
 		
@@ -91,6 +99,8 @@ function mog.Item_OnClick(self,btn,items,cycle)
 	local item;
 	if type(items) == "table" then
 		item = items[cycle];
+	else
+		item = items;
 	end
 	if not (self and item) then return end;
 	
