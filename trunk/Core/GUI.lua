@@ -367,16 +367,8 @@ function mog.updateGUI(resize)
 end
 
 function mog.FrameUpdate(frame,index)
-	if not mog.active then return end;
-	local state;
-	if mog.active.FrameUpdate then
-		state = mog.active:FrameUpdate(frame,mog.list[index],index);
-	end
-	if not state then
-		local template = mog:GetTemplate(frame.template or mog.active.template);
-		if template and template.FrameUpdate then
-			template.FrameUpdate(mog.active,frame,mog.list[index],index);
-		end
+	if mog.active and mog.active.FrameUpdate then
+		mog.active:FrameUpdate(frame,mog.list[index]);
 	end
 end
 
@@ -403,17 +395,9 @@ function mog.OnUpdate(self)
 	--autorotate?
 end
 
-function mog.OnClick(frame,btn,...)
-	if not mog.active then return end;
-	local state;
-	if mog.active.OnClick then
-		state = mog.active:OnClick(frame,btn,...);
-	end
-	if not state then
-		local template = mog:GetTemplate(frame.template or mog.active.template);
-		if template and template.OnClick then
-			template.OnClick(mog.active,frame,btn,...);
-		end
+function mog.OnClick(self,btn,...)
+	if mog.active and mog.active.OnClick then
+		mog.active:OnClick(self,btn,mog.list[self.index],...);
 	end
 end
 
@@ -430,58 +414,22 @@ function mog.OnDragStop(self,btn)
 	mog.modelUpdater.model = nil;
 end
 
-function mog.OnEnter(frame,...)
-	if not mog.active then return end;
-	local state;
-	if mog.active.OnEnter then
-		state = mog.active:OnEnter(frame,...);
-	end
-	if not state then
-		local template = mog:GetTemplate(frame.template or mog.active.template);
-		if template and template.OnEnter then
-			template.OnEnter(mog.active,frame,...);
-		end
+function mog.OnEnter(self,...)
+	if mog.active and mog.active.OnEnter then
+		mog.active:OnEnter(self,mog.list[self.index],...);
 	end
 end
 
-function mog.OnLeave(frame,...)
-	if not mog.active then return end;
-	local state;
-	if mog.active.OnLeave then
-		state = mog.active:OnLeave(frame,...);
-	end
-	if not state then
-		local template = mog:GetTemplate(frame.template or mog.active.template);
-		if template and template.OnLeave then
-			template.OnLeave(mog.active,frame,...);
-		end
+function mog.OnLeave(self,...)
+	if mog.active and mog.active.OnLeave then
+		mog.active:OnLeave(self,...);
+	else
+		GameTooltip:Hide();
 	end
 end
 
 function mog.GET_ITEM_INFO_RECEIVED(...)
-	if not mog.active then return end;
-	local state;
-	if mog.active.GET_ITEM_INFO_RECEIVED then
-		state = mog.active:GET_ITEM_INFO_RECEIVED(...);
-	end
-	if not state then
-		local template = mog:GetTemplate(mog.active.template);
-		if template and template.GET_ITEM_INFO_RECEIVED then
-			template.GET_ITEM_INFO_RECEIVED(...);
-		end
+	if mog.active and mog.active.GET_ITEM_INFO_RECEIVED then
+		mog.active:GET_ITEM_INFO_RECEIVED(...);
 	end
 end
-
---[=[function mog.execute(cmd,frame,...)
-	if not mog.active then return end;
-	local state;
-	if mog.active[cmd] then
-		state = mog.active[cmd](mog.active,frame,...);
-	end
-	if not state then
-		local template = mog:GetTemplate((type(frame) == "table" and frame.template) or mog.active.template);
-		if template and template[cmd] then
-			template[cmd](mog.active,frame,...);
-		end
-	end
-end--]=]

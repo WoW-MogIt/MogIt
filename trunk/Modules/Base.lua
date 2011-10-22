@@ -166,7 +166,20 @@ function mog.sub.FrameUpdate(module,self,value)
 	self.data.display = value;
 	self.data.items = display[value];
 	self.data.cycle = 1;
-	self.data.item = type(self.data.items) ~= "table" and self.data.items or self.data.items[self.data.cycle];
+	if type(self.data.items) == "table" then
+		self.data.item = self.data.items[self.data.cycle];
+	else
+		self.data.item = self.data.items;
+	end
+	mog.Item_FrameUpdate(self,self.data.item);
+end
+
+function mog.sub.OnEnter(module,self,value)
+	mog.Item_OnEnter(self,self.data.items,self.data.cycle);
+end
+
+function mog.sub.OnClick(module,self,btn,value)
+	mog.Item_OnClick(self,btn,self.data.items,self.data.cycle);
 end
 
 do
@@ -337,6 +350,8 @@ for k,v in ipairs(addons) do
 			Dropdown = mog.sub.Dropdown,
 			BuildList = mog.sub.BuildList,
 			FrameUpdate = mog.sub.FrameUpdate,
+			OnEnter = mog.sub.OnEnter,
+			OnClick = mog.sub.OnClick,
 			Unlist = mog.sub.Unlist,
 			filters = {
 				"level",
