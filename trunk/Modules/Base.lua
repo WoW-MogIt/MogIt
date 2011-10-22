@@ -163,98 +163,22 @@ function mog.sub.Dropdown(module,tier)
 end
 
 function mog.sub.FrameUpdate(module,self,value)
-	mog.Item_FrameUpdate(self,display[value],1);
+	if type(display[value]) == "table" then
+		self.data.items = display[value];
+		self.data.cycle = 1;
+		self.data.item = self.data.items[self.data.cycle];
+	else
+		self.data.item = display[value];
+	end
+	mog.Item_FrameUpdate(self,self.data);
 end
 
 function mog.sub.OnEnter(module,self,value)
-	mog.Item_OnEnter(self,display[value],1);
+	mog.Item_OnEnter(self,self.data);
 end
 
 function mog.sub.OnClick(module,self,btn,value)
-	mog.Item_OnClick(self,btn,display[value],1);
-end
-
-do
-	local function onClick(self, arg1, arg2)
-		arg1.data.cycle = arg2;
-		arg1.data.item = arg1.data.items[arg2];
-	end
-	
-	local function setOnClick(self, set)
-		mog:GetModule("Wishlist"):AddItem(self.value, set);
-		CloseDropDownMenus();
-	end
-	
-	-- create a new set and add the item to it
-	local function newSetOnClick(self)
-		StaticPopup_Show("MOGIT_WISHLIST_CREATE_SET", nil, nil, self.value);
-		CloseDropDownMenus();
-	end
-	
-	local function menuAddItem(self, itemID, index)
-		local name,link,_,_,_,_,_,_,_,texture = GetItemInfo(itemID);
-		local info = UIDropDownMenu_CreateInfo();
-		info.text = (texture and "\124T"..texture..":18\124t " or "")..(link or name or "");
-		info.value = itemID;
-		info.func = onClick;
-		info.checked = not index or self.data.cycle == index;
-		info.hasArrow = true;
-		info.arg1 = self;
-		info.arg2 = index;
-		UIDropDownMenu_AddButton(info,tier);
-	end
-	
-	local menu = {
-		{
-			text = "Add to wishlist",
-			func = function(self)
-				mog:GetModule("Wishlist"):AddItem(self.value);
-				CloseDropDownMenus();
-			end,
-		},
-		{
-			text = "Add to set",
-			hasArrow = true,
-		},
-	}
-	
-	mog.sub.ItemMenu = CreateFrame("Frame",nil,mog.frame);
-	mog.sub.ItemMenu.displayMode = "MENU";
-	function mog.sub.ItemMenu:initialize(tier,self)
-		if tier == 1 then
-			local items = self.data.items;
-			if type(items) == "table" then
-				for i,itemID in ipairs(items) do
-					menuAddItem(self, itemID, i);
-				end
-			else
-				menuAddItem(self, items, index);
-			end
-		elseif tier == 2 then
-			for i, info in ipairs(menu) do
-				info.value = UIDROPDOWNMENU_MENU_VALUE;
-				info.notCheckable = true;
-				UIDropDownMenu_AddButton(info, tier);
-			end
-		elseif tier == 3 then
-			for i, set in ipairs(mog:GetModule("Wishlist"):GetSets()) do
-				local info = UIDropDownMenu_CreateInfo();
-				info.text = set.name;
-				info.value = UIDROPDOWNMENU_MENU_VALUE;
-				info.func = setOnClick;
-				info.notCheckable = true;
-				info.arg1 = set.name;
-				UIDropDownMenu_AddButton(info, tier);
-			end
-			
-			local info = UIDropDownMenu_CreateInfo();
-			info.text = "New set";
-			info.value = UIDROPDOWNMENU_MENU_VALUE;
-			info.func = newSetOnClick;
-			info.notCheckable = true;
-			UIDropDownMenu_AddButton(info, tier);
-		end
-	end
+	mog.Item_OnClick(self,btn,self.data);
 end
 
 function mog.sub.Unlist(module)

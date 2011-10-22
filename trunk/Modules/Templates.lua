@@ -7,25 +7,15 @@ function template.OnLeave(module,self)
 end
 --]=]
 
-function mog.Item_FrameUpdate(self,items,cycle)
-	local item;
-	if type(items) == "table" then
-		item = items[cycle];
-	else
-		item = items;
-	end
+function mog.Item_FrameUpdate(self,data)
+	if not (self and data and data.item) then return end;
 	self.model:Undress();
 	mog:DressModel(self.model);
-	self.model:TryOn(item);
+	self.model:TryOn(data.item);
 end
 
-function mog.Item_OnEnter(self,items,cycle)
-	local item;
-	if type(items) == "table" then
-		item = items[cycle];
-	else
-		item = items;
-	end
+function mog.Item_OnEnter(self,data)
+	local item = data.item;
 	if not (self and item) then return end;
 		
 	GameTooltip:SetOwner(self,"ANCHOR_RIGHT");
@@ -33,7 +23,7 @@ function mog.Item_OnEnter(self,items,cycle)
 	local name,link,_,_,_,_,_,_,_,texture = GetItemInfo(item);
 	--GameTooltip:AddLine(self.display,1,1,1);
 	--GameTooltip:AddLine(" ");
-	GameTooltip:AddDoubleLine((texture and "\124T"..texture..":18\124t " or "")..(link or name or ""),(type(items) == "table") and (#items > 1) and L["Item %d/%d"]:format(cycle,#items),nil,nil,nil,1,0,0);
+	GameTooltip:AddDoubleLine((texture and "\124T"..texture..":18\124t " or "")..(link or name or ""),data.items and (#data.items > 1) and L["Item %d/%d"]:format(data.cycle,#data.items),nil,nil,nil,1,0,0);
 	if mog.sub.data.source[item] then
 		GameTooltip:AddDoubleLine(L["Source"]..":",mog.sub.source[mog.sub.data.source[item]],nil,nil,nil,1,1,1);
 		if mog.sub.data.source[item] == 1 then -- Drop
@@ -93,15 +83,8 @@ function mog.Item_OnEnter(self,items,cycle)
 	GameTooltip:Show();
 end
 
-
-
-function mog.Item_OnClick(self,btn,items,cycle)
-	local item;
-	if type(items) == "table" then
-		item = items[cycle];
-	else
-		item = items;
-	end
+function mog.Item_OnClick(self,btn,data)
+	local item = data.item;
 	if not (self and item) then return end;
 	
 	if btn == "LeftButton" then
@@ -113,9 +96,9 @@ function mog.Item_OnClick(self,btn,items,cycle)
 		elseif IsControlKeyDown() then
 			DressUpItemLink(item);
 		else
-			if type(items) == "table" then
-				cycle = (cycle < #items and (cycle + 1)) or 1;
-				item = items[cycle];
+			if data.items then
+				data.cycle = (data.cycle < #data.items and (data.cycle + 1)) or 1;
+				data.item = data.items[data.cycle];
 				mog.OnEnter(self);
 			end
 		end
@@ -129,6 +112,89 @@ function mog.Item_OnClick(self,btn,items,cycle)
 				HideDropDownMenu(1);
 			end
 			ToggleDropDownMenu(nil,nil,mog.sub.ItemMenu,"cursor",0,0,self);
+		end
+	end
+end
+
+do
+	local function onClick(self, arg1, arg2)
+		arg1.data.cycle = arg2;
+		arg1.data.item = arg1.data.items[arg2];
+	end
+	
+	local function setOnClick(self, set)
+		mog:GetModule("Wishlist"):AddItem(self.value, set);
+		CloseDropDownMenus();
+	end
+	
+	-- create a new set and add the item to it
+	local function newSetOnClick(self)
+		StaticPopup_Show("MOGIT_WISHLIST_CREATE_SET", nil, nil, self.value);
+		CloseDropDownMenus();
+	end
+	
+	local function menuAddItem(self, itemID, index)
+		local name,link,_,_,_,_,_,_,_,texture = GetItemInfo(itemID);
+		local info = UIDropDownMenu_CreateInfo();
+		info.text = (texture and "\124T"..texture..":18\124t " or "")..(link or name or "");
+		info.value = itemID;
+		info.func = onClick;
+		info.checked = not index or self.data.cycle == index;
+		info.hasArrow = true;
+		info.arg1 = self;
+		info.arg2 = index;
+		UIDropDownMenu_AddButton(info,tier);
+	end
+	
+	local menu = {
+		{
+			text = "Add to wishlist",
+			func = function(self)
+				mog:GetModule("Wishlist"):AddItem(self.value);
+				CloseDropDownMenus();
+			end,
+		},
+		{
+			text = "Add to set",
+			hasArrow = true,
+		},
+	}
+	
+	mog.sub.ItemMenu = CreateFrame("Frame",nil,mog.frame);
+	mog.sub.ItemMenu.displayMode = "MENU";
+	function mog.sub.ItemMenu:initialize(tier,self)
+		if tier == 1 then
+			local items = self.data.items;
+			if type(items) == "table" then
+				for i,itemID in ipairs(items) do
+					menuAddItem(self, itemID, i);
+				end
+			else
+				menuAddItem(self, items, index);
+			end
+		elseif tier == 2 then
+			for i, info in ipairs(menu) do
+				info.value = UIDROPDOWNMENU_MENU_VALUE;
+				info.notCheckable = true;
+				UIDropDownMenu_AddButton(info, tier);
+			end
+		elseif tier == 3 then
+			for i, set in ipairs(mog:GetModule("Wishlist"):GetSets()) do
+				local info = UIDropDownMenu_CreateInfo();
+				info.text = set.name;
+				info.value = UIDROPDOWNMENU_MENU_VALUE;
+				info.func = setOnClick;
+				info.notCheckable = true;
+				info.arg1 = set.name;
+				UIDropDownMenu_AddButton(info, tier);
+			end
+			
+			local info = UIDropDownMenu_CreateInfo();
+			info.text = "New set";
+			info.value = UIDROPDOWNMENU_MENU_VALUE;
+			info.func = newSetOnClick;
+			info.notCheckable = true;
+			UIDropDownMenu_AddButton(info, tier);
 		end
 	end
 end
@@ -150,19 +216,20 @@ end
 
 --]=]
 
-function mog.Set_FrameUpdate(self,set)
+function mog.Set_FrameUpdate(self,data)
+	if not (self and data and data.items) then return end
 	self.model:Undress();
-	for k,v in pairs(set) do
+	for k,v in pairs(data.items) do
 		self.model:TryOn(v);
 	end
 end
 
-function mog.Set_OnEnter(self,set,name)
-	if not (self and set) then return end;
+function mog.Set_OnEnter(self,data)
+	if not (self and data and data.items) then return end;
 	GameTooltip:SetOwner(self,"ANCHOR_RIGHT");
 	
-	GameTooltip:AddLine(name);
-	for k,v in pairs(set) do
+	GameTooltip:AddLine(data.name);
+	for k,v in pairs(data.items) do
 		local name,link,_,_,_,_,_,_,_,texture = GetItemInfo(v);
 		GameTooltip:AddLine((texture and "\124T"..texture..":18\124t " or "")..(link or name or ""));
 	end
@@ -175,27 +242,27 @@ function template.OnLeave(module,self)
 	GameTooltip:Hide();
 end--]=]
 
-function mog.Set_OnClick(self,btn,set,name,id)
-	if not (self and set) then return end;
+function mog.Set_OnClick(self,btn,data)
+	if not (self and data and data.items) then return end;
 	if btn == "LeftButton" then
 		if IsShiftKeyDown() then
-			ChatEdit_InsertLink(mog:SetToLink(set));
+			ChatEdit_InsertLink(mog:SetToLink(data.items));
 		elseif IsControlKeyDown() then
-			for k,v in pairs(set) do
+			for k,v in pairs(data.items) do
 				DressUpItemLink(v);
 			end
 		end
 	elseif btn == "RightButton" then
 		if IsShiftKeyDown() then
-			mog:ShowURL(id,"set");
+			mog:ShowURL(data.id,"set");
 		elseif IsControlKeyDown() then
-			mog:AddToPreview(set);
+			mog:AddToPreview(data.items);
 		else
 			local wishlist = mog:GetModule("Wishlist")
-			local create = wishlist:CreateSet(name)
+			local create = wishlist:CreateSet(data.name)
 			if create then
-				for i, itemID in pairs(set) do
-					wishlist:AddItem(itemID, name)
+				for i, itemID in pairs(data.items) do
+					wishlist:AddItem(itemID, data.name)
 				end
 			end
 		end
