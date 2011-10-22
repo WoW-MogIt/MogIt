@@ -41,6 +41,23 @@ mog.invSlots = {
 	INVTYPE_TABARD = "TabardSlot",
 };
 
+mog.itemSlots = {
+	"HeadSlot",
+	"ShoulderSlot",
+	"BackSlot",
+	"ChestSlot",
+	"ShirtSlot",
+	"TabardSlot",
+	"WristSlot",
+	"HandsSlot",
+	"WaistSlot",
+	"LegsSlot",
+	"FeetSlot",
+	"MainHandSlot",
+	"SecondaryHandSlot",
+	"RangedSlot",
+};
+
 function mog:RegisterModule(name,data,base)
 	if mog.modules.lookup[name] then return end;
 	data = data or {};
