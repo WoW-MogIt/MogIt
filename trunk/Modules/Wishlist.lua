@@ -3,23 +3,6 @@ local L = mog.L
 
 local wishlist = mog:RegisterModule("Wishlist", {}, true)
 
-local itemSlots = {
-	"HeadSlot",
-	"ShoulderSlot",
-	"BackSlot",
-	"ChestSlot",
-	"ShirtSlot",
-	"TabardSlot",
-	"WristSlot",
-	"HandsSlot",
-	"WaistSlot",
-	"LegsSlot",
-	"FeetSlot",
-	"MainHandSlot",
-	"SecondaryHandSlot",
-	"RangedSlot",
-}
-
 -- "create set" popup
 StaticPopupDialogs["MOGIT_WISHLIST_CREATE_SET"] = {
 	text = L["Enter set name"],
@@ -74,143 +57,6 @@ StaticPopupDialogs["MOGIT_WISHLIST_RENAME_SET"] = {
 	end,
 	whileDead = true,
 	timeout = 0,
-}
-
-local dropdown = CreateFrame("Frame")
-dropdown.displayMode = "MENU"
---dropdown.point = "TOPLEFT"
---dropdown.relativePoint = "TOPRIGHT"
-function dropdown:initialize(level, menuList)
-	self.menu[menuList.type][level](menuList, level)
-end
-
-local itemMenu = {
-	{
-		text = "Add to set",
-		hasArrow = true,
-		notCheckable = true,
-	},
-	{
-		text = "Delete",
-		func = function(self)
-			tremove(wishlist.db.profile.items, self.value)
-			mog:BuildList()
-		end,
-		notCheckable = true,
-	},
-}
-
-dropdown.menu = {
-	-- menu used for single items
-	item = {
-		-- top level menu
-		[1] = function(menuList, level)
-			for k, v in pairs(itemMenu) do
-				v.value = menuList.index - #wishlist.db.profile.sets
-				v.menuList = menuList
-				UIDropDownMenu_AddButton(v, level)
-			end
-		end,
-		-- second level menu
-		[2] = function(menuList, level)
-			for i, set in ipairs(wishlist.db.profile.sets) do
-				local info = UIDropDownMenu_CreateInfo()
-				info.text = set.name
-				info.func = function(self)
-					wishlist:AddItem(menuList.value, self.value)
-					mog:BuildList()
-					CloseDropDownMenus()
-				end
-				info.notCheckable = true
-				UIDropDownMenu_AddButton(info, level)
-			end
-		end,
-	},
-	-- menu used for sets
-	set = {
-		[1] = function(menuList, level)
-			for i, slot in ipairs(itemSlots) do
-				local itemID = menuList.value.items[slot]
-				if itemID then
-					local itemName, _, itemQuality = GetItemInfo(itemID)
-					local info = UIDropDownMenu_CreateInfo()
-					info.text = itemName
-					info.value = itemID
-					-- info.icon = GetItemIcon(itemID)
-					info.hasArrow = true
-					info.colorCode = "|c"..select(4, GetItemQualityColor(itemQuality))
-					info.notCheckable = true
-					info.menuList = menuList
-					UIDropDownMenu_AddButton(info, level)
-				end
-			end
-			
-			local info = UIDropDownMenu_CreateInfo()
-			info.text = "Rename set"
-			info.value = menuList.index
-			info.func = function(self)
-				StaticPopup_Show("MOGIT_WISHLIST_RENAME_SET", nil, nil, wishlist.db.profile.sets[self.value])
-				mog:BuildList()
-			end
-			info.notCheckable = true
-			UIDropDownMenu_AddButton(info, level)
-			
-			local info = UIDropDownMenu_CreateInfo()
-			info.text = "Delete set"
-			info.value = menuList.index
-			info.func = function(self)
-				tremove(wishlist.db.profile.sets, self.value)
-				mog:BuildList()
-			end
-			info.notCheckable = true
-			UIDropDownMenu_AddButton(info, level)
-		end,
-		[2] = function(menuList, level)
-			local info = UIDropDownMenu_CreateInfo()
-			info.text = "Add to set"
-			info.value = UIDROPDOWNMENU_MENU_VALUE
-			info.hasArrow = true
-			info.notCheckable = true
-			info.menuList = menuList
-			UIDropDownMenu_AddButton(info, level)
-			
-			local info = UIDropDownMenu_CreateInfo()
-			info.text = "Add as single item"
-			info.value = UIDROPDOWNMENU_MENU_VALUE
-			info.func = function(self)
-				wishlist:AddItem(self.value)
-				mog:BuildList()
-				CloseDropDownMenus()
-			end
-			info.notCheckable = true
-			UIDropDownMenu_AddButton(info, level)
-			
-			local info = UIDropDownMenu_CreateInfo()
-			info.text = "Delete"
-			-- info.value = 
-			info.func = function(self)
-				wishlist.db.profile.sets[menuList.index].items[mog.invSlots[select(9, GetItemInfo(UIDROPDOWNMENU_MENU_VALUE))]] = nil
-				mog:BuildList()
-				CloseDropDownMenus()
-			end
-			info.notCheckable = true
-			UIDropDownMenu_AddButton(info, level)
-		end,
-		[3] = function(menuList, level)
-			for i, set in ipairs(wishlist.db.profile.sets) do
-				local info = UIDropDownMenu_CreateInfo()
-				info.text = set.name
-				info.func = function(self, arg1)
-					wishlist:AddItem(arg1, self.value)
-					mog:BuildList()
-					CloseDropDownMenus()
-				end
-				info.notCheckable = true
-				info.arg1 = UIDROPDOWNMENU_MENU_VALUE
-				UIDropDownMenu_AddButton(info, level)
-			end
-		end,
-	}
 }
 
 local defaults = {
@@ -332,21 +178,18 @@ end
 
 function wishlist:FrameUpdate(self, value, index)
 	local data = self.data
-	data.type = type(value) == "table" and "set" or "item"
-	data.value = value
-	data.index = index
-	self.model:Undress()
-	if data.type == "set" then
-		for slot, itemID in pairs(value.items) do
-			self.model:TryOn(itemID)
-		end
+	local type = type(value) == "table"
+	if type then
+		data.items = value.items
+		mog.Set_FrameUpdate(self, self.data)
 	else
-		-- data.item = value.itemID
-		self.model:TryOn(value)
+		data.item = value
+		mog.Item_FrameUpdate(self, self.data)
 	end
 end
 
 function wishlist:OnEnter(self)
+	--[=[
 	-- if not self then return end
 	local data = self.data
 	local value = data.value
@@ -415,7 +258,6 @@ function wishlist:OnEnter(self)
 		-- end
 	end
 	
-	--[=[
 	if mog.sub.filters.source[item] then
 		GameTooltip:AddDoubleLine(L["Source"]..":",mog.sub.source[mog.sub.filters.source[item]],nil,nil,nil,1,1,1);
 		if mog.sub.filters.source[item] == 1 then -- Drop
@@ -469,12 +311,18 @@ function wishlist:OnEnter(self)
 	if mog.sub.filters.slot[item] then
 		GameTooltip:AddDoubleLine(L["Slot"]..":",mog.sub.slots[mog.sub.filters.slot[item]],nil,nil,nil,1,1,1);
 	end
-	]=]
 	GameTooltip:Show()
+	]=]
 end
 
-function wishlist:OnClick(self, button)
-	-- local type = 
+function wishlist:OnClick(frame, button, value)
+	local type = type(value) == "table"
+	if type then
+		mog.Set_OnClick(frame, button, frame.data)
+	else
+		mog.Item_OnClick(frame, button, frame.data)
+	end
+	--[[ local type = 
 	if button == "LeftButton" then
 		if IsShiftKeyDown() then
 			local link
@@ -514,7 +362,7 @@ function wishlist:OnClick(self, button)
 		else
 			ToggleDropDownMenu(nil, nil, dropdown, "cursor", 0, 0, self.data)
 		end
-	end
+	end]]
 end
 
 --[==[
