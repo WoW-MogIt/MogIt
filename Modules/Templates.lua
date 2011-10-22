@@ -254,7 +254,7 @@ function mog.Set_OnClick(self,btn,data)
 		end
 	elseif btn == "RightButton" then
 		if IsShiftKeyDown() then
-			mog:ShowURL(data.id,"set");
+			mog:ShowURL(data.set,"set");
 		elseif IsControlKeyDown() then
 			mog:AddToPreview(data.items);
 		else
