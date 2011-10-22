@@ -163,23 +163,15 @@ function mog.sub.Dropdown(module,tier)
 end
 
 function mog.sub.FrameUpdate(module,self,value)
-	self.data.display = value;
-	self.data.items = display[value];
-	self.data.cycle = 1;
-	if type(self.data.items) == "table" then
-		self.data.item = self.data.items[self.data.cycle];
-	else
-		self.data.item = self.data.items;
-	end
-	mog.Item_FrameUpdate(self,self.data.item);
+	mog.Item_FrameUpdate(self,display[value],1);
 end
 
 function mog.sub.OnEnter(module,self,value)
-	mog.Item_OnEnter(self,self.data.items,self.data.cycle);
+	mog.Item_OnEnter(self,display[value],1);
 end
 
 function mog.sub.OnClick(module,self,btn,value)
-	mog.Item_OnClick(self,btn,self.data.items,self.data.cycle);
+	mog.Item_OnClick(self,btn,display[value],1);
 end
 
 do
