@@ -196,7 +196,7 @@ mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 		if owner and owner.MogItModel then
 			mog.OnEnter(owner);
 		end
-		mog.GET_ITEM_INFO_RECEIVED();
+		--mog.GET_ITEM_INFO_RECEIVED();
 	elseif event == "ADDON_LOADED" then
 		if arg1 == MogIt then
 			local AceDB = LibStub("AceDB-3.0")
