@@ -254,15 +254,3 @@ function mog.GetMob(id)
 	--return mobs[id] or CachedMob(id);
 	return mobs[id];
 end
-
-mog.templates = {};
-function mog:CreateTemplate(name,data)
-	if not name or mog.templates[name] then return end;
-	data = data or {};
-	mog.templates[name] = data;
-	return data;
-end
-
-function mog:GetTemplate(name)
-	return mog.templates[name];
-end
