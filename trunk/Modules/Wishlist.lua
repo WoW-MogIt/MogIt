@@ -93,12 +93,13 @@ function wishlist:AddonLoaded()
 	for key, profile in pairs(db.profiles) do
 		if profile.sets then
 			for i, set in ipairs(profile.sets) do
-				if type(next(set.items)) == "string" then
+				local first = next(set.items)
+				if not first or type(first) == "string" then
 					break
 				end
-				for slotID = 1, #itemSlots do
+				for slotID = 1, #mog.itemSlots do
 					local itemID = set.items[slotID]
-					local slotName = itemID and itemSlots[slotID]
+					local slotName = itemID and mog.itemSlots[slotID]
 					if slotName then
 						set.items[slotName] = itemID
 						set.items[slotID] = nil
@@ -445,6 +446,10 @@ function wishlist:CreateSet(name)
 	return true
 end
 
+function wishlist:RenameSet(set)
+	StaticPopup_Show("MOGIT_WISHLIST_RENAME_SET", nil, nil, self:GetSet(set))
+end
+
 function wishlist:IsItemInWishlist(itemID)
 	for i, v in ipairs(self.db.profile.items) do
 		if v == itemID then
@@ -465,4 +470,12 @@ end
 
 function wishlist:GetSets()
 	return self.db.profile.sets
+end
+
+function wishlist:GetSet(name)
+	for i, set in ipairs(self.db.profile.sets) do
+		if set.name == name then
+			return set
+		end
+	end
 end
