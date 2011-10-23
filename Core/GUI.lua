@@ -302,13 +302,6 @@ function mog.addModel(view)
 		f.bg:SetAllPoints(f);
 		f.bg:SetTexture(0.3,0.3,0.3,0.2);
 		
-		f.label = f:CreateFontString(nil, nil, "GameFontNormalLarge")
-		f.label:SetPoint("TOPLEFT", 16, -16);
-		f.label:SetPoint("BOTTOMRIGHT", -16, 16);
-		f.label:SetJustifyV("BOTTOM");
-		f.label:SetJustifyH("CENTER");
-		f.label:SetNonSpaceWrap(true);
-		
 		if not view then
 			f:Hide();
 			f.MogItModel = true;
@@ -319,6 +312,13 @@ function mog.addModel(view)
 			f:SetScript("OnClick",mog.OnClick);
 			f:SetScript("OnEnter",mog.OnEnter);
 			f:SetScript("OnLeave",mog.OnLeave);
+			
+			f.label = f:CreateFontString(nil, nil, "GameFontNormalLarge")
+			f.label:SetPoint("TOPLEFT", 16, -16);
+			f.label:SetPoint("BOTTOMRIGHT", -16, 16);
+			f.label:SetJustifyV("BOTTOM");
+			f.label:SetJustifyH("CENTER");
+			f.label:SetNonSpaceWrap(true);
 		end
 	end
 	if not view then
