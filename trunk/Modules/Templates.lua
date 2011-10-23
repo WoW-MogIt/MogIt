@@ -129,6 +129,8 @@ end
 
 function mog.Set_FrameUpdate(self, data)
 	if not (self and data and data.items) then return end
+	self.label:SetText(data.name);
+	self.label:Show();
 	self.model:Undress();
 	for k, v in pairs(data.items) do
 		self.model:TryOn(v);
@@ -180,6 +182,7 @@ do
 	
 	local function setOnClick(self, set)
 		mog:GetModule("Wishlist"):AddItem(self.value, set);
+		mog:BuildList(nil, "Wishlist");
 		CloseDropDownMenus();
 	end
 	

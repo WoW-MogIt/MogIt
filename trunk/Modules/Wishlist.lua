@@ -178,24 +178,13 @@ function wishlist:Dropdown(level)
 end
 
 function wishlist:FrameUpdate(frame, value, index)
-	if not frame.label then
-		frame.label = frame:CreateFontString(nil, nil, "GameFontNormalLarge")
-		frame.label:SetPoint("TOPLEFT",16,-16);
-		frame.label:SetPoint("BOTTOMRIGHT",-16,16);
-		frame.label:SetJustifyV("BOTTOM");
-		frame.label:SetJustifyH("CENTER");
-		frame.label:SetNonSpaceWrap(true);
-	end
 	local data = frame.data
 	local type = type(value) == "table"
 	if type then
-		frame.label:Show()
-		frame.label:SetText(value.name)
 		data.name = value.name
 		data.items = value.items
 		mog.Set_FrameUpdate(frame, frame.data)
 	else
-		frame.label:Hide()
 		data.item = value
 		mog.Item_FrameUpdate(frame, frame.data)
 	end
@@ -371,14 +360,14 @@ function wishlist:BuildList()
 	return list
 end
 
-function wishlist:Unlist()
-	wipe(list);
-	for k,v in ipairs(mog.models) do
-		if v.label then
-			v.label:Hide();
-		end
-	end
-end
+-- function wishlist:Unlist()
+	-- wipe(list);
+	-- for k,v in ipairs(mog.models) do
+		-- if v.label then
+			-- v.label:Hide();
+		-- end
+	-- end
+-- end
 
 function wishlist:AddItem(itemID, setName)
 	if not setName and self:IsItemInWishlist(itemID) then
