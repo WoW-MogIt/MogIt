@@ -180,6 +180,7 @@ function wishlist:FrameUpdate(self, value, index)
 	local data = self.data
 	local type = type(value) == "table"
 	if type then
+		data.name = value.name
 		data.items = value.items
 		mog.Set_FrameUpdate(self, self.data)
 	else
@@ -406,8 +407,34 @@ function wishlist:AddItem(itemID, setName)
 	else
 		tinsert(self.db.profile.items, itemID)
 	end
-	self:BuildList()
 	return true
+end
+
+function wishlist:DeleteItem(itemID, setName)
+	-- if not setName and self:IsItemInWishlist(itemID) then
+		-- return false
+	-- end
+	if setName then
+		for i, set in ipairs(self.db.profile.sets) do
+			if set.name == setName then
+				for slot, item in pairs(set.items) do
+					if item == itemID then
+						set.items[slot] = nil
+						return
+					end
+				end
+			end
+		end
+	else
+		local items = self.db.profile.items
+		for i = 1, #items do
+			local v = items[i]
+			if v == itemID then
+				tremove(items, i)
+				break
+			end
+		end
+	end
 end
 
 function wishlist:CreateSet(name)

@@ -61,6 +61,7 @@ mog.itemSlots = {
 function mog:RegisterModule(name,data,base)
 	if mog.modules.lookup[name] then return end;
 	data = data or {};
+	data.label = name;
 	mog.modules.lookup[name] = data;
 	table.insert(base and mog.modules.base or mog.modules.extra,data);
 	if UIDropDownMenu_GetCurrentDropDown() == mog.dropdown and DropDownList1 and DropDownList1:IsShown() then
@@ -75,7 +76,7 @@ function mog:GetModule(name)
 end
 
 function mog:GetActiveModule()
-	return mog.active;
+	return mog.active.label;
 end
 
 function mog:SetModule(module,text)
@@ -96,8 +97,8 @@ function mog:SetModule(module,text)
 	end
 end
 
-function mog:BuildList(top)
-	if not mog.active then return end;
+function mog:BuildList(top, module)
+	if not mog.active or (module and mog.active.label ~= module) then return end;
 	mog.list = mog.active:BuildList();
 	mog.scroll:update(top and 1);
 	mog.filt.models:SetText(#mog.list);
