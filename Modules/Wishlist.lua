@@ -59,6 +59,10 @@ StaticPopupDialogs["MOGIT_WISHLIST_RENAME_SET"] = {
 	timeout = 0,
 }
 
+local function onProfileUpdated(self, event)
+	mog:BuildList(true, "Wishlist")
+end
+
 local defaults = {
 	profile = {
 		items = {},
@@ -109,9 +113,9 @@ function wishlist:MogItLoaded()
 		end
 	end
 	
-	-- db.RegisterCallback(self, "OnProfileChanged", "LoadSettings")
-	-- db.RegisterCallback(self, "OnProfileCopied", "LoadSettings")
-	-- db.RegisterCallback(self, "OnProfileReset", "LoadSettings")
+	db.RegisterCallback(self, "OnProfileChanged", onProfileUpdated)
+	db.RegisterCallback(self, "OnProfileCopied", onProfileUpdated)
+	db.RegisterCallback(self, "OnProfileReset", onProfileUpdated)
 end
 
 local level3 = {
