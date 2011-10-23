@@ -190,131 +190,102 @@ function wishlist:FrameUpdate(self, value, index)
 	end
 end
 
-function wishlist:OnEnter(self)
-	--[=[
-	-- if not self then return end
-	local data = self.data
-	local value = data.value
-	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+local data = mog.sub.data
+
+local function getSourceInfo(itemID)
+	local data = data or mog.sub.data
+	local source = data.source[itemID]
+	local sourceID = data.sourceid[itemID]
+	local sourceInfo = data.sourceinfo[itemID]
+	local info = mog.sub.source[source]
+	local extraInfo
+	if source == 1 then -- Drop
+		if sourceID then
+			extraInfo = mog.GetMob(sourceID)
+		end
+	-- elseif source == 3 then -- Quest
+	elseif source == 5 then -- Crafted
+		if sourceInfo then
+			extraInfo = mog.sub.professions[sourceInfo]
+		end
+	elseif source == 6 then -- Achievement
+		if sourceID then
+			local _, name, _, complete = GetAchievementInfo(sourceID)
+			extraInfo = name
+		end
+	end
+	local zone
+	if data.zone[itemID] then
+		zone = GetMapNameByID(data.zone[itemID])
+		if zone then
+			if source == 1 and extraInfo then
+				if mog.sub.diffs[sourceInfo] then
+					zone = zone.." ("..mog.sub.diffs[sourceInfo]..")"
+				end
+				info = extraInfo
+				extraInfo = zone
+			else
+				extraInfo = zone
+			end
+		end
+	end
+	return extraInfo and format("%s (%s)", info, extraInfo) or info
+end
+
+local displayIDs = {}
+
+function wishlist:OnEnter(frame, value)
+	GameTooltip:SetOwner(frame, "ANCHOR_RIGHT")
 	-- GameTooltip:SetOwner(self, "ANCHOR_NONE")
 	-- GameTooltip:ClearAllPoints()
-	-- GameTooltip:SetPoint("TOPLEFT",mog.frame,"TOPRIGHT",5,0)
+	-- GameTooltip:SetPoint("TOPLEFT", mog.frame, "TOPRIGHT", 5, 0)
 	
-	local data = mog.sub.data
-	-- if data.type == "set" then
-	if self.data.type == "set" then
+	-- if self.data.type == "set" then
+	local type = type(value) == "table"
+	if type then
 		GameTooltip:AddLine(value.name)
-		for i, slot in ipairs(itemSlots) do
+		for i, slot in ipairs(mog.itemSlots) do
 			local itemID = value.items[slot]
 			if itemID then
 				local name, link, _, _, _, _, _, _, _, texture = GetItemInfo(itemID)
-				local source = data.source[itemID]
-				local sourceID = data.sourceid[itemID]
-				local sourceInfo = data.sourceinfo[itemID]
-				local info = mog.sub.source[source]
-				local extraInfo
-				if source == 1 then -- Drop
-					if sourceID then
-						extraInfo = mog.GetMob(sourceID)
-					end
-				--elseif source == 3 then -- Quest
-				elseif source == 5 then -- Crafted
-					if sourceInfo then
-						extraInfo = mog.sub.professions[sourceInfo]
-					end
-				-- elseif source == 6 then -- Achievement
-					-- if mog.sub.filters.sourceid[item] then
-						-- local _,name,_,complete = GetAchievementInfo(mog.sub.filters.sourceid[item]);
-						-- GameTooltip:AddDoubleLine(L["Achievement"]..":",name,nil,nil,nil,1,1,1);
-						-- GameTooltip:AddDoubleLine(STATUS..":",complete and COMPLETE or INCOMPLETE,nil,nil,nil,1,1,1);
-					-- end
-				end
-				local zone
-				if data.zone[itemID] then
-					zone = GetMapNameByID(data.zone[itemID])
-					if zone then
-						if source == 1 and extraInfo then
-							if mog.sub.diffs[sourceInfo] then
-								zone = zone.." ("..mog.sub.diffs[sourceInfo]..")"
-							end
-							info = zone
-							-- extraInfo = 
-						else
-							extraInfo = zone
-						end
-					end
-				end
-				GameTooltip:AddDoubleLine(link, source and (extraInfo and strjoin(", ", info, extraInfo or "") or info))
+				GameTooltip:AddDoubleLine(link, getSourceInfo(itemID))
 				GameTooltip:AddTexture(GetItemIcon(itemID))
 			end
 		end
 	else
 		local name, link, _, _, _, _, _, _, _, texture = GetItemInfo(value)
-		-- GameTooltip:AddLine(self.display,1,1,1)
-		-- GameTooltip:AddLine(" ")
+		GameTooltip:AddDoubleLine(link, getSourceInfo(value))
 		
-		-- for i = 1, #items do
-			-- local item, source = items[i]
-			-- local source = sources[item.id]
-			GameTooltip:AddDoubleLine(link, mog.sub.source[data.source[value]])
-		-- end
-	end
-	
-	if mog.sub.filters.source[item] then
-		GameTooltip:AddDoubleLine(L["Source"]..":",mog.sub.source[mog.sub.filters.source[item]],nil,nil,nil,1,1,1);
-		if mog.sub.filters.source[item] == 1 then -- Drop
-			if mog.sub.bosses[mog.sub.filters.sourceid[item]] then
-				GameTooltip:AddDoubleLine(BOSS..":",mog.sub.bosses[mog.sub.filters.sourceid[item]],nil,nil,nil,1,1,1);
+		local display = mog.sub.data.display
+		if display[value] then
+			local d = display[value]
+			if not displayIDs[d] then
+				displayIDs[d] = {}
+				for itemID, displayID in pairs(display) do
+					if displayID == d then
+						tinsert(displayIDs[d], itemID)
+					end
+				end
 			end
-		--elseif mog.filters.source[self.item] == 3 then -- Quest
-		elseif mog.sub.filters.source[item] == 5 then -- Crafted
-			if mog.sub.filters.sourceinfo[item] then
-				GameTooltip:AddDoubleLine(L["Profession"]..":",mog.sub.professions[mog.sub.filters.sourceinfo[item]],nil,nil,nil,1,1,1);
-			end
-		elseif mog.sub.filters.source[item] == 6 then -- Achievement
-			if mog.sub.filters.sourceid[item] then
-				local _,name,_,complete = GetAchievementInfo(mog.sub.filters.sourceid[item]);
-				GameTooltip:AddDoubleLine(L["Achievement"]..":",name,nil,nil,nil,1,1,1);
-				GameTooltip:AddDoubleLine(STATUS..":",complete and COMPLETE or INCOMPLETE,nil,nil,nil,1,1,1);
-			end
-		end
-	end
-	if mog.sub.filters.zone[item] then
-		local zone = GetMapNameByID(mog.sub.filters.zone[item]);
-		if zone then
-			if mog.sub.filters.source[item] == 1 and mog.sub.diffs[mog.sub.filters.sourceinfo[item]] then
-				zone = zone.." ("..mog.sub.diffs[mog.sub.filters.sourceinfo[item]]..")";
-			end
-			GameTooltip:AddDoubleLine(ZONE..":",zone,nil,nil,nil,1,1,1);
-		end
-	end
-	
-	GameTooltip:AddLine(" ");
-	GameTooltip:AddDoubleLine(ID..":",item,nil,nil,nil,1,1,1);
-	if mog.sub.filters.lvl[item] then
-		GameTooltip:AddDoubleLine(LEVEL..":",mog.sub.filters.lvl[item],nil,nil,nil,1,1,1);
-	end
-	if mog.sub.filters.faction[item] then
-		GameTooltip:AddDoubleLine(FACTION..":",(mog.sub.filters.faction[item] == 1 and FACTION_ALLIANCE or FACTION_HORDE),nil,nil,nil,1,1,1);
-	end
-	if mog.sub.filters.class[item] and mog.sub.filters.class[item] > 0 then
-		local str;
-		for k,v in pairs(mog.sub.classBits) do
-			if bit.band(mog.sub.filters.class[item],v) > 0 then
-				if str then
-					str = str..", "..string.format("\124cff%.2x%.2x%.2x",RAID_CLASS_COLORS[k].r*255,RAID_CLASS_COLORS[k].g*255,RAID_CLASS_COLORS[k].b*255)..mog.classes[k].."\124r";
-				else
-					str = string.format("\124cff%.2x%.2x%.2x",RAID_CLASS_COLORS[k].r*255,RAID_CLASS_COLORS[k].g*255,RAID_CLASS_COLORS[k].b*255)..mog.sub.classes[k].."\124r";
+			if #displayIDs[d] > 1 then
+				GameTooltip:AddLine(" ")
+				GameTooltip:AddLine("Alternate items:")
+				for i, itemID in ipairs(displayIDs[d]) do
+					if itemID ~= value then
+						local name, link, _, _, _, _, _, _, _, texture = GetItemInfo(itemID)
+						GameTooltip:AddDoubleLine(link, getSourceInfo(itemID))
+					end
 				end
 			end
 		end
-		GameTooltip:AddDoubleLine(CLASS..":",str,nil,nil,nil,1,1,1);
 	end
+	
+	--[=[
 	if mog.sub.filters.slot[item] then
 		GameTooltip:AddDoubleLine(L["Slot"]..":",mog.sub.slots[mog.sub.filters.slot[item]],nil,nil,nil,1,1,1);
 	end
-	GameTooltip:Show()
 	]=]
+	GameTooltip:Show()
 end
 
 function wishlist:OnClick(frame, button, value)
