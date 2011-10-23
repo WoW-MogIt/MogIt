@@ -231,7 +231,7 @@ mog.frame:RegisterEvent("ADDON_LOADED");
 mog.items = {};
 
 function mog:AddItemData(id,field,value)
-	if not id then return;
+	if not id then return end;
 	if not mog.items[field] then
 		mog.items[field] = {};
 	end
