@@ -197,7 +197,6 @@ do
 		info.func = index and onClick;
 		info.checked = not index or self.data.cycle == index;
 		info.hasArrow = true;
-		info.keepShownOnClick = true;
 		info.arg1 = self;
 		info.arg2 = index;
 		UIDropDownMenu_AddButton(info, tier);
@@ -205,15 +204,15 @@ do
 	
 	local menu = {
 		{
+			text = "Add to set",
+			hasArrow = true,
+		},
+		{
 			text = "Add to wishlist",
 			func = function(self)
 				mog:GetModule("Wishlist"):AddItem(self.value)
 				CloseDropDownMenus()
 			end,
-		},
-		{
-			text = "Add to set",
-			hasArrow = true,
 		},
 		{
 			wishlist = true,
