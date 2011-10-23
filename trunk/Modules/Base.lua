@@ -18,18 +18,6 @@ local addons = {
 local list = {};
 local display = {};
 
-mog.sub.data = {
-	display = {},
-	quality = {},
-	lvl = {},
-	faction = {},
-	class = {},
-	slot = {},
-	source = {},
-	sourceid = {},
-	sourceinfo = {},
-	zone = {},
-};
 
 mog.sub.colours = {
 	[1] = {},
@@ -127,7 +115,7 @@ mog.sub.bind = {
 
 function mog.sub.DropdownTier1(self)
 	if not self.value.loaded then
-		LoadAddOn(self.value.addon);
+		LoadAddOn(self.value.name);
 	end
 end
 
@@ -198,7 +186,7 @@ function mog.sub.BuildList(module)
 			end
 		end
 		if state then
-			local disp = mog.sub.data.display[v];
+			local disp = mog.items.display[v];
 			if not display[disp] then
 				display[disp] = v;
 				tinsert(list,disp);
@@ -219,41 +207,55 @@ function mog.sub.AddSlot(label,addon)
 	return items;
 end
 
+mog.items.display = {};
+mog.items.quality = {};
+mog.items.level = {};
+mog.items.faction = {};
+mog.items.class = {};
+mog.items.slot = {};
+mog.items.source = {};
+mog.items.sourceid = {};
+mog.items.sourceinfo = {};
+mog.items.zone = {};
+mog.items.colour1 = {};
+mog.items.colour2 = {};
+mog.items.colour3 = {};
+
 function mog.sub.AddItem(tbl,id,display,quality,lvl,faction,class,slot,source,sourceid,zone,sourceinfo)
 	table.insert(tbl,id);
-	mog.sub.data.display[id] = display;
-	mog.sub.data.quality[id] = quality;
-	mog.sub.data.lvl[id] = lvl;
-	mog.sub.data.faction[id] = faction;
-	mog.sub.data.class[id] = class;
-	mog.sub.data.slot[id] = slot;
-	mog.sub.data.source[id] = source;
-	mog.sub.data.sourceid[id] = sourceid;
-	mog.sub.data.sourceinfo[id] = sourceinfo;
-	mog.sub.data.zone[id] = zone;
+	mog.items.display[id] = display;
+	mog.items.quality[id] = quality;
+	mog.items.level[id] = lvl;
+	mog.items.faction[id] = faction;
+	mog.items.class[id] = class;
+	mog.items.slot[id] = slot;
+	mog.items.source[id] = source;
+	mog.items.sourceid[id] = sourceid;
+	mog.items.sourceinfo[id] = sourceinfo;
+	mog.items.zone[id] = zone;
 end
 
 function mog.sub.AddColours(id,c1,c2,c3)
-	if c1 and (not mog.sub.colours[1][id]) then
-		mog.sub.colours[1][id] = c1;
-		mog.sub.colours[2][id] = c2;
-		mog.sub.colours[3][id] = c3;
+	if c1 and (not mog.items.colour1[id]) then
+		mog.items.colour1[id] = c1;
+		mog.items.colour2[id] = c2;
+		mog.items.colour3[id] = c3;
 	end
 end
 
 function mog.sub.GetFilterArgs(filter,item)
 	if filter == "level" then
-		return mog.sub.data.lvl[item];
+		return mog.items.level[item];
 	elseif filter == "faction" then
-		return mog.sub.data.faction[item];
+		return mog.items.faction[item];
 	elseif filter == "class" then
-		return mog.sub.data.class[item];
+		return mog.items.class[item];
 	elseif filter == "source" then
-		return mog.sub.data.source[item],mog.sub.data.sourceinfo[item];
+		return mog.items.source[item],mog.items.sourceinfo[item];
 	elseif filter == "quality" then
-		return mog.sub.data.quality[item];
+		return mog.items.quality[item];
 	elseif filter == "slot" then
-		return mog.sub.data.slot[item];
+		return mog.items.slot[item];
 	end
 end
 
@@ -261,19 +263,19 @@ function mog.sub.SortLevel(id)
 	if type(display[id]) == "table" then
 		local tbl = {};
 		for k,v in ipairs(display[id]) do
-			table.insert(tbl,mog.sub.data.lvl[v]);
+			table.insert(tbl,mog.items.level[v]);
 		end
 		return tbl;
 	else
-		return mog.sub.data.lvl[display[id]];
+		return mog.items.level[display[id]];
 	end
 end
 
 function mog.sub.SortColour(id)
 	local tbl = {};
 	for i=1,3 do
-		if mog.sub.colours[i][id] then
-			table.insert(tbl,mog.sub.colours[i][id]);
+		if mog.items["colour"..i][id] then
+			table.insert(tbl,mog.items["colour"..i][id]);
 		end
 	end
 	return tbl;
@@ -283,8 +285,10 @@ for k,v in ipairs(addons) do
 	local _,title,_,_,loadable = GetAddOnInfo(v);
 	if loadable then
 		mog:RegisterModule(v,{
-			name = title:match("MogIt_(.+)") or title,
-			template = "item",
+			name = v,
+			label = title:match("MogIt_(.+)") or title,
+			--addon = v,
+			slots = {},
 			Dropdown = mog.sub.Dropdown,
 			BuildList = mog.sub.BuildList,
 			FrameUpdate = mog.sub.FrameUpdate,
@@ -303,8 +307,6 @@ for k,v in ipairs(addons) do
 				level = mog.sub.SortLevel;
 				colour = mog.sub.SortColour;
 			},
-			addon = v,
-			slots = {},
 		},true);
 	end
 end
