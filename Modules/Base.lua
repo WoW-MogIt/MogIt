@@ -133,7 +133,7 @@ end
 
 function mog.sub.DropdownTier2(self)
 	self.arg1.active = self.value;
-	mog:SetModule(self.arg1,self.arg1.name.." - "..self.value.label);
+	mog:SetModule(self.arg1,self.arg1.label.." - "..self.value.label);
 	CloseDropDownMenus();
 end
 
@@ -141,7 +141,7 @@ function mog.sub.Dropdown(module,tier)
 	local info;
 	if tier == 1 then
 		info = UIDropDownMenu_CreateInfo();
-		info.text = module.name..(module.loaded and "" or " \124cFFFFFFFF("..L["Click to load addon"]..")");
+		info.text = module.label..(module.loaded and "" or " \124cFFFFFFFF("..L["Click to load addon"]..")");
 		info.value = module;
 		info.colorCode = "\124cFF"..(module.loaded and "00FF00" or "FF0000");
 		info.hasArrow = module.loaded;

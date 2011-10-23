@@ -58,7 +58,7 @@ mog.view.resize.texture:SetSize(16,16);
 mog.view.resize.texture:SetTexture("Interface\\AddOns\\MogIt\\Images\\Resize");
 mog.view.resize.texture:SetAllPoints(mog.view.resize);
 
-mog.view.model = CreateFrame("Button",nil,mog.view);
+mog.view.model = mog.addModel(true);
 mog.view.model:SetPoint("TOPLEFT",mog.view.Inset,"TOPLEFT",49,-8);
 mog.view.model:SetPoint("BOTTOMRIGHT",mog.view.Inset,"BOTTOMRIGHT",-49,8);
 mog.view.model:EnableMouseWheel(true);
@@ -66,47 +66,6 @@ mog.view.model:SetScript("OnMouseWheel",function(self,v)
 	mog.posZ = mog.posZ + ((v > 0 and 0.6) or -0.6);
 	mog.updateModels();
 end);
-mog.view.model:SetScript("OnShow",function(self,...)
-	self.model:SetPosition(mog.posZ,mog.posX,mog.posY);
-	self.model:Undress();
-	mog:DressModel(self.model);
-	if self:GetFrameLevel() <= mog.view:GetFrameLevel() then
-		self:SetFrameLevel(mog.view:GetFrameLevel()+1);
-	end
-end);
-mog.view.model:SetScript("OnHide",function(self)
-	if mog.modelUpdater.model == self then
-		self:GetScript("OnDragStop")(self);
-	end
-	self.model:SetPosition(0,0,0);
-end);
-mog.view.model:SetScript("OnUpdate",function(self)
-	if mog.db.profile.noAnim then
-		self.model:SetSequence(254);
-	end
-end);
-mog.view.model:RegisterForDrag("LeftButton","RightButton");
-mog.view.model:SetScript("OnDragStart",function(self,btn)
-	mog.modelUpdater.btn = btn;
-	mog.modelUpdater.model = self;
-	mog.modelUpdater.prevx,mog.modelUpdater.prevy = GetCursorPosition();
-	mog.modelUpdater:Show();
-end);
-mog.view.model:SetScript("OnDragStop",function(self,btn)
-	mog.modelUpdater:Hide();
-	mog.modelUpdater.btn = nil;
-	mog.modelUpdater.model = nil;
-end);
-
-mog.view.model.model = CreateFrame("DressUpModel",nil,mog.view.model);
-mog.view.model.model:SetModelScale(2);
-mog.view.model.model:SetPosition(0,0,0);
-mog.view.model.model:SetAllPoints(mog.view.model);
-mog.view.model.model.button = mog.view.model;
-		
-mog.view.model.bg = mog.view.model:CreateTexture(nil,"BACKGROUND");
-mog.view.model.bg:SetAllPoints(mog.view.model);
-mog.view.model.bg:SetTexture(0.3,0.3,0.3,0.2);
 
 mog.view.clear = CreateFrame("Button","MogItFramePreviewClear",mog.view,"UIPanelButtonTemplate2");
 mog.view.clear:SetPoint("TOPRIGHT",mog.view,"TOPRIGHT",-10,-30);

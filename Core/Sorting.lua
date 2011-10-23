@@ -16,17 +16,17 @@ function mog:GetActiveSort()
 end
 
 function mog:ApplySort(sort,label)
-	if mog.sorting.active and (mog.sorting.active ~= mog.sorting.sorts[sort]) and mog.sorting.active.Unlist then
-		mog.sorting.active.Unlist();
+	if mog.sorting.active and (mog.sorting.active ~= mog.sorting.sorts[sort]) and mog.sorting.active.unlist then
+		mog.sorting.active.unlist();
 	end
 	if mog.sorting.sorts[sort] then
 		mog.sorting.sorts[sort].sort(mog.list,mog.active.sorting[sort]);
+		if label then
+			UIDropDownMenu_SetText(mog.sorting,label);
+		end
+		mog.sorting.active = mog.sorting.sorts[sort];
+		mog.scroll:update();
 	end
-	if label then
-		UIDropDownMenu_SetText(mog.sorting,label);
-	end
-	mog.sorting.active = mog.sorting.sorts[sort];
-	mog.scroll:update();
 end
 
 do
@@ -53,6 +53,18 @@ do
 		return colourCache[id];
 	end
 	
+	local function dropdownTier1(self)
+		mog:ApplySort("colour",L["Approximate Colour"]);
+	end
+	
+	local function swatchFunc()
+		if not ColorPickerFrame:IsShown() then
+			local r,g,b = ColorPickerFrame:GetColorRGB();
+			cR,cG,cB = r*255,g*255,b*255;
+			mog:ApplySort("colour",L["Approximate Colour"]);
+		end
+	end
+	
 	mog:CreateSort("colour",{
 		dropdown = function(module,tier)
 			local info;
@@ -60,21 +72,13 @@ do
 				info = UIDropDownMenu_CreateInfo();
 				info.text =	L["Approximate Colour"];
 				info.value = "colour";
-				info.func = function(self)
-					mog:ApplySort("colour",L["Approximate Colour"]);
-				end
+				info.func = dropdownTier1;
 				--info.checked = mog.sorting == "colour";
 				info.hasColorSwatch = true;
 				info.r = cR/255;
 				info.g = cG/255;
 				info.b = cB/255;
-				info.swatchFunc = function()
-					if not ColorPickerFrame:IsShown() then
-						local r,g,b = ColorPickerFrame:GetColorRGB();
-						cR,cG,cB = r*255,g*255,b*255;
-						mog:ApplySort("colour",L["Approximate Colour"]);
-					end
-				end
+				info.swatchFunc = swatchFunc;
 				UIDropDownMenu_AddButton(info);
 			end
 		end,
@@ -109,15 +113,17 @@ do
 		return itemCache[id];
 	end
 	
+	local function dropdownTier1(self)
+		mog:ApplySort("level",L["Level"]);
+	end
+	
 	mog:CreateSort("level",{
 		dropdown = function(module,tier)
 			local info;
 			info = UIDropDownMenu_CreateInfo();
 			info.text = LEVEL;
 			info.value = "level";
-			info.func = function(self)
-				mog:ApplySort("level",L["Level"]);
-			end
+			info.func = dropdownTier1;
 			--info.checked = mog.sorting == "level";
 			UIDropDownMenu_AddButton(info);
 		end,
