@@ -129,6 +129,7 @@ SlashCmdList["MOGIT"] = toggleFrame;
 
 BINDING_HEADER_MogIt = "MogIt";
 BINDING_NAME_MogIt = L["Toggle Mogit"];
+BINDING_NAME_MogItPreview = L["Toggle Preview"];
 
 local LDB = LibStub("LibDataBroker-1.1");
 mog.LDBI = LibStub("LibDBIcon-1.0");
