@@ -7,5 +7,6 @@
 <Script file="Preview.lua"/>
 <Script file="URL.lua"/>
 <Script file="Links.lua"/>
+<Script file="Sorting.lua"/>
 
 </Ui>
