@@ -223,6 +223,7 @@ function mog.scroll.update(self,value,offset,onscroll)
 			frame.index = index;
 			wipe(frame.data);
 			frame.label:Hide();
+			--frame.icon:Hide();
 			if frame:IsShown() then
 				mog.FrameUpdate(frame);
 				if owner == frame then
@@ -319,6 +320,11 @@ function mog.addModel(view)
 			f.label:SetJustifyV("BOTTOM");
 			f.label:SetJustifyH("CENTER");
 			f.label:SetNonSpaceWrap(true);
+			
+			--f.icon = f:CreateTexture(nil,"ARTWORK");
+			--f.icon:SetPoint("TOPRIGHT",f,"TOPRIGHT",-4,-4);
+			--f.icon:SetSize(16,16);
+			--f.icon:SetTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcon_1");
 		end
 	end
 	if not view then
