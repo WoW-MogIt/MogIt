@@ -368,7 +368,7 @@ end
 
 function mog.FrameUpdate(frame,index)
 	if mog.active and mog.active.FrameUpdate then
-		mog.active:FrameUpdate(frame,mog.list[index]);
+		mog.active:FrameUpdate(frame,mog.list[index or frame.index]);
 	end
 end
 
