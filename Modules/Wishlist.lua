@@ -180,7 +180,11 @@ end
 function wishlist:FrameUpdate(frame, value, index)
 	if not frame.label then
 		frame.label = frame:CreateFontString(nil, nil, "GameFontNormalLarge")
-		frame.label:SetPoint("BOTTOM", 0, 16)
+		frame.label:SetPoint("TOPLEFT",16,-16);
+		frame.label:SetPoint("BOTTOMRIGHT",-16,16);
+		frame.label:SetJustifyV("BOTTOM");
+		frame.label:SetJustifyH("CENTER");
+		frame.label:SetNonSpaceWrap(true);
 	end
 	local data = frame.data
 	local type = type(value) == "table"
@@ -197,10 +201,10 @@ function wishlist:FrameUpdate(frame, value, index)
 	end
 end
 
-local data = mog.sub.data
+local data = mog.items
 
 local function getSourceInfo(itemID)
-	local data = data or mog.sub.data
+	local data = data or mog.items
 	local source = data.source[itemID]
 	local sourceID = data.sourceid[itemID]
 	local sourceInfo = data.sourceinfo[itemID]
@@ -263,7 +267,7 @@ function wishlist:OnEnter(frame, value)
 		local name, link, _, _, _, _, _, _, _, texture = GetItemInfo(value)
 		GameTooltip:AddDoubleLine(link, getSourceInfo(value))
 		
-		local display = mog.sub.data.display
+		local display = mog.items.display
 		if display[value] then
 			local d = display[value]
 			if not displayIDs[d] then
@@ -367,9 +371,14 @@ function wishlist:BuildList()
 	return list
 end
 
---[=[function wishlist:Unlist()
+function wishlist:Unlist()
 	wipe(list);
-end--]=]
+	for k,v in ipairs(mog.models) do
+		if v.label then
+			v.label:Hide();
+		end
+	end
+end
 
 function wishlist:AddItem(itemID, setName)
 	if not setName and self:IsItemInWishlist(itemID) then

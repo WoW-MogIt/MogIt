@@ -18,46 +18,46 @@ function mog.Item_OnEnter(self,data)
 	--GameTooltip:AddLine(self.display,1,1,1);
 	--GameTooltip:AddLine(" ");
 	GameTooltip:AddDoubleLine((texture and "\124T"..texture..":18\124t " or "")..(link or name or ""),data.items and (#data.items > 1) and L["Item %d/%d"]:format(data.cycle,#data.items),nil,nil,nil,1,0,0);
-	if mog.sub.data.source[item] then
-		GameTooltip:AddDoubleLine(L["Source"]..":",mog.sub.source[mog.sub.data.source[item]],nil,nil,nil,1,1,1);
-		if mog.sub.data.source[item] == 1 then -- Drop
-			if mog.GetMob(mog.sub.data.sourceid[item]) then
-				GameTooltip:AddDoubleLine(BOSS..":",mog.GetMob(mog.sub.data.sourceid[item]),nil,nil,nil,1,1,1);
+	if mog.items.source[item] then
+		GameTooltip:AddDoubleLine(L["Source"]..":",mog.sub.source[mog.items.source[item]],nil,nil,nil,1,1,1);
+		if mog.items.source[item] == 1 then -- Drop
+			if mog.GetMob(mog.items.sourceid[item]) then
+				GameTooltip:AddDoubleLine(BOSS..":",mog.GetMob(mog.items.sourceid[item]),nil,nil,nil,1,1,1);
 			end
-		--elseif mog.data.source[self.item] == 3 then -- Quest
-		elseif mog.sub.data.source[item] == 5 then -- Crafted
-			if mog.sub.data.sourceinfo[item] then
-				GameTooltip:AddDoubleLine(L["Profession"]..":",mog.sub.professions[mog.sub.data.sourceinfo[item]],nil,nil,nil,1,1,1);
+		--elseif mog.items.source[self.item] == 3 then -- Quest
+		elseif mog.items.source[item] == 5 then -- Crafted
+			if mog.items.sourceinfo[item] then
+				GameTooltip:AddDoubleLine(L["Profession"]..":",mog.sub.professions[mog.items.sourceinfo[item]],nil,nil,nil,1,1,1);
 			end
-		elseif mog.sub.data.source[item] == 6 then -- Achievement
-			if mog.sub.data.sourceid[item] then
-				local _,name,_,complete = GetAchievementInfo(mog.sub.data.sourceid[item]);
+		elseif mog.items.source[item] == 6 then -- Achievement
+			if mog.items.sourceid[item] then
+				local _,name,_,complete = GetAchievementInfo(mog.items.sourceid[item]);
 				GameTooltip:AddDoubleLine(L["Achievement"]..":",name,nil,nil,nil,1,1,1);
 				GameTooltip:AddDoubleLine(STATUS..":",complete and COMPLETE or INCOMPLETE,nil,nil,nil,1,1,1);
 			end
 		end
 	end
-	if mog.sub.data.zone[item] then
-		local zone = GetMapNameByID(mog.sub.data.zone[item]);
+	if mog.items.zone[item] then
+		local zone = GetMapNameByID(mog.items.zone[item]);
 		if zone then
-			if mog.sub.data.source[item] == 1 and mog.sub.diffs[mog.sub.data.sourceinfo[item]] then
-				zone = zone.." ("..mog.sub.diffs[mog.sub.data.sourceinfo[item]]..")";
+			if mog.items.source[item] == 1 and mog.sub.diffs[mog.items.sourceinfo[item]] then
+				zone = zone.." ("..mog.sub.diffs[mog.items.sourceinfo[item]]..")";
 			end
 			GameTooltip:AddDoubleLine(ZONE..":",zone,nil,nil,nil,1,1,1);
 		end
 	end
 	
 	GameTooltip:AddLine(" ");
-	if mog.sub.data.lvl[item] then
-		GameTooltip:AddDoubleLine(LEVEL..":",mog.sub.data.lvl[item],nil,nil,nil,1,1,1);
+	if mog.items.level[item] then
+		GameTooltip:AddDoubleLine(LEVEL..":",mog.items.level[item],nil,nil,nil,1,1,1);
 	end
-	if mog.sub.data.faction[item] then
-		GameTooltip:AddDoubleLine(FACTION..":",(mog.sub.data.faction[item] == 1 and FACTION_ALLIANCE or FACTION_HORDE),nil,nil,nil,1,1,1);
+	if mog.items.faction[item] then
+		GameTooltip:AddDoubleLine(FACTION..":",(mog.items.faction[item] == 1 and FACTION_ALLIANCE or FACTION_HORDE),nil,nil,nil,1,1,1);
 	end
-	if mog.sub.data.class[item] and mog.sub.data.class[item] > 0 then
+	if mog.items.class[item] and mog.items.class[item] > 0 then
 		local str;
 		for k,v in pairs(mog.sub.classBits) do
-			if bit.band(mog.sub.data.class[item],v) > 0 then
+			if bit.band(mog.items.class[item],v) > 0 then
 				if str then
 					str = str..", "..string.format("\124cff%.2x%.2x%.2x",RAID_CLASS_COLORS[k].r*255,RAID_CLASS_COLORS[k].g*255,RAID_CLASS_COLORS[k].b*255)..LOCALIZED_CLASS_NAMES_MALE[k].."\124r";
 				else
@@ -67,8 +67,8 @@ function mog.Item_OnEnter(self,data)
 		end
 		GameTooltip:AddDoubleLine(CLASS..":",str,nil,nil,nil,1,1,1);
 	end
-	if mog.sub.data.slot[item] then
-		GameTooltip:AddDoubleLine(L["Slot"]..":",mog.sub.slots[mog.sub.data.slot[item]],nil,nil,nil,1,1,1);
+	if mog.items.slot[item] then
+		GameTooltip:AddDoubleLine(L["Slot"]..":",mog.sub.slots[mog.items.slot[item]],nil,nil,nil,1,1,1);
 	end
 	
 	GameTooltip:AddLine(" ");
