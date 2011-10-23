@@ -43,17 +43,17 @@ StaticPopupDialogs["MOGIT_WISHLIST_RENAME_SET"] = {
 	OnAccept = function(self)
 		local text = self.editBox:GetText()
 		self.data.name = text
-		-- mog:BuildList()
+		mog:BuildList(nil, "Wishlist")
 	end,
 	EditBoxOnEnterPressed = function(self)
 		local text = self:GetText()
 		self:GetParent().data.name = text
-		-- mog:BuildList()
+		mog:BuildList(nil, "Wishlist")
 		self:GetParent():Hide()
 	end,
 	OnShow = function(self)
 		self.editBox:SetText(self.data.name)
-		-- self.editBox:SetFocus()
+		self.editBox:HighlightText()
 	end,
 	whileDead = true,
 	timeout = 0,
@@ -177,16 +177,23 @@ function wishlist:Dropdown(level)
 	end
 end
 
-function wishlist:FrameUpdate(self, value, index)
-	local data = self.data
+function wishlist:FrameUpdate(frame, value, index)
+	if not frame.label then
+		frame.label = frame:CreateFontString(nil, nil, "GameFontNormalLarge")
+		frame.label:SetPoint("BOTTOM", 0, 16)
+	end
+	local data = frame.data
 	local type = type(value) == "table"
 	if type then
+		frame.label:Show()
+		frame.label:SetText(value.name)
 		data.name = value.name
 		data.items = value.items
-		mog.Set_FrameUpdate(self, self.data)
+		mog.Set_FrameUpdate(frame, frame.data)
 	else
+		frame.label:Hide()
 		data.item = value
-		mog.Item_FrameUpdate(self, self.data)
+		mog.Item_FrameUpdate(frame, frame.data)
 	end
 end
 
