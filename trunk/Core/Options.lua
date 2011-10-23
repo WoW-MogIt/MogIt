@@ -109,6 +109,95 @@ elseif LOCALE == "ruRU" then
 	--L["current"] = "Current Profile:"
 end
 
+
+-- editbox
+local function createEditBox(parent)
+	local editbox = CreateFrame("EditBox", nil, parent)
+	editbox:SetAutoFocus(false)
+	editbox:SetHeight(20)
+	editbox:SetFontObject("ChatFontNormal")
+	editbox:SetTextInsets(5, 0, 0, 0)
+
+	local left = editbox:CreateTexture("BACKGROUND")
+	left:SetTexture("Interface\\Common\\Common-Input-Border")
+	left:SetTexCoord(0, 0.0625, 0, 0.625)
+	left:SetWidth(8)
+	left:SetPoint("TOPLEFT")
+	left:SetPoint("BOTTOMLEFT")
+
+	local right = editbox:CreateTexture("BACKGROUND")
+	right:SetTexture("Interface\\Common\\Common-Input-Border")
+	right:SetTexCoord(0.9375, 1, 0, 0.625)
+	right:SetWidth(8)
+	right:SetPoint("TOPRIGHT")
+	right:SetPoint("BOTTOMRIGHT")
+
+	local mid = editbox:CreateTexture("BACKGROUND")
+	mid:SetTexture("Interface\\Common\\Common-Input-Border")
+	mid:SetTexCoord(0.0625, 0.9375, 0, 0.625)
+	mid:SetPoint("TOPLEFT", left, "TOPRIGHT")
+	mid:SetPoint("BOTTOMRIGHT", right, "BOTTOMLEFT")
+	
+	return editbox
+end
+
+-- dropdown menu frame
+local function setSelectedValue(self, value)
+	UIDropDownMenu_SetSelectedValue(self, value)
+	UIDropDownMenu_SetText(self, self.menu and self.menu[value] or value)
+end
+
+local function setDisabled(self, disable)
+	if disable then
+		self:Disable()
+	else
+		self:Enable()
+	end
+end
+
+local function initialize(self)
+	local onClick = self.onClick
+	for _, v in ipairs(self.menu) do
+		local info = UIDropDownMenu_CreateInfo()
+		info.text = v.text
+		info.value = v.value
+		info.func = onClick or v.func
+		info.owner = self
+		info.fontObject = v.fontObject
+		UIDropDownMenu_AddButton(info)
+	end
+end
+
+local function createDropDownMenu(name, parent, menu, valueLookup)
+	local frame = CreateFrame("Frame", name, parent, "UIDropDownMenuTemplate")
+	
+	frame.SetFrameWidth = UIDropDownMenu_SetWidth
+	frame.SetSelectedValue = setSelectedValue
+	frame.GetSelectedValue = UIDropDownMenu_GetSelectedValue
+	frame.Refresh = UIDropDownMenu_Refresh
+	frame.SetText = UIDropDownMenu_SetText
+	frame.Enable = UIDropDownMenu_EnableDropDown
+	frame.Disable = UIDropDownMenu_DisableDropDown
+	frame.SetDisabled = setDisabled
+	frame.JustifyText = UIDropDownMenu_JustifyText
+	
+	if menu then
+		for _, v in ipairs(menu) do
+			menu[v.value] = v.text
+		end
+	end
+	frame.menu = menu or valueLookup
+	
+	frame.initialize = initialize
+	
+	local label = frame:CreateFontString(name.."Label", "BACKGROUND", "GameFontNormalSmall")
+	label:SetPoint("BOTTOMLEFT", frame, "TOPLEFT", 16, 3)
+	frame.label = label
+	
+	return frame
+end
+
+
 local options = CreateFrame("Frame")
 options.name = MogIt
 InterfaceOptions_AddCategory(options)
@@ -158,7 +247,7 @@ end
 local function createFontString(parent)
 	local text = parent:CreateFontString(nil, "BACKGROUND", "GameFontHighlightSmall")
 	-- text:SetHeight(32)
-	text:SetPoint("LEFT", parent.title)
+	text:SetPoint("LEFT", 32, 0)
 	text:SetPoint("RIGHT", -32, 0)
 	text:SetJustifyH("LEFT")
 	text:SetJustifyV("TOP")
@@ -167,10 +256,14 @@ end
 
 
 local function profilesLoaded(self)
-	-- local db = addon[self.db]
+	if self.module then
+		db = mog:GetModule(self.module).db
+	else
+		db = mog.db
+	end
 	self.db = db
 	
-	self:SetScript("OnShow")
+	self:SetScript("OnShow", nil)
 	
 	for k, object in pairs(self.objects) do
 		object.db = db
@@ -250,13 +343,13 @@ local function deleteProfileOnClick(self)
 end
 
 
-local function createProfileUI(name, db)
+local function createProfileUI(name, module)
 	local frame = CreateFrame("Frame")
-	frame.name = MogIt
+	frame.name = name
 	frame.parent = MogIt
 	InterfaceOptions_AddCategory(frame)
 	
-	frame.db = db
+	frame.db = module
 	
 	frame.ProfilesLoaded = profilesLoaded
 	frame.OnProfileChanged = onProfileChanged
@@ -272,9 +365,9 @@ local function createProfileUI(name, db)
 	local objects = {}
 	frame.objects = objects
 	
-	local reset = CreateFrame("Button", "MogItResetDBButton"..db, frame, "UIPanelButtonTemplate2")
+	local reset = CreateFrame("Button", "MogItResetDBButton"..module, frame, "UIPanelButtonTemplate2")
 	reset:SetSize(160, 22)
-	reset:SetPoint("TOPLEFT", frame.desc, "BOTTOMLEFT")
+	reset:SetPoint("TOPLEFT", 32, -32)
 	reset:SetScript("OnClick", function(self) self.db:ResetProfile() end)
 	reset:SetText(L.reset)
 	objects.reset = reset
@@ -291,7 +384,7 @@ local function createProfileUI(name, db)
 	-- chooseDesc:SetWordWrap(true)
 	chooseDesc:SetText(L.choose_desc)
 
-	local newProfile = templates:CreateEditBox(frame)
+	local newProfile = createEditBox(frame)
 	newProfile:SetWidth(160)
 	newProfile:SetPoint("TOPLEFT", chooseDesc, "BOTTOMLEFT", 0, -16)
 	newProfile:SetScript("OnEscapePressed", newProfile.ClearFocus)
@@ -305,7 +398,7 @@ local function createProfileUI(name, db)
 	label:SetHeight(18)
 	label:SetText(L.new)
 
-	local choose = templates:CreateDropDownMenu("MogItChooseProfile"..name, frame, nil, defaultProfiles)
+	local choose = createDropDownMenu("MogItChooseProfile"..name, frame, nil, defaultProfiles)
 	choose:SetFrameWidth(144)
 	choose:SetPoint("LEFT", newProfile, "RIGHT", 0, -2)
 	choose.label:SetText(L.choose)
@@ -320,7 +413,7 @@ local function createProfileUI(name, db)
 	copyDesc:SetWordWrap(true)
 	copyDesc:SetText(L.copy_desc)
 
-	local copy = templates:CreateDropDownMenu("MogItCopyProfile"..name, frame, nil, defaultProfiles)
+	local copy = createDropDownMenu("MogItCopyProfile"..name, frame, nil, defaultProfiles)
 	copy:SetFrameWidth(144)
 	copy:SetPoint("TOPLEFT", copyDesc, "BOTTOMLEFT", -16, -8)
 	copy.label:SetText(L.copy)
@@ -335,7 +428,7 @@ local function createProfileUI(name, db)
 	deleteDesc:SetWordWrap(true)
 	deleteDesc:SetText(L.delete_desc)
 
-	local delete = templates:CreateDropDownMenu("MogItDeleteProfile"..name, frame, nil, defaultProfiles)
+	local delete = createDropDownMenu("MogItDeleteProfile"..name, frame, nil, defaultProfiles)
 	delete:SetFrameWidth(144)
 	delete:SetPoint("TOPLEFT", deleteDesc, "BOTTOMLEFT", -16, -8)
 	delete.label:SetText(L.delete)
@@ -368,5 +461,5 @@ StaticPopupDialogs["MOGIT_DELETE_PROFILE"] = {
 -- local profiles = createProfileUI("Profiles", "db")
 -- profiles.desc:SetText("This profile controls all settings that are not related to individual trees or their records.")
 
-local spellProfiles = createProfileUI("Wishlist profiles", "MogItWishlist")
+local spellProfiles = createProfileUI("Wishlist profiles", "Wishlist")
 -- spellProfiles.desc:SetText("This profile stores individual tree settings, including which trees will be registered, and spell records.")
