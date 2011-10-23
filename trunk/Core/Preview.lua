@@ -54,7 +54,6 @@ mog.view.resize:SetScript("OnMouseUp",function(self)
 end);
 mog.view.resize:SetScript("OnHide",mog.view.resize:GetScript("OnMouseUp"));
 mog.view.resize.texture = mog.view.resize:CreateTexture(nil,"OVERLAY");
-mog.view.resize.texture:SetSize(16,16);
 mog.view.resize.texture:SetTexture("Interface\\AddOns\\MogIt\\Images\\Resize");
 mog.view.resize.texture:SetAllPoints(mog.view.resize);
 
