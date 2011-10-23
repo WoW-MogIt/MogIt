@@ -222,6 +222,7 @@ function mog.scroll.update(self,value,offset,onscroll)
 		if mog.list[index] then
 			frame.index = index;
 			wipe(frame.data);
+			frame.label:Hide();
 			if frame:IsShown() then
 				mog.FrameUpdate(frame);
 				if owner == frame then
@@ -300,6 +301,13 @@ function mog.addModel(view)
 		f.bg = f:CreateTexture(nil,"BACKGROUND");
 		f.bg:SetAllPoints(f);
 		f.bg:SetTexture(0.3,0.3,0.3,0.2);
+		
+		f.label = f:CreateFontString(nil, nil, "GameFontNormalLarge")
+		f.label:SetPoint("TOPLEFT", 16, -16);
+		f.label:SetPoint("BOTTOMRIGHT", -16, 16);
+		f.label:SetJustifyV("BOTTOM");
+		f.label:SetJustifyH("CENTER");
+		f.label:SetNonSpaceWrap(true);
 		
 		if not view then
 			f:Hide();

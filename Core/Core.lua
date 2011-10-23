@@ -199,10 +199,10 @@ mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 				-- MogIt_Global = nil
 			end
 			
-			if not mog.db.profile.version then
+			if not mog.db.global.version then
 				DEFAULT_CHAT_FRAME:AddMessage(L["MogIt has loaded! Type \"/mog\" to open it."]);
 			end
-			mog.db.profile.version = GetAddOnMetadata(MogIt,"Version");
+			mog.db.global.version = GetAddOnMetadata(MogIt,"Version");
 			
 			mog.LDBI:Register("MogIt",mog.mmb,mog.db.profile.minimap);
 			--[[mog.tooltip:SetSize(mog.db.profile.tooltipWidth,mog.db.profile.tooltipHeight);
