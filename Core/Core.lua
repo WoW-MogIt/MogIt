@@ -90,7 +90,7 @@ function mog:SetModule(module,text)
 	end
 	mog:BuildList(true);
 	mog:FilterUpdate();
-	if module.Sorting then
+	if module.sorting then
 		UIDropDownMenu_EnableDropDown(mog.sorting);
 	else
 		UIDropDownMenu_DisableDropDown(mog.sorting);
