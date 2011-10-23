@@ -219,7 +219,7 @@ do
 			text = "Delete",
 			func = function(self)
 				mog:GetModule("Wishlist"):DeleteItem(self.value)
-				mog:BuildList("Wishlist")
+				mog:BuildList(nil, "Wishlist")
 				CloseDropDownMenus()
 			end,
 			notCheckable = true,
@@ -297,7 +297,7 @@ do
 			wishlist = true,
 			text = "Delete from set",
 			func = function(self, set)
-				mog:GetModule("Wishlist"):DeleteItem(self.value, set)
+				mog:GetModule("Wishlist"):DeleteItem(self.value, set.name)
 				mog:BuildList(nil, "Wishlist")
 				CloseDropDownMenus()
 			end,
@@ -333,7 +333,7 @@ do
 			text = "Delete set",
 			func = function(self)
 				tremove(mog:GetModule("Wishlist"):GetSets(), self.value)
-				mog:BuildList()
+				mog:BuildList(nil, "Wishlist")
 			end,
 			notCheckable = true,
 		},
@@ -410,7 +410,7 @@ do
 					local info = UIDropDownMenu_CreateInfo()
 					info.text = set.name
 					info.func = function(self, arg1)
-						wishlist:AddItem(arg1, self.value)
+						mog:GetModule("Wishlist"):AddItem(arg1, self.value)
 						mog:BuildList(nil, "Wishlist")
 						CloseDropDownMenus()
 					end
