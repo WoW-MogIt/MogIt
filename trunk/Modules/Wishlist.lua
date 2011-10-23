@@ -66,7 +66,7 @@ local defaults = {
 	}
 }
 
-function wishlist:AddonLoaded()
+function wishlist:MogItLoaded()
 	local AceDB = LibStub("AceDB-3.0")
 	local db = AceDB:New("MogItWishlist", defaults)
 	self.db = db

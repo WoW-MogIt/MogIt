@@ -228,6 +228,32 @@ mog.frame:RegisterEvent("PLAYER_LOGIN");
 mog.frame:RegisterEvent("GET_ITEM_INFO_RECEIVED");
 mog.frame:RegisterEvent("ADDON_LOADED");
 
+mog.items = {};
+
+function mog:AddItemData(id,field,value)
+	if not id then return;
+	if not mog.items[field] then
+		mog.items[field] = {};
+	end
+	mog.items[field][id] = value;
+end
+
+function mog:GetItemData(id,field)
+	if not mog.items[field] then return end;
+	return mog.items[field][id];
+end
+
+--[[function mog:DeleteItemData(id,field)
+	if field then
+		if mog.items[field] then
+			mog.items[field][id] = nil;
+		end
+	else
+		for k,v in pairs(mog.items) do
+			v[id] = nil;
+		end
+	end
+end--]]
 
 local LBB = LibStub("LibBabble-Boss-3.0"):GetUnstrictLookupTable();
 mog.mobs = {};
