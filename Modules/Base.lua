@@ -257,6 +257,28 @@ function mog.sub.GetFilterArgs(filter,item)
 	end
 end
 
+function mog.sub.SortLevel(id)
+	if type(display[id]) == "table" then
+		local tbl = {};
+		for k,v in ipairs(display[id]) do
+			table.insert(tbl,mog.sub.data.lvl[v]);
+		end
+		return tbl;
+	else
+		return mog.sub.data.lvl[display[id]];
+	end
+end
+
+function mog.sub.SortColour(id)
+	local tbl = {};
+	for i=1,3 do
+		if mog.sub.colours[i][id] then
+			table.insert(tbl,mog.sub.colours[i][id]);
+		end
+	end
+	return tbl;
+end
+
 for k,v in ipairs(addons) do
 	local _,title,_,_,loadable = GetAddOnInfo(v);
 	if loadable then
@@ -276,6 +298,10 @@ for k,v in ipairs(addons) do
 				"source",
 				"quality",
 				(v == "MogIt_OneHanded" and "slot") or nil,
+			},
+			sorting = {
+				level = mog.sub.SortLevel;
+				colour = mog.sub.SortColour;
 			},
 			addon = v,
 			slots = {},
