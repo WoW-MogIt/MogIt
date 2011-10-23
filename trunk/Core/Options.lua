@@ -256,8 +256,8 @@ end
 
 
 local function profilesLoaded(self)
-	if self.module then
-		db = mog:GetModule(self.module).db
+	if self.db then
+		db = mog:GetModule(self.db).db
 	else
 		db = mog.db
 	end
@@ -365,7 +365,7 @@ local function createProfileUI(name, module)
 	local objects = {}
 	frame.objects = objects
 	
-	local reset = CreateFrame("Button", "MogItResetDBButton"..module, frame, "UIPanelButtonTemplate2")
+	local reset = CreateFrame("Button", "MogItResetDBButton"..name, frame, "UIPanelButtonTemplate2")
 	reset:SetSize(160, 22)
 	reset:SetPoint("TOPLEFT", 32, -32)
 	reset:SetScript("OnClick", function(self) self.db:ResetProfile() end)
@@ -378,15 +378,15 @@ local function createProfileUI(name, module)
 	currProfile:SetJustifyV("CENTER")
 	objects.currProfile = currProfile
 
-	local chooseDesc = createFontString(frame)
-	chooseDesc:SetHeight(32)
-	chooseDesc:SetPoint("TOP", reset, "BOTTOM", 0, -8)
+	-- local chooseDesc = createFontString(frame)
+	-- chooseDesc:SetHeight(32)
+	-- chooseDesc:SetPoint("TOP", reset, "BOTTOM", 0, -8)
 	-- chooseDesc:SetWordWrap(true)
-	chooseDesc:SetText(L.choose_desc)
+	-- chooseDesc:SetText(L.choose_desc)
 
 	local newProfile = createEditBox(frame)
 	newProfile:SetWidth(160)
-	newProfile:SetPoint("TOPLEFT", chooseDesc, "BOTTOMLEFT", 0, -16)
+	newProfile:SetPoint("TOPLEFT", reset, "BOTTOMLEFT", 0, -16)
 	newProfile:SetScript("OnEscapePressed", newProfile.ClearFocus)
 	newProfile:SetScript("OnEnterPressed", newProfileOnEnterPressed)
 	objects.newProfile = newProfile
@@ -407,30 +407,30 @@ local function createProfileUI(name, module)
 	choose.common = true
 	objects.choose = choose
 
-	local copyDesc = createFontString(frame)
-	copyDesc:SetHeight(32)
-	copyDesc:SetPoint("TOP", choose, "BOTTOM", 0, -8)
-	copyDesc:SetWordWrap(true)
-	copyDesc:SetText(L.copy_desc)
+	-- local copyDesc = createFontString(frame)
+	-- copyDesc:SetHeight(32)
+	-- copyDesc:SetPoint("TOP", choose, "BOTTOM", 0, -8)
+	-- copyDesc:SetWordWrap(true)
+	-- copyDesc:SetText(L.copy_desc)
 
 	local copy = createDropDownMenu("MogItCopyProfile"..name, frame, nil, defaultProfiles)
 	copy:SetFrameWidth(144)
-	copy:SetPoint("TOPLEFT", copyDesc, "BOTTOMLEFT", -16, -8)
+	copy:SetPoint("TOPLEFT", newProfile, "BOTTOMLEFT", 0, -16)
 	copy.label:SetText(L.copy)
 	copy.initialize = initializeDropdown
 	copy.func = copyProfileOnClick
 	copy.nocurrent = true
 	objects.copy = copy
 
-	local deleteDesc = createFontString(frame)
-	deleteDesc:SetHeight(32)
-	deleteDesc:SetPoint("TOP", copy, "BOTTOM", 0, -8)
-	deleteDesc:SetWordWrap(true)
-	deleteDesc:SetText(L.delete_desc)
+	-- local deleteDesc = createFontString(frame)
+	-- deleteDesc:SetHeight(32)
+	-- deleteDesc:SetPoint("TOP", copy, "BOTTOM", 0, -8)
+	-- deleteDesc:SetWordWrap(true)
+	-- deleteDesc:SetText(L.delete_desc)
 
 	local delete = createDropDownMenu("MogItDeleteProfile"..name, frame, nil, defaultProfiles)
 	delete:SetFrameWidth(144)
-	delete:SetPoint("TOPLEFT", deleteDesc, "BOTTOMLEFT", -16, -8)
+	delete:SetPoint("TOPLEFT", copy, "BOTTOMLEFT", 0, -16)
 	delete.label:SetText(L.delete)
 	delete.initialize = initializeDropdown
 	delete.func = deleteProfileOnClick
@@ -439,7 +439,6 @@ local function createProfileUI(name, module)
 	
 	return frame
 end
-
 
 StaticPopupDialogs["MOGIT_DELETE_PROFILE"] = {
 	text = L.delete_confirm,
@@ -457,9 +456,5 @@ StaticPopupDialogs["MOGIT_DELETE_PROFILE"] = {
 	timeout = 0,
 }
 
-
--- local profiles = createProfileUI("Profiles", "db")
--- profiles.desc:SetText("This profile controls all settings that are not related to individual trees or their records.")
-
-local spellProfiles = createProfileUI("Wishlist profiles", "Wishlist")
--- spellProfiles.desc:SetText("This profile stores individual tree settings, including which trees will be registered, and spell records.")
+createProfileUI("Profiles")
+createProfileUI("Wishlist profiles", "Wishlist")
