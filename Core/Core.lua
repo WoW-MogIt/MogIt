@@ -61,7 +61,7 @@ mog.itemSlots = {
 function mog:RegisterModule(name,data,base)
 	if mog.modules.lookup[name] then return end;
 	data = data or {};
-	data.label = name;
+	data.name = name;
 	mog.modules.lookup[name] = data;
 	table.insert(base and mog.modules.base or mog.modules.extra,data);
 	if UIDropDownMenu_GetCurrentDropDown() == mog.dropdown and DropDownList1 and DropDownList1:IsShown() then
@@ -76,29 +76,32 @@ function mog:GetModule(name)
 end
 
 function mog:GetActiveModule()
-	return mog.active.label;
+	return mog.active.name;
 end
 
 function mog:SetModule(module,text)
-	if not module then return end;
 	if mog.active and mog.active.Unlist and mog.active ~= module then
 		mog.active:Unlist(module);
 	end
 	mog.active = module;
-	if text then
-		UIDropDownMenu_SetText(mog.dropdown,text);
-	end
-	mog:BuildList(true);
-	mog:FilterUpdate();
-	if module.sorting then
-		UIDropDownMenu_EnableDropDown(mog.sorting);
+	if module then
+		UIDropDownMenu_SetText(mog.dropdown,text or module.label or module.name);
+		mog:BuildList(true);
+		if module.sorting then
+			UIDropDownMenu_EnableDropDown(mog.sorting);
+		else
+			UIDropDownMenu_DisableDropDown(mog.sorting);
+		end
 	else
+		UIDropDownMenu_SetText(mog.dropdown,L["Select a module"]);
+		mog.list = {};
 		UIDropDownMenu_DisableDropDown(mog.sorting);
 	end
+	mog:FilterUpdate();
 end
 
 function mog:BuildList(top, module)
-	if not mog.active or (module and mog.active.label ~= module) then return end;
+	if not mog.active or (module and mog.active.name ~= module) then return end;
 	mog.list = mog.active:BuildList();
 	mog.scroll:update(top and 1);
 	mog.filt.models:SetText(#mog.list);
@@ -123,20 +126,6 @@ end
 SLASH_MOGIT1 = "/mog";
 SLASH_MOGIT2 = "/mogit";
 SlashCmdList["MOGIT"] = toggleFrame;
---[[function(msg)
-	if msg and msg > "" then
-		if msg:match("item:(%d+)") then
-			local id = msg:match("item:(%d+)");
-			mog:ShowURL(id);
-			return;
-		elseif msg:match("spell:(%d+)") then
-			local id = msg:match("spell:(%d+)");
-			mog:ShowURL(id,"spell");
-			return;
-		end
-	end
-	mog.toggleFrame();
-end--]]
 
 BINDING_HEADER_MogIt = "MogIt";
 BINDING_NAME_MogIt = L["Toggle Mogit"];
@@ -186,12 +175,7 @@ mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 	if event == "PLAYER_LOGIN" then
 		mog.view.model.model:SetUnit("PLAYER");
 		mog.updateGUI();
-		
-		--[[mog.tooltip.model:SetUnit("PLAYER");
-		mog.tooltip:SetSize(mog.db.profile.tooltipWidth,mog.db.profile.tooltipHeight);
-		if mog.db.profile.tooltipRotate then
-			mog.tooltip.rotate:Show();
-		end--]]
+		--mog.tooltip.model:SetUnit("PLAYER");
 	elseif event == "GET_ITEM_INFO_RECEIVED" then
 		local owner = GameTooltip:IsShown() and GameTooltip:GetOwner();
 		if owner and owner.MogItModel then
@@ -201,8 +185,10 @@ mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 	elseif event == "ADDON_LOADED" then
 		if arg1 == MogIt then
 			local AceDB = LibStub("AceDB-3.0")
-			
 			mog.db = AceDB:New("MogItDB", defaults, true)
+			-- db.RegisterCallback(self, "OnProfileChanged", "LoadSettings")
+			-- db.RegisterCallback(self, "OnProfileCopied", "LoadSettings")
+			-- db.RegisterCallback(self, "OnProfileReset", "LoadSettings")
 			
 			-- deal with old saved variables
 			if MogIt_Global then
@@ -213,25 +199,23 @@ mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 				-- MogIt_Global = nil
 			end
 			
-			-- db.RegisterCallback(self, "OnProfileChanged", "LoadSettings")
-			-- db.RegisterCallback(self, "OnProfileCopied", "LoadSettings")
-			-- db.RegisterCallback(self, "OnProfileReset", "LoadSettings")
-			
-			if not mog.db.global.version then
+			if not mog.db.profile.version then
 				DEFAULT_CHAT_FRAME:AddMessage(L["MogIt has loaded! Type \"/mog\" to open it."]);
 			end
-			mog.db.global.version = GetAddOnMetadata(MogIt,"Version");
+			mog.db.profile.version = GetAddOnMetadata(MogIt,"Version");
 			
-			mog.LDBI:Register(MogIt,mog.mmb,mog.db.profile.minimap);
+			mog.LDBI:Register("MogIt",mog.mmb,mog.db.profile.minimap);
+			--[[mog.tooltip:SetSize(mog.db.profile.tooltipWidth,mog.db.profile.tooltipHeight);
+			if mog.db.profile.tooltipRotate then
+				mog.tooltip.rotate:Show();
+			end--]]
 			
-			-- fire every module's "init" method (if they have one)
 			for name,module in pairs(mog.modules.lookup) do
-				if module.AddonLoaded then
-					module:AddonLoaded()
+				if module.MogItLoaded then
+					module:MogItLoaded()
 				end
 			end
 		elseif mog.modules.lookup[arg1] then
-			--collectgarbage("collect");
 			mog.modules.lookup[arg1].loaded = true;
 			if UIDropDownMenu_GetCurrentDropDown() == mog.dropdown and DropDownList1 and DropDownList1:IsShown() then
 				HideDropDownMenu(1);
@@ -246,7 +230,7 @@ mog.frame:RegisterEvent("ADDON_LOADED");
 
 
 local LBB = LibStub("LibBabble-Boss-3.0"):GetUnstrictLookupTable();
-local mobs = {};
+mog.mobs = {};
 
 --[[local tooltip = CreateFrame("GameTooltip","MogItMobsTooltip");
 local text = tooltip:CreateFontString();
@@ -263,12 +247,12 @@ end--]]
 
 function mog.AddMob(id,name)
 	--if not (mobs[id] or CachedMob(id)) then
-	if not mobs[id] then
-		mobs[id] = LBB[name] or name;
+	if not mog.mobs[id] then
+		mog.mobs[id] = LBB[name] or name;
 	end
 end
 
 function mog.GetMob(id)
 	--return mobs[id] or CachedMob(id);
-	return mobs[id];
+	return mog.mobs[id];
 end

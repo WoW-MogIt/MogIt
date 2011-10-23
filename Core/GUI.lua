@@ -30,8 +30,8 @@ mog.frame.resize:SetSize(16,16);
 mog.frame.resize:SetPoint("BOTTOMRIGHT",mog.frame,"BOTTOMRIGHT",-4,3);
 mog.frame.resize:EnableMouse(true);
 function mog.frame.resize.update(self)
-	mog.db.profile.width = floor((mog.frame:GetWidth()+5-(4+10)-(10+18+4))/mog.db.profile.columns)-5;
-	mog.db.profile.height = floor((mog.frame:GetHeight()+5-(60+10)-(10+26))/mog.db.profile.rows)-5;
+	mog.db.profile.width = floor((mog.frame:GetWidth()+5-(4+10)-(10+18+4))/mog.db.profile.columns)-5; -- needs updating
+	mog.db.profile.height = floor((mog.frame:GetHeight()+5-(60+10)-(10+26))/mog.db.profile.rows)-5; -- needs updating
 	mog.updateGUI(true);
 end
 mog.frame.resize:SetScript("OnMouseDown",function(self)
@@ -46,7 +46,6 @@ mog.frame.resize:SetScript("OnMouseUp",function(self)
 end);
 mog.frame.resize:SetScript("OnHide",mog.frame.resize:GetScript("OnMouseUp"));
 mog.frame.resize.texture = mog.frame.resize:CreateTexture(nil,"OVERLAY");
-mog.frame.resize.texture:SetSize(16,16);
 mog.frame.resize.texture:SetTexture("Interface\\AddOns\\MogIt\\Images\\Resize");
 mog.frame.resize.texture:SetAllPoints(mog.frame.resize);
 
@@ -105,12 +104,11 @@ function mog.dropdown:initialize(tier)
 	end
 end
 
-mog.frame.sorting = mog.frame:CreateFontString(nil,"ARTWORK","GameFontNormal");
-mog.frame.sorting:SetPoint("TOPRIGHT",mog.frame,"TOPRIGHT",-142,-35);
-mog.frame.sorting:SetText(L["Sort by"]..":");
-
 mog.sorting = CreateFrame("Frame","MogItSorting",mog.frame,"UIDropDownMenuTemplate");
-mog.sorting:SetPoint("LEFT",mog.frame.sorting,"RIGHT",-12,-3);
+mog.sorting:SetPoint("TOPRIGHT",mog.frame,"TOPRIGHT",-6,-28);
+mog.sorting.label = mog.frame:CreateFontString(nil,"ARTWORK","GameFontNormal");
+mog.sorting.label:SetPoint("RIGHT",mog.sorting,"LEFT",12,3);
+mog.sorting.label:SetText(L["Sort by"]..":");
 UIDropDownMenu_SetWidth(mog.sorting,110);
 UIDropDownMenu_SetButtonWidth(mog.sorting,125);
 UIDropDownMenu_JustifyText(mog.sorting,"LEFT");
@@ -154,6 +152,9 @@ mog.frame.options = CreateFrame("Button","MogItFrameOptionsButton",mog.frame,"Ma
 mog.frame.options:SetPoint("TOPLEFT",mog.frame.preview,"TOPRIGHT");
 mog.frame.options:SetWidth(100);
 mog.frame.options:SetText(MAIN_MENU);
+mog.frame.options:SetScript("OnClick",function(self,btn)
+	
+end);
 
 mog.frame.page = mog.frame:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall");
 mog.frame.page:SetPoint("BOTTOMRIGHT",mog.frame,"BOTTOMRIGHT",-17,10);
@@ -222,7 +223,7 @@ function mog.scroll.update(self,value,offset,onscroll)
 			frame.index = index;
 			wipe(frame.data);
 			if frame:IsShown() then
-				mog.FrameUpdate(frame,index);
+				mog.FrameUpdate(frame);
 				if owner == frame then
 					mog.OnEnter(frame);
 				end
@@ -244,13 +245,6 @@ end
 
 mog.frame:SetScript("OnMouseWheel",function(self,offset)
 	mog.scroll:update(nil,offset > 0 and -1 or 1);
-	--[[local value = mog.scroll:GetValue();
-	local low,high = mog.scroll:GetMinMaxValues();
-	if (offset > 0 and value > low) then
-		mog.scroll:update(nil,-1);
-	elseif (offset < 0 and value < high) then
-		mog.scroll:update(nil,1);
-	end--]]
 end);
 
 function mog.updateModels()
@@ -281,32 +275,23 @@ mog.modelUpdater:SetScript("OnUpdate",function(self,elapsed)
 	self.prevx,self.prevy = currentx,currenty;
 end);
 
-function mog.addModel()
+function mog.addModel(view)
 	local f;
-	if mog.bin[1] then
+	if not mog.view and mog.bin[1] then
 		f = mog.bin[1];
 		tremove(mog.bin,1);
 	else
-		f = CreateFrame("Button",nil,mog.frame);
-		f:Hide();
-		f.MogItModel = true;
+		f = CreateFrame("Button",nil,view and mog.view or mog.frame);
 		
 		f:SetScript("OnShow",mog.OnShow);
 		f:SetScript("OnHide",mog.OnHide);
 		f:SetScript("OnUpdate",mog.OnUpdate);
 		
-		f:RegisterForClicks("AnyUp");
-		f:SetScript("OnClick",mog.OnClick);
-		
 		f:RegisterForDrag("LeftButton","RightButton");
 		f:SetScript("OnDragStart",mog.OnDragStart);
 		f:SetScript("OnDragStop",mog.OnDragStop);
 		
-		f:SetScript("OnEnter",mog.OnEnter);
-		f:SetScript("OnLeave",mog.OnLeave);
-		
 		f.model = CreateFrame("DressUpModel",nil,f);
-		f.model:SetUnit("PLAYER");
 		f.model:SetModelScale(2);
 		f.model:SetPosition(0,0,0);
 		f.model:SetAllPoints(f);
@@ -316,15 +301,21 @@ function mog.addModel()
 		f.bg:SetAllPoints(f);
 		f.bg:SetTexture(0.3,0.3,0.3,0.2);
 		
-		f.data = {};
-		--[[f.frames = {};
-		for k,v in ipairs(mog.modules) do
-			if v.AddModel then
-				v:AddModel(f);
-			end
-		end--]]
+		if not view then
+			f:Hide();
+			f.MogItModel = true;
+			f.data = {};
+			f.model:SetUnit("PLAYER");
+			
+			f:RegisterForClicks("AnyUp");
+			f:SetScript("OnClick",mog.OnClick);
+			f:SetScript("OnEnter",mog.OnEnter);
+			f:SetScript("OnLeave",mog.OnLeave);
+		end
 	end
-	tinsert(mog.models,f);
+	if not view then
+		tinsert(mog.models,f);
+	end
 	return f;
 end
 
@@ -370,18 +361,24 @@ function mog.updateGUI(resize)
 	end
 end
 
-function mog.FrameUpdate(frame,index)
+function mog.FrameUpdate(frame)
 	if mog.active and mog.active.FrameUpdate then
-		mog.active:FrameUpdate(frame,mog.list[index or frame.index]);
+		mog.active:FrameUpdate(frame,mog.list[frame.index]);
 	end
 end
 
 function mog.OnShow(self)
 	self.model:SetPosition(mog.posZ,mog.posX,mog.posY);
-	if self:GetFrameLevel() <= mog.frame:GetFrameLevel() then
-		self:SetFrameLevel(mog.frame:GetFrameLevel()+1);
+	local lvl = self:GetParent():GetFrameLevel();
+	if self:GetFrameLevel() <= lvl then
+		self:SetFrameLevel(lvl+1);
 	end
-	mog.FrameUpdate(self,self.index);
+	if self == mog.view.model then
+		self.model:Undress();
+		mog:DressModel(self.model);
+	else
+		mog.FrameUpdate(self);
+	end
 end
 
 function mog.OnHide(self)
@@ -429,11 +426,5 @@ function mog.OnLeave(self,...)
 		mog.active:OnLeave(self,...);
 	else
 		GameTooltip:Hide();
-	end
-end
-
-function mog.GET_ITEM_INFO_RECEIVED(...)
-	if mog.active and mog.active.GET_ITEM_INFO_RECEIVED then
-		mog.active:GET_ITEM_INFO_RECEIVED(...);
 	end
 end
