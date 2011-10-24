@@ -2,15 +2,16 @@ local MogIt,mog = ...;
 _G["MogIt"] = mog;
 local L = mog.L;
 
+mog.list = {};
+mog.models = {};
+mog.bin = {};
 mog.modules = {
 	base = {},
 	extra = {},
 	lookup = {},
 };
 mog.sub = {};
-mog.list = {};
-mog.models = {};
-mog.bin = {};
+mog.items = {};
 
 mog.posX = 0;
 mog.posY = 0;
@@ -224,8 +225,6 @@ end);
 mog.frame:RegisterEvent("PLAYER_LOGIN");
 mog.frame:RegisterEvent("GET_ITEM_INFO_RECEIVED");
 mog.frame:RegisterEvent("ADDON_LOADED");
-
-mog.items = {};
 
 --[=[
 function mog:AddItemData(id,field,value)
