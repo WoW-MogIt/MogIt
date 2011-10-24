@@ -13,6 +13,7 @@
 ## Notes-zhCN: 物品幻化系统 助理
 ## X-Category: Roleplay & Transmogrification
 ## X-Website: http://www.curse.com/addons/wow/mogit
+## X-Email: aelobin@gmail.com
 ## X-Localizations: enUS, frFR, deDE, esES, zhCN, zhTW
 
 Libs\Embeds.xml
