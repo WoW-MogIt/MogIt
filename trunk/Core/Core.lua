@@ -149,16 +149,17 @@ mog.mmb = LDB:NewDataObject("MogIt",{
 local defaults = {
 	profile = {
 		tooltip = true,
+		tooltipWidth = 300,
+		tooltipHeight = 300,
 		tooltipMouse = false,
 		tooltipDress = false,
 		tooltipRotate = true,
 		tooltipMog = true,
+		tooltipMod = "None",
 		gridDress = true,
 		noAnim = false,
 		minimap = {},
 		url = "Battle.net",
-		--tooltipWidth = 300,
-		--tooltipHeight = 300,
 		width = 200,
 		height = 200,
 		rows = 2;
@@ -171,7 +172,7 @@ mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 	if event == "PLAYER_LOGIN" then
 		mog.view.model.model:SetUnit("PLAYER");
 		mog.updateGUI();
-		--mog.tooltip.model:SetUnit("PLAYER");
+		mog.tooltip.model:SetUnit("PLAYER");
 	elseif event == "GET_ITEM_INFO_RECEIVED" then
 		local owner = GameTooltip:IsShown() and GameTooltip:GetOwner();
 		if owner and owner.MogItModel then
@@ -201,10 +202,11 @@ mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 			mog.db.global.version = GetAddOnMetadata(MogIt,"Version");
 			
 			mog.LDBI:Register("MogIt",mog.mmb,mog.db.profile.minimap);
-			--[[mog.tooltip:SetSize(mog.db.profile.tooltipWidth,mog.db.profile.tooltipHeight);
+			
+			mog.tooltip:SetSize(mog.db.profile.tooltipWidth,mog.db.profile.tooltipHeight);
 			if mog.db.profile.tooltipRotate then
 				mog.tooltip.rotate:Show();
-			end--]]
+			end
 			
 			for name,module in pairs(mog.modules.lookup) do
 				if module.MogItLoaded then
