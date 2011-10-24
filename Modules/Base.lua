@@ -217,9 +217,13 @@ mog.items.source = {};
 mog.items.sourceid = {};
 mog.items.sourceinfo = {};
 mog.items.zone = {};
-mog.items.colour1 = {};
-mog.items.colour2 = {};
-mog.items.colour3 = {};
+mog.items.colours = {
+	[1] = {},
+	[2] = {},
+	[3] = {},
+	--[4] = {},
+	--[5] = {},
+};
 
 function mog.sub.AddItem(tbl,id,display,quality,lvl,faction,class,slot,source,sourceid,zone,sourceinfo)
 	table.insert(tbl,id);
@@ -235,11 +239,13 @@ function mog.sub.AddItem(tbl,id,display,quality,lvl,faction,class,slot,source,so
 	mog.items.zone[id] = zone;
 end
 
-function mog.sub.AddColours(id,c1,c2,c3)
-	if c1 and (not mog.items.colour1[id]) then
-		mog.items.colour1[id] = c1;
-		mog.items.colour2[id] = c2;
-		mog.items.colour3[id] = c3;
+function mog.sub.AddColours(id,c1,c2,c3)--,c4,c5)
+	if c1 and (not mog.items.colours[1][id]) then
+		mog.items.colours[1][id] = c1;
+		mog.items.colours[2][id] = c2;
+		mog.items.colours[3][id] = c3;
+		--mog.items.colours[4][id] = c4;
+		--mog.items.colours[5][id] = c5;
 	end
 end
 
@@ -274,8 +280,8 @@ end
 function mog.sub.SortColour(id)
 	local tbl = {};
 	for i=1,3 do
-		if mog.items["colour"..i][id] then
-			table.insert(tbl,mog.items["colour"..i][id]);
+		if mog.items.colours[i][id] then
+			table.insert(tbl,mog.items.colours[i][id]);
 		end
 	end
 	return tbl;

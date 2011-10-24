@@ -225,6 +225,7 @@ mog.frame:RegisterEvent("ADDON_LOADED");
 
 mog.items = {};
 
+--[=[
 function mog:AddItemData(id,field,value)
 	if not id then return end;
 	if not mog.items[field] then
@@ -238,7 +239,7 @@ function mog:GetItemData(id,field)
 	return mog.items[field][id];
 end
 
---[[function mog:DeleteItemData(id,field)
+function mog:DeleteItemData(id,field)
 	if field then
 		if mog.items[field] then
 			mog.items[field][id] = nil;
@@ -248,7 +249,7 @@ end
 			v[id] = nil;
 		end
 	end
-end--]]
+end--]=]
 
 local LBB = LibStub("LibBabble-Boss-3.0"):GetUnstrictLookupTable();
 mog.mobs = {};
