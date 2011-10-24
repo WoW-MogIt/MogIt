@@ -210,6 +210,7 @@ mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 					module:MogItLoaded()
 				end
 			end
+			mog.createOptions();
 		elseif mog.modules.lookup[arg1] then
 			mog.modules.lookup[arg1].loaded = true;
 			if UIDropDownMenu_GetCurrentDropDown() == mog.dropdown and DropDownList1 and DropDownList1:IsShown() then
