@@ -87,7 +87,7 @@ function wishlist:MogItLoaded()
 			for slotID, items in pairs(set) do
 				if type(slotID) == "number" then
 					local itemID = tonumber(items[1])
-					set.items[itemSlots[slotID]] = itemID
+					set.items[mog.itemSlots[slotID]] = itemID
 					set[slotID] = nil
 				end
 			end
@@ -122,7 +122,7 @@ local level3 = {
 	{
 		text = "Rename set",
 		func = function(self)
-			StaticPopup_Show("MOGIT_WISHLIST_RENAME_SET", nil, nil, wishlist.db.profile.sets[self.value])
+			wishlist:RenameSet(wishlist.db.profile.sets[self.value].name)
 			CloseDropDownMenus()
 		end,
 	},
@@ -130,7 +130,7 @@ local level3 = {
 		text = "Delete set",
 		func = function(self)
 			tremove(wishlist.db.profile.sets, self.value)
-			mog:BuildList()
+			mog:BuildList(nil, "Wishlist")
 			CloseDropDownMenus()
 		end,
 	},
