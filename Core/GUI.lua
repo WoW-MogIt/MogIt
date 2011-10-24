@@ -153,6 +153,9 @@ mog.frame.options:SetPoint("TOPLEFT",mog.frame.preview,"TOPRIGHT");
 mog.frame.options:SetWidth(100);
 mog.frame.options:SetText(MAIN_MENU);
 mog.frame.options:SetScript("OnClick",function(self,btn)
+	if not mog.options then
+		mog.createOptions();
+	end
 	InterfaceOptionsFrame_OpenToCategory(MogIt);
 end);
 

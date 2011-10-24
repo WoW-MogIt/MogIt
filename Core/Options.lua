@@ -199,4 +199,14 @@ function mog.createOptions()
 	options.args.wishlist.order = 6;
 	config:RegisterOptionsTable("MogIt_Wishlist",options.args.wishlist);
 	dialog:AddToBlizOptions("MogIt_Wishlist",options.args.wishlist.name,MogIt);
+	
+	mog.options = options;
 end
+
+local hook = CreateFrame("Frame",nil,InterfaceOptionsFrame);
+hook:SetScript("OnShow",function(self)
+	if not mog.options then
+		mog.createOptions();
+	end
+	self:SetScript("OnShow",nil);
+end);
