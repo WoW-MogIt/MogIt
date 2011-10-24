@@ -294,8 +294,6 @@ function mog.addModel(view)
 		f:SetScript("OnDragStop",mog.OnDragStop);
 		
 		f.model = CreateFrame("DressUpModel",nil,f);
-		f.model:SetModelScale(2);
-		f.model:SetPosition(0,0,0);
 		f.model:SetAllPoints(f);
 		f.model.button = f;
 		
@@ -326,6 +324,9 @@ function mog.addModel(view)
 			--f.icon:SetSize(16,16);
 			--f.icon:SetTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcon_1");
 		end
+		
+		f.model:SetModelScale(2);
+		f.model:SetPosition(0,0,0);
 	end
 	if not view then
 		tinsert(mog.models,f);
