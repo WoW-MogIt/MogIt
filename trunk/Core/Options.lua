@@ -1,6 +1,6 @@
 ﻿local MogIt,mog = ...;
 local L = mog.L;
-
+--[[
 local L = {
 	default = "Default",
 	reset = "Reset profile",
@@ -108,8 +108,7 @@ elseif LOCALE == "ruRU" then
 	L["profiles"] = "Профили"
 	--L["current"] = "Current Profile:"
 end
-
-
+]]
 -- editbox
 local function createEditBox(parent)
 	local editbox = CreateFrame("EditBox", nil, parent)
@@ -198,9 +197,154 @@ local function createDropDownMenu(name, parent, menu, valueLookup)
 end
 
 
-local options = CreateFrame("Frame")
-options.name = MogIt
-InterfaceOptions_AddCategory(options)
+local frame = CreateFrame("Frame")
+frame.name = MogIt
+InterfaceOptions_AddCategory(frame)
+
+local options = {
+	{
+		text = L["Enable tooltip model"],
+		setting = "tooltip",
+	},
+	{
+		text = L["Rotate with mouse wheel"],
+		setting = "tooltipMouse",
+	},
+	{
+		text = L["Naked model"],
+		setting = "tooltipDress",
+	},
+	{
+		text = L["Auto rotate"],
+		setting = "tooltipRotate",
+		func = function(self)
+			if self:GetChecked() then
+				mog.tooltip.rotate:Show()
+			else
+				mog.tooltip.rotate:Hide()
+			end
+		end,
+	},
+	{
+		text = L["Only transmogrification items"],
+		setting = "tooltipMog",
+	},
+	{
+		text = L["Naked models"],
+		setting = "gridDress",
+		func = function(self)
+			if mog.grid:IsVisible() then
+				mog.scroll:update()
+			end
+		end,
+	},
+	{
+		text = L["No Animation"],
+		setting = "noAnim",
+	},
+	-- {
+		-- minimap = {},
+		func = function(self)
+			if self:GetChecked() then
+				mog.LDBI:Hide(MogIt)
+			else
+				mog.LDBI:Show(MogIt)
+			end
+		end,
+	-- },
+	{
+		type = "select",
+		text = L["Item URL"],
+		setting = "url",
+		menu = (function()
+			local function onClick(self)
+				mog.db.profile.url = self.value
+				self.owner:SetSelectedValue(self.value)
+			end
+			local menu = {}
+			for i, v in ipairs(mog.sortedURLs) do
+				local data = mog.url[v]
+				local info = {
+					text = "\124T"..data.fav..":18:18\124t "..v,
+					value = v,
+					func = onClick,
+					notCheckable = true,
+					-- icon = "Interface\\AddOns\\MogIt\\Images\\"..mog.urlFav[v],
+				}
+				tinsert(menu, info)
+			end
+			return menu
+		end)(),
+	},
+	-- {
+		--tooltipWidth = 300,
+	-- },
+	-- {
+		--tooltipHeight = 300,
+	-- },
+	-- {
+		-- width = 200,
+	-- },
+	-- {
+		-- height = 200,
+	-- },
+	{
+		text = L["Rows"],
+		rows = 2;
+	},
+	{
+		text = L["Columns"],
+		columns = 3,
+	},
+}
+
+local function onClick(self)
+	local checked = self:GetChecked()
+	PlaySound(checked and "igMainMenuOptionCheckBoxOn" or "igMainMenuOptionCheckBoxOff")
+	mog.db.profile[self.setting] = checked and true or false
+	if self.func then
+		self:func()
+	end
+end
+
+local function loadSetting(self)
+	self:SetChecked(mog.db.profile[self.setting])
+	if self.func then
+		self:func()
+	end
+end
+
+for i, v in ipairs(options) do
+	local widget
+	if v.type == "select" then
+		widget = createDropDownMenu("MogIt"..v.setting.."Dropdown", frame, v.menu)
+		widget.label:SetText(v.text)
+		
+		widget.LoadSetting = function(self)
+			self:SetSelectedValue(mog.db.profile[self.setting])
+		end
+	elseif v.type =="" then
+	else
+		widget = CreateFrame("CheckButton", nil, frame, "OptionsBaseCheckButtonTemplate")
+		widget:SetPushedTextOffset(0, 0)
+		widget:SetScript("OnClick", onClick)
+		
+		local text = widget:CreateFontString(nil, nil, "GameFontHighlight")
+		text:SetPoint("LEFT", widget, "RIGHT", 0, 1)
+		widget:SetFontString(text)
+		
+		widget.LoadSetting = loadSetting
+	end
+	if i == 1 then
+		widget:SetPoint("TOPLEFT", 32, -32)
+	else
+		widget:SetPoint("TOP", options[i - 1].widget, "BOTTOM", 0, -8)
+	end
+	widget.setting = v.setting
+	widget:SetText(v.text)
+	widget:SetScript("OnShow", widget.LoadSetting)
+	v.widget = widget
+end
 
 
 local defaultProfiles = {}
@@ -456,5 +600,5 @@ StaticPopupDialogs["MOGIT_DELETE_PROFILE"] = {
 	timeout = 0,
 }
 
-createProfileUI("Profiles")
+createProfileUI("Options profiles")
 createProfileUI("Wishlist profiles", "Wishlist")

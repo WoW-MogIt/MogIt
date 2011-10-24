@@ -2,9 +2,11 @@ local MogIt,mog = ...;
 local L = mog.L;
 
 mog.url = {};
+mog.sortedURLs = {};
 
 function mog:AddURL(name,tbl)
 	mog.url[name] = tbl;
+	tinsert(mog.sortedURLs, name);
 end
 
 function mog:ShowURL(id,sub,url,force)
