@@ -127,30 +127,28 @@ function mog.createOptions()
 	config:RegisterOptionsTable("MogIt_General",options.args.general);
 	dialog:AddToBlizOptions("MogIt_General",options.args.general.name,MogIt);
 	
-	options.args.modules = {
+	--[[options.args.modules = {
 		type = "group",
 		order = 2,
 		name = L["Modules"],
-		--[[plugins = {
-			
-		},--]]
+		--plugins
 		args = {
 			wishlist = db:GetOptionsTable(mog:GetModule("Wishlist").db),
 		},
 	};
 	options.args.modules.args.wishlist.name = L["Wishlist"];
 	config:RegisterOptionsTable("MogIt_Modules",options.args.modules);
-	dialog:AddToBlizOptions("MogIt_Modules",options.args.modules.name,MogIt);
-	
-	--[[options.args.wishlist = db:GetOptionsTable(mog:GetModule("Wishlist").db);
-	options.args.wishlist.name = L["Wishlist Profile"];
-	options.args.wishlist.order = 6;
-	config:RegisterOptionsTable("MogIt_Wishlist",options.args.wishlist);
-	dialog:AddToBlizOptions("MogIt_Wishlist",options.args.wishlist.name,MogIt);--]]
+	dialog:AddToBlizOptions("MogIt_Modules",options.args.modules.name,MogIt);--]]
 
 	options.args.options = db:GetOptionsTable(mog.db);
 	options.args.options.name = L["Options Profile"];
-	options.args.options.order = 7;
+	options.args.options.order = 5;
 	config:RegisterOptionsTable("MogIt_Options",options.args.options);
 	dialog:AddToBlizOptions("MogIt_Options",options.args.options.name,MogIt);
+	
+	options.args.wishlist = db:GetOptionsTable(mog:GetModule("Wishlist").db);
+	options.args.wishlist.name = L["Wishlist Profile"];
+	options.args.wishlist.order = 6;
+	config:RegisterOptionsTable("MogIt_Wishlist",options.args.wishlist);
+	dialog:AddToBlizOptions("MogIt_Wishlist",options.args.wishlist.name,MogIt);
 end
