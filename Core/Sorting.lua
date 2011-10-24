@@ -4,6 +4,8 @@ local L = mog.L;
 mog.sorting.sorts = {};
 
 function mog:CreateSort(name,data)
+	data = data or {};
+	data.name = name;
 	mog.sorting.sorts[name] = data;
 end
 
@@ -15,17 +17,22 @@ function mog:GetActiveSort()
 	return mog.sorting.active;
 end
 
-function mog:ApplySort(sort,label)
-	if mog.sorting.active and (mog.sorting.active ~= mog.sorting.sorts[sort]) and mog.sorting.active.unlist then
-		mog.sorting.active.unlist();
-	end
-	if mog.sorting.sorts[sort] then
-		mog.sorting.sorts[sort].sort(mog.list,mog.active.sorting[sort]);
-		if label then
-			UIDropDownMenu_SetText(mog.sorting,label);
+function mog:SortList(new,update)
+	if mog.active and mog.active.sorting and #mog.active.sorting > 0 then
+		UIDropDownMenu_EnableDropDown(mog.sorting);
+		new = new or (mog.active.sorts[mog.sorting.active] and mog.sorting.active) or mog.active.sorting[1];
+		if mog.sorting.active and (mog.sorting.active ~= new) and mog.sorting.sorts[mog.sorting.active].Unlist then
+			mog.sorting.sorts[mog.sorting.active].Unlist();
 		end
-		mog.sorting.active = mog.sorting.sorts[sort];
-		mog.scroll:update();
+		mog.sorting.active = new;
+		mog.sorting.sorts[new].Sort(mog.active.sorts[new]);
+		UIDropDownMenu_SetText(mog.sorting,mog.sorting.sorts[new].label);
+		if not update then
+			mog.scroll:update();
+		end
+	else
+		UIDropDownMenu_SetText(mog.sorting,NONE);
+		UIDropDownMenu_DisableDropDown(mog.sorting);
 	end
 end
 
@@ -54,26 +61,27 @@ do
 	end
 	
 	local function dropdownTier1(self)
-		mog:ApplySort("colour",L["Approximate Colour"]);
+		mog:SortList("colour");
 	end
 	
 	local function swatchFunc()
 		if not ColorPickerFrame:IsShown() then
 			local r,g,b = ColorPickerFrame:GetColorRGB();
 			cR,cG,cB = r*255,g*255,b*255;
-			mog:ApplySort("colour",L["Approximate Colour"]);
+			mog:SortList("colour");
 		end
 	end
 	
 	mog:CreateSort("colour",{
-		dropdown = function(module,tier)
+		label = L["Approximate Colour"],
+		Dropdown = function(module,tier)
 			local info;
 			if tier == 1 then
 				info = UIDropDownMenu_CreateInfo();
 				info.text =	L["Approximate Colour"];
 				info.value = "colour";
 				info.func = dropdownTier1;
-				--info.checked = mog.sorting == "colour";
+				info.checked = mog.sorting.active == "colour";
 				info.hasColorSwatch = true;
 				info.r = cR/255;
 				info.g = cG/255;
@@ -82,13 +90,13 @@ do
 				UIDropDownMenu_AddButton(info);
 			end
 		end,
-		sort = function(list,args)
+		Sort = function(args)
 			wipe(colourCache);
-			table.sort(list,function(a,b)
+			table.sort(mog.list,function(a,b)
 				return colourScore(a,args) < colourScore(b,args);
 			end);
 		end,
-		unlist = function()
+		Unlist = function()
 			wipe(colourCache);
 		end,
 	});
@@ -114,26 +122,27 @@ do
 	end
 	
 	local function dropdownTier1(self)
-		mog:ApplySort("level",L["Level"]);
+		mog:SortList("level");
 	end
 	
 	mog:CreateSort("level",{
-		dropdown = function(module,tier)
+		label = LEVEL,
+		Dropdown = function(module,tier)
 			local info;
 			info = UIDropDownMenu_CreateInfo();
 			info.text = LEVEL;
 			info.value = "level";
 			info.func = dropdownTier1;
-			--info.checked = mog.sorting == "level";
+			info.checked = mog.sorting.active == "level";
 			UIDropDownMenu_AddButton(info);
 		end,
-		sort = function(list,args)
+		Sort = function(args)
 			wipe(itemCache);
-			table.sort(list,function(a,b)
+			table.sort(mog.list,function(a,b)
 				return minItem(a,args) > minItem(b,args);
 			end);
 		end,
-		unlist = function()
+		Unlist = function()
 			wipe(itemCache);
 		end,
 	});
