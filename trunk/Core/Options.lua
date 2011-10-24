@@ -34,6 +34,8 @@ function mog.createOptions()
 				else
 					mog.tooltip.rotate:Hide();
 				end
+			elseif info.arg == "rows" or info.arg == "columns" then
+				mog.updateGUI();
 			end
 		end
 	end
@@ -89,6 +91,24 @@ function mog.createOptions()
 							return tbl;
 						end,
 						arg = "url",
+					},
+					rows = {
+						type = "range",
+						order = 4,
+						name = L["Rows"],
+						step = 1,
+						min = 1,
+						max = 10,
+						arg = "rows",
+					},
+					columns = {
+						type = "range",
+						order = 5,
+						name = L["Columns"],
+						step = 1,
+						min = 1,
+						max = 15,
+						arg = "columns",
 					},
 				},
 			},
