@@ -2,7 +2,7 @@
 local L = mog.L;
 
 function mog.createOptions()
-	do
+	--[=[do
 		local about = CreateFrame("Frame",nil,InterfaceOptionsFramePanelContainer);
 		about.name = MogIt;
 		about:Hide();
@@ -19,9 +19,38 @@ function mog.createOptions()
 		desc:SetJustifyH("LEFT");
 		desc:SetJustifyV("TOP");
 		desc:SetText(GetAddOnMetadata(MogIt,"Notes"));
+		
+		local fields = {"Version","Author","X-Category","X-License","X-Email","X-Website","X-Credits"};
+		local anchor;
+		for _,field in ipairs(fields) do
+			local val = GetAddOnMetadata(MogIt,field);
+			if val then
+				local title = about:CreateFontString(nil,"ARTWORK","GameFontNormalSmall")
+				title:SetWidth(75);
+				if anchor then
+					title:SetPoint("TOPLEFT",anchor,"BOTTOMLEFT",0,-6);
+				else
+					title:SetPoint("TOPLEFT",desc,"BOTTOMLEFT",-2,-8);
+				end
+				title:SetJustifyH("RIGHT");
+				title:SetText(field:gsub("X%-",""));
+				
+				local detail = frame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+				detail:SetPoint("LEFT", title, "RIGHT", 4, 0)
+				detail:SetPoint("RIGHT", -16, 0)
+				detail:SetJustifyH("LEFT")
+				detail:SetText(val)
+
+				anchor = title
+			end
+		end
 	
 		InterfaceOptions_AddCategory(about);
-	end
+	end--]=]
+	
+	local about = LibStub("LibAboutPanel").new(nil,MogIt);
+	about:GetScript("OnShow")(about);
+	about:SetScript("OnShow",nil);
 
 	local config = LibStub("AceConfig-3.0");
 	local dialog = LibStub("AceConfigDialog-3.0");
