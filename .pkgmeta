@@ -21,8 +21,17 @@ externals:
     Libs/LibBabble-Inventory-3.0:
         url: svn://svn.wowace.com/wow/libbabble-inventory-3-0/mainline/trunk
         tag: latest
+    Libs/AceGUI-3.0:
+        url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceGUI-3.0
+        tag: latest
+    Libs/AceConfig-3.0:
+        url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceConfig-3.0
+        tag: latest
     Libs/AceDB-3.0:
         url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceDB-3.0
+        tag: latest
+    Libs/AceDBOptions-3.0:
+        url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceDBOptions-3.0
         tag: latest
 
 ignore:
