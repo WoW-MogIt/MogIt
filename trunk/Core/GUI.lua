@@ -116,9 +116,9 @@ UIDropDownMenu_SetText(mog.sorting,NONE);
 UIDropDownMenu_DisableDropDown(mog.sorting);
 function mog.sorting:initialize(tier)
 	if mog.active and mog.active.sorting then
-		for k,v in pairs(mog.active.sorting) do
-			if mog.sorting.sorts[k] and mog.sorting.sorts[k].dropdown then
-				mog.sorting.sorts[k].dropdown(mog.active,tier);
+		for k,v in ipairs(mog.active.sorting) do
+			if mog.sorting.sorts[v] and mog.sorting.sorts[v].Dropdown then
+				mog.sorting.sorts[v].Dropdown(mog.active,tier);
 			end
 		end
 	end

@@ -84,25 +84,19 @@ function mog:SetModule(module,text)
 		mog.active:Unlist(module);
 	end
 	mog.active = module;
+	mog:BuildList(true);
+	mog:FilterUpdate();
 	if module then
 		UIDropDownMenu_SetText(mog.dropdown,text or module.label or module.name);
-		mog:BuildList(true);
-		if module.sorting then
-			UIDropDownMenu_EnableDropDown(mog.sorting);
-		else
-			UIDropDownMenu_DisableDropDown(mog.sorting);
-		end
 	else
 		UIDropDownMenu_SetText(mog.dropdown,L["Select a module"]);
-		mog.list = {};
-		UIDropDownMenu_DisableDropDown(mog.sorting);
 	end
-	mog:FilterUpdate();
 end
 
 function mog:BuildList(top, module)
-	if not mog.active or (module and mog.active.name ~= module) then return end;
-	mog.list = mog.active:BuildList();
+	if (module and mog.active and mog.active.name ~= module) then return end;
+	mog.list = mog.active and mog.active:BuildList() or {};
+	mog:SortList(nil,true);
 	mog.scroll:update(top and 1);
 	mog.filt.models:SetText(#mog.list);
 end

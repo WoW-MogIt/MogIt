@@ -304,8 +304,12 @@ for k,v in ipairs(addons) do
 				(v == "MogIt_OneHanded" and "slot") or nil,
 			},
 			sorting = {
-				level = mog.sub.SortLevel;
-				colour = mog.sub.SortColour;
+				"level",
+				"colour",
+			},
+			sorts = {
+				level = mog.sub.SortLevel,
+				colour = mog.sub.SortColour,
 			},
 		},true);
 	end
