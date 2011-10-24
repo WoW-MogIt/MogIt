@@ -119,7 +119,7 @@ end
 
 SLASH_MOGIT1 = "/mog";
 SLASH_MOGIT2 = "/mogit";
-SlashCmdList["MOGIT"] = toggleFrame;
+SlashCmdList["MOGIT"] = mog.toggleFrame;
 
 BINDING_HEADER_MogIt = "MogIt";
 BINDING_NAME_MogIt = L["Toggle Mogit"];
