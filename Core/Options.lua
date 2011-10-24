@@ -21,8 +21,20 @@ function mog.createOptions()
 	local function set(info,value)
 		if info.arg == "minimap" then
 			mog.db.profile.minimap.hide = value;
+			if value then
+				mog.LDBI:Hide("MogIt");
+			else
+				mog.LDBI:Show("MogIt");
+			end
 		else
 			mog.db.profile[info.arg] = value;
+			if info.arg == "tooltipRotate" then
+				if value then
+					mog.tooltip.rotate:Show();
+				else
+					mog.tooltip.rotate:Hide();
+				end
+			end
 		end
 	end
 	
@@ -58,19 +70,26 @@ function mog.createOptions()
 						width = "double",
 						arg = "noAnim",
 					},
-					naked = {
+					dress = {
 						type = "toggle",
 						order = 2,
-						name = L["Naked models"],
+						name = L["Dress models"],
 						width = "double",
 						arg = "gridDress",
 					},
-					--[[url = {
+					url = {
 						type = "select",
 						order = 3,
 						name = L["URL website"],
+						values = function()
+							local tbl = {};
+							for k,v in pairs(mog.url) do
+								tbl[k] = (v.fav and "\124T"..v.fav..":16\124t " or "")..k;
+							end
+							return tbl;
+						end,
 						arg = "url",
-					},--]]
+					},
 				},
 			},
 			tooltip = {
@@ -86,10 +105,10 @@ function mog.createOptions()
 						width = "double",
 						arg = "tooltip",
 					},
-					naked = {
+					dress = {
 						type = "toggle",
 						order = 2,
-						name = L["Naked model"],
+						name = L["Dress model"],
 						width = "double",
 						arg = "tooltipDress",
 					},
@@ -112,14 +131,23 @@ function mog.createOptions()
 						order = 5,
 						name = L["Only transmogrification items"],
 						width = "double",
-						arg = "tooltipRotate",
+						arg = "tooltipMog",
 					},
-					--[[modifier = {
+					modifier = {
 						type = "select",
 						order = 6,
 						name = L["Only show if modifier is pressed"],
+						values = function()
+							local tbl = {
+								None = "None",
+							};
+							for k,v in pairs(mog.tooltip.mod) do
+								tbl[k] = k;
+							end
+							return tbl;
+						end,
 						arg = "tooltipMod",
-					},--]]
+					},
 				},
 			},
 		},
