@@ -153,7 +153,7 @@ mog.frame.options:SetPoint("TOPLEFT",mog.frame.preview,"TOPRIGHT");
 mog.frame.options:SetWidth(100);
 mog.frame.options:SetText(MAIN_MENU);
 mog.frame.options:SetScript("OnClick",function(self,btn)
-	InterfaceOptionsFrame_OpenToCategory(mog.config);
+	InterfaceOptionsFrame_OpenToCategory(MogIt);
 end);
 
 mog.frame.page = mog.frame:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall");
