@@ -173,15 +173,6 @@ end
 
 mog.Item_Menu = CreateFrame("Frame",nil,mog.frame);
 mog.Item_Menu.displayMode = "MENU";
-mog.Item_Menu:SetScript("OnEvent",function(self,event)
-	if event == "GET_ITEM_INFO_RECEIVED" then
-		if UIDropDownMenu_GetCurrentDropDown() == self and DropDownList1 and DropDownList1:IsShown() then
-			HideDropDownMenu(1);
-			ToggleDropDownMenu(nil,nil,self,"cursor",0,0,self.menuList);
-		end
-	end
-end);
-mog.Item_Menu:RegisterEvent("GET_ITEM_INFO_RECEIVED");
 do
 	local function onClick(self, arg1, arg2)
 		arg1.data.cycle = arg2;
@@ -276,15 +267,6 @@ end
 
 mog.Set_Menu = CreateFrame("Frame",nil,mog.frame);
 mog.Set_Menu.displayMode = "MENU";
-mog.Set_Menu:SetScript("OnEvent",function(self,event)
-	if event == "GET_ITEM_INFO_RECEIVED" then
-		if UIDropDownMenu_GetCurrentDropDown() == self and DropDownList1 and DropDownList1:IsShown() then
-			HideDropDownMenu(1);
-			ToggleDropDownMenu(nil,nil,self,"cursor",0,0,self.menuList);
-		end
-	end
-end);
-mog.Set_Menu:RegisterEvent("GET_ITEM_INFO_RECEIVED");
 do
 	local types = {
 		number = "item",
