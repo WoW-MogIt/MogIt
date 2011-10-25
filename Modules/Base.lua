@@ -103,6 +103,29 @@ function mog.sub.BuildList(module)
 	return list;
 end
 
+function mog.sub.Help(module,self)
+	GameTooltip:SetOwner(self,"ANCHOR_RIGHT");
+	GameTooltip:AddLine("Help",1,0,0);
+	
+	GameTooltip:AddLine(" ");
+	GameTooltip:AddLine(L["Item Controls"]);
+	GameTooltip:AddDoubleLine(L["Change item"],L["Left click"],0,1,0,1,1,1);
+	GameTooltip:AddDoubleLine(L["Chat link"],L["Shift + Left click"],0,1,0,1,1,1);
+	GameTooltip:AddDoubleLine(L["Try on"],L["Ctrl + Left click"],0,1,0,1,1,1);
+	GameTooltip:AddDoubleLine(L["Add to wishlist"],L["Right click"],0,1,0,1,1,1);
+	GameTooltip:AddDoubleLine(L["Item URL"],L["Shift + Right click"],0,1,0,1,1,1);
+	GameTooltip:AddDoubleLine(L["Add to preview"],L["Ctrl + Right click"],0,1,0,1,1,1);
+	
+	GameTooltip:AddLine(" ");
+	GameTooltip:AddLine(L["Positioning Controls"]);
+	GameTooltip:AddDoubleLine(L["Rotate"],L["Left click + horizontal drag"],0,1,0,1,1,1);
+	GameTooltip:AddDoubleLine(L["Zoom"],L["Left click + vertical drag"],0,1,0,1,1,1);
+	GameTooltip:AddDoubleLine(L["Move"],L["Right click + drag"],0,1,0,1,1,1);
+	GameTooltip:AddDoubleLine(L["Resize"],L["Click bottom right corner + drag"],0,1,0,1,1,1);
+	
+	GameTooltip:Show();
+end
+
 function mog.sub.AddSlot(label,addon)
 	local items = {};
 	local module = mog:GetModule(addon);
@@ -204,6 +227,7 @@ for k,v in ipairs(addons) do
 			OnEnter = mog.sub.OnEnter,
 			OnClick = mog.sub.OnClick,
 			Unlist = mog.sub.Unlist,
+			Help = mog.sub.Help,
 			filters = {
 				"level",
 				"faction",
