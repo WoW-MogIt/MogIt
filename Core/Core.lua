@@ -284,6 +284,17 @@ mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 		if owner and owner.MogItModel then
 			mog.OnEnter(owner);
 		end
+		if UIDropDownMenu_GetCurrentDropDown() == mog.Item_Menu then
+			if DropDownList1 and DropDownList1:IsShown() then
+				HideDropDownMenu(1);
+				ToggleDropDownMenu(nil,nil,mog.Item_Menu,"cursor",0,0,mog.Item_Menu.menuList);
+			end
+		elseif UIDropDownMenu_GetCurrentDropDown() == mog.Set_Menu then
+			if DropDownList1 and DropDownList1:IsShown() then
+				HideDropDownMenu(1);
+				ToggleDropDownMenu(nil,nil,mog.Set_Menu,"cursor",0,0,mog.Set_Menu.menuList);
+			end
+		end
 	elseif event == "ADDON_LOADED" then
 		if arg1 == MogIt then
 			local AceDB = LibStub("AceDB-3.0")
