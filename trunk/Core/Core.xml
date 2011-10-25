@@ -10,4 +10,7 @@
 <Script file="Tooltip.lua"/>
 <Script file="Options.lua"/>
 
+<Include file="Filters\Filters.xml"/>
+<Include file="Sorting\Sorting.xml"/>
+
 </Ui>
