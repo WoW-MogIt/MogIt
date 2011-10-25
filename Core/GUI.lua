@@ -228,6 +228,10 @@ function mog.scroll.update(self,value,offset,onscroll)
 		self.down:Enable();
 	end
 	
+	if ((UIDropDownMenu_GetCurrentDropDown() == mog.Item_Menu) or (UIDropDownMenu_GetCurrentDropDown() == mog.Set_Menu)) and DropDownList1 and DropDownList1:IsShown() then
+		HideDropDownMenu(1);
+	end
+	
 	if mog.active and mog.active.OnScroll then
 		mog.active:OnScroll();
 	end

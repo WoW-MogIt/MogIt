@@ -105,9 +105,7 @@ end
 
 function mog.sub.Help(module,self)
 	GameTooltip:SetOwner(self,"ANCHOR_RIGHT");
-	GameTooltip:AddLine("Help",1,0,0);
-	
-	GameTooltip:AddLine(" ");
+
 	GameTooltip:AddLine(L["Item Controls"]);
 	GameTooltip:AddDoubleLine(L["Change item"],L["Left click"],0,1,0,1,1,1);
 	GameTooltip:AddDoubleLine(L["Chat link"],L["Shift + Left click"],0,1,0,1,1,1);
