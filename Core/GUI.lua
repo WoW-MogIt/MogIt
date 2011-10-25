@@ -163,13 +163,21 @@ mog.frame.help = CreateFrame("Button","MogItFrameHelpButton",mog.frame,"MagicBut
 mog.frame.help:SetPoint("TOPLEFT",mog.frame.options,"TOPRIGHT");
 mog.frame.help:SetWidth(100);
 mog.frame.help:SetText(L["Help"]);
-mog.frame.help:Disable();
-mog.frame.help:SetScript("OnEnter",function(self,btn)
+mog.frame.help:SetScript("OnEnter",function(self)
+	GameTooltip:SetOwner(self,"ANCHOR_RIGHT");
+	GameTooltip:AddLine("Basic Controls");
+	GameTooltip:AddDoubleLine(L["Rotate"],L["Left click + horizontal drag"],0,1,0,1,1,1);
+	GameTooltip:AddDoubleLine(L["Zoom"],L["Left click + vertical drag"],0,1,0,1,1,1);
+	GameTooltip:AddDoubleLine(L["Move"],L["Right click + drag"],0,1,0,1,1,1);
+	GameTooltip:AddDoubleLine(L["Resize"],L["Click bottom right corner + drag"],0,1,0,1,1,1);
 	if mog.active and mog.active.Help then
-		mog.active:Help(self);
+		GameTooltip:AddLine(" ");
+		GameTooltip:AddLine("Module Controls");
+		mog.active:Help();
 	end
+	GameTooltip:Show();
 end);
-mog.frame.help:SetScript("OnLeave",function(self,btn)
+mog.frame.help:SetScript("OnLeave",function(self)
 	GameTooltip:Hide();
 end);
 
