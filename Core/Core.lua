@@ -2,14 +2,20 @@ local MogIt,mog = ...;
 _G["MogIt"] = mog;
 local L = mog.L;
 
-mog.list = {};
-mog.models = {};
-mog.bin = {};
 mog.modules = {
 	base = {},
 	extra = {},
 	lookup = {},
 };
+
+mog.list = {};
+mog.models = {};
+mog.bin = {};
+mog.posX = 0;
+mog.posY = 0;
+mog.posZ = 0;
+mog.face = 0;
+
 mog.items = {};
 mog.sub = {
 	colours = {
@@ -98,11 +104,6 @@ mog.sub = {
 		[5] = ITEM_BIND_TO_BNETACCOUNT,
 	},
 };
-
-mog.posX = 0;
-mog.posY = 0;
-mog.posZ = 0;
-mog.face = 0;
 
 mog.invSlots = {
 	INVTYPE_HEAD = "HeadSlot",

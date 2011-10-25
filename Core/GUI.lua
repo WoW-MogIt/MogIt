@@ -105,7 +105,7 @@ function mog.dropdown:initialize(tier)
 end
 
 mog.sorting = CreateFrame("Frame","MogItSorting",mog.frame,"UIDropDownMenuTemplate");
-mog.sorting:SetPoint("TOPRIGHT",mog.frame,"TOPRIGHT",-6,-28);
+mog.sorting:SetPoint("TOPRIGHT",mog.frame,"TOPRIGHT",6,-28);
 mog.sorting.label = mog.frame:CreateFontString(nil,"ARTWORK","GameFontNormal");
 mog.sorting.label:SetPoint("RIGHT",mog.sorting,"LEFT",12,3);
 mog.sorting.label:SetText(L["Sort by"]..":");
@@ -157,6 +157,14 @@ mog.frame.options:SetScript("OnClick",function(self,btn)
 		mog.createOptions();
 	end
 	InterfaceOptionsFrame_OpenToCategory(MogIt);
+end);
+
+mog.frame.help = CreateFrame("Button","MogItFrameHelpButton",mog.frame,"MagicButtonTemplate");
+mog.frame.help:SetPoint("TOPLEFT",mog.frame.options,"TOPRIGHT");
+mog.frame.help:SetWidth(100);
+mog.frame.help:SetText(L["Help"]);
+mog.frame.help:SetScript("OnClick",function(self,btn)
+	
 end);
 
 mog.frame.page = mog.frame:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall");
@@ -360,6 +368,9 @@ function mog.updateGUI(resize)
 			end
 		end
 		mog.frame:SetSize(((width+5)*columns)-5+(4+10)+(10+18+4),((height+5)*rows)-5+(60+10)+(10+26));
+		if mog.frame:IsShown() then
+			mog.scroll:update();
+		end
 	end
 	
 	for row=1,rows do
