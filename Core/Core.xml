@@ -5,10 +5,11 @@
 <Script file="Core.lua"/>
 <Script file="GUI.lua"/>
 <Script file="Preview.lua"/>
-<Script file="Sorting.lua"/>
 <Script file="Links.lua"/>
 <Script file="URL.lua"/>
 <Script file="Tooltip.lua"/>
 <Script file="Options.lua"/>
+<Include file="Filters\Filters.xml"/>
+<Include file="Sorting\Sorting.xml"/>
 
 </Ui>
