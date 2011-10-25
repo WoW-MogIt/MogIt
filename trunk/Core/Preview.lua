@@ -74,6 +74,9 @@ mog.view.clear:SetScript("OnClick",function(self,btn)
 	for k,v in pairs(mog.view.slots) do
 		mog.view.delItem(k);
 	end
+	if mog.db.profile.gridDress then
+		mog.scroll:update();
+	end
 end);
 
 mog.view.add = CreateFrame("Button","MogItFramePreviewAddItem",mog.view,"MagicButtonTemplate");
