@@ -88,7 +88,12 @@ function wishlist:MogItLoaded()
 			-- item = type(MogIt_Wishlist.display[v]) == "table" and MogIt_Wishlist.display[v][1] or MogIt_Wishlist.display[v]
 		end
 		MogIt_Wishlist = nil;
-	elseif MogIt_Character then -- v1.2b
+	end
+	if MogIt_Global then -- v1.2b
+		
+		MogIt_Global = nil;
+	end
+	if MogIt_Character then -- v1.2b
 		db.profile.items = MogIt_Character.wishlist.items
 		db.profile.sets = MogIt_Character.wishlist.sets
 		for i, itemID in ipairs(db.profile.items) do
