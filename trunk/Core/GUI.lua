@@ -163,8 +163,14 @@ mog.frame.help = CreateFrame("Button","MogItFrameHelpButton",mog.frame,"MagicBut
 mog.frame.help:SetPoint("TOPLEFT",mog.frame.options,"TOPRIGHT");
 mog.frame.help:SetWidth(100);
 mog.frame.help:SetText(L["Help"]);
-mog.frame.help:SetScript("OnClick",function(self,btn)
-	
+mog.frame.help:Disable();
+mog.frame.help:SetScript("OnEnter",function(self,btn)
+	if mog.active and mog.active.Help then
+		mog.active:Help(self);
+	end
+end);
+mog.frame.help:SetScript("OnLeave",function(self,btn)
+	GameTooltip:Hide();
 end);
 
 mog.frame.page = mog.frame:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall");

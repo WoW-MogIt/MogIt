@@ -179,6 +179,11 @@ function mog:SetModule(module,text)
 	else
 		UIDropDownMenu_SetText(mog.dropdown,L["Select a module"]);
 	end
+	if module and module.Help then
+		mog.frame.help:Enable();
+	else
+		mog.frame.help:Disable();
+	end
 end
 
 function mog:BuildList(top,module)
