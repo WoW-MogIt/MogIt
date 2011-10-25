@@ -76,7 +76,19 @@ function wishlist:MogItLoaded()
 	self.db = db
 	
 	-- convert old database
-	if MogIt_Character then
+	if MogIt_Wishlist then -- v1.1.4
+		local tbl = {};
+		for k,v in pairs(MogIt_Wishlist.display) do
+			table.insert(tbl,k);
+		end
+		table.sort(tbl,function(a,b)
+			return MogIt_Wishlist.time[a] < MogIt_Wishlist.time[b];
+		end);
+		for k,v in ipairs(tbl) do
+			-- item = type(MogIt_Wishlist.display[v]) == "table" and MogIt_Wishlist.display[v][1] or MogIt_Wishlist.display[v]
+		end
+		MogIt_Wishlist = nil;
+	elseif MogIt_Character then -- v1.2b
 		db.profile.items = MogIt_Character.wishlist.items
 		db.profile.sets = MogIt_Character.wishlist.sets
 		for i, itemID in ipairs(db.profile.items) do
@@ -92,6 +104,7 @@ function wishlist:MogItLoaded()
 				end
 			end
 		end
+		MogIt_Character = nil;
 	end
 	
 	for key, profile in pairs(db.profiles) do
