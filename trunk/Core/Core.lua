@@ -167,6 +167,20 @@ local defaults = {
 	}
 }
 
+function mog.LoadSettings()
+	mog.updateGUI();
+	if mog.db.profile.minimap.hide then
+		mog.LDBI:Hide("MogIt");
+	else
+		mog.LDBI:Show("MogIt");
+	end
+	if mog.db.profile.tooltipRotate then
+		mog.tooltip.rotate:Show();
+	else
+		mog.tooltip.rotate:Hide();
+	end
+end
+
 mog.frame = CreateFrame("Frame","MogItFrame",UIParent,"ButtonFrameTemplate");
 mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 	if event == "PLAYER_LOGIN" then
@@ -182,6 +196,10 @@ mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 		if arg1 == MogIt then
 			local AceDB = LibStub("AceDB-3.0")
 			mog.db = AceDB:New("MogItDB", defaults, true)
+			db.RegisterCallback(mog, "OnProfileChanged", "LoadSettings")
+			db.RegisterCallback(mog, "OnProfileCopied", "LoadSettings")
+			db.RegisterCallback(mog, "OnProfileReset", "LoadSettings")
+
 			
 			if not mog.db.global.version then
 				DEFAULT_CHAT_FRAME:AddMessage(L["MogIt has loaded! Type \"/mog\" to open it."]);
