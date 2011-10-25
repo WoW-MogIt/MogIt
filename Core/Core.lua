@@ -200,7 +200,6 @@ mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 			db.RegisterCallback(mog, "OnProfileCopied", "LoadSettings")
 			db.RegisterCallback(mog, "OnProfileReset", "LoadSettings")
 
-			
 			if not mog.db.global.version then
 				DEFAULT_CHAT_FRAME:AddMessage(L["MogIt has loaded! Type \"/mog\" to open it."]);
 			end
