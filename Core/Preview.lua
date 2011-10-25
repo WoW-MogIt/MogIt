@@ -122,7 +122,7 @@ local function slot_OnClick(self,btn)
 end
 
 mog.view.slots = {};
-for k,v in ipairs(mogt.itemSlots) do
+for k,v in ipairs(mog.itemSlots) do
 	mog.view.slots[v] = CreateFrame("Button","MogItPreview"..v,mog.view,"ItemButtonTemplate");
 	mog.view.slots[v].slot = v;
 	if k == 1 then

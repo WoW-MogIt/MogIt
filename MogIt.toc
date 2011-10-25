@@ -21,4 +21,3 @@ Locale\Locale.xml
 
 Core\Core.xml
 Modules\Modules.xml
-Filters\Filters.xml
