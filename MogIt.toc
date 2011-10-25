@@ -20,6 +20,4 @@ Libs\Embeds.xml
 Locale\Locale.xml
 
 Core\Core.xml
-Filters\Filters.xml
-Sorting\Sorting.xml
 Modules\Modules.xml
