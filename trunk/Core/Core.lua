@@ -94,7 +94,7 @@ function mog:SetModule(module,text)
 	end
 end
 
-function mog:BuildList(top, module)
+function mog:BuildList(top,module)
 	if (module and mog.active and mog.active.name ~= module) then return end;
 	mog.list = mog.active and mog.active:BuildList() or {};
 	mog:SortList(nil,true);
@@ -178,23 +178,10 @@ mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 		if owner and owner.MogItModel then
 			mog.OnEnter(owner);
 		end
-		--mog.GET_ITEM_INFO_RECEIVED();
 	elseif event == "ADDON_LOADED" then
 		if arg1 == MogIt then
 			local AceDB = LibStub("AceDB-3.0")
 			mog.db = AceDB:New("MogItDB", defaults, true)
-			-- db.RegisterCallback(self, "OnProfileChanged", "LoadSettings")
-			-- db.RegisterCallback(self, "OnProfileCopied", "LoadSettings")
-			-- db.RegisterCallback(self, "OnProfileReset", "LoadSettings")
-			
-			-- deal with old saved variables
-			if MogIt_Global then
-				MogIt_Global.wishlist = nil
-				for k, v in pairs (MogIt_Global) do
-					mog.db.profile[k] = v
-				end
-				-- MogIt_Global = nil
-			end
 			
 			if not mog.db.global.version then
 				DEFAULT_CHAT_FRAME:AddMessage(L["MogIt has loaded! Type \"/mog\" to open it."]);
