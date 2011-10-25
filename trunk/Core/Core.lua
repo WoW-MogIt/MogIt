@@ -196,9 +196,9 @@ mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 		if arg1 == MogIt then
 			local AceDB = LibStub("AceDB-3.0")
 			mog.db = AceDB:New("MogItDB", defaults, true)
-			db.RegisterCallback(mog, "OnProfileChanged", "LoadSettings")
-			db.RegisterCallback(mog, "OnProfileCopied", "LoadSettings")
-			db.RegisterCallback(mog, "OnProfileReset", "LoadSettings")
+			mog.db.RegisterCallback(mog, "OnProfileChanged", "LoadSettings")
+			mog.db.RegisterCallback(mog, "OnProfileCopied", "LoadSettings")
+			mog.db.RegisterCallback(mog, "OnProfileReset", "LoadSettings")
 
 			if not mog.db.global.version then
 				DEFAULT_CHAT_FRAME:AddMessage(L["MogIt has loaded! Type \"/mog\" to open it."]);
