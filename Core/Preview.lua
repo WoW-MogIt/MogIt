@@ -1,23 +1,6 @@
 local MogIt,mog = ...;
 local L = mog.L;
 
-local slots = {
-	"HeadSlot",
-	"ShoulderSlot",
-	"BackSlot",
-	"ChestSlot",
-	"ShirtSlot",
-	"TabardSlot",
-	"WristSlot",
-	"HandsSlot",
-	"WaistSlot",
-	"LegsSlot",
-	"FeetSlot",
-	"MainHandSlot",
-	"SecondaryHandSlot",
-	"RangedSlot",
-};
-
 mog.view = CreateFrame("Frame","MogItPreview",UIParent,"ButtonFrameTemplate");
 mog.view:SetPoint("CENTER",UIParent,"CENTER");
 mog.view:SetSize(335,385);
@@ -139,7 +122,7 @@ local function slot_OnClick(self,btn)
 end
 
 mog.view.slots = {};
-for k,v in ipairs(slots) do
+for k,v in ipairs(mogt.itemSlots) do
 	mog.view.slots[v] = CreateFrame("Button","MogItPreview"..v,mog.view,"ItemButtonTemplate");
 	mog.view.slots[v].slot = v;
 	if k == 1 then
@@ -149,7 +132,7 @@ for k,v in ipairs(slots) do
 		--mog.view.slots[v]:SetPoint("TOPRIGHT",mog.view,"TOPRIGHT",-7,-60);
 		mog.view.slots[v]:SetPoint("TOPRIGHT",mog.view.Inset,"TOPRIGHT",-7,-8);
 	else
-		mog.view.slots[v]:SetPoint("TOP",mog.view.slots[slots[k-1]],"BOTTOM",0,-4);
+		mog.view.slots[v]:SetPoint("TOP",mog.view.slots[mog.itemSlots[k-1]],"BOTTOM",0,-4);
 	end
 	
 	local id,texture = GetInventorySlotInfo(v);
@@ -269,7 +252,7 @@ local function hookInspectUI()
 			end
 		end
 	end
-	for k,v in ipairs(slots) do
+	for k,v in ipairs(mog.itemSlots) do
 		_G["Inspect"..v].slot = v;
 		_G["Inspect"..v]:RegisterForClicks("AnyUp");
 		_G["Inspect"..v]:HookScript("OnClick",inspect_OnClick);
