@@ -3,62 +3,6 @@ local L = mog.L
 
 local wishlist = mog:RegisterModule("Wishlist", {}, true)
 
--- "create set" popup
-StaticPopupDialogs["MOGIT_WISHLIST_CREATE_SET"] = {
-	text = L["Enter set name"],
-	button1 = ACCEPT,
-	button2 = CANCEL,
-	hasEditBox = true,
-	OnAccept = function(self)
-		local text = self.editBox:GetText()
-		wishlist:CreateSet(text)
-		if self.data then
-			wishlist:AddItem(self.data, text)
-		end
-		mog:BuildList()
-	end,
-	EditBoxOnEnterPressed = function(self)
-		local text = self:GetText()
-		wishlist:CreateSet(text)
-		if self:GetParent().data then
-			wishlist:AddItem(self:GetParent().data, text)
-		end
-		mog:BuildList()
-		self:GetParent():Hide()
-	end,
-	OnShow = function(self)
-		self.editBox:SetText("Set "..(#wishlist:GetSets() + 1))
-		self.editBox:SetFocus()
-	end,
-	whileDead = true,
-	timeout = 0,
-}
-
--- "rename set" popup
-StaticPopupDialogs["MOGIT_WISHLIST_RENAME_SET"] = {
-	text = L["Enter set name"],
-	button1 = ACCEPT,
-	button2 = CANCEL,
-	hasEditBox = true,
-	OnAccept = function(self)
-		local text = self.editBox:GetText()
-		self.data.name = text
-		mog:BuildList(nil, "Wishlist")
-	end,
-	EditBoxOnEnterPressed = function(self)
-		local text = self:GetText()
-		self:GetParent().data.name = text
-		mog:BuildList(nil, "Wishlist")
-		self:GetParent():Hide()
-	end,
-	OnShow = function(self)
-		self.editBox:SetText(self.data.name)
-		self.editBox:HighlightText()
-	end,
-	whileDead = true,
-	timeout = 0,
-}
-
 local function onProfileUpdated(self, event)
 	mog:BuildList(true, "Wishlist")
 end
@@ -77,25 +21,22 @@ function wishlist:MogItLoaded()
 	
 	-- convert old database
 	if MogIt_Wishlist then -- v1.1.4
-		local tbl = {};
-		for k,v in pairs(MogIt_Wishlist.display) do
-			table.insert(tbl,k);
+		local tbl = {}
+		for k, v in pairs(MogIt_Wishlist.display) do
+			tinsert(tbl, k)
 		end
-		table.sort(tbl,function(a,b)
-			return MogIt_Wishlist.time[a] < MogIt_Wishlist.time[b];
-		end);
-		for k,v in ipairs(tbl) do
-			-- item = type(MogIt_Wishlist.display[v]) == "table" and MogIt_Wishlist.display[v][1] or MogIt_Wishlist.display[v]
+		sort(tbl, function(a, b)
+			return MogIt_Wishlist.time[a] < MogIt_Wishlist.time[b]
+		end)
+		for k, v in ipairs(tbl) do
+			tinsert(self.db.profile.items, tonumber(type(MogIt_Wishlist.display[v]) == "table" and MogIt_Wishlist.display[v][1] or MogIt_Wishlist.display[v]))
 		end
-		MogIt_Wishlist = nil;
+		MogIt_Wishlist = nil
 	end
-	if MogIt_Global then -- v1.2b
-		
-		MogIt_Global = nil;
-	end
-	if MogIt_Character then -- v1.2b
-		db.profile.items = MogIt_Character.wishlist.items
-		db.profile.sets = MogIt_Character.wishlist.sets
+	
+	local function upgradeDB(dbTable)
+		db.profile.items = dbTable.wishlist.items
+		db.profile.sets = dbTable.wishlist.sets
 		for i, itemID in ipairs(db.profile.items) do
 			db.profile.items[i] = tonumber(itemID)
 		end
@@ -109,26 +50,20 @@ function wishlist:MogItLoaded()
 				end
 			end
 		end
-		MogIt_Character = nil;
 	end
 	
-	for key, profile in pairs(db.profiles) do
-		if profile.sets then
-			for i, set in ipairs(profile.sets) do
-				local first = next(set.items)
-				if not first or type(first) == "string" then
-					break
-				end
-				for slotID = 1, #mog.itemSlots do
-					local itemID = set.items[slotID]
-					local slotName = itemID and mog.itemSlots[slotID]
-					if slotName then
-						set.items[slotName] = itemID
-						set.items[slotID] = nil
-					end
-				end
-			end
-		end
+	-- convert old database
+	if MogIt_Global then -- v1.2b
+		local prevProfile = db:GetCurrentProfile()
+		db:SetProfile("Default")
+		upgradeDB(MogIt_Global)
+		db:SetProfile(prevProfile)
+		MogIt_Global = nil
+		print("MogIt: Database upgraded. Previous account wide wishlist was moved to 'Default' profile.")
+	end
+	if MogIt_Character then -- v1.2b
+		upgradeDB(MogIt_Character)
+		MogIt_Character = nil
 	end
 	
 	db.RegisterCallback(self, "OnProfileChanged", onProfileUpdated)
@@ -477,3 +412,66 @@ function wishlist:GetSet(name)
 		end
 	end
 end
+
+local function onAccept(self)
+	local text = self.editBox:GetText()
+	local create = wishlist:CreateSet(text)
+	if not create then
+		return
+	end
+	if self.data then
+		if type(self.data) == "table" then
+			for i, v in ipairs(self.data.items) do
+				wishlist:AddItem(v, text)
+			end
+		else
+			wishlist:AddItem(self.data, text)
+		end
+	end
+	mog:BuildList(nil, "Wishlist")
+end
+
+-- "create set" popup
+StaticPopupDialogs["MOGIT_WISHLIST_CREATE_SET"] = {
+	text = L["Enter set name"],
+	button1 = ACCEPT,
+	button2 = CANCEL,
+	hasEditBox = true,
+	OnAccept = onAccept,
+	EditBoxOnEnterPressed = function(self)
+		local parent = self:GetParent()
+		onAccept(parent)
+		parent:Hide()
+	end,
+	OnShow = function(self)
+		self.editBox:SetText("Set "..(#wishlist:GetSets() + 1))
+		self.editBox:SetFocus()
+	end,
+	whileDead = true,
+	timeout = 0,
+}
+
+-- "rename set" popup
+StaticPopupDialogs["MOGIT_WISHLIST_RENAME_SET"] = {
+	text = L["Enter set name"],
+	button1 = ACCEPT,
+	button2 = CANCEL,
+	hasEditBox = true,
+	OnAccept = function(self)
+		local text = self.editBox:GetText()
+		self.data.name = text
+		mog:BuildList(nil, "Wishlist")
+	end,
+	EditBoxOnEnterPressed = function(self)
+		local text = self:GetText()
+		self:GetParent().data.name = text
+		mog:BuildList(nil, "Wishlist")
+		self:GetParent():Hide()
+	end,
+	OnShow = function(self)
+		self.editBox:SetText(self.data.name)
+		self.editBox:HighlightText()
+	end,
+	whileDead = true,
+	timeout = 0,
+}

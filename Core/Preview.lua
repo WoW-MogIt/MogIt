@@ -49,6 +49,86 @@ mog.view.model:SetScript("OnMouseWheel",function(self,v)
 	mog.updateModels();
 end);
 
+local newSet = {items = {}}
+
+mog.view.save = CreateFrame("Button","MogItFramePreviewSave",mog.view,"UIPanelButtonTemplate2");
+mog.view.save:SetPoint("TOPLEFT",10,-30);
+mog.view.save:SetWidth(100);
+mog.view.save:SetText(L["Save"]);
+mog.view.save:SetScript("OnClick",function(self,btn)
+	ToggleDropDownMenu(nil, nil, self.menu, self, 0, 0)
+end);
+
+local function onClick(self)
+	-- wipe(newSet.items)
+	-- newSet.name = "Set "..(#mog:GetModule("Wishlist"):GetSets() + 1)
+	wipe(mog:GetModule("Wishlist"):GetSet(self.value).items)
+	for k, v in pairs(mog.view.slots) do
+		if v.item then
+			mog:GetModule("Wishlist"):AddItem(v.item, self.value)
+		end
+	end
+	-- StaticPopup_Show("MOGIT_WISHLIST_CREATE_SET", nil, nil, set)
+	mog:BuildList(nil, "Wishlist")
+end
+
+local function newSetOnClick(self)
+	wipe(newSet.items)
+	newSet.name = "Set "..(#mog:GetModule("Wishlist"):GetSets() + 1)
+	for k, v in pairs(mog.view.slots) do
+		tinsert(newSet.items, v.item)
+	end
+	StaticPopup_Show("MOGIT_WISHLIST_CREATE_SET", nil, nil, newSet)
+end
+
+local saveMenu = CreateFrame("Frame")
+saveMenu.displayMode = "MENU"
+saveMenu.initialize = function(self, level)
+	for i, set in ipairs(mog:GetModule("Wishlist"):GetSets()) do
+		local info = UIDropDownMenu_CreateInfo()
+		info.text = set.name
+		-- info.value = set
+		info.func = onClick
+		info.notCheckable = true
+		UIDropDownMenu_AddButton(info, level)
+	end
+	
+	local info = UIDropDownMenu_CreateInfo()
+	info.text = "New set"
+	info.func = newSetOnClick
+	info.notCheckable = true
+	UIDropDownMenu_AddButton(info, level)
+end
+mog.view.save.menu = saveMenu
+
+mog.view.load = CreateFrame("Button","MogItFramePreviewLoad",mog.view,"UIPanelButtonTemplate2");
+mog.view.load:SetPoint("LEFT",mog.view.save,"RIGHT",10,0);
+mog.view.load:SetWidth(100);
+mog.view.load:SetText(L["Load"]);
+mog.view.load:SetScript("OnClick",function(self,btn)
+	ToggleDropDownMenu(nil, nil, self.menu, self, 0, 0)
+end);
+
+local function onClick(self)
+	for slot, itemID in pairs(self.value.items) do
+		mog:AddToPreview(itemID)
+	end
+end
+
+local loadMenu = CreateFrame("Frame")
+loadMenu.displayMode = "MENU"
+loadMenu.initialize = function(self, level)
+	for i, set in ipairs(mog:GetModule("Wishlist"):GetSets()) do
+		local info = UIDropDownMenu_CreateInfo()
+		info.text = set.name
+		info.value = set
+		info.func = onClick
+		info.notCheckable = true
+		UIDropDownMenu_AddButton(info, level)
+	end
+end
+mog.view.load.menu = loadMenu
+
 mog.view.clear = CreateFrame("Button","MogItFramePreviewClear",mog.view,"UIPanelButtonTemplate2");
 mog.view.clear:SetPoint("TOPRIGHT",mog.view,"TOPRIGHT",-10,-30);
 mog.view.clear:SetWidth(100);
