@@ -248,9 +248,15 @@ function mog.scroll.update(self,value,offset,onscroll)
 	local id,frame,index;
 	for id,frame in ipairs(mog.models) do
 		index = ((value-1)*models)+id;
-		if mog.list[index] then
+		local listValue = mog.list[index]
+		if listValue then
 			frame.index = index;
-			wipe(frame.data);
+			-- wipe(frame.data);
+			frame.item = nil;
+			frame.items = nil;
+			frame.set = nil;
+			frame.name = nil;
+			frame.cycle = nil;
 			frame.label:Hide();
 			--frame.icon:Hide();
 			if frame:IsShown() then
@@ -333,7 +339,7 @@ function mog.addModel(view)
 		if not view then
 			f:Hide();
 			f.MogItModel = true;
-			f.data = {};
+			-- f.data = {};
 			f.model:SetUnit("PLAYER");
 			
 			f:RegisterForClicks("AnyUp");

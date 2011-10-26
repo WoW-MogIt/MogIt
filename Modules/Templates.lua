@@ -166,7 +166,7 @@ function mog.Set_OnClick(self, btn, data)
 		elseif IsControlKeyDown() then
 			mog:AddToPreview(data.items);
 		else
-			ToggleDropDownMenu(nil, nil, mog.Set_Menu, "cursor", 0, 0, self)
+			ToggleDropDownMenu(nil, nil, mog.Set_Menu, "cursor", 0, 0, data)
 		end
 	end
 end
@@ -175,8 +175,8 @@ mog.Item_Menu = CreateFrame("Frame",nil,mog.frame);
 mog.Item_Menu.displayMode = "MENU";
 do
 	local function onClick(self, arg1, arg2)
-		arg1.data.cycle = arg2;
-		arg1.data.item = arg1.data.items[arg2];
+		arg1.cycle = arg2;
+		arg1.item = arg1.items[arg2];
 	end
 	
 	local function setOnClick(self, set)
@@ -197,7 +197,7 @@ do
 		info.text = (texture and "\124T"..texture..":18\124t " or "")..(link or name or "");
 		info.value = itemID;
 		info.func = index and onClick;
-		info.checked = not index or self.data.cycle == index;
+		info.checked = not index or self.cycle == index;
 		info.hasArrow = true;
 		info.arg1 = self;
 		info.arg2 = index;
@@ -230,13 +230,13 @@ do
 	
 	function mog.Item_Menu:initialize(tier, self)
 		if tier == 1 then
-			local items = self.data.items;
+			local items = self.items;
 			if items then
 				for i, itemID in ipairs(items) do
 					menuAddItem(self, itemID, i);
 				end
 			else
-				menuAddItem(self, self.data.item);
+				menuAddItem(self, self.item);
 			end
 		elseif tier == 2 then
 			for i, info in ipairs(menu) do
@@ -276,7 +276,7 @@ do
 	--dropdown.point = "TOPLEFT"
 	--dropdown.relativePoint = "TOPRIGHT"
 	function mog.Set_Menu:initialize(level, menuList)
-		self.menu[types[type(menuList.data)]][level](menuList, level)
+		self.menu[types[type(menuList)]][level](menuList, level)
 	end
 
 	local itemMenu = {
@@ -373,7 +373,7 @@ do
 		set = {
 			[1] = function(menuList, level)
 				for i, slot in ipairs(mog.itemSlots) do
-					local itemID = menuList.data.items[slot] or menuList.data.items[i]
+					local itemID = menuList.items[slot] or menuList.items[i]
 					if itemID then
 						local itemName, _, itemQuality = GetItemInfo(itemID)
 						local info = UIDropDownMenu_CreateInfo()
@@ -391,7 +391,7 @@ do
 				for k, v in pairs(setMenu) do
 					if v.wishlist == nil or v.wishlist == (mog:GetActiveModule() == "Wishlist") then
 						v.value = menuList.index
-						v.arg1 = menuList.data
+						v.arg1 = menuList
 						-- v.menuList = menuList
 						UIDropDownMenu_AddButton(v, level)
 					end
@@ -401,7 +401,7 @@ do
 				for k, v in pairs(itemMenu) do
 					if v.wishlist == nil or v.wishlist == (mog:GetActiveModule() == "Wishlist") then
 						v.value = UIDROPDOWNMENU_MENU_VALUE
-						v.arg1 = menuList.data
+						v.arg1 = menuList
 						v.menuList = menuList
 						UIDropDownMenu_AddButton(v, level)
 					end
