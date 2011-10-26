@@ -166,7 +166,7 @@ function mog.Set_OnClick(self, btn, data)
 		elseif IsControlKeyDown() then
 			mog:AddToPreview(data.items);
 		else
-			ToggleDropDownMenu(nil, nil, mog.Set_Menu, "cursor", 0, 0, data)
+			ToggleDropDownMenu(nil, nil, mog.Set_Menu, "cursor", 0, 0, self)
 		end
 	end
 end
