@@ -34,6 +34,5 @@ end
 
 getLocale("LocaleList",{
 	"Core\\Core.xml",
-	"Filters\\Filters.xml",
 	"Modules\\Modules.xml",
 });
