@@ -256,7 +256,7 @@ function mog.scroll.update(self,value,offset,onscroll)
 		index = ((value-1)*models)+id;
 		if mog.list[index] then
 			wipe(frame.data);
-			frame.index = index;
+			frame.data.index = index;
 			frame.label:Hide();
 			--frame.icon:Hide();
 			if frame:IsShown() then
@@ -416,7 +416,7 @@ end
 
 function mog.FrameUpdate(frame)
 	if mog.active and mog.active.FrameUpdate then
-		mog.active:FrameUpdate(frame,mog.list[frame.index]);
+		mog.active:FrameUpdate(frame,mog.list[frame.data.index]);
 	end
 end
 
@@ -450,7 +450,7 @@ end
 
 function mog.OnClick(self,btn,...)
 	if mog.active and mog.active.OnClick then
-		mog.active:OnClick(self,btn,mog.list[self.index],...);
+		mog.active:OnClick(self,btn,mog.list[self.data.index],...);
 	end
 end
 
@@ -469,7 +469,7 @@ end
 
 function mog.OnEnter(self,...)
 	if mog.active and mog.active.OnEnter then
-		mog.active:OnEnter(self,mog.list[self.index],...);
+		mog.active:OnEnter(self,mog.list[self.data.index],...);
 	end
 end
 
