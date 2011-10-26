@@ -170,6 +170,17 @@ mog.frame.help:SetScript("OnEnter",function(self)
 	GameTooltip:AddDoubleLine(L["Zoom"],L["Left click + vertical drag"],0,1,0,1,1,1);
 	GameTooltip:AddDoubleLine(L["Move"],L["Right click + drag"],0,1,0,1,1,1);
 	GameTooltip:AddDoubleLine(L["Resize"],L["Click bottom right corner + drag"],0,1,0,1,1,1);
+	if mog.view:IsShown() then
+		GameTooltip:AddLine(" ");
+		GameTooltip:AddLine("Preview Controls");
+		--GameTooltip:AddDoubleLine(L["Change item"],L["Left click"],0,1,0,1,1,1);
+		GameTooltip:AddDoubleLine(L["Chat link"],L["Shift + Left click"],0,1,0,1,1,1);
+		GameTooltip:AddDoubleLine(L["Try on"],L["Ctrl + Left click"],0,1,0,1,1,1);
+		GameTooltip:AddDoubleLine(L["Wishlist menu"],L["Right click"],0,1,0,1,1,1);
+		GameTooltip:AddDoubleLine(L["Item URL"],L["Shift + Right click"],0,1,0,1,1,1);
+		GameTooltip:AddDoubleLine(L["Remove from preview"],L["Ctrl + Right click"],0,1,0,1,1,1);
+		GameTooltip:AddDoubleLine(L["Resize"],L["Click bottom right corner + drag"],0,1,0,1,1,1);
+	end
 	if mog.active and mog.active.Help then
 		GameTooltip:AddLine(" ");
 		GameTooltip:AddLine("Module Controls");
@@ -250,7 +261,7 @@ function mog.scroll.update(self,value,offset,onscroll)
 		index = ((value-1)*models)+id;
 		if mog.list[index] then
 			wipe(frame.data);
-			frame.data.index = index;
+			frame.index = index;
 			frame.label:Hide();
 			--frame.icon:Hide();
 			if frame:IsShown() then
@@ -410,7 +421,7 @@ end
 
 function mog.FrameUpdate(frame)
 	if mog.active and mog.active.FrameUpdate then
-		mog.active:FrameUpdate(frame,mog.list[frame.data.index]);
+		mog.active:FrameUpdate(frame,mog.list[frame.index]);
 	end
 end
 
@@ -445,7 +456,7 @@ end
 
 function mog.OnClick(self,btn,...)
 	if mog.active and mog.active.OnClick then
-		mog.active:OnClick(self,btn,mog.list[self.data.index],...);
+		mog.active:OnClick(self,btn,mog.list[self.index],...);
 	end
 end
 
@@ -464,7 +475,7 @@ end
 
 function mog.OnEnter(self,...)
 	if mog.active and mog.active.OnEnter then
-		mog.active:OnEnter(self,mog.list[self.data.index],...);
+		mog.active:OnEnter(self,mog.list[self.index],...);
 	end
 end
 

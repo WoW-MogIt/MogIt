@@ -107,7 +107,7 @@ function mog.sub.Help(module)
 	GameTooltip:AddDoubleLine(L["Change item"],L["Left click"],0,1,0,1,1,1);
 	GameTooltip:AddDoubleLine(L["Chat link"],L["Shift + Left click"],0,1,0,1,1,1);
 	GameTooltip:AddDoubleLine(L["Try on"],L["Ctrl + Left click"],0,1,0,1,1,1);
-	GameTooltip:AddDoubleLine(L["Add to wishlist"],L["Right click"],0,1,0,1,1,1);
+	GameTooltip:AddDoubleLine(L["Wishlist menu"],L["Right click"],0,1,0,1,1,1);
 	GameTooltip:AddDoubleLine(L["Item URL"],L["Shift + Right click"],0,1,0,1,1,1);
 	GameTooltip:AddDoubleLine(L["Add to preview"],L["Ctrl + Right click"],0,1,0,1,1,1);
 end
