@@ -104,7 +104,6 @@ function wishlist:Dropdown(level)
 	elseif level == 2 then
 		local info = UIDropDownMenu_CreateInfo()
 		info.text = "New set"
-		-- info.value = v
 		info.func = function(self)
 			StaticPopup_Show("MOGIT_WISHLIST_CREATE_SET")
 			CloseDropDownMenus()
@@ -198,8 +197,7 @@ function wishlist:OnEnter(frame, value)
 	-- GameTooltip:SetPoint("TOPLEFT", mog.frame, "TOPRIGHT", 5, 0)
 	
 	-- if self.data.type == "set" then
-	local type = type(value) == "table"
-	if type then
+	if type(value) == "table" then
 		GameTooltip:AddLine(value.name)
 		for i, slot in ipairs(mog.itemSlots) do
 			local itemID = value.items[slot]
@@ -246,62 +244,12 @@ function wishlist:OnEnter(frame, value)
 end
 
 function wishlist:OnClick(frame, button, value)
-	local type = type(value) == "table"
-	if type then
+	if type(value) == "table" then
 		mog.Set_OnClick(frame, button, frame.data)
 	else
 		mog.Item_OnClick(frame, button, frame.data)
 	end
-	--[[ local type = 
-	if button == "LeftButton" then
-		if IsShiftKeyDown() then
-			local link
-			if self.data.type == "set" then
-				link = mog:SetToLink(self.data.value.items)
-			else
-				link = select(2, GetItemInfo(self.data.value))
-			end
-			-- if link then
-				ChatEdit_InsertLink(link)
-			-- end
-		elseif IsControlKeyDown() then
-			local value = self.data.value
-			if type(value) == "table" then
-				DressUpModel:Undress()
-				for slot, itemID in pairs(value.items) do
-					local name, link, _, _, _, _, _, _, _, texture = GetItemInfo(itemID)
-					DressUpItemLink(itemID)
-				end
-			else
-				local name, link, _, _, _, _, _, _, _, texture = GetItemInfo(value)
-				DressUpItemLink(value)
-			end
-		else
-			if UIDropDownMenu_GetCurrentDropDown() == mog.sub.LeftClick and mog.sub.LeftClick.menuList ~= self and DropDownList1 and DropDownList1:IsShown() then
-				HideDropDownMenu(1)
-			end
-			if type(self.data.items) == "table" then
-				ToggleDropDownMenu(nil, nil, mog.sub.LeftClick, "cursor", 0, 0, self)
-			end
-		end
-	elseif button == "RightButton" then
-		if IsControlKeyDown() then
-			mog:AddToPreview(self.data.type == "set" and self.data.value.items or self.data.value)
-		elseif IsShiftKeyDown() then
-			mog:ShowURL(self.data.type == "set" and self.data.value.items or self.data.value, self.data.type == "set" and "compare")
-		else
-			ToggleDropDownMenu(nil, nil, dropdown, "cursor", 0, 0, self.data)
-		end
-	end]]
 end
-
---[==[
-function mog.sub.OnScroll(module)
-	if UIDropDownMenu_GetCurrentDropDown() == mog.sub.LeftClick and DropDownList1 and DropDownList1:IsShown() then
-		HideDropDownMenu(1);
-	end
-end
-]==]
 
 local list = {}
 
