@@ -36,6 +36,8 @@ function mog.createOptions()
 				end
 			elseif info.arg == "rows" or info.arg == "columns" then
 				mog.updateGUI();
+			elseif info.arg == "gridDress" then
+				mog.scroll:update();
 			end
 		end
 	end

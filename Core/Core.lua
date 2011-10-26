@@ -266,6 +266,7 @@ function mog.LoadSettings()
 	else
 		mog.tooltip.rotate:Hide();
 	end
+	mog.scroll:update();
 end
 
 mog.frame = CreateFrame("Frame","MogItFrame",UIParent,"ButtonFrameTemplate");
