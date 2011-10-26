@@ -1,9 +1,6 @@
 local MogIt,mog = ...;
 local L = mog.L;
 
---.AddModel -> .frames
---SetModel? to fix pets?
-
 mog.frame:SetPoint("CENTER",UIParent,"CENTER");
 mog.frame:SetSize(252,108);
 mog.frame:SetToplevel(true);
@@ -21,8 +18,6 @@ mog.frame.TitleText:SetText("MogIt");
 mog.frame.TitleText:SetPoint("RIGHT",mog.frame,"RIGHT",-28,0);
 mog.frame.portrait:SetTexture("Interface\\AddOns\\MogIt\\Images\\MogIt");
 mog.frame.portrait:SetTexCoord(0,106/128,0,105/128);
---mog.frame.Inset.Bg:SetTexture("Interface\\AddOns\\MogIt\\Images\\Background");
---mog.frame.Inset.Bg:SetTexCoord(0,0.666015625,0,0.666015625);
 MogItFrameBg:SetVertexColor(0.8,0.3,0.8);
 
 mog.frame.resize = CreateFrame("Frame",nil,mog.frame);
@@ -30,8 +25,8 @@ mog.frame.resize:SetSize(16,16);
 mog.frame.resize:SetPoint("BOTTOMRIGHT",mog.frame,"BOTTOMRIGHT",-4,3);
 mog.frame.resize:EnableMouse(true);
 function mog.frame.resize.update(self)
-	mog.db.profile.width = floor((mog.frame:GetWidth()+5-(4+10)-(10+18+4))/mog.db.profile.columns)-5; -- needs updating
-	mog.db.profile.height = floor((mog.frame:GetHeight()+5-(60+10)-(10+26))/mog.db.profile.rows)-5; -- needs updating
+	mog.db.profile.width = floor((mog.frame:GetWidth()+5-(4+10)-(10+18+4))/mog.db.profile.columns)-5;
+	mog.db.profile.height = floor((mog.frame:GetHeight()+5-(60+10)-(10+26))/mog.db.profile.rows)-5;
 	mog.updateGUI(true);
 end
 mog.frame.resize:SetScript("OnMouseDown",function(self)
@@ -173,7 +168,7 @@ mog.frame.help:SetScript("OnEnter",function(self)
 	if mog.view:IsShown() then
 		GameTooltip:AddLine(" ");
 		GameTooltip:AddLine("Preview Controls");
-		--GameTooltip:AddDoubleLine(L["Change item"],L["Left click"],0,1,0,1,1,1);
+		--GameTooltip:AddDoubleLine(,,0,1,0,1,1,1);
 		GameTooltip:AddDoubleLine(L["Chat link"],L["Shift + Left click"],0,1,0,1,1,1);
 		GameTooltip:AddDoubleLine(L["Try on"],L["Ctrl + Left click"],0,1,0,1,1,1);
 		GameTooltip:AddDoubleLine(L["Wishlist menu"],L["Right click"],0,1,0,1,1,1);
@@ -451,7 +446,6 @@ function mog.OnUpdate(self)
 	if mog.db.profile.noAnim then
 		self.model:SetSequence(254);
 	end
-	--autorotate?
 end
 
 function mog.OnClick(self,btn,...)

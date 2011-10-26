@@ -371,13 +371,13 @@ local function CachedMob(id)
 end--]]
 
 function mog.AddMob(id,name)
-	--if not (mobs[id] or CachedMob(id)) then
+	--if not (mog.mobs[id] or CachedMob(id)) then
 	if not mog.mobs[id] then
 		mog.mobs[id] = LBB[name] or name;
 	end
 end
 
 function mog.GetMob(id)
-	--return mobs[id] or CachedMob(id);
+	--return mog.mobs[id] or CachedMob(id);
 	return mog.mobs[id];
 end
