@@ -135,15 +135,14 @@ function wishlist:Dropdown(level)
 end
 
 function wishlist:FrameUpdate(frame, value, index)
-	local data = frame.data
-	local type = type(value) == "table"
-	if type then
-		data.name = value.name
-		data.items = value.items
-		mog.Set_FrameUpdate(frame, frame.data)
+	-- local data = frame.data
+	if type(value) == "table" then
+		-- data.name = value.name
+		-- data.items = value.items
+		mog.Set_FrameUpdate(frame, value)
 	else
-		data.item = value
-		mog.Item_FrameUpdate(frame, frame.data)
+		frame.item = value
+		mog.Item_FrameUpdate(frame, frame)
 	end
 end
 
@@ -198,8 +197,7 @@ function wishlist:OnEnter(frame, value)
 	-- GameTooltip:SetPoint("TOPLEFT", mog.frame, "TOPRIGHT", 5, 0)
 	
 	-- if self.data.type == "set" then
-	local type = type(value) == "table"
-	if type then
+	if type(value) == "table" then
 		GameTooltip:AddLine(value.name)
 		for i, slot in ipairs(mog.itemSlots) do
 			local itemID = value.items[slot]
@@ -246,11 +244,10 @@ function wishlist:OnEnter(frame, value)
 end
 
 function wishlist:OnClick(frame, button, value)
-	local type = type(value) == "table"
-	if type then
-		mog.Set_OnClick(frame, button, frame.data)
+	if type(value) == "table" then
+		mog.Set_OnClick(frame, button, value)
 	else
-		mog.Item_OnClick(frame, button, frame.data)
+		mog.Item_OnClick(frame, button, frame)
 	end
 	--[[ local type = 
 	if button == "LeftButton" then
