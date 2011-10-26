@@ -100,7 +100,7 @@ end
 mog.view.save.menu = saveMenu
 
 mog.view.load = CreateFrame("Button","MogItFramePreviewLoad",mog.view,"UIPanelButtonTemplate2");
-mog.view.load:SetPoint("LEFT",mog.view.save,"RIGHT",10,0);
+mog.view.load:SetPoint("LEFT",mog.view.save,"RIGHT",8,0);
 mog.view.load:SetWidth(100);
 mog.view.load:SetText(L["Load"]);
 mog.view.load:SetScript("OnClick",function(self,btn)
