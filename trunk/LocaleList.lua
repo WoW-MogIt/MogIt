@@ -37,6 +37,16 @@ L["Move"] = true
 L["Right click + drag"] = true
 L["Resize"] = true
 L["Click bottom right corner + drag"] = true
+L["Chat link"] = true
+L["Shift + Left click"] = true
+L["Try on"] = true
+L["Ctrl + Left click"] = true
+L["Wishlist menu"] = true
+L["Right click"] = true
+L["Item URL"] = true
+L["Shift + Right click"] = true
+L["Remove from preview"] = true
+L["Ctrl + Right click"] = true
 
 	--[[ Core\Preview.lua ]]--
 L["Save"] = true
@@ -120,21 +130,12 @@ L["Profession"] = true
 L["Slot"] = true
 
 	--[[ Modules\Wishlist.lua ]]--
+L["Change item"] = true
+L["Left click"] = true
+L["Add to preview"] = true
 L["Enter set name"] = true
 
 	--[[ Modules\Base.lua ]]--
 L["Click to load addon"] = true
-L["Change item"] = true
-L["Left click"] = true
-L["Chat link"] = true
-L["Shift + Left click"] = true
-L["Try on"] = true
-L["Ctrl + Left click"] = true
-L["Add to wishlist"] = true
-L["Right click"] = true
-L["Item URL"] = true
-L["Shift + Right click"] = true
-L["Add to preview"] = true
-L["Ctrl + Right click"] = true
 
 	--[[ Modules\Extra.lua ]]--
