@@ -1,0 +1,23 @@
+﻿## Interface: 40200
+## Title: MogIt
+## Author: Aelobin (The Maelstrom EU) & Lombra (Shattered Hand EU)
+## Version: 2.0
+## SavedVariables: MogItDB, MogItWishlist
+## Notes: Transmogrification Assistant
+## Notes-deDE: Transmogrifikation Assistentin
+## Notes-frFR: Transmogrification Assistante
+## Notes-esES: Transfigurar Ayudante
+## Notes-ruRU: трансмогрификация помощником
+## Notes-koKR: 형상변환 조교
+## Notes-zhTW: 塑形 助理
+## Notes-zhCN: 物品幻化系统 助理
+## X-Category: Roleplay & Transmogrification
+## X-Website: http://www.curse.com/addons/wow/mogit
+## X-Email: aelobin@gmail.com
+## X-Localizations: enUS, frFR, deDE, esES, zhCN, zhTW
+
+Libs\Embeds.xml
+Locale\Locale.xml
+
+Core\Core.xml
+Modules\Modules.xml
