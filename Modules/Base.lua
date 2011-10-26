@@ -55,21 +55,21 @@ end
 
 function mog.sub.FrameUpdate(module,self,value)
 	if type(display[value]) == "table" then
-		self.items = display[value];
-		self.cycle = 1;
-		self.item = self.items[self.cycle];
+		self.data.items = display[value];
+		self.data.cycle = 1;
+		self.data.item = self.data.items[self.data.cycle];
 	else
-		self.item = display[value];
+		self.data.item = display[value];
 	end
-	mog.Item_FrameUpdate(self,self);
+	mog.Item_FrameUpdate(self,self.data);
 end
 
 function mog.sub.OnEnter(module,self,value)
-	mog.Item_OnEnter(self,self);
+	mog.Item_OnEnter(self,self.data);
 end
 
 function mog.sub.OnClick(module,self,btn,value)
-	mog.Item_OnClick(self,btn,self);
+	mog.Item_OnClick(self,btn,self.data);
 end
 
 function mog.sub.Unlist(module)

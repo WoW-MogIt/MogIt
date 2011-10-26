@@ -248,15 +248,9 @@ function mog.scroll.update(self,value,offset,onscroll)
 	local id,frame,index;
 	for id,frame in ipairs(mog.models) do
 		index = ((value-1)*models)+id;
-		local listValue = mog.list[index]
-		if listValue then
-			frame.index = index;
-			-- wipe(frame.data);
-			frame.item = nil;
-			frame.items = nil;
-			frame.set = nil;
-			frame.name = nil;
-			frame.cycle = nil;
+		if mog.list[index] then
+			wipe(frame.data);
+			frame.data.index = index;
 			frame.label:Hide();
 			--frame.icon:Hide();
 			if frame:IsShown() then
@@ -339,7 +333,7 @@ function mog.addModel(view)
 		if not view then
 			f:Hide();
 			f.MogItModel = true;
-			-- f.data = {};
+			f.data = {};
 			f.model:SetUnit("PLAYER");
 			
 			f:RegisterForClicks("AnyUp");
@@ -416,7 +410,7 @@ end
 
 function mog.FrameUpdate(frame)
 	if mog.active and mog.active.FrameUpdate then
-		mog.active:FrameUpdate(frame,mog.list[frame.index]);
+		mog.active:FrameUpdate(frame,mog.list[frame.data.index]);
 	end
 end
 
@@ -451,7 +445,7 @@ end
 
 function mog.OnClick(self,btn,...)
 	if mog.active and mog.active.OnClick then
-		mog.active:OnClick(self,btn,mog.list[self.index],...);
+		mog.active:OnClick(self,btn,mog.list[self.data.index],...);
 	end
 end
 
@@ -470,7 +464,7 @@ end
 
 function mog.OnEnter(self,...)
 	if mog.active and mog.active.OnEnter then
-		mog.active:OnEnter(self,mog.list[self.index],...);
+		mog.active:OnEnter(self,mog.list[self.data.index],...);
 	end
 end
 
