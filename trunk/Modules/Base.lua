@@ -233,8 +233,3 @@ for k,v in ipairs(addons) do
 		},true);
 	end
 end
-
--- addon loader (and edit data.lua)
--- buildlist/setlist
--- filters/sort?
--- click etc

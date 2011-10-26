@@ -20,8 +20,6 @@ mog.view.portraitFrame:Hide();
 mog.view.topLeftCorner:Show();
 mog.view.topBorderBar:SetPoint("TOPLEFT",mog.view.topLeftCorner,"TOPRIGHT",0,0);
 mog.view.leftBorderBar:SetPoint("TOPLEFT",mog.view.topLeftCorner,"BOTTOMLEFT",0,0);
---mog.view.Inset:SetPoint("TOPLEFT",mog.view,"TOPLEFT",44,-60);
---mog.view.Inset:SetPoint("BOTTOMRIGHT",mog.view,"BOTTOMRIGHT",-47,26);
 
 mog.view.resize = CreateFrame("Frame",nil,mog.view);
 mog.view.resize:SetSize(16,16);
@@ -183,6 +181,7 @@ local function slot_OnEnter(self)
 		GameTooltip:SetOwner(self,"ANCHOR_RIGHT");
 		GameTooltip:SetText(_G[strupper(self.slot)]);
 	end
+	--GameTooltip:SetItemByID(self.item);
 end
 
 local function slot_OnLeave(self)
@@ -206,10 +205,8 @@ for k,v in ipairs(mog.itemSlots) do
 	mog.view.slots[v] = CreateFrame("Button","MogItPreview"..v,mog.view,"ItemButtonTemplate");
 	mog.view.slots[v].slot = v;
 	if k == 1 then
-		--mog.view.slots[v]:SetPoint("TOPLEFT",mog.view,"TOPLEFT",5,-60);
 		mog.view.slots[v]:SetPoint("TOPLEFT",mog.view.Inset,"TOPLEFT",8,-8);
 	elseif k == 8 then
-		--mog.view.slots[v]:SetPoint("TOPRIGHT",mog.view,"TOPRIGHT",-7,-60);
 		mog.view.slots[v]:SetPoint("TOPRIGHT",mog.view.Inset,"TOPRIGHT",-7,-8);
 	else
 		mog.view.slots[v]:SetPoint("TOP",mog.view.slots[mog.itemSlots[k-1]],"BOTTOM",0,-4);
@@ -222,18 +219,6 @@ for k,v in ipairs(mog.itemSlots) do
 	mog.view.slots[v]:SetScript("OnClick",slot_OnClick);
 	mog.view.slots[v]:SetScript("OnEnter",slot_OnEnter);
 	mog.view.slots[v]:SetScript("OnLeave",slot_OnLeave);
-	--[=[mog.view.slots[k]:SetScript("OnEnter",function(self)
-		if self.item then
-			--GameTooltip:SetItemByID(self.item);
-			mog.itemTooltip(self);
-		else
-			GameTooltip:SetOwner(self,"ANCHOR_RIGHT");
-			GameTooltip:SetText(_G[strupper(mog.itemSlots[self.slot])]);
-		end
-	end);
-	mog.view.slots[k]:SetScript("OnLeave",function(self)
-		GameTooltip:Hide();
-	end);--]=]
 end
 
 mog.view.wait = {};
@@ -299,11 +284,8 @@ end
 function mog.view.delItem(slot)
 	mog.view.slots[slot].item = nil;
 	mog.view.setTexture(slot);
-	mog.view.model.model:Undress(); -- <--
+	mog.view.model.model:Undress(); -- needs cleanup
 	mog:DressModel(mog.view.model.model);
-	--[=[if GameTooltip:GetOwner() == mog.view.slots[slot] then
-		GameTooltip:Hide();
-	end--]=]
 end
 
 function mog:DressModel(model)
