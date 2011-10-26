@@ -4,7 +4,6 @@
 
 <Script file="Locale.lua"/>
 
-<Script file="enUS.lua"/>
 <Script file="frFR.lua"/>
 <Script file="deDE.lua"/>
 <Script file="esES.lua"/>
