@@ -1,6 +1,47 @@
 local MogIt,mog = ...;
 local L = mog.L;
 
+local function itemIcon(itemID, textHeight)
+	return format("|T%s:%d|t ", GetItemIcon(itemID), textHeight or 0)
+end
+
+local data = mog.items
+
+local function getSourceInfo(itemID)
+	local data = data or mog.items
+	local source = data.source[itemID]
+	local sourceID = data.sourceid[itemID]
+	local sourceInfo = data.sourceinfo[itemID]
+	local info = mog.sub.source[source]
+	local extraInfo
+	if source == 1 and sourceID then -- Drop
+		extraInfo = mog.GetMob(sourceID)
+	-- elseif source == 3 then -- Quest
+	elseif source == 5 and sourceInfo then -- Crafted
+		extraInfo = mog.sub.professions[sourceInfo]
+	elseif source == 6 and sourceID then -- Achievement
+		local _, name, _, complete = GetAchievementInfo(sourceID)
+		extraInfo = name
+	end
+	local zone = data.zone[itemID]
+	if zone then
+		zone = GetMapNameByID(zone)
+		if zone then
+			if source == 1 and extraInfo then
+				local diff = mog.sub.diffs[sourceInfo]
+				if diff then
+					zone = format("%s (%s)", zone, diff)
+				end
+				info = extraInfo
+				extraInfo = zone
+			else
+				extraInfo = zone
+			end
+		end
+	end
+	return extraInfo and format("%s (%s)", info, extraInfo) or info
+end
+
 function mog.Item_FrameUpdate(self, data)
 	if not (self and data and data.item) then return end;
 	self.model:Undress();
@@ -14,10 +55,10 @@ function mog.Item_OnEnter(self,data)
 		
 	GameTooltip:SetOwner(self,"ANCHOR_RIGHT");
 	
-	local name,link,_,_,_,_,_,_,_,texture = GetItemInfo(item);
+	local name,link = GetItemInfo(item);
 	--GameTooltip:AddLine(self.display,1,1,1);
 	--GameTooltip:AddLine(" ");
-	GameTooltip:AddDoubleLine((texture and "\124T"..texture..":16\124t " or "")..(link or name or ""),data.items and (#data.items > 1) and L["Item %d/%d"]:format(data.cycle,#data.items),nil,nil,nil,1,0,0);
+	GameTooltip:AddDoubleLine(itemIcon(item)..(link or name or ""),data.items and (#data.items > 1) and L["Item %d/%d"]:format(data.cycle,#data.items),nil,nil,nil,1,0,0);
 	if mog.items.source[item] then
 		GameTooltip:AddDoubleLine(L["Source"]..":",mog.sub.source[mog.items.source[item]],nil,nil,nil,1,1,1);
 		if mog.items.source[item] == 1 then -- Drop
@@ -142,9 +183,12 @@ function mog.Set_OnEnter(self, data)
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 	
 	GameTooltip:AddLine(data.name);
-	for k, v in pairs(data.items) do
-		local name,link,_,_,_,_,_,_,_,texture = GetItemInfo(v);
-		GameTooltip:AddLine((texture and "\124T"..texture..":16\124t " or "")..(link or name or ""));
+	for i, slot in ipairs(mog.itemSlots) do
+		local itemID = data.items[slot] or data.items[i]
+		if itemID then
+			local name,link = GetItemInfo(itemID);
+			GameTooltip:AddDoubleLine(itemIcon(itemID)..(link or name or ""), getSourceInfo(itemID));
+		end
 	end
 	
 	GameTooltip:Show();
@@ -195,9 +239,9 @@ do
 	end
 	
 	local function menuAddItem(data, itemID, index)
-		local name,link,_,_,_,_,_,_,_,texture = GetItemInfo(itemID);
+		local name,link = GetItemInfo(itemID);
 		local info = UIDropDownMenu_CreateInfo();
-		info.text = (texture and "\124T"..texture..":16\124t " or "")..(link or name or "");
+		info.text = itemIcon(itemID, 16)..(link or name or "");
 		info.value = itemID;
 		info.func = index and onClick;
 		info.checked = not index or data.cycle == index;
@@ -343,9 +387,9 @@ do
 			for i, slot in ipairs(mog.itemSlots) do
 				local itemID = menuList.items[slot] or menuList.items[i]
 				if itemID then
-					local itemName,itemLink,_,_,_,_,_,_,_,itemTexture = GetItemInfo(itemID);
+					local itemName,itemLink = GetItemInfo(itemID);
 					local info = UIDropDownMenu_CreateInfo()
-					info.text = (itemTexture and "\124T"..itemTexture..":16\124t " or "")..(itemLink or itemName or "")
+					info.text = itemIcon(itemID, 16)..(itemLink or itemName or "")
 					info.value = itemID
 					-- info.icon = GetItemIcon(itemID)
 					info.hasArrow = true
