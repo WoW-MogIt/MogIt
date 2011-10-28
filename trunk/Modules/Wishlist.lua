@@ -82,8 +82,7 @@ local level3 = {
 	{
 		text = "Delete set",
 		func = function(self)
-			tremove(wishlist.db.profile.sets, self.value)
-			mog:BuildList(nil, "Wishlist")
+			wishlist:DeleteSet(self.value)
 			CloseDropDownMenus()
 		end,
 	},
@@ -108,6 +107,7 @@ function wishlist:Dropdown(level)
 			StaticPopup_Show("MOGIT_WISHLIST_CREATE_SET")
 			CloseDropDownMenus()
 		end
+		info.colorCode = GREEN_FONT_COLOR_CODE
 		info.notCheckable = true
 		UIDropDownMenu_AddButton(info, level)
 		
@@ -135,8 +135,7 @@ end
 
 function wishlist:FrameUpdate(frame, value, index)
 	local data = frame.data
-	local type = type(value) == "table"
-	if type then
+	if type(value) == "table" then
 		data.name = value.name
 		data.items = value.items
 		mog.Set_FrameUpdate(frame, frame.data)
@@ -155,28 +154,23 @@ local function getSourceInfo(itemID)
 	local sourceInfo = data.sourceinfo[itemID]
 	local info = mog.sub.source[source]
 	local extraInfo
-	if source == 1 then -- Drop
-		if sourceID then
-			extraInfo = mog.GetMob(sourceID)
-		end
+	if source == 1 and sourceID then -- Drop
+		extraInfo = mog.GetMob(sourceID)
 	-- elseif source == 3 then -- Quest
-	elseif source == 5 then -- Crafted
-		if sourceInfo then
-			extraInfo = mog.sub.professions[sourceInfo]
-		end
-	elseif source == 6 then -- Achievement
-		if sourceID then
-			local _, name, _, complete = GetAchievementInfo(sourceID)
-			extraInfo = name
-		end
+	elseif source == 5 and sourceInfo then -- Crafted
+		extraInfo = mog.sub.professions[sourceInfo]
+	elseif source == 6 and sourceID then -- Achievement
+		local _, name, _, complete = GetAchievementInfo(sourceID)
+		extraInfo = name
 	end
-	local zone
-	if data.zone[itemID] then
-		zone = GetMapNameByID(data.zone[itemID])
+	local zone = data.zone[itemID]
+	if zone then
+		zone = GetMapNameByID(zone)
 		if zone then
 			if source == 1 and extraInfo then
-				if mog.sub.diffs[sourceInfo] then
-					zone = zone.." ("..mog.sub.diffs[sourceInfo]..")"
+				local diff = mog.sub.diffs[sourceInfo]
+				if diff then
+					zone = format("%s (%s)", zone, diff)
 				end
 				info = extraInfo
 				extraInfo = zone
@@ -196,7 +190,6 @@ function wishlist:OnEnter(frame, value)
 	-- GameTooltip:ClearAllPoints()
 	-- GameTooltip:SetPoint("TOPLEFT", mog.frame, "TOPRIGHT", 5, 0)
 	
-	-- if self.data.type == "set" then
 	if type(value) == "table" then
 		GameTooltip:AddLine(value.name)
 		for i, slot in ipairs(mog.itemSlots) do
@@ -265,31 +258,35 @@ function wishlist:BuildList()
 	return list
 end
 
-function wishlist:Unlist()
-	wipe(list);
-end
+local help = {
+	-- L["Change item"],
+	-- L["Left click"],
+	L["Chat link"],
+	L["Shift + Left click"],
+	L["Try on"],
+	L["Ctrl + Left click"],
+	L["Wishlist menu"],
+	L["Right click"],
+	L["Item URL"],
+	L["Shift + Right click"],
+	L["Add to preview"],
+	L["Ctrl + Right click"],
+}
 
 function wishlist:Help()
-	--GameTooltip:AddDoubleLine(L["Change item"],L["Left click"],0,1,0,1,1,1);
-	GameTooltip:AddDoubleLine(L["Chat link"],L["Shift + Left click"],0,1,0,1,1,1);
-	GameTooltip:AddDoubleLine(L["Try on"],L["Ctrl + Left click"],0,1,0,1,1,1);
-	GameTooltip:AddDoubleLine(L["Wishlist menu"],L["Right click"],0,1,0,1,1,1);
-	GameTooltip:AddDoubleLine(L["Item URL"],L["Shift + Right click"],0,1,0,1,1,1);
-	GameTooltip:AddDoubleLine(L["Add to preview"],L["Ctrl + Right click"],0,1,0,1,1,1);
+	for i = 1, #help, 2 do
+		GameTooltip:AddDoubleLine(help[i], help[i + 1], 0, 1, 0, 1, 1, 1)
+	end
 end
 	
 function wishlist:AddItem(itemID, setName)
 	if not setName and self:IsItemInWishlist(itemID) then
 		return false
 	end
-	if setName then
-		for i, set in ipairs(self.db.profile.sets) do
-			if set.name == setName then
-				local slot = mog.invSlots[select(9, GetItemInfo(itemID))]
-				set.items[slot] = itemID
-				break
-			end
-		end
+	local set = self:GetSet(setName)
+	if set then
+		local slot = mog.invSlots[select(9, GetItemInfo(itemID))]
+		set.items[slot] = itemID
 	else
 		tinsert(self.db.profile.items, itemID)
 	end
@@ -333,6 +330,15 @@ end
 
 function wishlist:RenameSet(set)
 	StaticPopup_Show("MOGIT_WISHLIST_RENAME_SET", nil, nil, self:GetSet(set))
+end
+
+function wishlist:DeleteSet(setIndex, noConfirm)
+	if noConfirm then
+		tremove(wishlist:GetSets(), setIndex)
+		mog:BuildList(nil, "Wishlist")
+	else
+		StaticPopup_Show("MOGIT_WISHLIST_DELETE_SET", self.db.profile.sets[setIndex].name, nil, setIndex)
+	end
 end
 
 function wishlist:IsItemInWishlist(itemID)
@@ -383,7 +389,6 @@ local function onAccept(self)
 	mog:BuildList(nil, "Wishlist")
 end
 
--- "create set" popup
 StaticPopupDialogs["MOGIT_WISHLIST_CREATE_SET"] = {
 	text = L["Enter set name"],
 	button1 = ACCEPT,
@@ -403,7 +408,6 @@ StaticPopupDialogs["MOGIT_WISHLIST_CREATE_SET"] = {
 	timeout = 0,
 }
 
--- "rename set" popup
 StaticPopupDialogs["MOGIT_WISHLIST_RENAME_SET"] = {
 	text = L["Enter set name"],
 	button1 = ACCEPT,
@@ -411,6 +415,11 @@ StaticPopupDialogs["MOGIT_WISHLIST_RENAME_SET"] = {
 	hasEditBox = true,
 	OnAccept = function(self)
 		local text = self.editBox:GetText()
+		local set = self:GetSet(setName)
+		if set then
+			print("MogIt: A set with this name already exists.")
+			return
+		end
 		self.data.name = text
 		mog:BuildList(nil, "Wishlist")
 	end,
@@ -423,6 +432,33 @@ StaticPopupDialogs["MOGIT_WISHLIST_RENAME_SET"] = {
 	OnShow = function(self)
 		self.editBox:SetText(self.data.name)
 		self.editBox:HighlightText()
+	end,
+	whileDead = true,
+	timeout = 0,
+}
+
+StaticPopupDialogs["MOGIT_WISHLIST_DELETE_SET"] = {
+	text = L["Delete set '%s'?"],
+	button1 = OKAY,
+	button2 = CANCEL,
+	OnAccept = function(self)
+		wishlist:DeleteSet(self.data, true)
+	end,
+	whileDead = true,
+	timeout = 0,
+}
+
+StaticPopupDialogs["MOGIT_WISHLIST_OVERWRITE_SET"] = {
+	text = L["Overwrite set '%s'?"],
+	button1 = OKAY,
+	button2 = CANCEL,
+	OnAccept = function(self)
+		-- first clear all items since every slot might not be used
+		wipe(wishlist:GetSet(self.data.name).items)
+		for i, v in ipairs(self.data.items) do
+			wishlist:AddItem(v, self.data.name)
+		end
+		mog:BuildList(nil, "Wishlist")
 	end,
 	whileDead = true,
 	timeout = 0,

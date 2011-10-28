@@ -58,16 +58,12 @@ mog.view.save:SetScript("OnClick",function(self,btn)
 end);
 
 local function onClick(self)
-	-- wipe(newSet.items)
-	-- newSet.name = "Set "..(#mog:GetModule("Wishlist"):GetSets() + 1)
-	wipe(mog:GetModule("Wishlist"):GetSet(self.value).items)
+	newSet.name = self.value
+	wipe(newSet.items)
 	for k, v in pairs(mog.view.slots) do
-		if v.item then
-			mog:GetModule("Wishlist"):AddItem(v.item, self.value)
-		end
+		tinsert(newSet.items, v.item)
 	end
-	-- StaticPopup_Show("MOGIT_WISHLIST_CREATE_SET", nil, nil, set)
-	mog:BuildList(nil, "Wishlist")
+	StaticPopup_Show("MOGIT_WISHLIST_OVERWRITE_SET", self.value, nil, newSet)
 end
 
 local function newSetOnClick(self)
@@ -94,6 +90,7 @@ saveMenu.initialize = function(self, level)
 	local info = UIDropDownMenu_CreateInfo()
 	info.text = "New set"
 	info.func = newSetOnClick
+	info.colorCode = GREEN_FONT_COLOR_CODE
 	info.notCheckable = true
 	UIDropDownMenu_AddButton(info, level)
 end
@@ -108,6 +105,9 @@ mog.view.load:SetScript("OnClick",function(self,btn)
 end);
 
 local function onClick(self)
+	for k, v in pairs(mog.view.slots) do
+		mog.view.delItem(k)
+	end
 	for slot, itemID in pairs(self.value.items) do
 		mog:AddToPreview(itemID)
 	end
@@ -220,6 +220,16 @@ for k,v in ipairs(mog.itemSlots) do
 	mog.view.slots[v]:SetScript("OnEnter",slot_OnEnter);
 	mog.view.slots[v]:SetScript("OnLeave",slot_OnLeave);
 end
+
+--[[
+
+one handed weapons first go into main hand slot, then alternate between off and main hand, does not have to be same item
+
+equipping any non one handed weapon will cause the next one handed weapon to go into main hand
+
+equipping a right handed ranged weapon (gun, crossbow, thrown) will cause the next two one hand weapons to go into main hand (above rule still applies)
+
+]]
 
 mog.view.wait = {};
 function mog.view.addItem(item)
