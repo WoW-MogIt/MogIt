@@ -415,7 +415,7 @@ StaticPopupDialogs["MOGIT_WISHLIST_RENAME_SET"] = {
 	hasEditBox = true,
 	OnAccept = function(self)
 		local text = self.editBox:GetText()
-		local set = self:GetSet(setName)
+		local set = self:GetSet(text)
 		if set then
 			print("MogIt: A set with this name already exists.")
 			return
