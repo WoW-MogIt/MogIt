@@ -134,6 +134,9 @@ L["Change item"] = true
 L["Left click"] = true
 L["Add to preview"] = true
 L["Enter set name"] = true
+L["Enter new set name"] = true
+L["Delete set '%s'?"] = true
+L["Overwrite set '%s'?"] = true
 
 	--[[ Modules\Base.lua ]]--
 L["Click to load addon"] = true
