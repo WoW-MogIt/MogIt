@@ -71,7 +71,16 @@ function wishlist:MogItLoaded()
 	db.RegisterCallback(self, "OnProfileReset", onProfileUpdated)
 end
 
-local level3 = {
+local function setModule(self)
+	mog:SetModule(wishlist, L["Wishlist"])
+end
+
+local function newSetOnClick(self)
+	StaticPopup_Show("MOGIT_WISHLIST_CREATE_SET")
+	CloseDropDownMenus()
+end
+
+local setMenu = {
 	{
 		text = "Rename set",
 		func = function(self)
@@ -96,21 +105,9 @@ function wishlist:Dropdown(level)
 		info.colorCode = "|cffffff00"
 		info.hasArrow = true
 		info.notCheckable = true
-		info.func = function(self)
-			mog:SetModule(wishlist, L["Wishlist"])
-		end
+		info.func = setModule
 		UIDropDownMenu_AddButton(info, level)
 	elseif level == 2 then
-		local info = UIDropDownMenu_CreateInfo()
-		info.text = "New set"
-		info.func = function(self)
-			StaticPopup_Show("MOGIT_WISHLIST_CREATE_SET")
-			CloseDropDownMenus()
-		end
-		info.colorCode = GREEN_FONT_COLOR_CODE
-		info.notCheckable = true
-		UIDropDownMenu_AddButton(info, level)
-		
 		for i, set in ipairs(wishlist.db.profile.sets) do
 			local info = UIDropDownMenu_CreateInfo()
 			info.text = set.name
@@ -124,8 +121,15 @@ function wishlist:Dropdown(level)
 			info.notCheckable = true
 			UIDropDownMenu_AddButton(info, level)
 		end
+		
+		local info = UIDropDownMenu_CreateInfo()
+		info.text = "New set"
+		info.func = newSetOnClick
+		info.colorCode = GREEN_FONT_COLOR_CODE
+		info.notCheckable = true
+		UIDropDownMenu_AddButton(info, level)
 	elseif level == 3 then
-		for i, v in ipairs(level3) do
+		for i, v in ipairs(setMenu) do
 			v.value = UIDROPDOWNMENU_MENU_VALUE
 			v.notCheckable = true
 			UIDropDownMenu_AddButton(v, level)
@@ -192,16 +196,6 @@ function wishlist:OnEnter(frame, value)
 	
 	if type(value) == "table" then
 		mog.Set_OnEnter(frame, value)
-		--[[
-		GameTooltip:AddLine(value.name)
-		for i, slot in ipairs(mog.itemSlots) do
-			local itemID = value.items[slot]
-			if itemID then
-				local name, link, _, _, _, _, _, _, _, texture = GetItemInfo(itemID)
-				GameTooltip:AddDoubleLine("|T"..texture..":0|t"..link, getSourceInfo(itemID))
-				-- GameTooltip:AddTexture(GetItemIcon(itemID))
-			end
-		end]]
 	else
 		local name, link, _, _, _, _, _, _, _, texture = GetItemInfo(value)
 		GameTooltip:AddDoubleLine(link, getSourceInfo(value))
