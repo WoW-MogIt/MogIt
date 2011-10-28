@@ -191,15 +191,17 @@ function wishlist:OnEnter(frame, value)
 	-- GameTooltip:SetPoint("TOPLEFT", mog.frame, "TOPRIGHT", 5, 0)
 	
 	if type(value) == "table" then
+		mog.Set_OnEnter(frame, value)
+		--[[
 		GameTooltip:AddLine(value.name)
 		for i, slot in ipairs(mog.itemSlots) do
 			local itemID = value.items[slot]
 			if itemID then
 				local name, link, _, _, _, _, _, _, _, texture = GetItemInfo(itemID)
-				GameTooltip:AddDoubleLine(link, getSourceInfo(itemID))
-				GameTooltip:AddTexture(GetItemIcon(itemID))
+				GameTooltip:AddDoubleLine("|T"..texture..":0|t"..link, getSourceInfo(itemID))
+				-- GameTooltip:AddTexture(GetItemIcon(itemID))
 			end
-		end
+		end]]
 	else
 		local name, link, _, _, _, _, _, _, _, texture = GetItemInfo(value)
 		GameTooltip:AddDoubleLine(link, getSourceInfo(value))
