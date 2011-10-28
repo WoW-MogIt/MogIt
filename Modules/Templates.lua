@@ -17,7 +17,7 @@ function mog.Item_OnEnter(self,data)
 	local name,link,_,_,_,_,_,_,_,texture = GetItemInfo(item);
 	--GameTooltip:AddLine(self.display,1,1,1);
 	--GameTooltip:AddLine(" ");
-	GameTooltip:AddDoubleLine((texture and "\124T"..texture..":18\124t " or "")..(link or name or ""),data.items and (#data.items > 1) and L["Item %d/%d"]:format(data.cycle,#data.items),nil,nil,nil,1,0,0);
+	GameTooltip:AddDoubleLine((texture and "\124T"..texture..":16\124t " or "")..(link or name or ""),data.items and (#data.items > 1) and L["Item %d/%d"]:format(data.cycle,#data.items),nil,nil,nil,1,0,0);
 	if mog.items.source[item] then
 		GameTooltip:AddDoubleLine(L["Source"]..":",mog.sub.source[mog.items.source[item]],nil,nil,nil,1,1,1);
 		if mog.items.source[item] == 1 then -- Drop
@@ -102,7 +102,7 @@ function mog.Item_OnClick(self,btn,data)
 		elseif IsShiftKeyDown() then
 			mog:ShowURL(item);
 		else
-			if UIDropDownMenu_GetCurrentDropDown() == mog.Item_Menu and mog.Item_Menu.menuList ~= self and DropDownList1 and DropDownList1:IsShown() then
+			if UIDropDownMenu_GetCurrentDropDown() == mog.Item_Menu and mog.Item_Menu.menuList ~= self.data and DropDownList1 and DropDownList1:IsShown() then
 				HideDropDownMenu(1);
 			end
 			ToggleDropDownMenu(nil,nil,mog.Item_Menu,"cursor",0,0,data);
@@ -144,7 +144,7 @@ function mog.Set_OnEnter(self, data)
 	GameTooltip:AddLine(data.name);
 	for k, v in pairs(data.items) do
 		local name,link,_,_,_,_,_,_,_,texture = GetItemInfo(v);
-		GameTooltip:AddLine((texture and "\124T"..texture..":18\124t " or "")..(link or name or ""));
+		GameTooltip:AddLine((texture and "\124T"..texture..":16\124t " or "")..(link or name or ""));
 	end
 	
 	GameTooltip:Show();
@@ -166,7 +166,10 @@ function mog.Set_OnClick(self, btn, data)
 		elseif IsControlKeyDown() then
 			mog:AddToPreview(data.items);
 		else
-			ToggleDropDownMenu(nil, nil, mog.Set_Menu, "cursor", 0, 0, data)
+			if UIDropDownMenu_GetCurrentDropDown() == mog.Set_Menu and mog.Set_Menu.menuList ~= self.data and DropDownList1 and DropDownList1:IsShown() then
+				HideDropDownMenu(1);
+			end
+			ToggleDropDownMenu(nil,nil,mog.Set_Menu,"cursor",0,0,data);
 		end
 	end
 end
@@ -194,7 +197,7 @@ do
 	local function menuAddItem(data, itemID, index)
 		local name,link,_,_,_,_,_,_,_,texture = GetItemInfo(itemID);
 		local info = UIDropDownMenu_CreateInfo();
-		info.text = (texture and "\124T"..texture..":18\124t " or "")..(link or name or "");
+		info.text = (texture and "\124T"..texture..":16\124t " or "")..(link or name or "");
 		info.value = itemID;
 		info.func = index and onClick;
 		info.checked = not index or data.cycle == index;
@@ -340,13 +343,13 @@ do
 			for i, slot in ipairs(mog.itemSlots) do
 				local itemID = menuList.items[slot] or menuList.items[i]
 				if itemID then
-					local itemName, _, itemQuality = GetItemInfo(itemID)
+					local itemName,itemLink,_,_,_,_,_,_,_,itemTexture = GetItemInfo(itemID);
 					local info = UIDropDownMenu_CreateInfo()
-					info.text = itemName
+					info.text = (itemTexture and "\124T"..itemTexture..":16\124t " or "")..(itemLink or itemName or "")
 					info.value = itemID
 					-- info.icon = GetItemIcon(itemID)
 					info.hasArrow = true
-					info.colorCode = "|c"..select(4, GetItemQualityColor(itemQuality))
+					--info.colorCode = "|c"..select(4, GetItemQualityColor(itemQuality))
 					info.notCheckable = true
 					info.menuList = menuList
 					UIDropDownMenu_AddButton(info, level)

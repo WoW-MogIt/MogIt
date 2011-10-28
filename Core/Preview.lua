@@ -78,6 +78,13 @@ end
 local saveMenu = CreateFrame("Frame")
 saveMenu.displayMode = "MENU"
 saveMenu.initialize = function(self, level)
+	local info = UIDropDownMenu_CreateInfo()
+	info.text = "New set"
+	info.func = newSetOnClick
+	info.colorCode = GREEN_FONT_COLOR_CODE
+	info.notCheckable = true
+	UIDropDownMenu_AddButton(info, level)
+	
 	for i, set in ipairs(mog:GetModule("Wishlist"):GetSets()) do
 		local info = UIDropDownMenu_CreateInfo()
 		info.text = set.name
@@ -86,13 +93,6 @@ saveMenu.initialize = function(self, level)
 		info.notCheckable = true
 		UIDropDownMenu_AddButton(info, level)
 	end
-	
-	local info = UIDropDownMenu_CreateInfo()
-	info.text = "New set"
-	info.func = newSetOnClick
-	info.colorCode = GREEN_FONT_COLOR_CODE
-	info.notCheckable = true
-	UIDropDownMenu_AddButton(info, level)
 end
 mog.view.save.menu = saveMenu
 
