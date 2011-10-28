@@ -409,7 +409,7 @@ StaticPopupDialogs["MOGIT_WISHLIST_CREATE_SET"] = {
 }
 
 StaticPopupDialogs["MOGIT_WISHLIST_RENAME_SET"] = {
-	text = L["Enter set name"],
+	text = L["Enter new set name"],
 	button1 = ACCEPT,
 	button2 = CANCEL,
 	hasEditBox = true,
