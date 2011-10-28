@@ -371,6 +371,7 @@ local function onAccept(self)
 	local text = self.editBox:GetText()
 	local create = wishlist:CreateSet(text)
 	if not create then
+		print("MogIt: A set with this name already exists.")
 		return
 	end
 	if self.data then
