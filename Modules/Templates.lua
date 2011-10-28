@@ -162,7 +162,7 @@ function mog.Set_OnClick(self, btn, data)
 		end
 	elseif btn == "RightButton" then
 		if IsShiftKeyDown() then
-			mog:ShowURL(data.set, "set");
+			mog:ShowURL(data.set or data.items, data.set and "set" or "compare");
 		elseif IsControlKeyDown() then
 			mog:AddToPreview(data.items);
 		else
@@ -213,6 +213,7 @@ do
 			text = "Add to wishlist",
 			func = function(self)
 				mog:GetModule("Wishlist"):AddItem(self.value)
+				mog:BuildList(nil, "Wishlist")
 				CloseDropDownMenus()
 			end,
 		},
@@ -259,6 +260,7 @@ do
 			info.text = "New set";
 			info.value = UIDROPDOWNMENU_MENU_VALUE;
 			info.func = newSetOnClick;
+			info.colorCode = GREEN_FONT_COLOR_CODE;
 			info.notCheckable = true;
 			UIDropDownMenu_AddButton(info, tier);
 		end
@@ -289,7 +291,7 @@ do
 		},
 		{
 			wishlist = true,
-			text = "Delete from set",
+			text = "Remove from set",
 			func = function(self, set)
 				mog:GetModule("Wishlist"):DeleteItem(self.value, set.name)
 				mog:BuildList(nil, "Wishlist")
@@ -326,8 +328,7 @@ do
 			wishlist = true,
 			text = "Delete set",
 			func = function(self)
-				tremove(mog:GetModule("Wishlist"):GetSets(), self.value)
-				mog:BuildList(nil, "Wishlist")
+				mog:GetModule("Wishlist"):DeleteSet(self.value)
 			end,
 			notCheckable = true,
 		},
