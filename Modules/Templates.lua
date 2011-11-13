@@ -321,33 +321,6 @@ do
 		self.menu[level](menuList, level)
 	end
 
-	local itemMenu = {
-		{
-			text = "Add to set",
-			hasArrow = true,
-			notCheckable = true,
-		},
-		{
-			text = "Add to wishlist",
-			func = function(self)
-				mog:GetModule("Wishlist"):AddItem(self.value)
-				mog:BuildList(nil, "Wishlist")
-				CloseDropDownMenus()
-			end,
-			notCheckable = true,
-		},
-		{
-			wishlist = true,
-			text = "Remove from set",
-			func = function(self, set)
-				mog:GetModule("Wishlist"):DeleteItem(self.value, set.name)
-				mog:BuildList(nil, "Wishlist")
-				CloseDropDownMenus()
-			end,
-			notCheckable = true,
-		},
-	}
-
 	local setMenu = {
 		{
 			wishlist = false,
@@ -376,6 +349,33 @@ do
 			text = "Delete set",
 			func = function(self)
 				mog:GetModule("Wishlist"):DeleteSet(self.value)
+			end,
+			notCheckable = true,
+		},
+	}
+
+	local itemMenu = {
+		{
+			text = "Add to set",
+			hasArrow = true,
+			notCheckable = true,
+		},
+		{
+			text = "Add to wishlist",
+			func = function(self)
+				mog:GetModule("Wishlist"):AddItem(self.value)
+				mog:BuildList(nil, "Wishlist")
+				CloseDropDownMenus()
+			end,
+			notCheckable = true,
+		},
+		{
+			wishlist = true,
+			text = "Remove from set",
+			func = function(self, set)
+				mog:GetModule("Wishlist"):DeleteItem(self.value, set.name)
+				mog:BuildList(nil, "Wishlist")
+				CloseDropDownMenus()
 			end,
 			notCheckable = true,
 		},
