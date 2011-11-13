@@ -367,72 +367,77 @@ function wishlist:GetSet(name)
 	end
 end
 
-local function onAccept(self)
-	local text = self.editBox:GetText()
-	local create = wishlist:CreateSet(text)
-	if not create then
-		print("MogIt: A set with this name already exists.")
-		return
-	end
-	if self.data then
-		if type(self.data) == "table" then
-			for i, v in ipairs(self.data.items) do
-				wishlist:AddItem(v, text)
-			end
-		else
-			wishlist:AddItem(self.data, text)
+do
+	local function onAccept(self)
+		local text = self.editBox:GetText()
+		local create = wishlist:CreateSet(text)
+		if not create then
+			print("MogIt: A set with this name already exists.")
+			return
 		end
+		if self.data then
+			if type(self.data) == "table" then
+				for i, v in ipairs(self.data.items) do
+					wishlist:AddItem(v, text)
+				end
+			else
+				wishlist:AddItem(self.data, text)
+			end
+		end
+		mog:BuildList(nil, "Wishlist")
 	end
-	mog:BuildList(nil, "Wishlist")
+
+	StaticPopupDialogs["MOGIT_WISHLIST_CREATE_SET"] = {
+		text = L["Enter set name"],
+		button1 = ACCEPT,
+		button2 = CANCEL,
+		hasEditBox = true,
+		OnAccept = onAccept,
+		EditBoxOnEnterPressed = function(self)
+			local parent = self:GetParent()
+			onAccept(parent)
+			parent:Hide()
+		end,
+		OnShow = function(self)
+			self.editBox:SetText("Set "..(#wishlist:GetSets() + 1))
+			self.editBox:HighlightText()
+		end,
+		whileDead = true,
+		timeout = 0,
+	}
 end
 
-StaticPopupDialogs["MOGIT_WISHLIST_CREATE_SET"] = {
-	text = L["Enter set name"],
-	button1 = ACCEPT,
-	button2 = CANCEL,
-	hasEditBox = true,
-	OnAccept = onAccept,
-	EditBoxOnEnterPressed = function(self)
-		local parent = self:GetParent()
-		onAccept(parent)
-		parent:Hide()
-	end,
-	OnShow = function(self)
-		self.editBox:SetText("Set "..(#wishlist:GetSets() + 1))
-		self.editBox:SetFocus()
-	end,
-	whileDead = true,
-	timeout = 0,
-}
-
-StaticPopupDialogs["MOGIT_WISHLIST_RENAME_SET"] = {
-	text = L["Enter new set name"],
-	button1 = ACCEPT,
-	button2 = CANCEL,
-	hasEditBox = true,
-	OnAccept = function(self)
+do
+	local function onAccept(self)
 		local text = self.editBox:GetText()
-		local set = self:GetSet(text)
+		local set = wishlist:GetSet(text)
 		if set then
 			print("MogIt: A set with this name already exists.")
 			return
 		end
 		self.data.name = text
 		mog:BuildList(nil, "Wishlist")
-	end,
-	EditBoxOnEnterPressed = function(self)
-		local text = self:GetText()
-		self:GetParent().data.name = text
-		mog:BuildList(nil, "Wishlist")
-		self:GetParent():Hide()
-	end,
-	OnShow = function(self)
-		self.editBox:SetText(self.data.name)
-		self.editBox:HighlightText()
-	end,
-	whileDead = true,
-	timeout = 0,
-}
+	end
+	
+	StaticPopupDialogs["MOGIT_WISHLIST_RENAME_SET"] = {
+		text = L["Enter new set name"],
+		button1 = ACCEPT,
+		button2 = CANCEL,
+		hasEditBox = true,
+		OnAccept = onAccept,
+		EditBoxOnEnterPressed = function(self)
+			local parent = self:GetParent()
+			onAccept(parent)
+			parent:Hide()
+		end,
+		OnShow = function(self)
+			self.editBox:SetText(self.data.name)
+			self.editBox:HighlightText()
+		end,
+		whileDead = true,
+		timeout = 0,
+	}
+end
 
 StaticPopupDialogs["MOGIT_WISHLIST_DELETE_SET"] = {
 	text = L["Delete set '%s'?"],
