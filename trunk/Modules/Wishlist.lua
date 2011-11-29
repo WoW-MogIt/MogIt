@@ -367,6 +367,37 @@ function wishlist:GetSet(name)
 	end
 end
 
+function wishlist:GetSetItems(setName)
+	for i, set in ipairs(self.db.profile.sets) do
+		if set.name == setName then
+			return set.items
+		end
+	end
+end
+
+local setFuncs = {
+	addItem = function(self, item)
+		wishlist:AddItem(item, self.value)
+		mog:BuildList(nil, "Wishlist")
+		CloseDropDownMenus()
+	end,
+}
+
+function wishlist:AddSetMenuItems(level, func, arg1, value)
+	if type(func) ~= "function" then
+		func = setFuncs[func]
+	end
+	for i, set in ipairs(wishlist.db.profile.sets) do
+		local info = UIDropDownMenu_CreateInfo()
+		info.text = set.name
+		info.value = value
+		info.func = func
+		info.notCheckable = true
+		info.arg1 = arg1
+		UIDropDownMenu_AddButton(info, level)
+	end
+end
+
 do
 	local function onAccept(self)
 		local text = self.editBox:GetText()

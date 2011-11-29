@@ -226,12 +226,6 @@ do
 		arg1.item = arg1.items[arg2];
 	end
 	
-	local function setOnClick(self, set)
-		mog:GetModule("Wishlist"):AddItem(self.value, set);
-		mog:BuildList(nil, "Wishlist");
-		CloseDropDownMenus();
-	end
-	
 	-- create a new set and add the item to it
 	local function newSetOnClick(self)
 		StaticPopup_Show("MOGIT_WISHLIST_CREATE_SET", nil, nil, self.value);
@@ -272,7 +266,6 @@ do
 				mog:BuildList(nil, "Wishlist")
 				CloseDropDownMenus()
 			end,
-			notCheckable = true,
 		},
 	}
 	
@@ -293,15 +286,7 @@ do
 				UIDropDownMenu_AddButton(info, tier);
 			end
 		elseif tier == 3 then
-			for i, set in ipairs(mog:GetModule("Wishlist"):GetSets()) do
-				local info = UIDropDownMenu_CreateInfo();
-				info.text = set.name;
-				info.value = UIDROPDOWNMENU_MENU_VALUE;
-				info.func = setOnClick;
-				info.notCheckable = true;
-				info.arg1 = set.name;
-				UIDropDownMenu_AddButton(info, tier);
-			end
+			mog:GetModule("Wishlist"):AddSetMenuItems(tier, "addItem", UIDROPDOWNMENU_MENU_VALUE);
 			
 			local info = UIDropDownMenu_CreateInfo();
 			info.text = "New set";
@@ -380,7 +365,7 @@ do
 			notCheckable = true,
 		},
 	}
-
+	
 	mog.Set_Menu.menu = {
 		-- menu used for sets
 		[1] = function(menuList, level)
@@ -420,18 +405,7 @@ do
 			end
 		end,
 		[3] = function(menuList, level)
-			for i, set in ipairs(mog:GetModule("Wishlist"):GetSets()) do
-				local info = UIDropDownMenu_CreateInfo()
-				info.text = set.name
-				info.func = function(self, arg1)
-					mog:GetModule("Wishlist"):AddItem(arg1, self.value)
-					mog:BuildList(nil, "Wishlist")
-					CloseDropDownMenus()
-				end
-				info.notCheckable = true
-				info.arg1 = UIDROPDOWNMENU_MENU_VALUE
-				UIDropDownMenu_AddButton(info, level)
-			end
+			mog:GetModule("Wishlist"):AddSetMenuItems(level, "addItem", UIDROPDOWNMENU_MENU_VALUE)
 		end,
 	}
 end
