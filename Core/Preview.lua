@@ -78,14 +78,7 @@ end
 local saveMenu = CreateFrame("Frame")
 saveMenu.displayMode = "MENU"
 saveMenu.initialize = function(self, level)
-	for i, set in ipairs(mog:GetModule("Wishlist"):GetSets()) do
-		local info = UIDropDownMenu_CreateInfo()
-		info.text = set.name
-		-- info.value = set
-		info.func = onClick
-		info.notCheckable = true
-		UIDropDownMenu_AddButton(info, level)
-	end
+	mog:GetModule("Wishlist"):AddSetMenuItems(level, onClick)
 	
 	local info = UIDropDownMenu_CreateInfo()
 	info.text = "New set"
@@ -108,7 +101,7 @@ local function onClick(self)
 	for k, v in pairs(mog.view.slots) do
 		mog.view.delItem(k)
 	end
-	for slot, itemID in pairs(self.value.items) do
+	for slot, itemID in pairs(mog:GetModule("Wishlist"):GetSetItems(self.value)) do
 		mog:AddToPreview(itemID)
 	end
 end
@@ -116,14 +109,7 @@ end
 local loadMenu = CreateFrame("Frame")
 loadMenu.displayMode = "MENU"
 loadMenu.initialize = function(self, level)
-	for i, set in ipairs(mog:GetModule("Wishlist"):GetSets()) do
-		local info = UIDropDownMenu_CreateInfo()
-		info.text = set.name
-		info.value = set
-		info.func = onClick
-		info.notCheckable = true
-		UIDropDownMenu_AddButton(info, level)
-	end
+	mog:GetModule("Wishlist"):AddSetMenuItems(level, onClick)
 end
 mog.view.load.menu = loadMenu
 
