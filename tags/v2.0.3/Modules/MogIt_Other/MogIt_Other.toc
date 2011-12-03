@@ -1,0 +1,30 @@
+﻿## Interface: 40300
+## Author: Aelobin (The Maelstrom EU)
+## Version: 2.0
+## LoadOnDemand: 1
+## RequiredDeps: MogIt
+
+## Title: MogIt_Other
+## Title-deDE: MogIt_Sonstige
+## Title-frFR: MogIt_Autre
+## Title-esES: MogIt_Otro
+## Title-ruRU: MogIt_Другое
+## Title-koKR: MogIt_기타
+## Title-zhTW: MogIt_其他
+## Title-zhCN: MogIt_其它
+
+## Notes: MogIt Data
+## Notes-deDE: MogIt Daten
+## Notes-frFR: MogIt Données
+## Notes-esES: MogIt Datos
+## Notes-ruRU: MogIt данные
+## Notes-koKR: MogIt 데이터
+## Notes-zhTW: MogIt 的數據
+## Notes-zhCN: MogIt 数据
+
+Bosses.lua
+Colours.lua
+
+Shield.lua
+Held in Off-Hand.lua
+Cloak.lua
