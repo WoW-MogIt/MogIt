@@ -162,7 +162,9 @@ function mog.sub.AddColours(id,c1,c2,c3)--,c4,c5)
 end
 
 function mog.sub.GetFilterArgs(filter,item)
-	if filter == "level" then
+	if filter == "name" then
+		return GetItemInfo(item);
+	elseif filter == "level" then
 		return mog.items.level[item];
 	elseif filter == "faction" then
 		return mog.items.faction[item];
@@ -215,6 +217,7 @@ for k,v in ipairs(addons) do
 			Unlist = mog.sub.Unlist,
 			Help = mog.sub.Help,
 			filters = {
+				"name",
 				"level",
 				"faction",
 				"class",

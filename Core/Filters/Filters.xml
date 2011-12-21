@@ -4,6 +4,7 @@
 
 <Script file="Filters.lua"/>
 
+<Script file="name.lua"/>
 <Script file="level.lua"/>
 <Script file="faction.lua"/>
 <Script file="class.lua"/>
