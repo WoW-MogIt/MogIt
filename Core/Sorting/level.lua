@@ -3,7 +3,7 @@ local L = mog.L;
 
 local itemCache = {};
 local function minItem(id,args)
-	if not itemCache[display] then
+	if not itemCache[id] then
 		local levels = args and args(id);
 		if type(levels) == "table" then
 			for k,v in pairs(levels) do
@@ -37,7 +37,12 @@ mog:CreateSort("level",{
 	Sort = function(args)
 		wipe(itemCache);
 		table.sort(mog.list,function(a,b)
-			return minItem(a,args) > minItem(b,args);
+			local aLv, bLv = minItem(a,args), minItem(b,args);
+			if aLv == bLv then
+				return a > b;
+			else
+				return aLv > bLv;
+			end
 		end);
 	end,
 	Unlist = function()
