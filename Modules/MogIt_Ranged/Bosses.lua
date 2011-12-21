@@ -1,4 +1,6 @@
 local b=MogIt.AddMob
+b(4831,"Lady Sarevess")
+b(3673,"Lord Serpentis")
 b(9236,"Shadow Hunter Vosh'gajin")
 b(10436,"Baroness Anastari")
 b(9319,"Houndmaster Grebmar")
