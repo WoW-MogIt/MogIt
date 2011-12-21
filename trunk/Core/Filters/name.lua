@@ -33,23 +33,9 @@ function f.edit.clearFunc(self)
 	mog:BuildList();
 end
 
-local tbl = {
-	["$"] = "%$",
-	["%"] = "%%",
-	["^"] = "%^",
-	["*"] = "%*",
-	["("] = "%(",
-	[")"] = "%)",
-	["-"] = "%-",
-	["+"] = "%+",
-	["."] = "%.",
-	["["] = "%[",
-	["]"] = "%]",
-	["?"] = "%?",
-};
 function f.Filter(item)
 	item = item or "";
-	return (name == "") or (item:lower():find(name:gsub("(.)",tbl)));
+	return (name == "") or (item:lower():find(name,nil,true));
 end
 
 function f.Default()
