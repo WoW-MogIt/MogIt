@@ -60,8 +60,8 @@ end);
 local function onClick(self)
 	newSet.name = self.value
 	wipe(newSet.items)
-	for k, v in pairs(mog.view.slots) do
-		tinsert(newSet.items, v.item)
+	for slot, v in pairs(mog.view.slots) do
+		newSet.items[slot] = v.item
 	end
 	StaticPopup_Show("MOGIT_WISHLIST_OVERWRITE_SET", self.value, nil, newSet)
 end
@@ -69,8 +69,8 @@ end
 local function newSetOnClick(self)
 	wipe(newSet.items)
 	newSet.name = "Set "..(#mog:GetModule("Wishlist"):GetSets() + 1)
-	for k, v in pairs(mog.view.slots) do
-		tinsert(newSet.items, v.item)
+	for slot, v in pairs(mog.view.slots) do
+		newSet.items[slot] = v.item
 	end
 	StaticPopup_Show("MOGIT_WISHLIST_CREATE_SET", nil, nil, newSet)
 end

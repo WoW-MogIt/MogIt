@@ -190,9 +190,6 @@ local displayIDs = {}
 
 function wishlist:OnEnter(frame, value)
 	GameTooltip:SetOwner(frame, "ANCHOR_RIGHT")
-	-- GameTooltip:SetOwner(self, "ANCHOR_NONE")
-	-- GameTooltip:ClearAllPoints()
-	-- GameTooltip:SetPoint("TOPLEFT", mog.frame, "TOPRIGHT", 5, 0)
 	
 	if type(value) == "table" then
 		mog.Set_OnEnter(frame, value)
@@ -224,19 +221,18 @@ function wishlist:OnEnter(frame, value)
 		end
 	end
 	
-	--[=[
-	if mog.sub.filters.slot[item] then
-		GameTooltip:AddDoubleLine(L["Slot"]..":",mog.sub.slots[mog.sub.filters.slot[item]],nil,nil,nil,1,1,1);
-	end
-	]=]
+	-- if mog.sub.filters.slot[item] then
+		-- GameTooltip:AddDoubleLine(L["Slot"]..":",mog.sub.slots[mog.sub.filters.slot[item]],nil,nil,nil,1,1,1);
+	-- end
+
 	GameTooltip:Show()
 end
 
 function wishlist:OnClick(frame, button, value)
 	if type(value) == "table" then
-		mog.Set_OnClick(frame, button, frame.data)
+		mog.Set_OnClick(frame, button, frame.data, true)
 	else
-		mog.Item_OnClick(frame, button, frame.data)
+		mog.Item_OnClick(frame, button, frame.data, true)
 	end
 end
 
@@ -275,13 +271,13 @@ function wishlist:Help()
 	end
 end
 	
-function wishlist:AddItem(itemID, setName)
+function wishlist:AddItem(itemID, setName, slot)
 	if not setName and self:IsItemInWishlist(itemID) then
 		return false
 	end
 	local set = self:GetSet(setName)
 	if set then
-		local slot = mog.invSlots[select(9, GetItemInfo(itemID))]
+		slot = slot or mog.invSlots[select(9, GetItemInfo(itemID))]
 		set.items[slot] = itemID
 	else
 		tinsert(self.db.profile.items, itemID)
@@ -408,8 +404,8 @@ do
 		end
 		if self.data then
 			if type(self.data) == "table" then
-				for i, v in ipairs(self.data.items) do
-					wishlist:AddItem(v, text)
+				for slot, v in pairs(self.data.items) do
+					wishlist:AddItem(v, text, slot)
 				end
 			else
 				wishlist:AddItem(self.data, text)
@@ -488,8 +484,8 @@ StaticPopupDialogs["MOGIT_WISHLIST_OVERWRITE_SET"] = {
 	OnAccept = function(self)
 		-- first clear all items since every slot might not be used
 		wipe(wishlist:GetSet(self.data.name).items)
-		for i, v in ipairs(self.data.items) do
-			wishlist:AddItem(v, self.data.name)
+		for slot, v in pairs(self.data.items) do
+			wishlist:AddItem(v, self.data.name, slot)
 		end
 		mog:BuildList(nil, "Wishlist")
 	end,
