@@ -43,3 +43,13 @@ function f.Default()
 	f.edit:SetText(name);
 end
 f.Default();
+
+local function onUpdate(self)
+	self:SetScript("OnUpdate", nil);
+	mog.BuildList();
+end
+
+f:RegisterEvent("GET_ITEM_INFO_RECEIVED");
+f:SetScript("OnEvent", function(self, event)
+	self:SetScript("OnUpdate", onUpdate);
+end)
