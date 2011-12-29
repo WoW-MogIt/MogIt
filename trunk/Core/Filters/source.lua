@@ -95,11 +95,13 @@ function f.Filter(src1,sub1)
 	elseif selected[src1] then
 		if src1 == 1 then
 			if not sub1 then
-				return sub[1][7];
+				return sub[1][8];
 			elseif sub1 == 7 then
 				return sub[1][3] or sub[1][5];
 			elseif sub1 == 8 then
 				return sub[1][4] or sub[1][6];
+			elseif sub1 == 9 then
+				return sub[1][7];
 			else
 				return sub[1][sub1];
 			end
