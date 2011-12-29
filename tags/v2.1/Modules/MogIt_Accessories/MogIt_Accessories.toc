@@ -1,0 +1,29 @@
+﻿## Interface: 40300
+## Author: Aelobin (The Maelstrom EU)
+## Version: 2.1
+## LoadOnDemand: 1
+## RequiredDeps: MogIt
+
+## Title: MogIt_Accessories
+## Title-deDE: MogIt_Zubehör
+## Title-frFR: MogIt_Accessoires
+## Title-esES: MogIt_Accesorios
+## Title-ruRU: MogIt_принадлежности
+## Title-koKR: MogIt_부속물
+## Title-zhTW: MogIt_飾品
+## Title-zhCN: MogIt_饰品
+
+## Notes: MogIt Data
+## Notes-deDE: MogIt Daten
+## Notes-frFR: MogIt Données
+## Notes-esES: MogIt Datos
+## Notes-ruRU: MogIt данные
+## Notes-koKR: MogIt 데이터
+## Notes-zhTW: MogIt 的數據
+## Notes-zhCN: MogIt 数据
+
+Bosses.lua
+Colours.lua
+
+Tabards.lua
+Shirts.lua
