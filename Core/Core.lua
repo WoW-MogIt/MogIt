@@ -41,6 +41,7 @@ mog.sub = {
 		[6] = L["25H"],
 		--[7] = PLAYER_DIFFICULTY1,
 		[8] = PLAYER_DIFFICULTY2,
+		[9] = PLAYER_DIFFICULTY3,
 	},
 	difficulties = {
 		[1] = DUNGEON_DIFFICULTY_5PLAYER;
@@ -49,7 +50,8 @@ mog.sub = {
 		[4] = RAID_DIFFICULTY_10PLAYER_HEROIC;
 		[5] = RAID_DIFFICULTY_25PLAYER;
 		[6] = RAID_DIFFICULTY_25PLAYER_HEROIC;
-		[7] = OTHER,
+		[7] = PLAYER_DIFFICULTY3,
+		[8] = OTHER,
 	},
 	slots = {
 		[1] = INVTYPE_WEAPON,
@@ -322,6 +324,8 @@ mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 				HideDropDownMenu(1);
 				ToggleDropDownMenu(1,mog.modules.lookup[arg1],mog.dropdown);
 			end
+		elseif arg1 == "AtlasLoot" then
+			mog.tooltip.hookAtlasLoot();
 		end
 	end
 end);
