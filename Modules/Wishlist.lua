@@ -2,6 +2,7 @@ local MogIt, mog = ...
 local L = mog.L
 
 local wishlist = mog:RegisterModule("Wishlist", {}, true)
+mog.wishlist = wishlist
 
 local function onProfileUpdated(self, event)
 	mog:BuildList(true, "Wishlist")
@@ -270,6 +271,19 @@ function wishlist:Help()
 		GameTooltip:AddDoubleLine(help[i], help[i + 1], 0, 1, 0, 1, 1, 1)
 	end
 end
+
+local t = {}
+
+-- returns a sorted array of existing wishlist profiles
+function wishlist:GetProfiles()
+	self.db:GetProfiles(t)
+	sort(t)
+	return t
+end
+
+function wishlist:GetCurrentProfile()
+	return self.db:GetCurrentProfile()
+end
 	
 function wishlist:AddItem(itemID, setName, slot)
 	if not setName and self:IsItemInWishlist(itemID) then
@@ -351,24 +365,25 @@ function wishlist:IsSetInWishlist(setName)
 	return false
 end
 
-function wishlist:GetSets()
-	return self.db.profile.sets
+function wishlist:GetSets(profile)
+	if profile then
+		profile = self.db.profiles[profile]
+		return profile and profile.sets
+	else
+		return self.db.profile.sets
+	end
 end
 
-function wishlist:GetSet(name)
-	for i, set in ipairs(self.db.profile.sets) do
+function wishlist:GetSet(name, profile)
+	for i, set in ipairs(self:GetSets(profile)) do
 		if set.name == name then
 			return set
 		end
 	end
 end
 
-function wishlist:GetSetItems(setName)
-	for i, set in ipairs(self.db.profile.sets) do
-		if set.name == setName then
-			return set.items
-		end
-	end
+function wishlist:GetSetItems(setName, profile)
+	return self:GetSet(setName, profile).items
 end
 
 local setFuncs = {
@@ -379,14 +394,19 @@ local setFuncs = {
 	end,
 }
 
-function wishlist:AddSetMenuItems(level, func, arg1, value)
+function wishlist:AddSetMenuItems(level, func, arg1, profile)
+	local sets = self:GetSets(profile)
+	if not sets then
+		return
+	end
+	
 	if type(func) ~= "function" then
 		func = setFuncs[func]
 	end
-	for i, set in ipairs(wishlist.db.profile.sets) do
+	for i, set in ipairs(sets) do
 		local info = UIDropDownMenu_CreateInfo()
 		info.text = set.name
-		info.value = value
+		-- info.value = value
 		info.func = func
 		info.notCheckable = true
 		info.arg1 = arg1

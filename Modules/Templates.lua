@@ -44,7 +44,11 @@ end
 
 function mog.Item_FrameUpdate(self, data)
 	if not (self and data and data.item) then return end;
-	self.model:Undress();
+	if mog.db.profile.gridDress == "equipped" then
+		self.model:Dress();
+	else
+		self.model:Undress();
+	end
 	mog:DressModel(self.model);
 	self.model:TryOn(data.item);
 end
@@ -55,7 +59,7 @@ function mog.Item_OnEnter(self, data)
 		
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 	
-	local name, link = GetItemInfo(item);
+	local name, link, _, itemLevel = GetItemInfo(item);
 	--GameTooltip:AddLine(self.display, 1, 1, 1);
 	--GameTooltip:AddLine(" ");
 	
@@ -98,6 +102,7 @@ function mog.Item_OnEnter(self, data)
 	if mog.items.level[item] then
 		GameTooltip:AddDoubleLine(LEVEL..":", mog.items.level[item], nil, nil, nil, 1, 1, 1);
 	end
+	GameTooltip:AddDoubleLine(STAT_AVERAGE_ITEM_LEVEL..":", itemLevel, nil, nil, nil, 1, 1, 1);
 	if mog.items.faction[item] then
 		GameTooltip:AddDoubleLine(FACTION..":", (mog.items.faction[item] == 1 and FACTION_ALLIANCE or FACTION_HORDE), nil, nil, nil, 1, 1, 1);
 	end
@@ -120,6 +125,13 @@ function mog.Item_OnEnter(self, data)
 	
 	GameTooltip:AddLine(" ");
 	GameTooltip:AddDoubleLine(ID..":", item, nil, nil, nil, 1, 1, 1);
+	
+	-- need to hack a random suffix into the link, or those items will be thought not moggable because they have no stats
+	local canBeChanged, noChangeReason, canBeSource, noSourceReason = GetItemTransmogrifyInfo(link:gsub("(item:%d+:0:0:0:0:0:)", "%05"));
+	if not canBeSource then
+		GameTooltip:AddLine(" ");
+		GameTooltip:AddLine(ERR_TRANSMOGRIFY_INVALID_SOURCE, 1, 0, 0);
+	end
 	
 	GameTooltip:Show();
 end
@@ -201,7 +213,7 @@ do
 			wishlist = false,
 			text = "Add to wishlist",
 			func = function(self)
-				mog:GetModule("Wishlist"):AddItem(self.value)
+				mog.wishlist:AddItem(self.value)
 				mog:BuildList(nil, "Wishlist")
 				CloseDropDownMenus()
 			end,
@@ -210,7 +222,7 @@ do
 			wishlist = true,
 			text = "Delete",
 			func = function(self)
-				mog:GetModule("Wishlist"):DeleteItem(self.value)
+				mog.wishlist:DeleteItem(self.value)
 				mog:BuildList(nil, "Wishlist")
 				CloseDropDownMenus()
 			end,
@@ -238,7 +250,7 @@ do
 				end
 			end
 		elseif level == 3 then
-			mog:GetModule("Wishlist"):AddSetMenuItems(level, "addItem", UIDROPDOWNMENU_MENU_VALUE);
+			mog.wishlist:AddSetMenuItems(level, "addItem", UIDROPDOWNMENU_MENU_VALUE);
 			
 			local info = UIDropDownMenu_CreateInfo();
 			info.text = "New set";
@@ -330,11 +342,10 @@ do
 			wishlist = false,
 			text = "Add set to wishlist",
 			func = function(self, set)
-				local wishlist = mog:GetModule("Wishlist")
-				local create = wishlist:CreateSet(set.name)
+				local create = mog.wishlist:CreateSet(set.name)
 				if create then
 					for i, itemID in pairs(set.items) do
-						wishlist:AddItem(itemID, set.name)
+						mog.wishlist:AddItem(itemID, set.name)
 					end
 				end
 			end,
@@ -344,7 +355,7 @@ do
 			wishlist = true,
 			text = "Rename set",
 			func = function(self, set)
-				mog:GetModule("Wishlist"):RenameSet(set.name)
+				mog.wishlist:RenameSet(set.name)
 			end,
 			notCheckable = true,
 		},
@@ -352,7 +363,7 @@ do
 			wishlist = true,
 			text = "Delete set",
 			func = function(self)
-				mog:GetModule("Wishlist"):DeleteSet(self.value)
+				mog.wishlist:DeleteSet(self.value)
 			end,
 			notCheckable = true,
 		},
@@ -375,7 +386,7 @@ do
 		{
 			text = "Add to wishlist",
 			func = function(self)
-				mog:GetModule("Wishlist"):AddItem(self.value)
+				mog.wishlist:AddItem(self.value)
 				mog:BuildList(nil, "Wishlist")
 				CloseDropDownMenus()
 			end,
@@ -385,7 +396,7 @@ do
 			wishlist = true,
 			text = "Remove from set",
 			func = function(self, set)
-				mog:GetModule("Wishlist"):DeleteItem(self.value, set.name)
+				mog.wishlist:DeleteItem(self.value, set.name)
 				mog:BuildList(nil, "Wishlist")
 				CloseDropDownMenus()
 			end,
@@ -428,7 +439,7 @@ do
 				end
 			end
 		elseif level == 3 then
-			mog:GetModule("Wishlist"):AddSetMenuItems(level, "addItem", UIDROPDOWNMENU_MENU_VALUE)
+			mog.wishlist:AddSetMenuItems(level, "addItem", UIDROPDOWNMENU_MENU_VALUE)
 		end
 	end
 end

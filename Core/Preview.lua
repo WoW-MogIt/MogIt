@@ -68,7 +68,7 @@ end
 
 local function newSetOnClick(self)
 	wipe(newSet.items)
-	newSet.name = "Set "..(#mog:GetModule("Wishlist"):GetSets() + 1)
+	newSet.name = "Set "..(#mog.wishlist:GetSets() + 1)
 	for slot, v in pairs(mog.view.slots) do
 		newSet.items[slot] = v.item
 	end
@@ -78,7 +78,7 @@ end
 local saveMenu = CreateFrame("Frame")
 saveMenu.displayMode = "MENU"
 saveMenu.initialize = function(self, level)
-	mog:GetModule("Wishlist"):AddSetMenuItems(level, onClick)
+	mog.wishlist:AddSetMenuItems(level, onClick)
 	
 	local info = UIDropDownMenu_CreateInfo()
 	info.text = "New set"
@@ -97,19 +97,43 @@ mog.view.load:SetScript("OnClick",function(self,btn)
 	ToggleDropDownMenu(nil, nil, self.menu, self, 0, 0)
 end);
 
-local function onClick(self)
+local function onClick(self, profile)
 	for k, v in pairs(mog.view.slots) do
 		mog.view.delItem(k)
 	end
-	for slot, itemID in pairs(mog:GetModule("Wishlist"):GetSetItems(self.value)) do
+	for slot, itemID in pairs(mog.wishlist:GetSetItems(self.value, profile)) do
 		mog:AddToPreview(itemID)
 	end
+	CloseDropDownMenus()
 end
 
 local loadMenu = CreateFrame("Frame")
 loadMenu.displayMode = "MENU"
 loadMenu.initialize = function(self, level)
-	mog:GetModule("Wishlist"):AddSetMenuItems(level, onClick)
+	if level == 1 then
+		mog.wishlist:AddSetMenuItems(level, onClick)
+		
+		local info = UIDropDownMenu_CreateInfo()
+		info.text = "Other profiles"
+		info.hasArrow = true
+		-- info.notClickable = true
+		info.notCheckable = true
+		UIDropDownMenu_AddButton(info, level)
+	elseif level == 2 then
+		local curProfile = mog.wishlist:GetCurrentWishlist()
+		for i, profile in ipairs(mog.wishlist:GetWishlists()) do
+			if profile ~= curProfile then
+				local info = UIDropDownMenu_CreateInfo()
+				info.text = profile
+				info.hasArrow = true
+				-- info.notClickable = true
+				info.notCheckable = true
+				UIDropDownMenu_AddButton(info, level)
+			end
+		end
+	elseif level == 3 then
+		mog.wishlist:AddSetMenuItems(level, onClick, UIDROPDOWNMENU_MENU_VALUE, UIDROPDOWNMENU_MENU_VALUE)
+	end
 end
 mog.view.load.menu = loadMenu
 
@@ -267,12 +291,17 @@ function mog:AddToPreview(item)
 	elseif type(item) == "string" then
 		mog.view.addItem(tonumber(item:match("item:(%d+)")));
 	elseif type(item) == "table" then
+		if mog.db.profile.clearOnPreviewSet then
+			for k,v in pairs(mog.view.slots) do
+				mog.view.delItem(k);
+			end
+		end
 		for k,v in pairs(item) do
 			mog.view.addItem(v);
 		end
 	end
 	ShowUIPanel(mog.view);
-	if mog.db.profile.gridDress then
+	if mog.db.profile.gridDress == "preview" then
 		mog.scroll:update();
 	end
 end
@@ -285,7 +314,7 @@ function mog.view.delItem(slot)
 end
 
 function mog:DressModel(model)
-	if mog.db.profile.gridDress or (model == mog.view.model.model) then
+	if mog.db.profile.gridDress == "preview" or (model == mog.view.model.model) then
 		for k,v in pairs(mog.view.slots) do
 			if v.item then
 				model:TryOn(v.item);
