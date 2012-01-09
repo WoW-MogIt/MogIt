@@ -59,7 +59,15 @@ function mog.createOptions()
 				type = "toggle",
 				order = 1,
 				name = L["Hide minimap button"],
+				width = "full",
 				arg = "minimap",
+			},
+			clearOnPreviewSet = {
+				type = "toggle",
+				order = 1.5,
+				name = L["Undress before previewing sets"],
+				width = "full",
+				arg = "clearOnPreviewSet",
 			},
 			catalogue = {
 				type = "group",
@@ -75,15 +83,20 @@ function mog.createOptions()
 						arg = "noAnim",
 					},
 					dress = {
-						type = "toggle",
+						type = "select",
 						order = 2,
 						name = L["Dress models"],
 						width = "double",
+						values = {
+							none = "None",
+							preview = "Preview",
+							equipped = "Equipped"
+						};
 						arg = "gridDress",
 					},
 					url = {
 						type = "select",
-						order = 3,
+						order = 2.5,
 						name = L["URL website"],
 						values = function()
 							local tbl = {};
@@ -183,7 +196,7 @@ function mog.createOptions()
 		name = L["Modules"],
 		--plugins
 		args = {
-			wishlist = db:GetOptionsTable(mog:GetModule("Wishlist").db),
+			wishlist = db:GetOptionsTable(mog.wishlist.db),
 		},
 	};
 	options.args.modules.args.wishlist.name = L["Wishlist"];
@@ -196,7 +209,7 @@ function mog.createOptions()
 	config:RegisterOptionsTable("MogIt_Options",options.args.options);
 	dialog:AddToBlizOptions("MogIt_Options",options.args.options.name,MogIt);
 	
-	options.args.wishlist = db:GetOptionsTable(mog:GetModule("Wishlist").db);
+	options.args.wishlist = db:GetOptionsTable(mog.wishlist.db);
 	options.args.wishlist.name = L["Wishlist Profile"];
 	options.args.wishlist.order = 6;
 	config:RegisterOptionsTable("MogIt_Wishlist",options.args.wishlist);

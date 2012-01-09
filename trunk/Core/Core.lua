@@ -245,7 +245,8 @@ local defaults = {
 		tooltipRotate = true,
 		tooltipMog = true,
 		tooltipMod = "None",
-		gridDress = true,
+		clearOnPreviewSet = false,
+		gridDress = "preview",
 		noAnim = false,
 		minimap = {},
 		url = "Battle.net",
@@ -293,6 +294,10 @@ mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 				ToggleDropDownMenu(nil,nil,mog.Set_Menu,"cursor",0,0,mog.Set_Menu.menuList);
 			end
 		end
+	elseif event == "PLAYER_EQUIPMENT_CHANGED" then
+		if mog.db.profile.gridDress == "equipped" then
+			mog.scroll:update();
+		end
 	elseif event == "ADDON_LOADED" then
 		if arg1 == MogIt then
 			local AceDB = LibStub("AceDB-3.0")
@@ -332,6 +337,7 @@ end);
 mog.frame:RegisterEvent("PLAYER_LOGIN");
 mog.frame:RegisterEvent("GET_ITEM_INFO_RECEIVED");
 mog.frame:RegisterEvent("ADDON_LOADED");
+mog.frame:RegisterEvent("PLAYER_EQUIPMENT_CHANGED");
 
 --[=[
 function mog:AddItemData(id,field,value)
