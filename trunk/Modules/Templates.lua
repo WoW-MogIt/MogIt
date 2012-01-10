@@ -198,7 +198,7 @@ do
 	
 	local menu = {
 		{
-			text = "Preview",
+			text = L["Preview"],
 			func = function(self)
 				mog:AddToPreview(self.value)
 				CloseDropDownMenus()
@@ -206,12 +206,12 @@ do
 			notCheckable = true,
 		},
 		{
-			text = "Add to set",
+			text = L["Add to set"],
 			hasArrow = true,
 		},
 		{
 			wishlist = false,
-			text = "Add to wishlist",
+			text = L["Add to wishlist"],
 			func = function(self)
 				mog.wishlist:AddItem(self.value)
 				mog:BuildList(nil, "Wishlist")
@@ -253,7 +253,7 @@ do
 			mog.wishlist:AddSetMenuItems(level, "addItem", UIDROPDOWNMENU_MENU_VALUE);
 			
 			local info = UIDropDownMenu_CreateInfo();
-			info.text = "New set";
+			info.text = L["New set"];
 			info.value = UIDROPDOWNMENU_MENU_VALUE;
 			info.func = newSetOnClick;
 			info.colorCode = GREEN_FONT_COLOR_CODE;
@@ -340,12 +340,12 @@ do
 	local setMenu = {
 		{
 			wishlist = false,
-			text = "Add set to wishlist",
-			func = function(self, set)
-				local create = mog.wishlist:CreateSet(set.name)
+			text = L["Add set to wishlist"],
+			func = function(self)
+				local create = mog.wishlist:CreateSet(self.value)
 				if create then
-					for i, itemID in pairs(set.items) do
-						mog.wishlist:AddItem(itemID, set.name)
+					for i, itemID in pairs(mog.wishlist:GetSetItems(self.value)) do
+						mog.wishlist:AddItem(itemID, self.value)
 					end
 				end
 			end,
@@ -353,15 +353,15 @@ do
 		},
 		{
 			wishlist = true,
-			text = "Rename set",
-			func = function(self, set)
-				mog.wishlist:RenameSet(set.name)
+			text = L["Rename set"],
+			func = function(self)
+				mog.wishlist:RenameSet(self.value)
 			end,
 			notCheckable = true,
 		},
 		{
 			wishlist = true,
-			text = "Delete set",
+			text = L["Delete set"],
 			func = function(self)
 				mog.wishlist:DeleteSet(self.value)
 			end,
@@ -371,7 +371,7 @@ do
 
 	local itemMenu = {
 		{
-			text = "Preview",
+			text = L["Preview"],
 			func = function(self)
 				mog:AddToPreview(self.value)
 				CloseDropDownMenus()
@@ -379,12 +379,12 @@ do
 			notCheckable = true,
 		},
 		{
-			text = "Add to set",
+			text = L["Add to set"],
 			hasArrow = true,
 			notCheckable = true,
 		},
 		{
-			text = "Add to wishlist",
+			text = L["Add to wishlist"],
 			func = function(self)
 				mog.wishlist:AddItem(self.value)
 				mog:BuildList(nil, "Wishlist")
@@ -394,7 +394,7 @@ do
 		},
 		{
 			wishlist = true,
-			text = "Remove from set",
+			text = L["Remove from set"],
 			func = function(self, set)
 				mog.wishlist:DeleteItem(self.value, set.name)
 				mog:BuildList(nil, "Wishlist")
@@ -424,8 +424,7 @@ do
 			
 			for i, v in ipairs(setMenu) do
 				if v.wishlist == nil or v.wishlist == data.isSaved then
-					v.value = data.index
-					v.arg1 = data
+					v.value = data.name
 					UIDropDownMenu_AddButton(v, level)
 				end
 			end
