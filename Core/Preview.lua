@@ -81,7 +81,7 @@ saveMenu.initialize = function(self, level)
 	mog.wishlist:AddSetMenuItems(level, onClick)
 	
 	local info = UIDropDownMenu_CreateInfo()
-	info.text = "New set"
+	info.text = L["New set"]
 	info.func = newSetOnClick
 	info.colorCode = GREEN_FONT_COLOR_CODE
 	info.notCheckable = true
@@ -114,7 +114,7 @@ loadMenu.initialize = function(self, level)
 		mog.wishlist:AddSetMenuItems(level, onClick)
 		
 		local info = UIDropDownMenu_CreateInfo()
-		info.text = "Other profiles"
+		info.text = L["Other profiles"]
 		info.hasArrow = true
 		info.notCheckable = true
 		UIDropDownMenu_AddButton(info, level)

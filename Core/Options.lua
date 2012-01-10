@@ -88,9 +88,9 @@ function mog.createOptions()
 						name = L["Dress models"],
 						width = "double",
 						values = {
-							none = "None",
-							preview = "Preview",
-							equipped = "Equipped",
+							none = NONE,
+							preview = L["Preview"],
+							equipped = L["Equipped"],
 						};
 						arg = "gridDress",
 					},

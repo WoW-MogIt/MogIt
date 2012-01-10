@@ -83,14 +83,14 @@ end
 
 local setMenu = {
 	{
-		text = "Rename set",
+		text = L["Rename set"],
 		func = function(self)
-			wishlist:RenameSet(wishlist.db.profile.sets[self.value].name)
+			wishlist:RenameSet(self.value)
 			CloseDropDownMenus()
 		end,
 	},
 	{
-		text = "Delete set",
+		text = L["Delete set"],
 		func = function(self)
 			wishlist:DeleteSet(self.value)
 			CloseDropDownMenus()
@@ -112,7 +112,6 @@ function wishlist:Dropdown(level)
 		for i, set in ipairs(wishlist.db.profile.sets) do
 			local info = UIDropDownMenu_CreateInfo()
 			info.text = set.name
-			info.value = i
 			-- info.func = function(self)
 				-- wishlist:AddItem(menuList.value, self.value)
 				-- mog:BuildList()
@@ -124,7 +123,7 @@ function wishlist:Dropdown(level)
 		end
 		
 		local info = UIDropDownMenu_CreateInfo()
-		info.text = "New set"
+		info.text = L["New set"]
 		info.func = newSetOnClick
 		info.colorCode = GREEN_FONT_COLOR_CODE
 		info.notCheckable = true
@@ -338,12 +337,18 @@ function wishlist:RenameSet(set)
 	StaticPopup_Show("MOGIT_WISHLIST_RENAME_SET", nil, nil, self:GetSet(set))
 end
 
-function wishlist:DeleteSet(setIndex, noConfirm)
+function wishlist:DeleteSet(setName, noConfirm)
 	if noConfirm then
-		tremove(wishlist:GetSets(), setIndex)
+		local sets = wishlist:GetSets()
+		for i, set in ipairs(sets) do
+			if set.name == setName then
+				tremove(sets, i)
+				break
+			end
+		end
 		mog:BuildList(nil, "Wishlist")
 	else
-		StaticPopup_Show("MOGIT_WISHLIST_DELETE_SET", self.db.profile.sets[setIndex].name, nil, setIndex)
+		StaticPopup_Show("MOGIT_WISHLIST_DELETE_SET", setName, nil, setName)
 	end
 end
 
