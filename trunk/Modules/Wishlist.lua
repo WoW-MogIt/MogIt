@@ -367,8 +367,8 @@ end
 
 function wishlist:GetSets(profile)
 	if profile then
-		profile = self.db.profiles[profile]
-		return profile and profile.sets
+		assert(self.db.profiles[profile], format("Profile '%s' does not exist.", profile))
+		return self.db.profiles[profile].sets
 	else
 		return self.db.profile.sets
 	end
