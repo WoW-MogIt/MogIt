@@ -116,17 +116,15 @@ loadMenu.initialize = function(self, level)
 		local info = UIDropDownMenu_CreateInfo()
 		info.text = "Other profiles"
 		info.hasArrow = true
-		-- info.notClickable = true
 		info.notCheckable = true
 		UIDropDownMenu_AddButton(info, level)
 	elseif level == 2 then
-		local curProfile = mog.wishlist:GetCurrentWishlist()
-		for i, profile in ipairs(mog.wishlist:GetWishlists()) do
+		local curProfile = mog.wishlist:GetCurrentProfile()
+		for i, profile in ipairs(mog.wishlist:GetProfiles()) do
 			if profile ~= curProfile then
 				local info = UIDropDownMenu_CreateInfo()
 				info.text = profile
 				info.hasArrow = true
-				-- info.notClickable = true
 				info.notCheckable = true
 				UIDropDownMenu_AddButton(info, level)
 			end

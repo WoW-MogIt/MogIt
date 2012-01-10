@@ -90,7 +90,7 @@ function mog.createOptions()
 						values = {
 							none = "None",
 							preview = "Preview",
-							equipped = "Equipped"
+							equipped = "Equipped",
 						};
 						arg = "gridDress",
 					},
