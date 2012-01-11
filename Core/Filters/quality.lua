@@ -52,7 +52,9 @@ function f.dd.initialize(self)
 	info.notCheckable = true;
 	UIDropDownMenu_AddButton(info);
 	
-	for k,v in ipairs(mog.sub.quality) do
+	local quality = mog.sub.quality
+	for i = 0, #quality do
+		local v = quality[i]
 		info = UIDropDownMenu_CreateInfo();
 		info.text =	_G["ITEM_QUALITY"..v.."_DESC"];
 		info.value = v;
@@ -60,7 +62,7 @@ function f.dd.initialize(self)
 		info.func = f.dd.Tier1;
 		info.keepShownOnClick = true;
 		info.isNotRadio = true;
-		info.checked = selected[k];
+		info.checked = selected[i];
 		UIDropDownMenu_AddButton(info);
 	end
 end
@@ -73,7 +75,7 @@ function f.Default()
 	selected = {};
 	num = 0;
 	all = nil;
-	for k,v in ipairs(mog.sub.quality) do
+	for k,v in pairs(mog.sub.quality) do
 		selected[k] = true;
 		num = num + 1;
 	end

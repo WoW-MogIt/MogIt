@@ -358,6 +358,30 @@ function mog.addModel(view)
 			--f.icon:SetPoint("TOPRIGHT",f,"TOPRIGHT",-4,-4);
 			--f.icon:SetSize(16,16);
 			--f.icon:SetTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcon_1");
+			
+			-- f.c1Bg = f:CreateTexture()
+			-- f.c1Bg:SetTexture(0, 0, 0)
+			-- f.c1Bg:SetSize(32, 32)
+			-- f.c1Bg:SetPoint("BOTTOM", 0, 8)
+			-- f.c1 = f:CreateTexture()
+			-- f.c1:SetPoint("TOPLEFT", f.c1Bg, 4, -4)
+			-- f.c1:SetPoint("BOTTOMRIGHT", f.c1Bg, -4, 4)
+			
+			-- f.c2Bg = f:CreateTexture()
+			-- f.c2Bg:SetTexture(0, 0, 0)
+			-- f.c2Bg:SetSize(32, 32)
+			-- f.c2Bg:SetPoint("RIGHT", f.c1Bg, "LEFT", -8, 0)
+			-- f.c2 = f:CreateTexture()
+			-- f.c2:SetPoint("TOPLEFT", f.c2Bg, 4, -4)
+			-- f.c2:SetPoint("BOTTOMRIGHT", f.c2Bg, -4, 4)
+			
+			-- f.c3Bg = f:CreateTexture()
+			-- f.c3Bg:SetTexture(0, 0, 0)
+			-- f.c3Bg:SetSize(32, 32)
+			-- f.c3Bg:SetPoint("LEFT", f.c1Bg, "RIGHT", 8, 0)
+			-- f.c3 = f:CreateTexture()
+			-- f.c3:SetPoint("TOPLEFT", f.c3Bg, 4, -4)
+			-- f.c3:SetPoint("BOTTOMRIGHT", f.c3Bg, -4, 4)
 		end
 		
 		f.model:SetModelScale(2);

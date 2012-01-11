@@ -149,43 +149,6 @@ function wishlist:FrameUpdate(frame, value, index)
 	end
 end
 
-local data = mog.items
-
-local function getSourceInfo(itemID)
-	local data = data or mog.items
-	local source = data.source[itemID]
-	local sourceID = data.sourceid[itemID]
-	local sourceInfo = data.sourceinfo[itemID]
-	local info = mog.sub.source[source]
-	local extraInfo
-	if source == 1 and sourceID then -- Drop
-		extraInfo = mog.GetMob(sourceID)
-	-- elseif source == 3 then -- Quest
-	elseif source == 5 and sourceInfo then -- Crafted
-		extraInfo = mog.sub.professions[sourceInfo]
-	elseif source == 6 and sourceID then -- Achievement
-		local _, name, _, complete = GetAchievementInfo(sourceID)
-		extraInfo = name
-	end
-	local zone = data.zone[itemID]
-	if zone then
-		zone = GetMapNameByID(zone)
-		if zone then
-			if source == 1 and extraInfo then
-				local diff = mog.sub.diffs[sourceInfo]
-				if diff then
-					zone = format("%s (%s)", zone, diff)
-				end
-				info = extraInfo
-				extraInfo = zone
-			else
-				extraInfo = zone
-			end
-		end
-	end
-	return extraInfo and format("%s (%s)", info, extraInfo) or info
-end
-
 local displayIDs = {}
 
 function wishlist:OnEnter(frame, value)
@@ -195,7 +158,7 @@ function wishlist:OnEnter(frame, value)
 		mog.Set_OnEnter(frame, value)
 	else
 		local name, link, _, _, _, _, _, _, _, texture = GetItemInfo(value)
-		GameTooltip:AddDoubleLine(link, getSourceInfo(value))
+		GameTooltip:AddDoubleLine(link, mog.GetItemSourceShort(value))
 		
 		local display = mog.items.display
 		if display[value] then
@@ -210,11 +173,11 @@ function wishlist:OnEnter(frame, value)
 			end
 			if #displayIDs[d] > 1 then
 				GameTooltip:AddLine(" ")
-				GameTooltip:AddLine("Alternate items:")
+				GameTooltip:AddLine(L["Other items using this appearance:"])
 				for i, itemID in ipairs(displayIDs[d]) do
 					if itemID ~= value then
 						local name, link, _, _, _, _, _, _, _, texture = GetItemInfo(itemID)
-						GameTooltip:AddDoubleLine(link, getSourceInfo(itemID))
+						GameTooltip:AddDoubleLine(link, mog.GetItemSourceShort(itemID))
 					end
 				end
 			end
