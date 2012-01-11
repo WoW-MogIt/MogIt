@@ -61,6 +61,14 @@ function mog.sub.FrameUpdate(module,self,value)
 	else
 		self.data.item = display[value];
 	end
+	-- local colors = mog.items.colours
+	-- for i = 1, 3 do
+		-- local color = colors[i][value]
+		-- if color then
+			-- local r, g, b = color:match("(..)(..)(..)")
+			-- self["c"..i]:SetTexture(tonumber(r, 16) / 255, tonumber(g, 16) / 255, tonumber(b, 16) / 255)
+		-- end
+	-- end
 	mog.Item_FrameUpdate(self,self.data);
 end
 

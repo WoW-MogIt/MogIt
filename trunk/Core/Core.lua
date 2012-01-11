@@ -392,3 +392,49 @@ function mog.GetMob(id)
 	--return mog.mobs[id] or CachedMob(id);
 	return mog.mobs[id];
 end
+
+function mog.GetItemSourceInfo(itemID)
+	local source, info;
+	local sourceType = mog.items.source[itemID];
+	local sourceID = mog.items.sourceid[itemID];
+	local sourceInfo = mog.items.sourceinfo[itemID];
+	
+	if sourceType == 1 and sourceID then -- Drop
+		source = mog.GetMob(sourceID);
+	-- elseif sourceType == 3 then -- Quest
+	elseif sourceType == 5 and sourceInfo then -- Crafted
+		source = mog.sub.professions[sourceInfo];
+	elseif sourceType == 6 and sourceID then -- Achievement
+		local _, name, _, complete = GetAchievementInfo(sourceID);
+		source = name;
+		info = complete;
+	end
+	
+	local zone = mog.items.zone[itemID];
+	if zone then
+		zone = GetMapNameByID(zone);
+		if zone then
+			local diff = mog.sub.diffs[sourceInfo];
+			if sourceType == 1 and diff then
+				zone = format("%s (%s)", zone, diff);
+			end
+		end
+	end
+	
+	return mog.sub.source[sourceType], source, zone, info;
+end
+
+function mog.GetItemSourceShort(itemID)
+	local sourceType, source, zone, info = mog.GetItemSourceInfo(itemID);
+	if zone then
+		if source then
+			sourceType = source;
+		end
+		source = zone;
+	end
+	if source then
+		return format("%s (%s)", sourceType, source)
+	else
+		return sourceType
+	end
+end

@@ -5,43 +5,6 @@ local function itemIcon(itemID, textHeight)
 	return format("|T%s:%d|t ", GetItemIcon(itemID), textHeight or 0)
 end
 
-local data = mog.items
-
-local function getSourceInfo(itemID)
-	local data = data or mog.items
-	local source = data.source[itemID]
-	local sourceID = data.sourceid[itemID]
-	local sourceInfo = data.sourceinfo[itemID]
-	local info = mog.sub.source[source]
-	local extraInfo
-	if source == 1 and sourceID then -- Drop
-		extraInfo = mog.GetMob(sourceID)
-	-- elseif source == 3 then -- Quest
-	elseif source == 5 and sourceInfo then -- Crafted
-		extraInfo = mog.sub.professions[sourceInfo]
-	elseif source == 6 and sourceID then -- Achievement
-		local _, name, _, complete = GetAchievementInfo(sourceID)
-		extraInfo = name
-	end
-	local zone = data.zone[itemID]
-	if zone then
-		zone = GetMapNameByID(zone)
-		if zone then
-			if source == 1 and extraInfo then
-				local diff = mog.sub.diffs[sourceInfo]
-				if diff then
-					zone = format("%s (%s)", zone, diff)
-				end
-				info = extraInfo
-				extraInfo = zone
-			else
-				extraInfo = zone
-			end
-		end
-	end
-	return extraInfo and format("%s (%s)", info, extraInfo) or info
-end
-
 function mog.Item_FrameUpdate(self, data)
 	if not (self and data and data.item) then return end;
 	if mog.db.profile.gridDress == "equipped" then
@@ -52,6 +15,10 @@ function mog.Item_FrameUpdate(self, data)
 	mog:DressModel(self.model);
 	self.model:TryOn(data.item);
 end
+
+local sourceLabels = {
+	[mog.sub.source[1]] = BOSS,
+}
 
 function mog.Item_OnEnter(self, data)
 	local item = data.item;
@@ -69,33 +36,18 @@ function mog.Item_OnEnter(self, data)
 		GameTooltip:AddLine(itemIcon(item)..(link or name or ""));
 	end
 	
-	if mog.items.source[item] then
-		GameTooltip:AddDoubleLine(L["Source"]..":", mog.sub.source[mog.items.source[item]], nil, nil, nil, 1, 1, 1);
-		if mog.items.source[item] == 1 then -- Drop
-			if mog.GetMob(mog.items.sourceid[item]) then
-				GameTooltip:AddDoubleLine(BOSS..":", mog.GetMob(mog.items.sourceid[item]), nil, nil, nil, 1, 1, 1);
-			end
-		--elseif mog.items.source[self.item] == 3 then -- Quest
-		elseif mog.items.source[item] == 5 then -- Crafted
-			if mog.items.sourceinfo[item] then
-				GameTooltip:AddDoubleLine(L["Profession"]..":", mog.sub.professions[mog.items.sourceinfo[item]], nil, nil, nil, 1, 1, 1);
-			end
-		elseif mog.items.source[item] == 6 then -- Achievement
-			if mog.items.sourceid[item] then
-				local _, name, _, complete = GetAchievementInfo(mog.items.sourceid[item]);
-				GameTooltip:AddDoubleLine(L["Achievement"]..":", name, nil, nil, nil, 1, 1, 1);
-				GameTooltip:AddDoubleLine(STATUS..":", complete and COMPLETE or INCOMPLETE, nil, nil, nil, 1, 1, 1);
-			end
+	local sourceType, source, zone, info = mog.GetItemSourceInfo(item);
+	if sourceType then
+		GameTooltip:AddDoubleLine(L["Source"]..":", sourceType, nil, nil, nil, 1, 1, 1);
+		if source then
+			GameTooltip:AddDoubleLine((sourceLabels[sourceType] or sourceType)..":", source, nil, nil, nil, 1, 1, 1);
+		end
+		if info then
+			GameTooltip:AddDoubleLine(STATUS..":", info and COMPLETE or INCOMPLETE, nil, nil, nil, 1, 1, 1);
 		end
 	end
-	if mog.items.zone[item] then
-		local zone = GetMapNameByID(mog.items.zone[item]);
-		if zone then
-			if mog.items.source[item] == 1 and mog.sub.diffs[mog.items.sourceinfo[item]] then
-				zone = zone.." ("..mog.sub.diffs[mog.items.sourceinfo[item]]..")";
-			end
-			GameTooltip:AddDoubleLine(ZONE..":", zone, nil, nil, nil, 1, 1, 1);
-		end
+	if zone then
+		GameTooltip:AddDoubleLine(ZONE..":", zone, nil, nil, nil, 1, 1, 1);
 	end
 	
 	GameTooltip:AddLine(" ");
@@ -126,11 +78,13 @@ function mog.Item_OnEnter(self, data)
 	GameTooltip:AddLine(" ");
 	GameTooltip:AddDoubleLine(ID..":", item, nil, nil, nil, 1, 1, 1);
 	
-	-- need to hack a random suffix into the link, or those items will be thought not moggable because they have no stats
-	local canBeChanged, noChangeReason, canBeSource, noSourceReason = GetItemTransmogrifyInfo(link:gsub("(item:%d+:0:0:0:0:0:)", "%05"));
-	if not canBeSource then
-		GameTooltip:AddLine(" ");
-		GameTooltip:AddLine(ERR_TRANSMOGRIFY_INVALID_SOURCE, 1, 0, 0);
+	if link then
+		-- need to hack a random suffix into the link, or those items will be thought not moggable because they have no stats
+		local canBeChanged, noChangeReason, canBeSource, noSourceReason = GetItemTransmogrifyInfo(link:gsub("(item:%d+:0:0:0:0:0:)", "%05"));
+		if not canBeSource then
+			GameTooltip:AddLine(" ");
+			GameTooltip:AddLine(ERR_TRANSMOGRIFY_INVALID_SOURCE, 1, 0, 0);
+		end
 	end
 	
 	GameTooltip:Show();
@@ -206,10 +160,6 @@ do
 			notCheckable = true,
 		},
 		{
-			text = L["Add to set"],
-			hasArrow = true,
-		},
-		{
 			wishlist = false,
 			text = L["Add to wishlist"],
 			func = function(self)
@@ -217,6 +167,10 @@ do
 				mog:BuildList(nil, "Wishlist")
 				CloseDropDownMenus()
 			end,
+		},
+		{
+			text = L["Add to set"],
+			hasArrow = true,
 		},
 		{
 			wishlist = true,
@@ -299,7 +253,7 @@ function mog.Set_OnEnter(self, data)
 		local itemID = data.items[slot] or data.items[i]
 		if itemID then
 			local name, link = GetItemInfo(itemID);
-			GameTooltip:AddDoubleLine(itemIcon(itemID)..(link or name or ""), getSourceInfo(itemID));
+			GameTooltip:AddDoubleLine(itemIcon(itemID)..(link or name or ""), mog.GetItemSourceShort(itemID));
 		end
 	end
 	
@@ -349,7 +303,6 @@ do
 					end
 				end
 			end,
-			notCheckable = true,
 		},
 		{
 			wishlist = true,
@@ -357,7 +310,6 @@ do
 			func = function(self)
 				mog.wishlist:RenameSet(self.value)
 			end,
-			notCheckable = true,
 		},
 		{
 			wishlist = true,
@@ -365,7 +317,6 @@ do
 			func = function(self)
 				mog.wishlist:DeleteSet(self.value)
 			end,
-			notCheckable = true,
 		},
 	}
 
@@ -376,12 +327,6 @@ do
 				mog:AddToPreview(self.value)
 				CloseDropDownMenus()
 			end,
-			notCheckable = true,
-		},
-		{
-			text = L["Add to set"],
-			hasArrow = true,
-			notCheckable = true,
 		},
 		{
 			text = L["Add to wishlist"],
@@ -390,7 +335,10 @@ do
 				mog:BuildList(nil, "Wishlist")
 				CloseDropDownMenus()
 			end,
-			notCheckable = true,
+		},
+		{
+			text = L["Add to set"],
+			hasArrow = true,
 		},
 		{
 			wishlist = true,
@@ -400,7 +348,6 @@ do
 				mog:BuildList(nil, "Wishlist")
 				CloseDropDownMenus()
 			end,
-			notCheckable = true,
 		},
 	}
 	
@@ -425,6 +372,7 @@ do
 			for i, v in ipairs(setMenu) do
 				if v.wishlist == nil or v.wishlist == data.isSaved then
 					v.value = data.name
+					v.notCheckable = true
 					UIDropDownMenu_AddButton(v, level)
 				end
 			end
@@ -432,6 +380,7 @@ do
 			for i, v in ipairs(itemMenu) do
 				if v.wishlist == nil or v.wishlist == data.isSaved then
 					v.value = UIDROPDOWNMENU_MENU_VALUE
+					v.notCheckable = true
 					v.arg1 = data
 					v.menuList = data
 					UIDropDownMenu_AddButton(v, level)
