@@ -101,7 +101,7 @@ local setMenu = {
 function wishlist:Dropdown(level)
 	if level == 1 then
 		local info = UIDropDownMenu_CreateInfo()
-		info.text = "Wishlist"
+		info.text = L["Wishlist"]
 		info.value = self
 		info.colorCode = "|cffffff00"
 		info.hasArrow = true
@@ -214,18 +214,12 @@ function wishlist:BuildList()
 end
 
 local help = {
-	-- L["Change item"],
-	-- L["Left click"],
-	L["Chat link"],
-	L["Shift + Left click"],
-	L["Try on"],
-	L["Ctrl + Left click"],
-	L["Wishlist menu"],
-	L["Right click"],
-	L["Item URL"],
-	L["Shift + Right click"],
-	L["Add to preview"],
-	L["Ctrl + Right click"],
+	-- L["Change item"],	L["Left click"],
+	L["Chat link"],			L["Shift + Left click"],
+	L["Try on"],			L["Ctrl + Left click"],
+	L["Wishlist menu"],		L["Right click"],
+	L["Item URL"],			L["Shift + Right click"],
+	L["Add to preview"],	L["Ctrl + Right click"],
 }
 
 function wishlist:Help()
@@ -266,14 +260,10 @@ function wishlist:DeleteItem(itemID, setName)
 		-- return false
 	-- end
 	if setName then
-		for i, set in ipairs(self.db.profile.sets) do
-			if set.name == setName then
-				for slot, item in pairs(set.items) do
-					if item == itemID then
-						set.items[slot] = nil
-						return
-					end
-				end
+		for slot, item in pairs(self:GetSetItems(setName)) do
+			if item == itemID then
+				set.items[slot] = nil
+				return
 			end
 		end
 	else
