@@ -112,12 +112,12 @@ function mog.sub.BuildList(module)
 end
 
 function mog.sub.Help(module)
-	GameTooltip:AddDoubleLine(L["Change item"],L["Left click"],0,1,0,1,1,1);
-	GameTooltip:AddDoubleLine(L["Chat link"],L["Shift + Left click"],0,1,0,1,1,1);
-	GameTooltip:AddDoubleLine(L["Try on"],L["Ctrl + Left click"],0,1,0,1,1,1);
-	GameTooltip:AddDoubleLine(L["Wishlist menu"],L["Right click"],0,1,0,1,1,1);
-	GameTooltip:AddDoubleLine(L["Item URL"],L["Shift + Right click"],0,1,0,1,1,1);
-	GameTooltip:AddDoubleLine(L["Add to preview"],L["Ctrl + Right click"],0,1,0,1,1,1);
+	GameTooltip:AddDoubleLine(L["Change item"],		L["Left click"],0,1,0,1,1,1);
+	GameTooltip:AddDoubleLine(L["Chat link"],		L["Shift + Left click"],0,1,0,1,1,1);
+	GameTooltip:AddDoubleLine(L["Try on"],			L["Ctrl + Left click"],0,1,0,1,1,1);
+	GameTooltip:AddDoubleLine(L["Wishlist menu"],	L["Right click"],0,1,0,1,1,1);
+	GameTooltip:AddDoubleLine(L["Item URL"],		L["Shift + Right click"],0,1,0,1,1,1);
+	GameTooltip:AddDoubleLine(L["Add to preview"],	L["Ctrl + Right click"],0,1,0,1,1,1);
 end
 
 function mog.sub.AddSlot(label,addon)
@@ -174,6 +174,11 @@ function mog.sub.GetFilterArgs(filter,item)
 		return GetItemInfo(item);
 	elseif filter == "level" then
 		return mog.items.level[item];
+	elseif filter == "itemLevel" then
+		return select(4,GetItemInfo(item));
+	elseif filter == "moggable" then
+		local _, link = GetItemInfo(item);
+		return link and select(3,GetItemTransmogrifyInfo(link:gsub("(item:%d+:0:0:0:0:0:)", "%05")));
 	elseif filter == "faction" then
 		return mog.items.faction[item];
 	elseif filter == "class" then
@@ -227,6 +232,8 @@ for k,v in ipairs(addons) do
 			filters = {
 				"name",
 				"level",
+				"itemLevel",
+				"moggable",
 				"faction",
 				"class",
 				"source",
