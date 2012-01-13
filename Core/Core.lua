@@ -2,6 +2,8 @@ local MogIt,mog = ...;
 _G["MogIt"] = mog;
 local L = mog.L;
 
+local doBuildList
+
 mog.modules = {
 	base = {},
 	extra = {},
@@ -189,6 +191,29 @@ function mog:BuildList(top,module)
 	mog:SortList(nil,true);
 	mog.scroll:update(top and 1);
 	mog.filt.models:SetText(#mog.list);
+	doBuildList = false;
+end
+
+function mog.ItemInfoReceived()
+	local owner = GameTooltip:IsShown() and GameTooltip:GetOwner();
+	if owner and owner.MogItModel then
+		mog.OnEnter(owner);
+	end
+	if DropDownList1 and DropDownList1:IsShown() then
+		if UIDropDownMenu_GetCurrentDropDown() == mog.Item_Menu then
+			HideDropDownMenu(1);
+			ToggleDropDownMenu(nil,nil,mog.Item_Menu,"cursor",0,0,mog.Item_Menu.menuList);
+		elseif UIDropDownMenu_GetCurrentDropDown() == mog.Set_Menu then
+			HideDropDownMenu(1);
+			ToggleDropDownMenu(nil,nil,mog.Set_Menu,"cursor",0,0,mog.Set_Menu.menuList);
+		end
+	end
+	
+	if doBuildList then
+		mog.BuildList();
+	end
+	
+	mog.frame:SetScript("OnUpdate", nil);
 end
 
 function mog.toggleFrame()
@@ -279,21 +304,8 @@ mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 		mog.updateGUI();
 		mog.tooltip.model:SetUnit("PLAYER");
 	elseif event == "GET_ITEM_INFO_RECEIVED" then
-		local owner = GameTooltip:IsShown() and GameTooltip:GetOwner();
-		if owner and owner.MogItModel then
-			mog.OnEnter(owner);
-		end
-		if UIDropDownMenu_GetCurrentDropDown() == mog.Item_Menu then
-			if DropDownList1 and DropDownList1:IsShown() then
-				HideDropDownMenu(1);
-				ToggleDropDownMenu(nil,nil,mog.Item_Menu,"cursor",0,0,mog.Item_Menu.menuList);
-			end
-		elseif UIDropDownMenu_GetCurrentDropDown() == mog.Set_Menu then
-			if DropDownList1 and DropDownList1:IsShown() then
-				HideDropDownMenu(1);
-				ToggleDropDownMenu(nil,nil,mog.Set_Menu,"cursor",0,0,mog.Set_Menu.menuList);
-			end
-		end
+		doBuildList = true
+		self:SetScript("OnUpdate", mog.ItemInfoReceived);
 	elseif event == "PLAYER_EQUIPMENT_CHANGED" then
 		if mog.db.profile.gridDress == "equipped" then
 			mog.scroll:update();

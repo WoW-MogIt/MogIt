@@ -1,8 +1,9 @@
 local MogIt, mog = ...;
 local L = mog.L;
 
-local function itemIcon(itemID, textHeight)
-	return format("|T%s:%d|t ", GetItemIcon(itemID), textHeight or 0)
+local function itemLabel(itemID, textHeight)
+	local name, link = GetItemInfo(itemID);
+	return format("|T%s:%d|t %s", GetItemIcon(itemID), textHeight or 0, link or name or "");
 end
 
 function mog.Item_FrameUpdate(self, data)
@@ -26,14 +27,14 @@ function mog.Item_OnEnter(self, data)
 		
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 	
-	local name, link, _, itemLevel = GetItemInfo(item);
+	local itemName, _, _, itemLevel = GetItemInfo(item);
 	--GameTooltip:AddLine(self.display, 1, 1, 1);
 	--GameTooltip:AddLine(" ");
 	
 	if data.items and #data.items > 1 then
-		GameTooltip:AddDoubleLine(itemIcon(item)..(link or name or ""), L["Item %d/%d"]:format(data.cycle, #data.items), nil, nil, nil, 1, 0, 0);
+		GameTooltip:AddDoubleLine(itemLabel(item), L["Item %d/%d"]:format(data.cycle, #data.items), nil, nil, nil, 1, 0, 0);
 	else
-		GameTooltip:AddLine(itemIcon(item)..(link or name or ""));
+		GameTooltip:AddLine(itemLabel(item));
 	end
 	
 	local sourceType, source, zone, info = mog.GetItemSourceInfo(item);
@@ -78,9 +79,9 @@ function mog.Item_OnEnter(self, data)
 	GameTooltip:AddLine(" ");
 	GameTooltip:AddDoubleLine(ID..":", item, nil, nil, nil, 1, 1, 1);
 	
-	if link then
+	if itemName then
 		-- need to hack a random suffix into the link, or those items will be thought not moggable because they have no stats
-		local canBeChanged, noChangeReason, canBeSource, noSourceReason = GetItemTransmogrifyInfo(link:gsub("(item:%d+:0:0:0:0:0:)", "%05"));
+		local canBeChanged, noChangeReason, canBeSource, noSourceReason = GetItemTransmogrifyInfo(format("item:%d:0:0:0:0:0:5", item));
 		if not canBeSource then
 			GameTooltip:AddLine(" ");
 			GameTooltip:AddLine(ERR_TRANSMOGRIFY_INVALID_SOURCE, 1, 0, 0);
@@ -139,7 +140,7 @@ do
 	local function menuAddItem(data, itemID, index)
 		local name, link = GetItemInfo(itemID);
 		local info = UIDropDownMenu_CreateInfo();
-		info.text = itemIcon(itemID, 16)..(link or name or "");
+		info.text = itemLabel(itemID, 16);
 		info.value = itemID;
 		info.func = index and onClick;
 		info.checked = not index or data.cycle == index;
@@ -253,7 +254,7 @@ function mog.Set_OnEnter(self, data)
 		local itemID = data.items[slot] or data.items[i]
 		if itemID then
 			local name, link = GetItemInfo(itemID);
-			GameTooltip:AddDoubleLine(itemIcon(itemID)..(link or name or ""), mog.GetItemSourceShort(itemID));
+			GameTooltip:AddDoubleLine(itemLabel(itemID), mog.GetItemSourceShort(itemID));
 		end
 	end
 	
@@ -360,7 +361,7 @@ do
 				if itemID then
 					local itemName, itemLink = GetItemInfo(itemID);
 					local info = UIDropDownMenu_CreateInfo()
-					info.text = itemIcon(itemID, 16)..(itemLink or itemName or "")
+					info.text = itemLabel(itemID, 16)
 					info.value = itemID
 					info.hasArrow = true
 					info.notCheckable = true
