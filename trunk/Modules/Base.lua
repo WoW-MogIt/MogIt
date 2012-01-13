@@ -177,8 +177,7 @@ function mog.sub.GetFilterArgs(filter,item)
 	elseif filter == "itemLevel" then
 		return select(4,GetItemInfo(item));
 	elseif filter == "moggable" then
-		local _, link = GetItemInfo(item);
-		return link and select(3,GetItemTransmogrifyInfo(link:gsub("(item:%d+:0:0:0:0:0:)", "%05")));
+		return item;
 	elseif filter == "faction" then
 		return mog.items.faction[item];
 	elseif filter == "class" then

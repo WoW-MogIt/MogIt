@@ -20,8 +20,8 @@ checkButton:SetScript("OnClick",function(self)
 	mog:BuildList();
 end);
 
-function f.Filter(moggable)
-	return moggable or showUnmoggable;
+function f.Filter(itemID)
+	return select(3,GetItemTransmogrifyInfo(format("item:%d:0:0:0:0:0:5", itemID))) or showUnmoggable;
 end
 
 function f.Default()
