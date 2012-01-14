@@ -9,7 +9,7 @@ f:SetHeight(36);
 local label = f:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall");
 label:SetPoint("TOPLEFT",f,"TOPLEFT",0,0);
 label:SetPoint("RIGHT",f,"RIGHT",0,0);
-label:SetText(L["Moggable"]..":");
+label:SetText(L["Include unmoggable"]..":");
 label:SetJustifyH("LEFT");
 
 local checkButton = CreateFrame("CheckButton","MogItFiltersMoggable",f,"UICheckButtonTemplate");
