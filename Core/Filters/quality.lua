@@ -23,8 +23,8 @@ UIDropDownMenu_JustifyText(f.dd,"LEFT");
 
 function f.dd.SelectAll(self)
 	num = 0;
-	for k,v in ipairs(mog.sub.slots) do
-		selected[k] = all;
+	for k,v in ipairs(mog.sub.quality) do
+		selected[v] = all;
 		num = num + (all and 1 or 0);
 	end
 	all = not all;
@@ -52,9 +52,7 @@ function f.dd.initialize(self)
 	info.notCheckable = true;
 	UIDropDownMenu_AddButton(info);
 	
-	local quality = mog.sub.quality
-	for i = 0, #quality do
-		local v = quality[i]
+	for i,v in ipairs(mog.sub.quality) do
 		info = UIDropDownMenu_CreateInfo();
 		info.text =	_G["ITEM_QUALITY"..v.."_DESC"];
 		info.value = v;
@@ -62,7 +60,7 @@ function f.dd.initialize(self)
 		info.func = f.dd.Tier1;
 		info.keepShownOnClick = true;
 		info.isNotRadio = true;
-		info.checked = selected[i];
+		info.checked = selected[v];
 		UIDropDownMenu_AddButton(info);
 	end
 end
@@ -75,8 +73,8 @@ function f.Default()
 	selected = {};
 	num = 0;
 	all = nil;
-	for k,v in pairs(mog.sub.quality) do
-		selected[k] = true;
+	for i,v in ipairs(mog.sub.quality) do
+		selected[v] = true;
 		num = num + 1;
 	end
 	UIDropDownMenu_SetText(f.dd,L["%d selected"]:format(num));
