@@ -259,6 +259,7 @@ function mog.scroll.update(self,value,offset,onscroll)
 			frame.data.index = index;
 			frame.label:Hide();
 			--frame.icon:Hide();
+			frame.hasItem:Hide();
 			if frame:IsShown() then
 				mog.FrameUpdate(frame);
 				if owner == frame then
@@ -347,12 +348,18 @@ function mog.addModel(view)
 			f:SetScript("OnEnter",mog.OnEnter);
 			f:SetScript("OnLeave",mog.OnLeave);
 			
-			f.label = f:CreateFontString(nil, nil, "GameFontNormalLarge")
+			f.label = f:CreateFontString(nil, nil, "GameFontNormalLarge");
 			f.label:SetPoint("TOPLEFT", 16, -16);
 			f.label:SetPoint("BOTTOMRIGHT", -16, 16);
 			f.label:SetJustifyV("BOTTOM");
 			f.label:SetJustifyH("CENTER");
 			f.label:SetNonSpaceWrap(true);
+			
+			f.hasItem = f:CreateTexture();
+			f.hasItem:SetTexture("Interface\\RaidFrame\\ReadyCheck-Ready");
+			f.hasItem:SetSize(32, 32);
+			f.hasItem:SetPoint("BOTTOMRIGHT", -8, 8);
+			-- f.hasItem:
 			
 			--f.icon = f:CreateTexture(nil,"ARTWORK");
 			--f.icon:SetPoint("TOPRIGHT",f,"TOPRIGHT",-4,-4);

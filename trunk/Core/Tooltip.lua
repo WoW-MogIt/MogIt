@@ -48,14 +48,25 @@ mog.tooltip.model = CreateFrame("DressUpModel",nil,mog.tooltip);
 mog.tooltip.model:SetPoint("TOPLEFT",mog.tooltip,"TOPLEFT",5,-5);
 mog.tooltip.model:SetPoint("BOTTOMRIGHT",mog.tooltip,"BOTTOMRIGHT",-5,5);
 mog.tooltip:SetScript("OnShow",function(self)
-	if mog.db.profile.tooltipMouse then
+	if mog.db.profile.tooltipMouse and not InCombatLockdown() then
 		SetOverrideBinding(mog.tooltip,true,"MOUSEWHEELUP","MogIt_TooltipScrollUp");
 		SetOverrideBinding(mog.tooltip,true,"MOUSEWHEELDOWN","MogIt_TooltipScrollDown");
 	end
 end);
 mog.tooltip:SetScript("OnHide",function(self)
-	SetOverrideBinding(mog.tooltip,true,"MOUSEWHEELUP",nil);
-	SetOverrideBinding(mog.tooltip,true,"MOUSEWHEELDOWN",nil);
+	if not InCombatLockdown() then
+		ClearOverrideBindings(mog.tooltip);
+	end
+end);
+mog.tooltip:RegisterEvent("PLAYER_REGEN_DISABLED");
+mog.tooltip:RegisterEvent("PLAYER_REGEN_ENABLED");
+mog.tooltip:SetScript("OnEvent", function(self, event)
+	if event == "PLAYER_REGEN_DISABLED" then
+		ClearOverrideBindings(mog.tooltip);
+	elseif self:IsShown() and  mog.db.profile.tooltipMouse then
+		SetOverrideBinding(mog.tooltip,true,"MOUSEWHEELUP","MogIt_TooltipScrollUp");
+		SetOverrideBinding(mog.tooltip,true,"MOUSEWHEELDOWN","MogIt_TooltipScrollDown");
+	end
 end);
 
 mog.tooltip.check = CreateFrame("Frame");
@@ -96,13 +107,13 @@ end);
 
 function mog.tooltip.ShowItem(self)
 	if mog.db.profile.tooltip and (not mog.tooltip.mod[mog.db.profile.tooltipMod] or mog.tooltip.mod[mog.db.profile.tooltipMod]()) then
-		local _,item = self:GetItem();
+		local _,itemLink = self:GetItem();
 		local owner = self:GetOwner();
-		if item and owner then --and not (owner.MogItModel or owner.MogItSlot) then
-			if mog.tooltip.item ~= item then
-				mog.tooltip.item = item;
-				local _,_,quality,_,_,class,subclass,_,slot = GetItemInfo(item);
-				if (not mog.db.profile.tooltipMog or quality == 2 or quality == 3 or quality == 4 or quality == 7) and mog.tooltip.slots[slot] and IsDressableItem(item) then
+		if itemLink and owner then --and not (owner.MogItModel or owner.MogItSlot) then
+			if mog.tooltip.item ~= itemLink then
+				mog.tooltip.item = itemLink;
+				local _,_,quality,_,_,class,subclass,_,slot = GetItemInfo(itemLink);
+				if (not mog.db.profile.tooltipMog or select(3, GetItemTransmogrifyInfo(itemLink))) and mog.tooltip.slots[slot] and IsDressableItem(itemLink) then
 					mog.tooltip.model:SetFacing(mog.tooltip.slots[slot]-(mog.db.profile.tooltipRotate and 0.5 or 0));
 					mog.tooltip:Show();
 					mog.tooltip.owner = self;
@@ -117,7 +128,7 @@ function mog.tooltip.ShowItem(self)
 					else
 						mog.tooltip.model:Undress();
 					end
-					mog.tooltip.model:TryOn(item);
+					mog.tooltip.model:TryOn(itemLink);
 				else
 					mog.tooltip:Hide();
 				end
