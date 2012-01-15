@@ -58,8 +58,17 @@ function mog.sub.FrameUpdate(module,self,value)
 		self.data.items = display[value];
 		self.data.cycle = 1;
 		self.data.item = self.data.items[self.data.cycle];
+		for i, v in ipairs(self.data.items) do
+			if GetItemCount(v, true) > 0 then
+				self.hasItem:Show();
+				break;
+			end
+		end
 	else
 		self.data.item = display[value];
+		if GetItemCount(self.data.item, true) > 0 then
+			self.hasItem:Show();
+		end
 	end
 	-- local colors = mog.items.colours
 	-- for i = 1, 3 do
