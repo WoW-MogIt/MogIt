@@ -158,7 +158,6 @@ do
 				mog:AddToPreview(self.value)
 				CloseDropDownMenus()
 			end,
-			notCheckable = true,
 		},
 		{
 			wishlist = false,
@@ -296,10 +295,10 @@ do
 		{
 			wishlist = false,
 			text = L["Add set to wishlist"],
-			func = function(self)
+			func = function(self, items)
 				local create = mog.wishlist:CreateSet(self.value)
 				if create then
-					for i, itemID in pairs(mog.wishlist:GetSetItems(self.value)) do
+					for i, itemID in pairs(items) do
 						mog.wishlist:AddItem(itemID, self.value)
 					end
 				end
@@ -374,6 +373,7 @@ do
 				if v.wishlist == nil or v.wishlist == data.isSaved then
 					v.value = data.name
 					v.notCheckable = true
+					v.arg1 = data.items
 					UIDropDownMenu_AddButton(v, level)
 				end
 			end

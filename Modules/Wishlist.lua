@@ -260,7 +260,8 @@ function wishlist:DeleteItem(itemID, setName)
 		-- return false
 	-- end
 	if setName then
-		for slot, item in pairs(self:GetSetItems(setName)) do
+		local set = self:GetSet(setName)
+		for slot, item in pairs(set.items) do
 			if item == itemID then
 				set.items[slot] = nil
 				return
