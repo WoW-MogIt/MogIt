@@ -94,6 +94,18 @@ function mog.sub.Unlist(module)
 	wipe(display);
 end
 
+-- this sorts items of the same display ID thusly:
+--	first sort by required level
+--	then by display ID
+local function itemSort(a, b)
+	local level = mog.items.level;
+	if level[a] == level[b] then
+		return b > a;
+	else
+		return level[b] > level[a];
+	end
+end
+
 function mog.sub.BuildList(module)
 	wipe(list);
 	wipe(display);
@@ -115,6 +127,11 @@ function mog.sub.BuildList(module)
 			else
 				display[disp] = {display[disp],v};
 			end
+		end
+	end
+	for k, v in pairs(display) do
+		if type(v) == "table" then
+			sort(v, itemSort);
 		end
 	end
 	return list;
