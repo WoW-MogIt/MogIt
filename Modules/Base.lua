@@ -102,7 +102,7 @@ local function itemSort(a, b)
 	if level[a] == level[b] then
 		return b > a;
 	else
-		return level[b] > level[a];
+		return (level[b] or 1) > (level[a] or 1);
 	end
 end
 
