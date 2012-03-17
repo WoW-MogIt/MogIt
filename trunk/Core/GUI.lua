@@ -257,9 +257,9 @@ function mog.scroll.update(self,value,offset,onscroll)
 		if mog.list[index] then
 			wipe(frame.data);
 			frame.data.index = index;
-			frame.label:Hide();
-			--frame.icon:Hide();
-			frame.hasItem:Hide();
+			for k, v in pairs(frame.indicators) do
+				v:Hide();
+			end
 			if frame:IsShown() then
 				mog.FrameUpdate(frame);
 				if owner == frame then
@@ -313,6 +313,14 @@ mog.modelUpdater:SetScript("OnUpdate",function(self,elapsed)
 	self.prevx,self.prevy = currentx,currenty;
 end);
 
+local function setText(self, text)
+	self.indicators.label:SetText(text);
+end
+
+local function showIndicator(self, indicator)
+	self.indicators[indicator]:Show();
+end
+
 function mog.addModel(view)
 	local f;
 	if not mog.view and mog.bin[1] then
@@ -348,23 +356,29 @@ function mog.addModel(view)
 			f:SetScript("OnEnter",mog.OnEnter);
 			f:SetScript("OnLeave",mog.OnLeave);
 			
-			f.label = f:CreateFontString(nil, nil, "GameFontNormalLarge");
-			f.label:SetPoint("TOPLEFT", 16, -16);
-			f.label:SetPoint("BOTTOMRIGHT", -16, 16);
-			f.label:SetJustifyV("BOTTOM");
-			f.label:SetJustifyH("CENTER");
-			f.label:SetNonSpaceWrap(true);
+			f.indicators = {};
+			f.ShowIndicator = showIndicator;
+			f.SetText = setText;
 			
-			f.hasItem = f:CreateTexture();
-			f.hasItem:SetTexture("Interface\\RaidFrame\\ReadyCheck-Ready");
-			f.hasItem:SetSize(32, 32);
-			f.hasItem:SetPoint("BOTTOMRIGHT", -8, 8);
-			-- f.hasItem:
+			local label = f:CreateFontString(nil, nil, "GameFontNormalLarge");
+			label:SetPoint("TOPLEFT", 16, -16);
+			label:SetPoint("BOTTOMRIGHT", -16, 16);
+			label:SetJustifyV("BOTTOM");
+			label:SetJustifyH("CENTER");
+			label:SetNonSpaceWrap(true);
+			f.indicators.label = label;
 			
-			--f.icon = f:CreateTexture(nil,"ARTWORK");
-			--f.icon:SetPoint("TOPRIGHT",f,"TOPRIGHT",-4,-4);
-			--f.icon:SetSize(16,16);
-			--f.icon:SetTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcon_1");
+			local hasItem = f:CreateTexture();
+			hasItem:SetTexture("Interface\\RaidFrame\\ReadyCheck-Ready");
+			hasItem:SetSize(32, 32);
+			hasItem:SetPoint("BOTTOMRIGHT", -8, 8);
+			f.indicators.hasItem = hasItem;
+			
+			local wishlist = f:CreateTexture();
+			wishlist:SetTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcon_1");
+			wishlist:SetSize(32, 32);
+			wishlist:SetPoint("TOPRIGHT", -8, -8);
+			f.indicators.wishlist = wishlist;
 			
 			-- f.c1Bg = f:CreateTexture()
 			-- f.c1Bg:SetTexture(0, 0, 0)
