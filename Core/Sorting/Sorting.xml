@@ -6,5 +6,6 @@
 
 <Script file="level.lua"/>
 <Script file="colour.lua"/>
+<Script file="display.lua"/>
 
 </Ui>

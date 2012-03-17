@@ -63,10 +63,11 @@ function mog.Item_OnEnter(self, data)
 		local str;
 		for k, v in pairs(mog.sub.classBits) do
 			if bit.band(mog.items.class[item], v) > 0 then
+				local color = RAID_CLASS_COLORS[k]
 				if str then
-					str = str..", "..string.format("\124cff%.2x%.2x%.2x", RAID_CLASS_COLORS[k].r*255, RAID_CLASS_COLORS[k].g*255, RAID_CLASS_COLORS[k].b*255)..LOCALIZED_CLASS_NAMES_MALE[k].."\124r";
+					str = str..", "..string.format("\124cff%.2x%.2x%.2x", color.r * 255, color.g * 255, color.b * 255)..LOCALIZED_CLASS_NAMES_MALE[k].."\124r";
 				else
-					str = string.format("\124cff%.2x%.2x%.2x", RAID_CLASS_COLORS[k].r*255, RAID_CLASS_COLORS[k].g*255, RAID_CLASS_COLORS[k].b*255)..LOCALIZED_CLASS_NAMES_MALE[k].."\124r";
+					str = string.format("\124cff%.2x%.2x%.2x", color.r * 255, color.g * 255, color.b * 255)..LOCALIZED_CLASS_NAMES_MALE[k].."\124r";
 				end
 			end
 		end
@@ -96,19 +97,10 @@ function mog.Item_OnClick(self, btn, data, isSaved)
 	if not (self and item) then return end;
 	
 	if btn == "LeftButton" then
-		if IsShiftKeyDown() then
-			local _, link = GetItemInfo(item);
-			if link then
-				ChatEdit_InsertLink(link);
-			end
-		elseif IsControlKeyDown() then
-			DressUpItemLink(item);
-		else
-			if data.items then
-				data.cycle = (data.cycle < #data.items and (data.cycle + 1)) or 1;
-				data.item = data.items[data.cycle];
-				mog.OnEnter(self);
-			end
+		if not HandleModifiedItemClick(select(2, GetItemInfo(item))) and data.items then
+			data.cycle = (data.cycle % #data.items) + 1;
+			data.item = data.items[data.cycle];
+			mog.OnEnter(self);
 		end
 	elseif btn == "RightButton" then
 		if IsControlKeyDown() then
@@ -236,8 +228,8 @@ end
 
 function mog.Set_FrameUpdate(self, data)
 	if not (self and data and data.items) then return end
-	self.label:SetText(data.name);
-	self.label:Show();
+	self:ShowIndicator("label");
+	self:SetText(data.name);
 	self.model:Undress();
 	for k, v in pairs(data.items) do
 		self.model:TryOn(v);

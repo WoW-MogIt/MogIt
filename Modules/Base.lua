@@ -60,14 +60,20 @@ function mog.sub.FrameUpdate(module,self,value)
 		self.data.item = self.data.items[self.data.cycle];
 		for i, v in ipairs(self.data.items) do
 			if GetItemCount(v, true) > 0 then
-				self.hasItem:Show();
-				break;
+				self:ShowIndicator("hasItem");
+				-- break;
+			end
+			if mog.wishlist:IsItemInWishlist(v) then
+				self:ShowIndicator("wishlist");
 			end
 		end
 	else
 		self.data.item = display[value];
 		if GetItemCount(self.data.item, true) > 0 then
-			self.hasItem:Show();
+			self:ShowIndicator("hasItem");
+		end
+		if mog.wishlist:IsItemInWishlist(self.data.item) then
+			self:ShowIndicator("wishlist");
 		end
 	end
 	-- local colors = mog.items.colours
@@ -268,6 +274,7 @@ for k,v in ipairs(addons) do
 			sorting = {
 				"level",
 				"colour",
+				"display",
 			},
 			sorts = {
 				level = mog.sub.SortLevel,
