@@ -1,0 +1,32 @@
+﻿## Interface: 40300
+## Author: Aelobin (The Maelstrom EU)
+## Version: 2.2.1
+## LoadOnDemand: 1
+## RequiredDeps: MogIt
+
+## Title: MogIt_Two-Hand
+## Title-deDE: MogIt_Zweihändig
+## Title-frFR: MogIt_Deux mains
+## Title-esES: MogIt_Dos Manos
+## Title-ruRU: MogIt_Двуручное
+## Title-koKR: MogIt_양손
+## Title-zhTW: MogIt_雙手
+## Title-zhCN: MogIt_双手
+
+## Notes: MogIt Data
+## Notes-deDE: MogIt Daten
+## Notes-frFR: MogIt Données
+## Notes-esES: MogIt Datos
+## Notes-ruRU: MogIt данные
+## Notes-koKR: MogIt 데이터
+## Notes-zhTW: MogIt 的數據
+## Notes-zhCN: MogIt 数据
+
+Bosses.lua
+Colours.lua
+
+Sword.lua
+Axe.lua
+Mace.lua
+Polearm.lua
+Staff.lua
