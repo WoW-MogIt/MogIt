@@ -82,7 +82,7 @@ function mog.Item_OnEnter(self, data)
 	
 	if itemName then
 		-- need to hack a random suffix into the link, or those items will be thought not moggable because they have no stats
-		local canBeChanged, noChangeReason, canBeSource, noSourceReason = GetItemTransmogrifyInfo(format("item:%d:0:0:0:0:0:5", item));
+		local canBeChanged, noChangeReason, canBeSource, noSourceReason = GetItemTransmogrifyInfo(item);
 		if not canBeSource then
 			GameTooltip:AddLine(" ");
 			GameTooltip:AddLine(ERR_TRANSMOGRIFY_INVALID_SOURCE, 1, 0, 0);
