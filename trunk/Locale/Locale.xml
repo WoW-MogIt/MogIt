@@ -15,4 +15,6 @@
 <Script file="ptBR.lua"/>
 <Script file="itIT.lua"/>
 
+<Script file="Lists.lua"/>
+
 </Ui>

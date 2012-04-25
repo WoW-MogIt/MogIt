@@ -1,6 +1,16 @@
 local MogIt,mog = ...;
 local L = mog.L;
 
+
+mog.models = {};
+mog.bin = {};
+mog.posX = 0;
+mog.posY = 0;
+mog.posZ = 0;
+mog.face = 0;
+
+
+--// mog.frame
 mog.frame:SetPoint("CENTER",UIParent,"CENTER");
 mog.frame:SetSize(252,108);
 mog.frame:SetToplevel(true);
@@ -44,6 +54,12 @@ mog.frame.resize.texture = mog.frame.resize:CreateTexture(nil,"OVERLAY");
 mog.frame.resize.texture:SetTexture("Interface\\AddOns\\MogIt\\Images\\Resize");
 mog.frame.resize.texture:SetAllPoints(mog.frame.resize);
 
+mog.frame.page = mog.frame:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall");
+mog.frame.page:SetPoint("BOTTOMRIGHT",mog.frame,"BOTTOMRIGHT",-17,10);
+--//
+
+
+--// mog.dropdown
 mog.frame.module = mog.frame:CreateFontString(nil,"ARTWORK","GameFontNormal");
 mog.frame.module:SetPoint("TOPLEFT",mog.frame,"TOPLEFT",62,-35);
 mog.frame.module:SetText(L["Module"]..":");
@@ -98,7 +114,10 @@ function mog.dropdown:initialize(tier)
 		tier1:Dropdown(tier);
 	end
 end
+--//
 
+
+--// mog.sorting
 mog.sorting = CreateFrame("Frame","MogItSorting",mog.frame,"UIDropDownMenuTemplate");
 mog.sorting:SetPoint("TOPRIGHT",mog.frame,"TOPRIGHT",6,-28);
 mog.sorting.label = mog.frame:CreateFontString(nil,"ARTWORK","GameFontNormal");
@@ -118,7 +137,10 @@ function mog.sorting:initialize(tier)
 		end
 	end
 end
+--//
 
+
+--// Main Buttons
 mog.frame.filters = CreateFrame("Button","MogItFrameFiltersButton",mog.frame,"MagicButtonTemplate");
 mog.frame.filters:SetPoint("BOTTOMLEFT",mog.frame,"BOTTOMLEFT",5,5);
 mog.frame.filters:SetWidth(100);
@@ -186,10 +208,10 @@ end);
 mog.frame.help:SetScript("OnLeave",function(self)
 	GameTooltip:Hide();
 end);
+--//
 
-mog.frame.page = mog.frame:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall");
-mog.frame.page:SetPoint("BOTTOMRIGHT",mog.frame,"BOTTOMRIGHT",-17,10);
 
+--// mog.scroll
 mog.scroll = CreateFrame("Slider","MogItScroll",mog.frame,"UIPanelScrollBarTrimTemplate");
 mog.scroll:Hide();
 mog.scroll:SetPoint("TOPRIGHT",mog.frame.Inset,"TOPRIGHT",1,-17);
@@ -284,6 +306,11 @@ end
 mog.frame:SetScript("OnMouseWheel",function(self,offset)
 	mog.scroll:update(nil,offset > 0 and -1 or 1);
 end);
+--//
+
+
+
+
 
 function mog.updateModels()
 	mog.view.model.model:SetFacing(mog.face);

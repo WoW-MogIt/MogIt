@@ -21,7 +21,7 @@ checkButton:SetScript("OnClick",function(self)
 end);
 
 function f.Filter(itemID)
-	return select(3,GetItemTransmogrifyInfo(format("item:%d:0:0:0:0:0:5", itemID))) or showUnmoggable;
+	return showUnmoggable or select(3,GetItemTransmogrifyInfo(format("item:%d:0:0:0:0:0:5", itemID)));
 end
 
 function f.Default()

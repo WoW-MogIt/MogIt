@@ -2,114 +2,139 @@ local MogIt,mog = ...;
 _G["MogIt"] = mog;
 local L = mog.L;
 
-local doBuildList
 
-mog.modules = {
-	base = {},
-	extra = {},
-	lookup = {},
-};
-
+mog.frame = CreateFrame("Frame","MogItFrame",UIParent,"ButtonFrameTemplate");
 mog.list = {};
-mog.models = {};
-mog.bin = {};
-mog.posX = 0;
-mog.posY = 0;
-mog.posZ = 0;
-mog.face = 0;
 
-mog.items = {};
-mog.sub = {
-	colours = {
-		[1] = {},
-		[2] = {},
-		[3] = {},
-	},
-	source = {
-		[1] = L["Drop"],
-		[2] = PVP,
-		[3] = L["Quest"],
-		[4] = L["Vendor"],
-		[5] = L["Crafted"],
-		[6] = L["Achievement"],
-		[7] = L["Code Redemption"],
-	},
-	diffs = {
-		--[1] = PLAYER_DIFFICULTY1,
-		[2] = PLAYER_DIFFICULTY2,
-		[3] = L["10N"],
-		[4] = L["25N"],
-		[5] = L["10H"],
-		[6] = L["25H"],
-		--[7] = PLAYER_DIFFICULTY1,
-		[8] = PLAYER_DIFFICULTY2,
-		[9] = PLAYER_DIFFICULTY3,
-	},
-	difficulties = {
-		[1] = DUNGEON_DIFFICULTY_5PLAYER;
-		[2] = DUNGEON_DIFFICULTY_5PLAYER_HEROIC;
-		[3] = RAID_DIFFICULTY_10PLAYER;
-		[4] = RAID_DIFFICULTY_10PLAYER_HEROIC;
-		[5] = RAID_DIFFICULTY_25PLAYER;
-		[6] = RAID_DIFFICULTY_25PLAYER_HEROIC;
-		[7] = PLAYER_DIFFICULTY3,
-		[8] = OTHER,
-	},
-	slots = {
-		[1] = INVTYPE_WEAPON,
-		[2] = INVTYPE_WEAPONMAINHAND,
-		[3] = INVTYPE_WEAPONOFFHAND,
-	},
-	professions = {
-		[1] = GetSpellInfo(2259), -- Alchemy
-		[2] = GetSpellInfo(2018), -- Blacksmithing
-		[3] = GetSpellInfo(7411), -- Enchanting
-		[4] = GetSpellInfo(4036), -- Engineering
-		[5] = GetSpellInfo(45357), -- Inscription
-		[6] = GetSpellInfo(25229), -- Jewelcrafting
-		[7] = GetSpellInfo(2108), -- Leatherworking
-		[8] = GetSpellInfo(3908), -- Tailoring
+function mog:Error(msg)
+	DEFAULT_CHAT_FRAME:AddMessage("MogIt: "..msg); -- add colour
+end
 
-		[9] = GetSpellInfo(2366), -- Herbalism
-		[10] = GetSpellInfo(2575), -- Mining
-		[11] = GetSpellInfo(8613), -- Skinning
 
-		[12] = GetSpellInfo(78670), -- Archaeology
-		[13] = GetSpellInfo(2550), -- Cooking
-		[14] = GetSpellInfo(3273), -- First Aid
-		[15] = GetSpellInfo(7620), -- Fishing
-	},
-	quality = {
-		0, -- Poor
-		1, -- Common
-		2, -- Uncommon
-		3, -- Rare
-		4, -- Epic
-		5, -- Legendary
-		--6, -- Artifact
-		7, -- Heirloom
-	},
-	classBits = {
-		DEATHKNIGHT = 32,
-		DRUID = 1024,
-		HUNTER = 4,
-		MAGE = 128,
-		PALADIN = 2,
-		PRIEST = 16,
-		ROGUE = 8,
-		SHAMAN = 64,
-		WARLOCK = 256,
-		WARRIOR = 1,
-	},
-	bind = {
-		[0] = NONE,
-		[1] = ITEM_BIND_ON_PICKUP,
-		[2] = ITEM_BIND_ON_EQUIP,
-		[5] = ITEM_BIND_TO_BNETACCOUNT,
-	},
+--// Frame Toggle
+function mog.toggleFrame()
+	if mog.frame:IsShown() then
+		HideUIPanel(mog.frame);
+	else
+		ShowUIPanel(mog.frame);
+	end
+end
+
+function mog.togglePreview()
+	if mog.view:IsShown() then
+		HideUIPanel(mog.view);
+	else
+		ShowUIPanel(mog.view);
+	end
+end
+
+SLASH_MOGIT1 = "/mog";
+SLASH_MOGIT2 = "/mogit";
+SlashCmdList["MOGIT"] = mog.toggleFrame;
+
+BINDING_HEADER_MogIt = "MogIt";
+BINDING_NAME_MogIt = L["Toggle Mogit"];
+BINDING_NAME_MogItPreview = L["Toggle Preview"];
+--//
+
+
+--// LibDataBroker
+local LDB = LibStub("LibDataBroker-1.1");
+mog.LDBI = LibStub("LibDBIcon-1.0");
+mog.mmb = LDB:NewDataObject("MogIt",{
+	type = "launcher",
+	icon = "Interface\\Icons\\INV_Enchant_EssenceCosmicGreater",
+	OnClick = function(self,btn)
+		if btn == "RightButton" then
+			mog.togglePreview();
+		else
+			mog.toggleFrame();
+		end
+	end,
+	OnTooltipShow = function(self)
+		if not self or not self.AddLine then return end
+		self:AddLine("MogIt");
+		self:AddLine(L["Left click to toggle MogIt"],1,1,1);
+		self:AddLine(L["Right click to toggle the preview"],1,1,1);
+	end,
+});
+--//
+
+
+--// Module API
+mog.moduleVersion = 1;
+mog.modules = {};
+mog.modulesOrder = {};
+
+function mog:GetModule(name)
+	return mog.modules[name];
+end
+
+function mog:GetActiveModule()
+	return mog.active;
+end
+
+function mog:RegisterModule(name,version,data)
+	if mog:GetModule(name) then return end;
+	if type(version) ~= "number" or version < mog.moduleVersion then
+		mog:Error(L["The \"%s\" module needs to be updated to work with this version of MogIt."]:format(name));
+		return;
+	elseif version > mog.moduleVersion then
+		mog:Error(L["The \"%s\" module requires you to update MogIt for it to work."]:format(name));
+		return;
+	end
+	
+	data = data or {};
+	data.name = name;
+	mog.modules[name] = data;
+	table.insert(mog.modulesOrder,name);
+	if UIDropDownMenu_GetCurrentDropDown() == mog.dropdown and DropDownList1 and DropDownList1:IsShown() then
+		HideDropDownMenu(1);
+		ToggleDropDownMenu(1,data,mog.dropdown);
+	end
+	return data;
+end
+--//
+
+
+--// Data API
+mog.data = {};
+
+function mog:AddData(data,id,key,value)
+	if not mog.data[data] then
+		mog.data[data] = {};
+	end
+	if not mog.data[data][key] then
+		mog.data[data][key] = {};
+	end
+	mog.data[data][key][id] = value;
+end
+
+function mog:GetData(data,id,key)
+	return mog.data[data][key][id];
+end
+--//
+
+
+--// Slot Conversion
+mog.slots = {
+	"HeadSlot",
+	"ShoulderSlot",
+	"BackSlot",
+	"ChestSlot",
+	"ShirtSlot",
+	"TabardSlot",
+	"WristSlot",
+	"HandsSlot",
+	"WaistSlot",
+	"LegsSlot",
+	"FeetSlot",
+	"MainHandSlot",
+	"SecondaryHandSlot",
+	"RangedSlot",
 };
 
-mog.invSlots = {
+mog.slotsType = {
 	INVTYPE_HEAD = "HeadSlot",
 	INVTYPE_SHOULDER = "ShoulderSlot",
 	INVTYPE_BODY = "ShirtSlot",
@@ -133,45 +158,83 @@ mog.invSlots = {
 	INVTYPE_TABARD = "TabardSlot",
 };
 
-mog.itemSlots = {
-	"HeadSlot",
-	"ShoulderSlot",
-	"BackSlot",
-	"ChestSlot",
-	"ShirtSlot",
-	"TabardSlot",
-	"WristSlot",
-	"HandsSlot",
-	"WaistSlot",
-	"LegsSlot",
-	"FeetSlot",
-	"MainHandSlot",
-	"SecondaryHandSlot",
-	"RangedSlot",
-};
+function mog:GetSlot(id)
+	return mog.slots[id] or mog.slotsType[id];
+end
+--//
 
-function mog:RegisterModule(name,data,base)
-	if mog.modules.lookup[name] then return end;
-	data = data or {};
-	data.name = name;
-	mog.modules.lookup[name] = data;
-	table.insert(base and mog.modules.base or mog.modules.extra,data);
-	if UIDropDownMenu_GetCurrentDropDown() == mog.dropdown and DropDownList1 and DropDownList1:IsShown() then
-		HideDropDownMenu(1);
-		ToggleDropDownMenu(1,data,mog.dropdown);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--// Mob API
+local LBB = LibStub("LibBabble-Boss-3.0"):GetUnstrictLookupTable();
+mog.mobs = {};
+
+--[[local tooltip = CreateFrame("GameTooltip","MogItMobsTooltip");
+local text = tooltip:CreateFontString();
+tooltip:AddFontStrings(text,tooltip:CreateFontString());
+
+local function CachedMob(id)
+	if not id then return end;
+	tooltip:SetOwner(WorldFrame,"ANCHOR_NONE");
+	tooltip:SetHyperlink(("unit:0xF53%05X00000000"):format(id));
+	if (tooltip:IsShown()) then
+		return text:GetText();
 	end
-	return data;
+end--]]
+
+function mog.AddMob(id,name)
+	--if not (mog.mobs[id] or CachedMob(id)) then
+	if not mog.mobs[id] then
+		mog.mobs[id] = LBB[name] or name;
+	end
 end
 
-function mog:GetModule(name)
-	return mog.modules.lookup[name];
+function mog.GetMob(id)
+	--return mog.mobs[id] or CachedMob(id);
+	return mog.mobs[id];
 end
+--//
 
-function mog:GetActiveModule()
-	return mog.active.name;
-end
+
+
+
+
+--// Lists API
+mog.lists = {};
+
+--function mog:AddToList(module,
+--//
+
+
+
+
+
+
+
+
+
+
+
 
 function mog:SetModule(module,text)
+	if mog:GetActiveModule() and mog:GetActiveModule().UnList
 	if mog.active and mog.active.Unlist and mog.active ~= module then
 		mog.active:Unlist(module);
 	end
@@ -184,6 +247,24 @@ function mog:SetModule(module,text)
 		UIDropDownMenu_SetText(mog.dropdown,L["Select a module"]);
 	end
 end
+
+
+
+
+
+
+
+local doBuildList
+
+
+
+
+
+
+
+
+
+
 
 function mog:BuildList(top,module)
 	if (module and mog.active and mog.active.name ~= module) then return end;
@@ -216,49 +297,6 @@ function mog.ItemInfoReceived()
 	mog.frame:SetScript("OnUpdate", nil);
 end
 
-function mog.toggleFrame()
-	if mog.frame:IsShown() then
-		HideUIPanel(mog.frame);
-	else
-		ShowUIPanel(mog.frame);
-	end
-end
-
-function mog.togglePreview()
-	if mog.view:IsShown() then
-		HideUIPanel(mog.view);
-	else
-		ShowUIPanel(mog.view);
-	end
-end
-
-SLASH_MOGIT1 = "/mog";
-SLASH_MOGIT2 = "/mogit";
-SlashCmdList["MOGIT"] = mog.toggleFrame;
-
-BINDING_HEADER_MogIt = "MogIt";
-BINDING_NAME_MogIt = L["Toggle Mogit"];
-BINDING_NAME_MogItPreview = L["Toggle Preview"];
-
-local LDB = LibStub("LibDataBroker-1.1");
-mog.LDBI = LibStub("LibDBIcon-1.0");
-mog.mmb = LDB:NewDataObject("MogIt",{
-	type = "launcher",
-	icon = "Interface\\Icons\\INV_Enchant_EssenceCosmicGreater",
-	OnClick = function(self,btn)
-		if btn == "RightButton" then
-			mog.togglePreview();
-		else
-			mog.toggleFrame();
-		end
-	end,
-	OnTooltipShow = function(self)
-		if not self or not self.AddLine then return end
-		self:AddLine("MogIt");
-		self:AddLine(L["Left click to toggle MogIt"],1,1,1);
-		self:AddLine(L["Right click to toggle the preview"],1,1,1);
-	end,
-});
 
 local defaults = {
 	profile = {
@@ -297,7 +335,6 @@ function mog.LoadSettings()
 	mog.scroll:update();
 end
 
-mog.frame = CreateFrame("Frame","MogItFrame",UIParent,"ButtonFrameTemplate");
 mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 	if event == "PLAYER_LOGIN" then
 		mog.view.model.model:SetUnit("PLAYER");
@@ -377,33 +414,7 @@ function mog:DeleteItemData(id,field)
 	end
 end--]=]
 
-local LBB = LibStub("LibBabble-Boss-3.0"):GetUnstrictLookupTable();
-mog.mobs = {};
 
---[[local tooltip = CreateFrame("GameTooltip","MogItMobsTooltip");
-local text = tooltip:CreateFontString();
-tooltip:AddFontStrings(text,tooltip:CreateFontString());
-
-local function CachedMob(id)
-	if not id then return end;
-	tooltip:SetOwner(WorldFrame,"ANCHOR_NONE");
-	tooltip:SetHyperlink(("unit:0xF53%05X00000000"):format(id));
-	if (tooltip:IsShown()) then
-		return text:GetText();
-	end
-end--]]
-
-function mog.AddMob(id,name)
-	--if not (mog.mobs[id] or CachedMob(id)) then
-	if not mog.mobs[id] then
-		mog.mobs[id] = LBB[name] or name;
-	end
-end
-
-function mog.GetMob(id)
-	--return mog.mobs[id] or CachedMob(id);
-	return mog.mobs[id];
-end
 
 function mog.GetItemSourceInfo(itemID)
 	local source, info;
