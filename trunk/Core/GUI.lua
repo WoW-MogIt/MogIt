@@ -54,24 +54,60 @@ mog.frame.resize.texture = mog.frame.resize:CreateTexture(nil,"OVERLAY");
 mog.frame.resize.texture:SetTexture("Interface\\AddOns\\MogIt\\Images\\Resize");
 mog.frame.resize.texture:SetAllPoints(mog.frame.resize);
 
+mog.frame.path = mog.frame:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall");
+mog.frame.path:SetPoint("BOTTOMLEFT",mog.frame,"BOTTOMLEFT",17,10);
+
 mog.frame.page = mog.frame:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall");
 mog.frame.page:SetPoint("BOTTOMRIGHT",mog.frame,"BOTTOMRIGHT",-17,10);
 --//
 
 
---// mog.dropdown
-mog.frame.module = mog.frame:CreateFontString(nil,"ARTWORK","GameFontNormal");
-mog.frame.module:SetPoint("TOPLEFT",mog.frame,"TOPLEFT",62,-35);
-mog.frame.module:SetText(L["Module"]..":");
+--// Toolbar
+mog.menu = CreateFrame("Frame");
+mog.menu.displayMode = "MENU";
+mog.menu.initialize = function(self,level)
+	mog.menu.active.func(level);
+end
 
-mog.dropdown = CreateFrame("Frame","MogItDropdown",mog.frame,"UIDropDownMenuTemplate");
-mog.dropdown:SetPoint("LEFT",mog.frame.module,"RIGHT",-12,-3);
-UIDropDownMenu_SetWidth(mog.dropdown,175);
-UIDropDownMenu_SetButtonWidth(mog.dropdown,190);
-UIDropDownMenu_JustifyText(mog.dropdown,"LEFT");
-UIDropDownMenu_SetText(mog.dropdown,L["Select a module"]);
+local function menuOnClick(self,btn)
+	mog.menu.active = self;
+	ToggleDropDownMenu(1,nil,mog.menu,self,0,0,self,self);
+end
+
+local function menuOnEnter(self)
+	self.nt:SetTexture(1,0.82,0,1);
+end
+
+local function menuOnLeave(self)
+	self.nt:SetTexture(0,0,0,0);
+end
+
+function mog.CreateMenu(parent,label,func)
+	local f = CreateFrame("Button",nil,parent);
+	f:SetText(label);
+	f:SetNormalFontObject(GameFontNormal);
+	f:SetHighlightFontObject(GameFontBlack);
+	f:SetSize(f:GetFontString():GetStringWidth()+10,f:GetFontString():GetStringHeight()+10);
+	
+	f.nt = f:CreateTexture(nil,"BACKGROUND");
+	--nt:SetTexture(0.8,0.3,0.8,1);
+	f.nt:SetTexture(0,0,0,0);
+	f.nt:SetAllPoints(f);
+	f:SetNormalTexture(f.nt);
+	
+	f.func = func;
+	f:SetScript("OnClick",menuOnClick);
+	f:SetScript("OnEnter",menuOnEnter);
+	f:SetScript("OnLeave",menuOnLeave);
+	
+	return f;
+end
+--//
+
+
+--// Modules Menu
 local tier1;
-function mog.dropdown:initialize(tier)
+mog.menu.modules = mog.CreateMenu(mog.frame,L["Modules"],function(tier)
 	if tier == 2 then
 		tier1 = UIDROPDOWNMENU_MENU_VALUE;
 	end
@@ -85,38 +121,85 @@ function mog.dropdown:initialize(tier)
 		info.justifyH = "CENTER";
 		UIDropDownMenu_AddButton(info,tier);
 		
-		for k,v in ipairs(mog.modules.base) do
-			if v.Dropdown then
+		for k,v in ipairs(mog.moduleList) do
+			if v.base and v.Dropdown then
 				v:Dropdown(tier);
 			end
 		end
 		
-		if #mog.modules.extra > 0 then
-			info = UIDropDownMenu_CreateInfo();
-			info.isTitle = true;
-			info.notCheckable = true;
-			UIDropDownMenu_AddButton(info,tier);
-			
-			info = UIDropDownMenu_CreateInfo();
-			info.text = L["Extra Modules"];
-			info.isTitle = true;
-			info.notCheckable = true;
-			info.justifyH = "CENTER";
-			UIDropDownMenu_AddButton(info,tier);
+		info = UIDropDownMenu_CreateInfo();
+		info.isTitle = true;
+		info.notCheckable = true;
+		UIDropDownMenu_AddButton(info,tier);
 		
-			for k,v in ipairs(mog.modules.extra) do
-				if v.Dropdown then
-					v:Dropdown(tier);
-				end
+		info = UIDropDownMenu_CreateInfo();
+		info.text = L["Extra Modules"];
+		info.isTitle = true;
+		info.notCheckable = true;
+		info.justifyH = "CENTER";
+		UIDropDownMenu_AddButton(info,tier);
+		
+		for k,v in ipairs(mog.moduleList) do
+			if (not v.base) and v.Dropdown then
+				v:Dropdown(tier);
 			end
 		end
 	elseif tier1.Dropdown then
 		tier1:Dropdown(tier);
 	end
-end
+end);
+mog.menu.modules:SetPoint("TOPLEFT",mog.frame,"TOPLEFT",62,-31);
 --//
 
 
+--// Catalogue Menu
+local function filtToggle()
+	if mog.filt:IsShown() then
+		mog.filt:Hide();
+	else
+		mog.filt:Show();
+	end
+end
+
+mog.menu.catalogue = mog.CreateMenu(mog.frame,L["Catalogue"],function(tier)
+	if tier == 2 then
+		tier1 = UIDROPDOWNMENU_MENU_VALUE;
+	end
+	
+	if tier == 1 then
+		local info;
+		info = UIDropDownMenu_CreateInfo();
+		info.text = mog.filt:IsShown() and L["Hide Filters"] or L["Show Filters"];
+		info.notCheckable = true;
+		info.func = filtToggle;
+		UIDropDownMenu_AddButton(info,tier);
+	end
+end);
+mog.menu.catalogue:SetPoint("LEFT",mog.menu.modules,"RIGHT",4,0);
+--//
+
+
+--// Preview Menu
+mog.menu.preview = mog.CreateMenu(mog.frame,L["Preview"]);
+mog.menu.preview:SetPoint("LEFT",mog.menu.catalogue,"RIGHT",4,0);
+--//
+
+
+--// Options Menu
+local function optionsToggle()
+	if not mog.options then
+		mog.createOptions();
+	end
+	InterfaceOptionsFrame_OpenToCategory(MogIt);
+end
+
+mog.menu.options = mog.CreateMenu(mog.frame,L["Options"]);
+mog.menu.options:SetScript("OnClick",optionsToggle);
+mog.menu.options:SetPoint("LEFT",mog.menu.preview,"RIGHT",4,0);
+--//
+
+
+--[[
 --// mog.sorting
 mog.sorting = CreateFrame("Frame","MogItSorting",mog.frame,"UIDropDownMenuTemplate");
 mog.sorting:SetPoint("TOPRIGHT",mog.frame,"TOPRIGHT",6,-28);
@@ -136,78 +219,7 @@ function mog.sorting:initialize(tier)
 			end
 		end
 	end
-end
---//
-
-
---// Main Buttons
-mog.frame.filters = CreateFrame("Button","MogItFrameFiltersButton",mog.frame,"MagicButtonTemplate");
-mog.frame.filters:SetPoint("BOTTOMLEFT",mog.frame,"BOTTOMLEFT",5,5);
-mog.frame.filters:SetWidth(100);
-mog.frame.filters:SetText(FILTERS);
-mog.frame.filters:SetScript("OnClick",function(self,btn)
-	if mog.filt:IsShown() then
-		mog.filt:Hide();
-	else
-		mog.filt:Show();
-	end
-end);
-
-mog.frame.preview = CreateFrame("Button","MogItFramePreviewButton",mog.frame,"MagicButtonTemplate");
-mog.frame.preview:SetPoint("TOPLEFT",mog.frame.filters,"TOPRIGHT");
-mog.frame.preview:SetWidth(100);
-mog.frame.preview:SetText(L["Preview"]);
-mog.frame.preview:SetScript("OnClick",function(self,btn)
-	if mog.view:IsShown() then
-		HideUIPanel(mog.view);
-	else
-		ShowUIPanel(mog.view);
-	end
-end);
-
-mog.frame.options = CreateFrame("Button","MogItFrameOptionsButton",mog.frame,"MagicButtonTemplate");
-mog.frame.options:SetPoint("TOPLEFT",mog.frame.preview,"TOPRIGHT");
-mog.frame.options:SetWidth(100);
-mog.frame.options:SetText(MAIN_MENU);
-mog.frame.options:SetScript("OnClick",function(self,btn)
-	if not mog.options then
-		mog.createOptions();
-	end
-	InterfaceOptionsFrame_OpenToCategory(MogIt);
-end);
-
-mog.frame.help = CreateFrame("Button","MogItFrameHelpButton",mog.frame,"MagicButtonTemplate");
-mog.frame.help:SetPoint("TOPLEFT",mog.frame.options,"TOPRIGHT");
-mog.frame.help:SetWidth(100);
-mog.frame.help:SetText(L["Help"]);
-mog.frame.help:SetScript("OnEnter",function(self)
-	GameTooltip:SetOwner(self,"ANCHOR_RIGHT");
-	GameTooltip:AddLine("Basic Controls");
-	GameTooltip:AddDoubleLine(L["Rotate"],L["Left click + horizontal drag"],0,1,0,1,1,1);
-	GameTooltip:AddDoubleLine(L["Zoom"],L["Left click + vertical drag"],0,1,0,1,1,1);
-	GameTooltip:AddDoubleLine(L["Move"],L["Right click + drag"],0,1,0,1,1,1);
-	GameTooltip:AddDoubleLine(L["Resize"],L["Click bottom right corner + drag"],0,1,0,1,1,1);
-	if mog.view:IsShown() then
-		GameTooltip:AddLine(" ");
-		GameTooltip:AddLine("Preview Controls");
-		--GameTooltip:AddDoubleLine(,,0,1,0,1,1,1);
-		GameTooltip:AddDoubleLine(L["Chat link"],L["Shift + Left click"],0,1,0,1,1,1);
-		GameTooltip:AddDoubleLine(L["Try on"],L["Ctrl + Left click"],0,1,0,1,1,1);
-		GameTooltip:AddDoubleLine(L["Wishlist menu"],L["Right click"],0,1,0,1,1,1);
-		GameTooltip:AddDoubleLine(L["Item URL"],L["Shift + Right click"],0,1,0,1,1,1);
-		GameTooltip:AddDoubleLine(L["Remove from preview"],L["Ctrl + Right click"],0,1,0,1,1,1);
-		GameTooltip:AddDoubleLine(L["Resize"],L["Click bottom right corner + drag"],0,1,0,1,1,1);
-	end
-	if mog.active and mog.active.Help then
-		GameTooltip:AddLine(" ");
-		GameTooltip:AddLine("Module Controls");
-		mog.active:Help();
-	end
-	GameTooltip:Show();
-end);
-mog.frame.help:SetScript("OnLeave",function(self)
-	GameTooltip:Hide();
-end);
+end--]]
 --//
 
 
@@ -264,7 +276,7 @@ function mog.scroll.update(self,value,offset,onscroll)
 		self.down:Enable();
 	end
 	
-	if ((UIDropDownMenu_GetCurrentDropDown() == mog.Item_Menu) or (UIDropDownMenu_GetCurrentDropDown() == mog.Set_Menu)) and DropDownList1 and DropDownList1:IsShown() then
+	if mog.IsDropdownShown(mog.Item_Menu) or mog.IsDropdownShown(mog.Set_Menu) then
 		HideDropDownMenu(1);
 	end
 	
