@@ -248,10 +248,10 @@ end
 for k,v in ipairs(addons) do
 	local _,title,_,_,loadable = GetAddOnInfo(v);
 	if loadable then
-		mog:RegisterModule(v,{
-			name = v,
+		mog:RegisterModule(v,1,{
 			label = title:match("MogIt_(.+)") or title,
 			--addon = v,
+			base = true,
 			slots = {},
 			Dropdown = mog.sub.Dropdown,
 			BuildList = mog.sub.BuildList,
@@ -280,6 +280,6 @@ for k,v in ipairs(addons) do
 				level = mog.sub.SortLevel,
 				colour = mog.sub.SortColour,
 			},
-		},true);
+		});
 	end
 end
