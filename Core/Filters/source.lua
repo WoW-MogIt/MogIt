@@ -23,7 +23,7 @@ UIDropDownMenu_JustifyText(f.dd,"LEFT");
 
 function f.dd.SelectAll(self)
 	num = 0;
-	for k,v in ipairs(mog.sub.source) do
+	for k,v in ipairs(L.source) do
 		selected[k] = all;
 		num = num + (all and 1 or 0);
 	end
@@ -60,7 +60,7 @@ function f.dd.initialize(self,tier)
 		info.notCheckable = true;
 		UIDropDownMenu_AddButton(info);
 		
-		for k,v in ipairs(mog.sub.source) do
+		for k,v in ipairs(L.source) do
 			info = UIDropDownMenu_CreateInfo();
 			info.text =	v;
 			info.value = k;
@@ -74,7 +74,7 @@ function f.dd.initialize(self,tier)
 	elseif tier == 2 then
 		local parent = UIDROPDOWNMENU_MENU_VALUE;
 		if parent == 1 then
-			for k,v in ipairs(mog.sub.difficulties) do
+			for k,v in ipairs(L.difficulties) do
 				info = UIDropDownMenu_CreateInfo();
 				info.text =	v;
 				info.value = k;
@@ -117,11 +117,11 @@ function f.Default()
 	};
 	num = 0;
 	all = nil;
-	for k,v in ipairs(mog.sub.source) do
+	for k,v in ipairs(L.source) do
 		selected[k] = true;
 		num = num + 1;
 	end
-	for k,v in ipairs(mog.sub.difficulties) do
+	for k,v in ipairs(L.difficulties) do
 		sub[1][k] = true;
 	end
 	UIDropDownMenu_SetText(f.dd,L["%d selected"]:format(num));

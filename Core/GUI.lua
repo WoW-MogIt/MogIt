@@ -63,7 +63,7 @@ mog.frame.page:SetPoint("BOTTOMRIGHT",mog.frame,"BOTTOMRIGHT",-17,10);
 
 
 --// Toolbar
-mog.menu = CreateFrame("Frame");
+mog.menu = CreateFrame("Frame", "MogItMenuBarMenu");
 mog.menu.displayMode = "MENU";
 mog.menu.initialize = function(self,level)
 	mog.menu.active.func(level);
@@ -199,7 +199,7 @@ mog.menu.options:SetPoint("LEFT",mog.menu.preview,"RIGHT",4,0);
 --//
 
 
---[[
+
 --// mog.sorting
 mog.sorting = CreateFrame("Frame","MogItSorting",mog.frame,"UIDropDownMenuTemplate");
 mog.sorting:SetPoint("TOPRIGHT",mog.frame,"TOPRIGHT",6,-28);
@@ -219,7 +219,7 @@ function mog.sorting:initialize(tier)
 			end
 		end
 	end
-end--]]
+end
 --//
 
 
@@ -325,10 +325,10 @@ end);
 
 
 function mog.updateModels()
-	mog.view.model.model:SetFacing(mog.face);
-	if mog.view.model.model:IsVisible() then
-		mog.view.model.model:SetPosition(mog.posZ,mog.posX,mog.posY);
-	end
+	-- mog.view.model.model:SetFacing(mog.face);
+	-- if mog.view.model.model:IsVisible() then
+		-- mog.view.model.model:SetPosition(mog.posZ,mog.posX,mog.posY);
+	-- end
 	for k,v in ipairs(mog.models) do
 		v.model:SetFacing(mog.face);
 		if v.model:IsVisible() then

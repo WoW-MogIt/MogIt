@@ -243,7 +243,7 @@ saveMenu.initialize = function(self, level)
 	info.notCheckable = true
 	UIDropDownMenu_AddButton(info, level)
 end
-mog.view.save.menu = saveMenu
+-- mog.view.save.menu = saveMenu
 
 
 local function onClick(self, profile)
@@ -282,7 +282,7 @@ loadMenu.initialize = function(self, level)
 		mog.wishlist:AddSetMenuItems(level, onClick, UIDROPDOWNMENU_MENU_VALUE, UIDROPDOWNMENU_MENU_VALUE)
 	end
 end
-mog.view.load.menu = loadMenu
+-- mog.view.load.menu = loadMenu
 
 
 
@@ -366,11 +366,12 @@ end
 function mog.view.delItem(slot)
 	mog.view.slots[slot].item = nil;
 	mog.view.setTexture(slot);
-	mog.view.model.model:Undress(); -- needs cleanup
-	mog:DressModel(mog.view.model.model);
+	mog.view.model.model:UndressSlot(slot); -- needs cleanup
+	-- mog:DressModel(mog.view.model.model);
 end
 
 function mog:DressModel(model)
+	do return end
 	if mog.db.profile.gridDress == "preview" or (model == mog.view.model.model) then
 		for k,v in pairs(mog.view.slots) do
 			if v.item then

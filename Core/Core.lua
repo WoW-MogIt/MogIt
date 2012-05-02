@@ -183,7 +183,7 @@ end
 
 mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 	if event == "PLAYER_LOGIN" then
-		mog.view.model.model:SetUnit("PLAYER");
+		-- mog.view.model.model:SetUnit("PLAYER");
 		mog.updateGUI();
 		mog.tooltip.model:SetUnit("PLAYER");
 	elseif event == "GET_ITEM_INFO_RECEIVED" then
@@ -213,7 +213,7 @@ mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 				mog.tooltip.rotate:Show();
 			end
 			
-			for name,module in pairs(mog.modules.lookup) do
+			for name,module in pairs(mog.moduleList) do
 				if module.MogItLoaded then
 					module:MogItLoaded()
 				end
@@ -263,7 +263,7 @@ function mog:DeleteData(data,id,key)
 end
 
 function mog:GetData(data,id,key)
-	return mog.data[data][key][id];
+	return mog.data[data] and mog.data[data][key] and mog.data[data][key][id];
 end
 --//
 
@@ -340,33 +340,33 @@ end
 
 function mog.GetItemSourceInfo(itemID)
 	local source, info;
-	local sourceType = mog.items.source[itemID];
-	local sourceID = mog.items.sourceid[itemID];
-	local sourceInfo = mog.items.sourceinfo[itemID];
+	local sourceType = mog:GetData("item", itemID, "source");
+	local sourceID = mog:GetData("item", itemID, "sourceid");
+	local sourceInfo = mog:GetData("item", itemID, "sourceinfo");
 	
 	if sourceType == 1 and sourceID then -- Drop
-		source = mog.GetMob(sourceID);
+		source = mog:GetData("npc", sourceID, "name");
 	-- elseif sourceType == 3 then -- Quest
 	elseif sourceType == 5 and sourceInfo then -- Crafted
-		source = mog.sub.professions[sourceInfo];
+		source = L.professions[sourceInfo];
 	elseif sourceType == 6 and sourceID then -- Achievement
 		local _, name, _, complete = GetAchievementInfo(sourceID);
 		source = name;
 		info = complete;
 	end
 	
-	local zone = mog.items.zone[itemID];
+	local zone = mog:GetData("item", itemID, "zone");
 	if zone then
 		zone = GetMapNameByID(zone);
 		if zone then
-			local diff = mog.sub.diffs[sourceInfo];
+			local diff = L.diffs[sourceInfo];
 			if sourceType == 1 and diff then
 				zone = format("%s (%s)", zone, diff);
 			end
 		end
 	end
 	
-	return mog.sub.source[sourceType], source, zone, info;
+	return L.source[sourceType], source, zone, info;
 end
 
 function mog.GetItemSourceShort(itemID)

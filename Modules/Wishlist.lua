@@ -1,7 +1,7 @@
 local MogIt, mog = ...
 local L = mog.L
 
-local wishlist = mog:RegisterModule("Wishlist", {}, true)
+local wishlist = mog:RegisterModule("Wishlist", mog.moduleVersion)
 mog.wishlist = wishlist
 
 local function onProfileUpdated(self, event)
@@ -184,8 +184,8 @@ function wishlist:OnEnter(frame, value)
 		end
 	end
 	
-	-- if mog.sub.filters.slot[item] then
-		-- GameTooltip:AddDoubleLine(L["Slot"]..":",mog.sub.slots[mog.sub.filters.slot[item]],nil,nil,nil,1,1,1);
+	-- if L.filters.slot[item] then
+		-- GameTooltip:AddDoubleLine(L["Slot"]..":",L.slots[L.filters.slot[item]],nil,nil,nil,1,1,1);
 	-- end
 
 	GameTooltip:Show()
