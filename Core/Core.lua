@@ -222,7 +222,7 @@ mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 			mog.modules[arg1].loaded = true;
 			if mog.menu.active == mog.menu.modules and mog.IsDropdownShown(mog.menu) then
 				HideDropDownMenu(1);
-				ToggleDropDownMenu(1,mog.modules[arg1],mog.menu);
+				ToggleDropDownMenu(1,mog.modules[arg1],mog.menu,mog.menu.modules,0,0);
 			end
 		elseif arg1 == "AtlasLoot" then
 			mog.tooltip.hookAtlasLoot();
@@ -315,6 +315,11 @@ function mog:GetSlot(id)
 end
 --//
 
+
+-- temporary wrapper
+function mog.AddMob(id, name)
+	mog:AddData("npc", id, "name", name)
+end
 
 
 

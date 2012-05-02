@@ -306,7 +306,7 @@ function mog.view.addItem(item)
 		mog.view.wait[item] = (mog.view.wait[item] or 0) + 1;
 		return;
 	end
-	if mog.invSlots[slot] then
+	if mog.slotsType[slot] then
 		if slot == "INVTYPE_2HWEAPON" then
 			if select(2,UnitClass("PLAYER")) == "WARRIOR" and (select(5,GetTalentInfo(2,20)) or 0) > 0 then
 				slot = "INVTYPE_WEAPON";
@@ -332,9 +332,9 @@ function mog.view.addItem(item)
 			mog.view.twohand = nil;
 		end
 		
-		mog.view.slots[mog.invSlots[slot]].item = item;
+		mog.view.slots[mog.slotsType[slot]].item = item;
 		-- item history
-		mog.view.setTexture(mog.invSlots[slot],texture);
+		mog.view.setTexture(mog.slotsType[slot],texture);
 		if mog.view:IsShown() then
 			mog.view.model.model:TryOn(item);
 		end
