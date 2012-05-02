@@ -22,7 +22,7 @@ UIDropDownMenu_JustifyText(f.dd,"LEFT");
 
 function f.dd.SelectAll(self)
 	num = 0;
-	for k,v in ipairs(mog.sub.slots) do
+	for k,v in ipairs(L.slots) do
 		selected[k] = all;
 		num = num + (all and 1 or 0);
 	end
@@ -51,7 +51,7 @@ function f.dd.initialize(self)
 	info.notCheckable = true;
 	UIDropDownMenu_AddButton(info);
 	
-	for k,v in ipairs(mog.sub.slots) do
+	for k,v in ipairs(L.slots) do
 		info = UIDropDownMenu_CreateInfo();
 		info.text =	v;
 		info.value = k;
@@ -71,7 +71,7 @@ function f.Default()
 	selected = {};
 	num = 0;
 	all = nil;
-	for k,v in ipairs(mog.sub.slots) do
+	for k,v in ipairs(L.slots) do
 		selected[k] = true;
 		num = num + 1;
 	end

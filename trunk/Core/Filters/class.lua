@@ -29,7 +29,7 @@ function f.dd.SelectAll(self)
 	for k,v in pairs(LOCALIZED_CLASS_NAMES_MALE) do
 		selected[k] = all;
 		num = num + (all and 1 or 0);
-		class = class + (all and mog.sub.classBits[k] or 0);
+		class = class + (all and L.classBits[k] or 0);
 	end
 	all = not all;
 	UIDropDownMenu_SetText(f.dd,L["%d selected"]:format(num));
@@ -39,10 +39,10 @@ end
 
 function f.dd.Tier1(self)
 	if selected[self.value] and (not self.checked) then
-		class = class - mog.sub.classBits[self.value];
+		class = class - L.classBits[self.value];
 		num = num - 1;
 	elseif (not selected[self.value]) and self.checked then
-		class = class + mog.sub.classBits[self.value];
+		class = class + L.classBits[self.value];
 		num = num + 1;
 	end
 	selected[self.value] = self.checked;
@@ -81,7 +81,7 @@ function f.Filter(input)
 end
 
 function f.Default()
-	class = mog.sub.classBits[select(2,UnitClass("PLAYER"))];
+	class = L.classBits[select(2,UnitClass("PLAYER"))];
 	selected = {[select(2,UnitClass("PLAYER"))] = true};
 	num = 1;
 	all = true;

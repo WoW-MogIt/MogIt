@@ -16,6 +16,8 @@ local addons = {
 	"MogIt_Accessories",
 };
 
+mog.sub = {}
+
 function mog.sub.DropdownTier1(self)
 	if not self.value.loaded then
 		LoadAddOn(self.value.name);
@@ -124,7 +126,7 @@ function mog.sub.BuildList(module)
 			end
 		end
 		if state then
-			local disp = mog.items.display[v];
+			local disp = mog:GetData("item", v, "display");
 			if not display[disp] then
 				display[disp] = v;
 				tinsert(list,disp);
@@ -159,6 +161,7 @@ function mog.sub.AddSlot(label,addon)
 	return items;
 end
 
+mog.items = {}
 mog.items.display = {};
 mog.items.quality = {};
 mog.items.level = {};
@@ -179,16 +182,16 @@ mog.items.colours = {
 
 function mog.sub.AddItem(tbl,id,display,quality,lvl,faction,class,slot,source,sourceid,zone,sourceinfo)
 	table.insert(tbl,id);
-	mog.items.display[id] = display;
-	mog.items.quality[id] = quality;
-	mog.items.level[id] = lvl;
-	mog.items.faction[id] = faction;
-	mog.items.class[id] = class;
-	mog.items.slot[id] = slot;
-	mog.items.source[id] = source;
-	mog.items.sourceid[id] = sourceid;
-	mog.items.sourceinfo[id] = sourceinfo;
-	mog.items.zone[id] = zone;
+	mog:AddData("item", id, "display", display);
+	mog:AddData("item", id, "quality", quality);
+	mog:AddData("item", id, "level", lvl);
+	mog:AddData("item", id, "faction", faction);
+	mog:AddData("item", id, "class", class);
+	mog:AddData("item", id, "slot", slot);
+	mog:AddData("item", id, "source", source);
+	mog:AddData("item", id, "sourceid", sourceid);
+	mog:AddData("item", id, "sourceinfo", sourceinfo);
+	mog:AddData("item", id, "zone", zone);
 end
 
 function mog.sub.AddColours(id,c1,c2,c3)--,c4,c5)
@@ -205,21 +208,21 @@ function mog.sub.GetFilterArgs(filter,item)
 	if filter == "name" then
 		return GetItemInfo(item);
 	elseif filter == "level" then
-		return mog.items.level[item];
+		return mog:GetData("item", item, "level");
 	elseif filter == "itemLevel" then
 		return select(4,GetItemInfo(item));
 	elseif filter == "moggable" then
 		return item;
 	elseif filter == "faction" then
-		return mog.items.faction[item];
+		return mog:GetData("item", item, "faction");
 	elseif filter == "class" then
-		return mog.items.class[item];
+		return mog:GetData("item", item, "class");
 	elseif filter == "source" then
-		return mog.items.source[item],mog.items.sourceinfo[item];
+		return mog:GetData("item", item, "source"),mog:GetData("item", item, "sourceinfo");
 	elseif filter == "quality" then
-		return mog.items.quality[item];
+		return mog:GetData("item", item, "quality");
 	elseif filter == "slot" then
-		return mog.items.slot[item];
+		return mog:GetData("item", item, "slot");
 	end
 end
 
@@ -227,11 +230,11 @@ function mog.sub.SortLevel(id)
 	if type(display[id]) == "table" then
 		local tbl = {};
 		for k,v in ipairs(display[id]) do
-			table.insert(tbl,mog.items.level[v]);
+			table.insert(tbl,mog:GetData("item", v, "level"));
 		end
 		return tbl;
 	else
-		return mog.items.level[display[id]];
+		return mog:GetData("item", display[id], "level");
 	end
 end
 

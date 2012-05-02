@@ -18,7 +18,7 @@ function mog.Item_FrameUpdate(self, data)
 end
 
 local sourceLabels = {
-	[mog.sub.source[1]] = BOSS,
+	[L.source[1]] = BOSS,
 }
 
 function mog.Item_OnEnter(self, data)
@@ -52,17 +52,17 @@ function mog.Item_OnEnter(self, data)
 	end
 	
 	GameTooltip:AddLine(" ");
-	if mog.items.level[item] then
-		GameTooltip:AddDoubleLine(LEVEL..":", mog.items.level[item], nil, nil, nil, 1, 1, 1);
+	if mog:GetData("item", item, "level") then
+		GameTooltip:AddDoubleLine(LEVEL..":", mog:GetData("item", item, "level"), nil, nil, nil, 1, 1, 1);
 	end
 	GameTooltip:AddDoubleLine(STAT_AVERAGE_ITEM_LEVEL..":", itemLevel, nil, nil, nil, 1, 1, 1);
-	if mog.items.faction[item] then
-		GameTooltip:AddDoubleLine(FACTION..":", (mog.items.faction[item] == 1 and FACTION_ALLIANCE or FACTION_HORDE), nil, nil, nil, 1, 1, 1);
+	if mog:GetData("item", item, "faction") then
+		GameTooltip:AddDoubleLine(FACTION..":", (mog:GetData("item", item, "faction") == 1 and FACTION_ALLIANCE or FACTION_HORDE), nil, nil, nil, 1, 1, 1);
 	end
-	if mog.items.class[item] and mog.items.class[item] > 0 then
+	if mog:GetData("item", item, "class") and mog:GetData("item", item, "class") > 0 then
 		local str;
-		for k, v in pairs(mog.sub.classBits) do
-			if bit.band(mog.items.class[item], v) > 0 then
+		for k, v in pairs(L.classBits) do
+			if bit.band(mog:GetData("item", item, "class"), v) > 0 then
 				local color = RAID_CLASS_COLORS[k]
 				if str then
 					str = str..", "..string.format("\124cff%.2x%.2x%.2x", color.r * 255, color.g * 255, color.b * 255)..LOCALIZED_CLASS_NAMES_MALE[k].."\124r";
@@ -73,8 +73,8 @@ function mog.Item_OnEnter(self, data)
 		end
 		GameTooltip:AddDoubleLine(CLASS..":", str, nil, nil, nil, 1, 1, 1);
 	end
-	if mog.items.slot[item] then
-		GameTooltip:AddDoubleLine(L["Slot"]..":", mog.sub.slots[mog.items.slot[item]], nil, nil, nil, 1, 1, 1);
+	if mog:GetData("item", item, "slot") then
+		GameTooltip:AddDoubleLine(L["Slot"]..":", L.slots[mog:GetData("item", item, "slot")], nil, nil, nil, 1, 1, 1);
 	end
 	
 	GameTooltip:AddLine(" ");
@@ -241,7 +241,7 @@ function mog.Set_OnEnter(self, data)
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 	
 	GameTooltip:AddLine(data.name);
-	for i, slot in ipairs(mog.itemSlots) do
+	for i, slot in ipairs(mog.slots) do
 		local itemID = data.items[slot] or data.items[i]
 		if itemID then
 			local name, link = GetItemInfo(itemID);
