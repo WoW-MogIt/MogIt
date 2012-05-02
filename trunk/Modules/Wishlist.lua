@@ -247,7 +247,7 @@ function wishlist:AddItem(itemID, setName, slot)
 	end
 	local set = self:GetSet(setName)
 	if set then
-		slot = slot or mog.invSlots[select(9, GetItemInfo(itemID))]
+		slot = slot or mog.slotsType[select(9, GetItemInfo(itemID))]
 		set.items[slot] = itemID
 	else
 		tinsert(self.db.profile.items, itemID)
