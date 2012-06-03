@@ -4,17 +4,20 @@
 ## Version: 2.4.0
 ## SavedVariables: MogItDB, MogItWishlist
 ## Notes: Transmogrification Assistant
-## Notes-deDE: Transmogrifikation Assistentin
 ## Notes-frFR: Transmogrification Assistante
+## Notes-deDE: Transmogrifikation Assistentin
 ## Notes-esES: Transfigurar Ayudante
+## Notes-esMX: Transmogrification Assistant
 ## Notes-ruRU: трансмогрификация помощником
 ## Notes-koKR: 형상변환 조교
-## Notes-zhTW: 塑形 助理
 ## Notes-zhCN: 物品幻化系统 助理
+## Notes-zhTW: 塑形 助理
+## Notes-ptBR: Transmogrification Assistant
+## Notes-itIT: Transmogrification Assistant
 ## X-Category: Roleplay & Transmogrification
 ## X-Website: http://www.curse.com/addons/wow/mogit
 ## X-Email: aelobin@gmail.com
-## X-Localizations: enUS, frFR, deDE, esES, zhCN, zhTW
+## X-Localizations: enUS, frFR, deDE, esES, esMX, ruRU, koKR, zhCN, zhTW, ptBR, itIT
 
 Libs\Embeds.xml
 Locale\Locale.xml

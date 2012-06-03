@@ -1,6 +1,8 @@
 local MogIt,mog = ...;
 local L = mog.L;
 
+-- options to disable filters/info
+
 local LBI = LibStub("LibBabble-Inventory-3.0"):GetUnstrictLookupTable();
 local list = {};
 local display = {};

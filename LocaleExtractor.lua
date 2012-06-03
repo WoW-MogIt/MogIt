@@ -1,5 +1,5 @@
 local strings;
-local output;
+local output = "L[\"Transmogrification Assistant\"] = true";
 
 function getStrings(name)
 	output = output.."\n\n\t--[[ "..name.." ]]--";
