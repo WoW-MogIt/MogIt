@@ -4,6 +4,14 @@ local L = mog.L;
 
 mog.view = CreateFrame("Frame","MogItPreview",UIParent);
 mog.view:SetAllPoints(UIParent);
+mog.view:SetScript("OnShow",function(self)
+	mog.modelUpdater:Show();
+end);
+mog.view:SetScript("OnHide",function(self)
+	if not mog.frame:IsShown() then
+		mog.modelUpdater:Hide();
+	end
+end);
 tinsert(UISpecialFrames,"MogItPreview");
 
 mog.view.bin = {};

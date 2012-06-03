@@ -11,12 +11,12 @@ function mog:Error(msg)
 end
 
 function mog.IsDropdownShown(dd)
-	return UIDropDownMenu_GetCurrentDropDown() == dd and DropDownList1 and DropDownList1:IsShown();
+	return DropDownList1 and DropDownList1:IsShown() and UIDropDownMenu_GetCurrentDropDown() == dd;
 end
 
 
---// Frame Toggle
-function mog.toggleFrame()
+--// Slash Commands
+function mog:ToggleFrame()
 	if mog.frame:IsShown() then
 		HideUIPanel(mog.frame);
 	else
@@ -24,17 +24,20 @@ function mog.toggleFrame()
 	end
 end
 
-function mog.togglePreview()
+function mog:TogglePreview()
 	if mog.view:IsShown() then
 		HideUIPanel(mog.view);
 	else
 		ShowUIPanel(mog.view);
 	end
 end
+--//
 
+
+--// Bindings
 SLASH_MOGIT1 = "/mog";
 SLASH_MOGIT2 = "/mogit";
-SlashCmdList["MOGIT"] = mog.toggleFrame;
+SlashCmdList["MOGIT"] = mog.ToggleFrame;
 
 BINDING_HEADER_MogIt = "MogIt";
 BINDING_NAME_MogIt = L["Toggle Mogit"];
@@ -43,16 +46,15 @@ BINDING_NAME_MogItPreview = L["Toggle Preview"];
 
 
 --// LibDataBroker
-local LDB = LibStub("LibDataBroker-1.1");
 mog.LDBI = LibStub("LibDBIcon-1.0");
-mog.mmb = LDB:NewDataObject("MogIt",{
+mog.mmb = LibStub("LibDataBroker-1.1"):NewDataObject("MogIt",{
 	type = "launcher",
 	icon = "Interface\\Icons\\INV_Enchant_EssenceCosmicGreater",
 	OnClick = function(self,btn)
 		if btn == "RightButton" then
-			mog.togglePreview();
+			mog:TogglePreview();
 		else
-			mog.toggleFrame();
+			mog:ToggleFrame();
 		end
 	end,
 	OnTooltipShow = function(self)
@@ -80,8 +82,8 @@ end
 
 function mog:RegisterModule(name,version,data)
 	if mog.modules[name] then
-		mog:Error(L["The \124cFFFFFFFF%s\124r module is already loaded."]:format(name));
-		return;
+		--mog:Error(L["The \124cFFFFFFFF%s\124r module is already loaded."]:format(name));
+		return mog.modules[name];
 	elseif type(version) ~= "number" or version < mog.moduleVersion then
 		mog:Error(L["The \124cFFFFFFFF%s\124r module needs to be updated to work with this version of MogIt."]:format(name));
 		return;
@@ -163,11 +165,12 @@ local defaults = {
 		height = 200,
 		rows = 2;
 		columns = 3,
+		sync = true,
 	}
 }
 
 function mog.LoadSettings()
-	mog.updateGUI();
+	mog:UpdateGUI();
 	if mog.db.profile.minimap.hide then
 		mog.LDBI:Hide("MogIt");
 	else
@@ -184,7 +187,7 @@ end
 mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 	if event == "PLAYER_LOGIN" then
 		-- mog.view.model.model:SetUnit("PLAYER");
-		mog.updateGUI();
+		mog:UpdateGUI();
 		mog.tooltip.model:SetUnit("PLAYER");
 	elseif event == "GET_ITEM_INFO_RECEIVED" then
 		doBuildList = true
@@ -251,14 +254,16 @@ end
 
 function mog:DeleteData(data,id,key)
 	if not mog.data[data] then return end;
-	if key then
-		if mog.data[data][key] then
-			mog.data[data][key][id] = nil;
-		end
-	else
+	if id and key then
+		mog.data[data][key][id] = nil;
+	elseif id then
 		for k,v in pairs(mog.data[data]) do
 			v[id] = nil;
 		end
+	elseif key then
+		mog.data[data][key] = nil;
+	else
+		mog.data[data] = nil;
 	end
 end
 
@@ -316,32 +321,20 @@ end
 --//
 
 
--- temporary wrapper
+
+
+
+
+
+
+
+
+
+
+-- temporary wrappers
 function mog.AddMob(id, name)
 	mog:AddData("npc", id, "name", name)
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 function mog.GetItemSourceInfo(itemID)
 	local source, info;
