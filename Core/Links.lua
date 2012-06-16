@@ -22,7 +22,7 @@ local function fromBase(str)
 	return num;
 end
 
-function mog:SetToLink(set)
+function mog:SetToLink(set,race,gender)
 	local link = "[MogIt:";
 	for k,v in pairs(set) do
 		link = link..("%0"..maxlen.."s"):format(toBase(v));
@@ -33,7 +33,8 @@ end
 
 function mog:LinkToSet(link)
 	local set = {};
-	local items = link:match("MogIt:([^%]:]+)");
+	--local items = link:match("MogIt:([^%]:]+)");
+	local items,info = link:match("MogIt:(%w+):?(%d*)");
 	if items then
 		for i=1,#items/maxlen do
 			table.insert(set,fromBase(items:sub((i-1)*maxlen+1,i*maxlen)));

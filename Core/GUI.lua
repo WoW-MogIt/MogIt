@@ -45,7 +45,7 @@ mog.frame.resize:EnableMouse(true);
 function mog.frame.resize.update(self)
 	mog.db.profile.width = floor((mog.frame:GetWidth()+5-(4+10)-(10+18+4))/mog.db.profile.columns)-5;
 	mog.db.profile.height = floor((mog.frame:GetHeight()+5-(60+10)-(10+26))/mog.db.profile.rows)-5;
-	mog.updateGUI(true);
+	mog:UpdateGUI(true);
 end
 mog.frame.resize:SetScript("OnMouseDown",function(self)
 	mog.frame:SetMinResize(510,350);
@@ -71,6 +71,7 @@ mog.frame.page:SetPoint("BOTTOMRIGHT",mog.frame,"BOTTOMRIGHT",-17,10);
 
 
 --// Toolbar
+mog.menu = CreateFrame("Frame","MogItMenu",mog.frame);
 mog.menu.displayMode = "MENU";
 mog.menu.initialize = function(self,level)
 	if mog.menu.active and mog.menu.active.func then
@@ -91,13 +92,13 @@ local function menuOnClick(self,btn)
 end
 
 local function menuOnEnter(self)
-	--[[if mog.menu.active ~= self and mog.IsDropdownShown(mog.menu) then
+	if mog.menu.active ~= self and mog.IsDropdownShown(mog.menu) then
 		HideDropDownMenu(1);
 		if self.func then
 			mog.menu.active = self;
 			ToggleDropDownMenu(1,nil,mog.menu,self,0,0,self,self);
 		end
-	end--]]
+	end
 	self.nt:SetTexture(1,0.82,0,1);
 end
 
@@ -194,6 +195,7 @@ mog.menu.catalogue = mog.CreateMenu(mog.frame,L["Catalogue"],function(tier)
 		info.text = L["Sorting"];
 		info.value = "sorting";
 		info.notCheckable = true;
+		info.disabled = not (mog.active and mog.active.sorting and #mog.active.sorting > 0);
 		UIDropDownMenu_AddButton(info,tier);
 	elseif mog.menu.tier[2] == "sorting" then
 		if tier == 2 then

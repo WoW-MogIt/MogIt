@@ -2,9 +2,7 @@
 local L = mog.L;
 
 function mog.createOptions()
-	local about = LibStub("LibAboutPanel").new(nil,MogIt);
-	about:GetScript("OnShow")(about);
-	about:SetScript("OnShow",nil);
+	local about = LibStub("LibAddonInfo-1.0"):CreateFrame(MogIt);
 
 	local config = LibStub("AceConfig-3.0");
 	local dialog = LibStub("AceConfigDialog-3.0");
