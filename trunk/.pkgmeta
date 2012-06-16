@@ -21,9 +21,6 @@ externals:
     Libs/AceDBOptions-3.0:
         url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceDBOptions-3.0
         tag: latest
-    Libs/LibAboutPanel:
-        url: git://git.curseforge.net/wow/libaboutpanel/mainline.git
-        tag: latest
     Libs/LibDataBroker-1.1:
         url: git://git.wowace.com/wow/libdatabroker-1-1/mainline.git
         tag: latest
