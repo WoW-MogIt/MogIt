@@ -1,17 +1,16 @@
 local MogIt,mog = ...;
 local L = mog.L;
 
--- options to disable filters/info?
 mog.base = {};
-
-
---// Input Functions
 local tinsert = table.insert;
 local sort = table.sort;
+local ipairs = ipairs;
 local select = select;
 local LBI = LibStub("LibBabble-Inventory-3.0"):GetUnstrictLookupTable();
 local LBB = LibStub("LibBabble-Boss-3.0"):GetUnstrictLookupTable();
 
+
+--// Input Functions
 function mog.base.AddSlot(slot,addon)
 	local module = mog:GetModule(addon);
 	if not module.slots[slot] then
@@ -243,3 +242,6 @@ for _,addon in ipairs(addons) do
 	end
 end
 --//
+
+
+-- options to disable filters/info?
