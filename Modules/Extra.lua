@@ -17,6 +17,7 @@ end
 
 for i=1,GetNumAddOns() do
 	local name,title,_,_,loadable = GetAddOnInfo(i);
+	-- if load on demand and mogit dependency
 	if loadable and (not mog:GetModule(name)) and name:find("^MogIt_") then
 		mog:RegisterModule(name,{
 			name = name,
