@@ -2,12 +2,12 @@ local MogIt,mog = ...;
 local L = mog.L;
 
 mog.base = {};
+local LBI = LibStub("LibBabble-Inventory-3.0"):GetUnstrictLookupTable();
+local LBB = LibStub("LibBabble-Boss-3.0"):GetUnstrictLookupTable();
 local tinsert = table.insert;
 local sort = table.sort;
 local ipairs = ipairs;
 local select = select;
-local LBI = LibStub("LibBabble-Inventory-3.0"):GetUnstrictLookupTable();
-local LBB = LibStub("LibBabble-Boss-3.0"):GetUnstrictLookupTable();
 
 
 --// Input Functions
