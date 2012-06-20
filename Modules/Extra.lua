@@ -10,20 +10,20 @@ local function temp(module,tier)
 		info.colorCode = "\124cFF"..(module.loaded and "00FF00" or "FF0000");
 		info.keepShownOnClick = true;
 		info.notCheckable = true;
-		info.func = mog.sub.DropdownTier1;
+		info.func = mog.base.DropdownTier1;
 		UIDropDownMenu_AddButton(info,tier);
 	end
 end
 
 for i=1,GetNumAddOns() do
 	local name,title,_,_,loadable = GetAddOnInfo(i);
-	-- if load on demand and mogit dependency
-	if loadable and (not mog:GetModule(name)) and name:find("^MogIt_") then
-		mog:RegisterModule(name,{
-			name = name,
-			--addon = name,
-			label = title:match("^MogIt_(.+)") or title,
-			Dropdown = temp,
-		});
+	if loadable and (not mog:GetModule(name)) then
+		local version = tonumber(GetAddOnMetadata(name,"X-MogItModuleVersion"));
+		if version then
+			mog:RegisterModule(name,version,{
+				label = title:match("^MogIt_(.+)") or title,
+				Dropdown = temp,
+			});
+		end
 	end
 end
