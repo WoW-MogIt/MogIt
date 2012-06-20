@@ -27,6 +27,9 @@ function mog:SetToLink(set,race,gender)
 	for k,v in pairs(set) do
 		link = link..("%0"..maxlen.."s"):format(toBase(v));
 	end
+	link = link..":";
+	link = link..(race and toBase(race) or "0");
+	link = link..(sex and toBase(sex) or "0");
 	link = link.."]";
 	return link;
 end
@@ -34,13 +37,13 @@ end
 function mog:LinkToSet(link)
 	local set = {};
 	--local items = link:match("MogIt:([^%]:]+)");
-	local items,info = link:match("MogIt:(%w+):?(%d*)");
+	local items,race,sex = link:match("MogIt:(%w+):?(%w?)(%w?)");
 	if items then
 		for i=1,#items/maxlen do
 			table.insert(set,fromBase(items:sub((i-1)*maxlen+1,i*maxlen)));
 		end
 	end
-	return set;
+	return set,fromBase(race),fromBase(sex);
 end
 
 local function filter(self,event,msg,...)

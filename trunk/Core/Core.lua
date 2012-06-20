@@ -148,6 +148,20 @@ end
 
 local defaults = {
 	profile = {
+		clearOnPreviewSet = false,
+		noAnim = false,
+		minimap = {},
+		url = "Battle.net",
+		
+		gridDress = "preview",
+		width = 200,
+		height = 200,
+		rows = 2;
+		columns = 3,
+		sync = true,
+		rotateSynced = false,
+		rotateNoSynced = false,
+		
 		tooltip = true,
 		tooltipWidth = 300,
 		tooltipHeight = 300,
@@ -156,16 +170,6 @@ local defaults = {
 		tooltipRotate = true,
 		tooltipMog = true,
 		tooltipMod = "None",
-		clearOnPreviewSet = false,
-		gridDress = "preview",
-		noAnim = false,
-		minimap = {},
-		url = "Battle.net",
-		width = 200,
-		height = 200,
-		rows = 2;
-		columns = 3,
-		sync = true,
 	}
 }
 
@@ -243,6 +247,7 @@ mog.frame:RegisterEvent("PLAYER_EQUIPMENT_CHANGED");
 mog.data = {};
 
 function mog:AddData(data,id,key,value)
+	if not data and id and key then return end;
 	if not mog.data[data] then
 		mog.data[data] = {};
 	end
@@ -250,6 +255,7 @@ function mog:AddData(data,id,key,value)
 		mog.data[data][key] = {};
 	end
 	mog.data[data][key][id] = value;
+	return value;
 end
 
 function mog:DeleteData(data,id,key)

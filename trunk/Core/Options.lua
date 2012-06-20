@@ -33,7 +33,7 @@ function mog.createOptions()
 					mog.tooltip.rotate:Hide();
 				end
 			elseif info.arg == "rows" or info.arg == "columns" then
-				mog.updateGUI();
+				mog:UpdateGUI();
 			elseif info.arg == "gridDress" then
 				mog.scroll:update();
 			end

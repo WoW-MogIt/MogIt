@@ -1,11 +1,199 @@
 local MogIt,mog = ...;
 local L = mog.L;
 
--- options to disable filters/info
+-- options to disable filters/info?
+mog.base = {};
 
+
+--// Input Functions
+local tinsert = table.insert;
+local sort = table.sort;
+local select = select;
 local LBI = LibStub("LibBabble-Inventory-3.0"):GetUnstrictLookupTable();
+local LBB = LibStub("LibBabble-Boss-3.0"):GetUnstrictLookupTable();
+
+function mog.base.AddSlot(slot,addon)
+	local module = mog:GetModule(addon);
+	if not module.slots[slot] then
+		module.slots[slot] = {
+			label = LBI[slot] or slot,
+			list = {},
+		};
+		tinsert(module.slotList,slot);
+	end
+	local list = module.slots[slot].list;
+	
+	return function(id,display,quality,lvl,faction,class,slot,source,sourceid,zone,sourceinfo)
+		tinsert(list,id);
+		mog:AddData("item", id, "display", display);
+		mog:AddData("item", id, "quality", quality);
+		mog:AddData("item", id, "level", lvl);
+		mog:AddData("item", id, "faction", faction);
+		mog:AddData("item", id, "class", class);
+		mog:AddData("item", id, "slot", slot);
+		mog:AddData("item", id, "source", source);
+		mog:AddData("item", id, "sourceid", sourceid);
+		mog:AddData("item", id, "sourceinfo", sourceinfo);
+		mog:AddData("item", id, "zone", zone);
+		tinsert(mog:GetData("display",display,"items") or mog:AddData("display",display,"items",{}),id);
+	end
+end
+
+function mog.base.AddColours(display,c1,c2,c3)
+	--mog:AddData("display",display,"colours",colours);
+	mog:AddData("display",display,"colour1",c1);
+	mog:AddData("display",display,"colour2",c2);
+	mog:AddData("display",display,"colour3",c3);
+end
+
+function mog.base.AddNPC(id,name)
+	mog:AddData("npc", id, "name", LBB[name] or name);
+end
+
+function mog.base.AddObject(id,name)
+	mog:AddData("object", id, "name", LBB[name] or name);
+end
+--//
+
+
+--// Base Functions
 local list = {};
-local display = {};
+
+function mog.base.DropdownTier1(self)
+	if not self.value.loaded then
+		LoadAddOn(self.value.name);
+	end
+end
+
+function mog.base.DropdownTier2(self)
+	self.arg1.active = self.value;
+	mog:SetModule(self.arg1,self.arg1.label.." - "..self.value.label);
+	CloseDropDownMenus();
+end
+
+function mog.base.Dropdown(module,tier)
+	local info;
+	if tier == 1 then
+		info = UIDropDownMenu_CreateInfo();
+		info.text = module.label..(module.loaded and "" or " \124cFFFFFFFF("..L["Click to load addon"]..")");
+		info.value = module;
+		info.colorCode = "\124cFF"..(module.loaded and "00FF00" or "FF0000");
+		info.hasArrow = module.loaded;
+		info.keepShownOnClick = true;
+		info.notCheckable = true;
+		info.func = mog.base.DropdownTier1;
+		UIDropDownMenu_AddButton(info,tier);
+	elseif tier == 2 then
+		for _,slot in ipairs(module.slotList) do
+			info = UIDropDownMenu_CreateInfo();
+			info.text = module.slots[slot].label;
+			info.value = module.slots[slot];
+			info.notCheckable = true;
+			info.func = mog.base.DropdownTier2;
+			info.arg1 = module;
+			UIDropDownMenu_AddButton(info,tier);
+		end
+	end
+end
+
+function mog.base.FrameUpdate(module,self,value)
+	self.data.items = value;
+	self.data.cycle = 1;
+	self.data.item = self.data.items[self.data.cycle];
+	for i, v in ipairs(self.data.items) do
+		if GetItemCount(v, true) > 0 then
+			self:ShowIndicator("hasItem");
+		end
+		if mog.wishlist:IsItemInWishlist(v) then
+			self:ShowIndicator("wishlist");
+		end
+	end
+	mog.Item_FrameUpdate(self,self.data);
+end
+
+function mog.base.OnEnter(module,self,value)
+	mog.Item_OnEnter(self,self.data);
+end
+
+function mog.base.OnClick(module,self,btn,value)
+	mog.Item_OnClick(self,btn,self.data);
+end
+
+function mog.base.Unlist(module)
+	wipe(list);
+end
+
+local function itemSort(a, b)
+	local aLevel = mog:GetData("item",a,"level") or 0;
+	local bLevel = mog:GetData("item",b,"level") or 0;
+	if aLevel == bLevel then
+		return a < b;
+	else
+		return aLevel < bLevel;
+	end
+end
+
+function mog.base.BuildList(module)
+	wipe(list);
+	local items = {};
+	for _,item in ipairs(module.active.list) do
+		local state = true;
+		for _,filter in ipairs(module.filters) do
+			if not mog:GetFilter(filter).Filter(mog.base.GetFilterArgs(filter,item)) then
+				state = false;
+				break;
+			end
+		end
+		if state then
+			local display = mog:GetData("item", item, "display");
+			if not items[display] then
+				items[display] = {};
+				tinsert(list,items[display]);
+			end
+			tinsert(items[display],item);
+		end
+	end
+	for _,tbl in ipairs(list) do
+		sort(tbl,itemSort);
+	end
+	items = nil;
+	return list;
+end
+
+function mog.base.Help(module)
+	GameTooltip:AddDoubleLine(L["Change item"],		L["Left click"],			0,1,0,1,1,1);
+	GameTooltip:AddDoubleLine(L["Chat link"],		L["Shift + Left click"],	0,1,0,1,1,1);
+	GameTooltip:AddDoubleLine(L["Try on"],			L["Ctrl + Left click"],		0,1,0,1,1,1);
+	GameTooltip:AddDoubleLine(L["Wishlist menu"],	L["Right click"],			0,1,0,1,1,1);
+	GameTooltip:AddDoubleLine(L["Item URL"],		L["Shift + Right click"],	0,1,0,1,1,1);
+	GameTooltip:AddDoubleLine(L["Add to preview"],	L["Ctrl + Right click"],	0,1,0,1,1,1);
+end
+
+function mog.base.GetFilterArgs(filter,item)
+	if filter == "name" then
+		return GetItemInfo(item);
+	elseif filter == "itemLevel" then
+		return select(4,GetItemInfo(item));
+	elseif filter == "source" then
+		return mog:GetData("item", item, "source"),mog:GetData("item", item, "sourceinfo");
+	else
+		return mog:GetData("item", item, filter);
+	end
+end
+
+function mog.base.SortLevel(items)
+	return mog:GetData("item",items[1],"level");
+end
+
+function mog.base.SortColour(items)
+	local display = mog:GetData("item",items[1],"display");
+	return {mog:GetData("display",display,"colour1"),mog:GetData("display",display,"colour2"),mog:GetData("display",display,"colour3")};
+	--return mog:GetData("display",display,"colours");
+end
+--//
+
+
+--// Register Modules
 local addons = {
 	"MogIt_Cloth",
 	"MogIt_Leather",
@@ -18,258 +206,24 @@ local addons = {
 	"MogIt_Accessories",
 };
 
-mog.sub = {}
-
-function mog.sub.DropdownTier1(self)
-	if not self.value.loaded then
-		LoadAddOn(self.value.name);
-	end
-end
-
-function mog.sub.DropdownTier2(self)
-	self.arg1.active = self.value;
-	mog:SetModule(self.arg1,self.arg1.label.." - "..self.value.label);
-	CloseDropDownMenus();
-end
-
-function mog.sub.Dropdown(module,tier)
-	local info;
-	if tier == 1 then
-		info = UIDropDownMenu_CreateInfo();
-		info.text = module.label..(module.loaded and "" or " \124cFFFFFFFF("..L["Click to load addon"]..")");
-		info.value = module;
-		info.colorCode = "\124cFF"..(module.loaded and "00FF00" or "FF0000");
-		info.hasArrow = module.loaded;
-		info.keepShownOnClick = true;
-		info.notCheckable = true;
-		info.func = mog.sub.DropdownTier1;
-		UIDropDownMenu_AddButton(info,tier);
-	elseif tier == 2 then
-		for k,v in ipairs(module.slots) do
-			info = UIDropDownMenu_CreateInfo();
-			info.text = v.label;
-			info.value = v;
-			info.notCheckable = true;
-			info.func = mog.sub.DropdownTier2;
-			info.arg1 = module;
-			UIDropDownMenu_AddButton(info,tier);
-		end
-	end
-end
-
-function mog.sub.FrameUpdate(module,self,value)
-	if type(display[value]) == "table" then
-		self.data.items = display[value];
-		self.data.cycle = 1;
-		self.data.item = self.data.items[self.data.cycle];
-		for i, v in ipairs(self.data.items) do
-			if GetItemCount(v, true) > 0 then
-				self:ShowIndicator("hasItem");
-				-- break;
-			end
-			if mog.wishlist:IsItemInWishlist(v) then
-				self:ShowIndicator("wishlist");
-			end
-		end
-	else
-		self.data.item = display[value];
-		if GetItemCount(self.data.item, true) > 0 then
-			self:ShowIndicator("hasItem");
-		end
-		if mog.wishlist:IsItemInWishlist(self.data.item) then
-			self:ShowIndicator("wishlist");
-		end
-	end
-	-- local colors = mog.items.colours
-	-- for i = 1, 3 do
-		-- local color = colors[i][value]
-		-- if color then
-			-- local r, g, b = color:match("(..)(..)(..)")
-			-- self["c"..i]:SetTexture(tonumber(r, 16) / 255, tonumber(g, 16) / 255, tonumber(b, 16) / 255)
-		-- end
-	-- end
-	mog.Item_FrameUpdate(self,self.data);
-end
-
-function mog.sub.OnEnter(module,self,value)
-	mog.Item_OnEnter(self,self.data);
-end
-
-function mog.sub.OnClick(module,self,btn,value)
-	mog.Item_OnClick(self,btn,self.data);
-end
-
-function mog.sub.Unlist(module)
-	wipe(list);
-	wipe(display);
-end
-
--- this sorts items of the same display ID thusly:
---	first sort by required level
---	then by display ID
-local function itemSort(a, b)
-	local level = mog.items.level;
-	if level[a] == level[b] then
-		return b > a;
-	else
-		return (level[b] or 1) > (level[a] or 1);
-	end
-end
-
-function mog.sub.BuildList(module)
-	wipe(list);
-	wipe(display);
-	for k,v in ipairs(module.active.items) do
-		local state = true;
-		for x,y in ipairs(module.filters) do
-			if not mog:GetFilter(y).Filter(mog.sub.GetFilterArgs(y,v)) then
-				state = false;
-				break;
-			end
-		end
-		if state then
-			local disp = mog:GetData("item", v, "display");
-			if not display[disp] then
-				display[disp] = v;
-				tinsert(list,disp);
-			elseif type(display[disp]) == "table" then
-				tinsert(display[disp],v);
-			else
-				display[disp] = {display[disp],v};
-			end
-		end
-	end
-	for k, v in pairs(display) do
-		if type(v) == "table" then
-			sort(v, itemSort);
-		end
-	end
-	return list;
-end
-
-function mog.sub.Help(module)
-	GameTooltip:AddDoubleLine(L["Change item"],		L["Left click"],0,1,0,1,1,1);
-	GameTooltip:AddDoubleLine(L["Chat link"],		L["Shift + Left click"],0,1,0,1,1,1);
-	GameTooltip:AddDoubleLine(L["Try on"],			L["Ctrl + Left click"],0,1,0,1,1,1);
-	GameTooltip:AddDoubleLine(L["Wishlist menu"],	L["Right click"],0,1,0,1,1,1);
-	GameTooltip:AddDoubleLine(L["Item URL"],		L["Shift + Right click"],0,1,0,1,1,1);
-	GameTooltip:AddDoubleLine(L["Add to preview"],	L["Ctrl + Right click"],0,1,0,1,1,1);
-end
-
-function mog.sub.AddSlot(label,addon)
-	local items = {};
-	local module = mog:GetModule(addon);
-	table.insert(module.slots,{label = LBI[label] or label,items = items});
-	return items;
-end
-
-mog.items = {}
-mog.items.display = {};
-mog.items.quality = {};
-mog.items.level = {};
-mog.items.faction = {};
-mog.items.class = {};
-mog.items.slot = {};
-mog.items.source = {};
-mog.items.sourceid = {};
-mog.items.sourceinfo = {};
-mog.items.zone = {};
-mog.items.colours = {
-	[1] = {},
-	[2] = {},
-	[3] = {},
-	--[4] = {},
-	--[5] = {},
-};
-
-function mog.sub.AddItem(tbl,id,display,quality,lvl,faction,class,slot,source,sourceid,zone,sourceinfo)
-	table.insert(tbl,id);
-	mog:AddData("item", id, "display", display);
-	mog:AddData("item", id, "quality", quality);
-	mog:AddData("item", id, "level", lvl);
-	mog:AddData("item", id, "faction", faction);
-	mog:AddData("item", id, "class", class);
-	mog:AddData("item", id, "slot", slot);
-	mog:AddData("item", id, "source", source);
-	mog:AddData("item", id, "sourceid", sourceid);
-	mog:AddData("item", id, "sourceinfo", sourceinfo);
-	mog:AddData("item", id, "zone", zone);
-end
-
-function mog.sub.AddColours(id,c1,c2,c3)--,c4,c5)
-	if c1 and (not mog.items.colours[1][id]) then
-		mog.items.colours[1][id] = c1;
-		mog.items.colours[2][id] = c2;
-		mog.items.colours[3][id] = c3;
-		--mog.items.colours[4][id] = c4;
-		--mog.items.colours[5][id] = c5;
-	end
-end
-
-function mog.sub.GetFilterArgs(filter,item)
-	if filter == "name" then
-		return GetItemInfo(item);
-	elseif filter == "level" then
-		return mog:GetData("item", item, "level");
-	elseif filter == "itemLevel" then
-		return select(4,GetItemInfo(item));
-	elseif filter == "moggable" then
-		return item;
-	elseif filter == "faction" then
-		return mog:GetData("item", item, "faction");
-	elseif filter == "class" then
-		return mog:GetData("item", item, "class");
-	elseif filter == "source" then
-		return mog:GetData("item", item, "source"),mog:GetData("item", item, "sourceinfo");
-	elseif filter == "quality" then
-		return mog:GetData("item", item, "quality");
-	elseif filter == "slot" then
-		return mog:GetData("item", item, "slot");
-	end
-end
-
-function mog.sub.SortLevel(id)
-	if type(display[id]) == "table" then
-		local tbl = {};
-		for k,v in ipairs(display[id]) do
-			table.insert(tbl,mog:GetData("item", v, "level"));
-		end
-		return tbl;
-	else
-		return mog:GetData("item", display[id], "level");
-	end
-end
-
-function mog.sub.SortColour(id)
-	local tbl = {};
-	for i=1,3 do
-		if mog.items.colours[i][id] then
-			table.insert(tbl,mog.items.colours[i][id]);
-		end
-	end
-	return tbl;
-end
-
-for k,v in ipairs(addons) do
-	local _,title,_,_,loadable = GetAddOnInfo(v);
+for _,addon in ipairs(addons) do
+	local _,title,_,_,loadable = GetAddOnInfo(addon);
 	if loadable then
-		mog:RegisterModule(v,1,{
+		mog:RegisterModule(addon,tonumber(GetAddOnMetadata(addon,"X-MogItModuleVersion")),{
 			label = title:match("MogIt_(.+)") or title,
-			--addon = v,
 			base = true,
 			slots = {},
-			Dropdown = mog.sub.Dropdown,
-			BuildList = mog.sub.BuildList,
-			FrameUpdate = mog.sub.FrameUpdate,
-			OnEnter = mog.sub.OnEnter,
-			OnClick = mog.sub.OnClick,
-			Unlist = mog.sub.Unlist,
-			Help = mog.sub.Help,
+			Dropdown = mog.base.Dropdown,
+			BuildList = mog.base.BuildList,
+			FrameUpdate = mog.base.FrameUpdate,
+			OnEnter = mog.base.OnEnter,
+			OnClick = mog.base.OnClick,
+			Unlist = mog.base.Unlist,
+			Help = mog.base.Help,
 			filters = {
 				"name",
 				"level",
 				"itemLevel",
-				"moggable",
 				"faction",
 				"class",
 				"source",
@@ -282,9 +236,10 @@ for k,v in ipairs(addons) do
 				"display",
 			},
 			sorts = {
-				level = mog.sub.SortLevel,
-				colour = mog.sub.SortColour,
+				level = mog.base.SortLevel,
+				colour = mog.base.SortColour,
 			},
 		});
 	end
 end
+--//
