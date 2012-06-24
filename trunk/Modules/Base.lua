@@ -136,14 +136,7 @@ function mog.base.BuildList(module)
 	wipe(list);
 	local items = {};
 	for _,item in ipairs(module.active.list) do
-		local state = true;
-		for _,filter in ipairs(module.filters) do
-			if not mog:GetFilter(filter).Filter(mog.base.GetFilterArgs(filter,item)) then
-				state = false;
-				break;
-			end
-		end
-		if state then
+		if mog:CheckFilters(module,item) then
 			local display = mog:GetData("item", item, "display");
 			if not items[display] then
 				items[display] = {};
@@ -225,6 +218,7 @@ for _,addon in ipairs(addons) do
 			OnClick = mog.base.OnClick,
 			Unlist = mog.base.Unlist,
 			Help = mog.base.Help,
+			GetFilterArgs = mog.base.GetFilterArgs,
 			filters = {
 				"name",
 				"level",
