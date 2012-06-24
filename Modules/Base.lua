@@ -181,7 +181,12 @@ function mog.base.GetFilterArgs(filter,item)
 end
 
 function mog.base.SortLevel(items)
-	return mog:GetData("item",items[1],"level");
+	-- return mog:GetData("item",items[1],"level");
+	local tbl = {};
+	for k,v in ipairs(items) do
+		table.insert(tbl,mog:GetData("item", v, "level"));
+	end
+	return tbl;
 end
 
 function mog.base.SortColour(items)
@@ -208,10 +213,11 @@ local addons = {
 for _,addon in ipairs(addons) do
 	local _,title,_,_,loadable = GetAddOnInfo(addon);
 	if loadable then
-		mog:RegisterModule(addon,tonumber(GetAddOnMetadata(addon,"X-MogItModuleVersion")),{
+		mog:RegisterModule(addon,mog.moduleVersion,{
 			label = title:match("MogIt_(.+)") or title,
 			base = true,
 			slots = {},
+			slotList = {},
 			Dropdown = mog.base.Dropdown,
 			BuildList = mog.base.BuildList,
 			FrameUpdate = mog.base.FrameUpdate,

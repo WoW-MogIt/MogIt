@@ -24,7 +24,7 @@ local sourceLabels = {
 function mog.Item_OnEnter(self, data)
 	local item = data.item;
 	if not (self and item) then return end;
-		
+	
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 	
 	local itemName, _, _, itemLevel = GetItemInfo(item);
@@ -100,7 +100,7 @@ function mog.Item_OnClick(self, btn, data, isSaved)
 		if not HandleModifiedItemClick(select(2, GetItemInfo(item))) and data.items then
 			data.cycle = (data.cycle % #data.items) + 1;
 			data.item = data.items[data.cycle];
-			mog.OnEnter(self);
+			mog.ModelOnEnter(self);
 		end
 	elseif btn == "RightButton" then
 		if IsControlKeyDown() then

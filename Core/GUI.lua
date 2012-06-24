@@ -312,7 +312,7 @@ function mog.scroll.update(self,value,offset,onscroll)
 			if frame:IsShown() then
 				mog:ModelUpdate(frame);
 				if owner == frame then
-					mog:ModelOnEnter(frame);
+					mog.ModelOnEnter(frame);
 				end
 			else
 				frame:Show();
@@ -560,14 +560,12 @@ function mog.ModelOnShow(self)
 	if self:GetFrameLevel() <= lvl then
 		self:SetFrameLevel(lvl+1);
 	end
-	--[[
 	if self == mog.view.model then
 		self.model:Undress();
 		mog:DressModel(self.model);
 	else
 		mog:ModelUpdate(self);
 	end
-	--]]
 end
 
 function mog.ModelOnHide(self)

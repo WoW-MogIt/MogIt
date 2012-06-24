@@ -39,7 +39,7 @@ mog:CreateSort("level",{
 		table.sort(mog.list,function(a,b)
 			local aLv, bLv = minItem(a,args), minItem(b,args);
 			if aLv == bLv then
-				return a > b;
+				return mog:GetData("item", a[1], "display") > mog:GetData("item", b[1], "display");
 			else
 				return aLv > bLv;
 			end
