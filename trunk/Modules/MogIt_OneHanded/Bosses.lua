@@ -1,4 +1,4 @@
-local b=MogIt.AddMob
+local b=MogIt.base.AddNPC
 b(6487,"Arcanist Doan")
 b(1853,"Darkmaster Gandling")
 b(14020,"Chromaggus")

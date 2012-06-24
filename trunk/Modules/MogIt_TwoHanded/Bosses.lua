@@ -1,4 +1,4 @@
-local b=MogIt.AddMob
+local b=MogIt.base.AddNPC
 b(6488,"Fallen Champion")
 b(4829,"Aku'mai")
 b(10363,"General Drakkisath")

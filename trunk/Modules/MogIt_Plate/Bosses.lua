@@ -1,4 +1,4 @@
-local b=MogIt.AddMob
+local b=MogIt.base.AddNPC
 b(10339,"Gyth")
 b(9938,"Magmus")
 b(9056,"Fineous Darkvire")

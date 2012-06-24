@@ -206,7 +206,7 @@ local addons = {
 for _,addon in ipairs(addons) do
 	local _,title,_,_,loadable = GetAddOnInfo(addon);
 	if loadable then
-		mog:RegisterModule(addon,mog.moduleVersion,{
+		mog:RegisterModule(addon,tonumber(GetAddOnMetadata(addon,"X-MogItModuleVersion")),{
 			label = title:match("MogIt_(.+)") or title,
 			base = true,
 			slots = {},

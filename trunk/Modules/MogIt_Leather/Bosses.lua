@@ -1,4 +1,4 @@
-local b=function(id, name) MogIt:AddData("npc", id, "name", name) end
+local b=MogIt.base.AddNPC
 b(10429,"Warchief Rend Blackhand")
 b(10339,"Gyth")
 b(9537,"Hurley Blackbreath")

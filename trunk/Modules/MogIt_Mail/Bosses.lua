@@ -1,4 +1,4 @@
-local b=MogIt.AddMob
+local b=MogIt.base.AddNPC
 b(10339,"Gyth")
 b(5709,"Shade of Eranikus")
 b(9032,"Hedrum the Creeper")
