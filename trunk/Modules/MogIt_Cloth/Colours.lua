@@ -1,4 +1,4 @@
-local c=MogIt.sub.AddColours
+local c=MogIt.base.AddColours
 c(50565,"302D28","7F7969")
 c(16826,"616C70","AAB0AC","080A09")
 c(43894,"CBCFE8","9096A6","001A2B")
