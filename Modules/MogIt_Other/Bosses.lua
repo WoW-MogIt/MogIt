@@ -1,4 +1,4 @@
-local b=MogIt.AddMob
+local b=MogIt.base.AddNPC
 b(7800,"Mekgineer Thermaplugg")
 b(4278,"Commander Springvale")
 b(3653,"Kresh")

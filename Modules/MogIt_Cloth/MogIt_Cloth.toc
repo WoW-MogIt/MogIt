@@ -3,6 +3,7 @@
 ## Version: 2.2.1
 ## LoadOnDemand: 1
 ## RequiredDeps: MogIt
+## X-MogItModuleVersion: 1
 
 ## Title: MogIt_Cloth
 ## Title-deDE: MogIt_Stoff
