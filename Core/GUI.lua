@@ -474,28 +474,33 @@ end
 --// Indicators
 mog.indicators = {};
 
-function mog.CreateModelIndicator(model,name)
-	if model.indicators[name] then return end;
-	model.indicators[name] = CreateFrame("Frame",nil,model);
-	mog.indicators[name](model,model.indicators[name]);
+function mog.CreateModelIndicator(frame,name)
+	if frame.indicators[name] then return end;
+	frame.indicators[name] = mog.indicators[name](frame.model);
 end
 
 function mog:CreateIndicator(name,func)
 	if mog.indicators[name] then return end;
 	mog.indicators[name] = func;
-	for k,v in ipairs(mog.models) do
-		mog.CreateModelIndicator(v,name);
+	for k,frame in ipairs(mog.models) do
+		mog.CreateModelIndicator(frame,name);
 	end
 end
 
-function mog:ShowIndicator(model,name)
-	if model.indicators[name] then
-		model.indicators[name]:Show();
+function mog:ShowIndicator(name)
+	if self.indicators[name] then
+		self.indicators[name]:Show();
 	end
 end
 
-function mog:GetIndicator(model,name)
-	return model.indicators[name];
+function mog:GetIndicator(frame,name)
+	return frame.indicators[name];
+end
+
+function mog:SetText(text)
+	if self.indicators.label then
+		self.indicators.label:SetText(text);
+	end
 end
 --//
 
@@ -538,6 +543,8 @@ function mog:CreateModel(view)
 			f:SetScript("OnLeave",mog.ModelOnLeave);
 			
 			f.indicators = {};
+			f.ShowIndicator = mog.ShowIndicator;
+			f.SetText = mog.SetText;
 			for k,v in pairs(mog.indicators) do
 				mog.CreateModelIndicator(f,k);
 			end
@@ -648,7 +655,31 @@ end
 --//
 
 
+mog:CreateIndicator("label", function(model)
+	local label = model:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge");
+	label:SetPoint("TOPLEFT", 16, -16);
+	label:SetPoint("BOTTOMRIGHT", -16, 16);
+	label:SetJustifyV("BOTTOM");
+	label:SetJustifyH("CENTER");
+	label:SetNonSpaceWrap(true);
+	return label;
+end)
 
+mog:CreateIndicator("hasItem", function(model)
+	local hasItem = model:CreateTexture(nil, "OVERLAY");
+	hasItem:SetTexture("Interface\\RaidFrame\\ReadyCheck-Ready");
+	hasItem:SetSize(32, 32);
+	hasItem:SetPoint("BOTTOMRIGHT", -8, 8);
+	return hasItem;
+end)
+	
+mog:CreateIndicator("wishlist", function(model)
+	local wishlist = model:CreateTexture(nil, "OVERLAY");
+	wishlist:SetTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcon_1");
+	wishlist:SetSize(32, 32);
+	wishlist:SetPoint("TOPRIGHT", -8, -8);
+	return wishlist;
+end)
 
 
 
@@ -666,52 +697,27 @@ end
 
 
 --[[
-			local label = f:CreateFontString(nil, nil, "GameFontNormalLarge");
-			label:SetPoint("TOPLEFT", 16, -16);
-			label:SetPoint("BOTTOMRIGHT", -16, 16);
-			label:SetJustifyV("BOTTOM");
-			label:SetJustifyH("CENTER");
-			label:SetNonSpaceWrap(true);
-			f.indicators.label = label;
-			
-			local hasItem = f:CreateTexture();
-			hasItem:SetTexture("Interface\\RaidFrame\\ReadyCheck-Ready");
-			hasItem:SetSize(32, 32);
-			hasItem:SetPoint("BOTTOMRIGHT", -8, 8);
-			f.indicators.hasItem = hasItem;
-			
-			local wishlist = f:CreateTexture();
-			wishlist:SetTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcon_1");
-			wishlist:SetSize(32, 32);
-			wishlist:SetPoint("TOPRIGHT", -8, -8);
-			f.indicators.wishlist = wishlist;
-			
-			
-			
-			
-			
-			
-						-- f.c1Bg = f:CreateTexture()
-			-- f.c1Bg:SetTexture(0, 0, 0)
-			-- f.c1Bg:SetSize(32, 32)
-			-- f.c1Bg:SetPoint("BOTTOM", 0, 8)
-			-- f.c1 = f:CreateTexture()
-			-- f.c1:SetPoint("TOPLEFT", f.c1Bg, 4, -4)
-			-- f.c1:SetPoint("BOTTOMRIGHT", f.c1Bg, -4, 4)
-			
-			-- f.c2Bg = f:CreateTexture()
-			-- f.c2Bg:SetTexture(0, 0, 0)
-			-- f.c2Bg:SetSize(32, 32)
-			-- f.c2Bg:SetPoint("RIGHT", f.c1Bg, "LEFT", -8, 0)
-			-- f.c2 = f:CreateTexture()
-			-- f.c2:SetPoint("TOPLEFT", f.c2Bg, 4, -4)
-			-- f.c2:SetPoint("BOTTOMRIGHT", f.c2Bg, -4, 4)
-			
-			-- f.c3Bg = f:CreateTexture()
-			-- f.c3Bg:SetTexture(0, 0, 0)
-			-- f.c3Bg:SetSize(32, 32)
-			-- f.c3Bg:SetPoint("LEFT", f.c1Bg, "RIGHT", 8, 0)
-			-- f.c3 = f:CreateTexture()
-			-- f.c3:SetPoint("TOPLEFT", f.c3Bg, 4, -4)
-			-- f.c3:SetPoint("BOTTOMRIGHT", f.c3Bg, -4, 4)
-			--]]
+	-- f.c1Bg = f:CreateTexture()
+	-- f.c1Bg:SetTexture(0, 0, 0)
+	-- f.c1Bg:SetSize(32, 32)
+	-- f.c1Bg:SetPoint("BOTTOM", 0, 8)
+	-- f.c1 = f:CreateTexture()
+	-- f.c1:SetPoint("TOPLEFT", f.c1Bg, 4, -4)
+	-- f.c1:SetPoint("BOTTOMRIGHT", f.c1Bg, -4, 4)
+	
+	-- f.c2Bg = f:CreateTexture()
+	-- f.c2Bg:SetTexture(0, 0, 0)
+	-- f.c2Bg:SetSize(32, 32)
+	-- f.c2Bg:SetPoint("RIGHT", f.c1Bg, "LEFT", -8, 0)
+	-- f.c2 = f:CreateTexture()
+	-- f.c2:SetPoint("TOPLEFT", f.c2Bg, 4, -4)
+	-- f.c2:SetPoint("BOTTOMRIGHT", f.c2Bg, -4, 4)
+	
+	-- f.c3Bg = f:CreateTexture()
+	-- f.c3Bg:SetTexture(0, 0, 0)
+	-- f.c3Bg:SetSize(32, 32)
+	-- f.c3Bg:SetPoint("LEFT", f.c1Bg, "RIGHT", 8, 0)
+	-- f.c3 = f:CreateTexture()
+	-- f.c3:SetPoint("TOPLEFT", f.c3Bg, 4, -4)
+	-- f.c3:SetPoint("BOTTOMRIGHT", f.c3Bg, -4, 4)
+]]
