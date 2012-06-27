@@ -46,7 +46,7 @@ function wishlist:MogItLoaded()
 			for slotID, items in pairs(set) do
 				if type(slotID) == "number" then
 					local itemID = tonumber(items[1])
-					set.items[mog.itemSlots[slotID]] = itemID
+					set.items[mog.slots[slotID]] = itemID
 					set[slotID] = nil
 				end
 			end
@@ -150,11 +150,20 @@ function wishlist:FrameUpdate(frame, value, index)
 		mog.Set_FrameUpdate(frame, frame.data)
 	else
 		data.item = value
+		if GetItemCount(value, true) > 0 then
+			frame:ShowIndicator("hasItem")
+		end
+		local displayIDs = mog:GetData("display", mog:GetData("item", value, "display"), "items")
+		if displayIDs and #displayIDs > 1 then
+			for i, item in ipairs(displayIDs) do
+				if GetItemCount(item, true) > 0 then
+					frame:ShowIndicator("hasItem")
+				end
+			end
+		end
 		mog.Item_FrameUpdate(frame, frame.data)
 	end
 end
-
-local displayIDs = {}
 
 function wishlist:OnEnter(frame, value)
 	GameTooltip:SetOwner(frame, "ANCHOR_RIGHT")
@@ -165,25 +174,14 @@ function wishlist:OnEnter(frame, value)
 		local name, link, _, _, _, _, _, _, _, texture = GetItemInfo(value)
 		GameTooltip:AddDoubleLine(link, mog.GetItemSourceShort(value))
 		
-		local display = mog.items.display
-		if display[value] then
-			local d = display[value]
-			if not displayIDs[d] then
-				displayIDs[d] = {}
-				for itemID, displayID in pairs(display) do
-					if displayID == d then
-						tinsert(displayIDs[d], itemID)
-					end
-				end
-			end
-			if #displayIDs[d] > 1 then
-				GameTooltip:AddLine(" ")
-				GameTooltip:AddLine(L["Other items using this appearance:"])
-				for i, itemID in ipairs(displayIDs[d]) do
-					if itemID ~= value then
-						local name, link, _, _, _, _, _, _, _, texture = GetItemInfo(itemID)
-						GameTooltip:AddDoubleLine(link, mog.GetItemSourceShort(itemID))
-					end
+		local displayIDs = mog:GetData("display", mog:GetData("item", value, "display"), "items")
+		if displayIDs and #displayIDs > 1 then
+			GameTooltip:AddLine(" ")
+			GameTooltip:AddLine(L["Other items using this appearance:"])
+			for i, itemID in ipairs(displayIDs) do
+				if itemID ~= value then
+					local name, link, _, _, _, _, _, _, _, texture = GetItemInfo(itemID)
+					GameTooltip:AddDoubleLine(link, mog.GetItemSourceShort(itemID))
 				end
 			end
 		end

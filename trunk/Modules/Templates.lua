@@ -347,7 +347,7 @@ do
 	mog.Set_Menu.displayMode = "MENU";
 	mog.Set_Menu.initialize = function(self, level, data)
 		if level == 1 then
-			for i, slot in ipairs(mog.itemSlots) do
+			for i, slot in ipairs(mog.slots) do
 				local itemID = data.items[slot] or data.items[i]
 				if itemID then
 					local itemName, itemLink = GetItemInfo(itemID);

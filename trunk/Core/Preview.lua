@@ -405,7 +405,7 @@ local function hookInspectUI()
 			end
 		end
 	end
-	for k,v in ipairs(mog.itemSlots) do
+	for k,v in ipairs(mog.slots) do
 		_G["Inspect"..v].slot = v;
 		_G["Inspect"..v]:RegisterForClicks("AnyUp");
 		_G["Inspect"..v]:HookScript("OnClick",inspect_OnClick);
