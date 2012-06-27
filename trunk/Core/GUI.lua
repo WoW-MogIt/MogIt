@@ -609,6 +609,7 @@ function mog.ModelOnLeave(self,...)
 	else
 		GameTooltip:Hide();
 	end
+	GameTooltip.MogIt = nil;
 end
 --//
 

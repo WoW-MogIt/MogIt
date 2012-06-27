@@ -21,11 +21,28 @@ local sourceLabels = {
 	[L.source[1]] = BOSS,
 }
 
+GameTooltip:RegisterEvent("MODIFIER_STATE_CHANGED")
+GameTooltip:HookScript("OnEvent", function(self, event, key, state)
+	local owner = self:GetOwner();
+	if owner and self.MogIt then
+		mog.ModelOnEnter(owner);
+	end
+end)
+
 function mog.Item_OnEnter(self, data)
 	local item = data.item;
 	if not (self and item) then return end;
 	
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+	GameTooltip.MogIt = true
+	
+	if IsShiftKeyDown() then
+		GameTooltip:SetItemByID(item)
+		for _, frame in pairs(GameTooltip.shoppingTooltips) do
+			frame:Hide();
+		end
+		return
+	end
 	
 	local itemName, _, _, itemLevel = GetItemInfo(item);
 	--GameTooltip:AddLine(self.display, 1, 1, 1);

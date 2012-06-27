@@ -106,8 +106,9 @@ mog.tooltip.repos:SetScript("OnUpdate",function(self)
 end);
 
 function mog.tooltip.ShowItem(self)
+	local _,itemLink = self:GetItem();
+	
 	if mog.db.profile.tooltip and (not mog.tooltip.mod[mog.db.profile.tooltipMod] or mog.tooltip.mod[mog.db.profile.tooltipMod]()) then
-		local _,itemLink = self:GetItem();
 		local owner = self:GetOwner();
 		if itemLink and owner then --and not (owner.MogItModel or owner.MogItSlot) then
 			if mog.tooltip.item ~= itemLink then
@@ -136,6 +137,13 @@ function mog.tooltip.ShowItem(self)
 		else
 			mog.tooltip:Hide();
 		end
+	end
+	
+	-- add wishlist info about this item
+	if not self.MogIt and mog.wishlist:IsItemInWishlist(tonumber(itemLink:match("item:(%d+)"))) then
+		self:AddLine(" ");
+		self:AddLine(L["This item is on your wishlist."], 1, 1, 0);
+		self:AddTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcon_1");
 	end
 end
 
