@@ -418,7 +418,6 @@ mog.modelUpdater.elapsed = 0;
 mog.modelUpdater:SetScript("OnUpdate",function(self,elapsed)
 	self.elapsed = self.elapsed + elapsed;
 	if self.elapsed < 0.05 then return end;
-	self.elapsed = self.elapsed - 0.05;
 	
 	local sync;
 	if self.model then
@@ -433,14 +432,14 @@ mog.modelUpdater:SetScript("OnUpdate",function(self,elapsed)
 	end
 	
 	if mog.db.profile.rotateSynced then
-		mog:SetModelPosition(true,nil,nil,nil,elapsed,true);
+		mog:SetModelPosition(true,nil,nil,nil,self.elapsed,true);
 		mog:UpdateModelPosition(true);
 	elseif self.model and sync then
 		mog:UpdateModelPosition(true);
 	end
 	
 	if mog.db.profile.rotateNoSynced then
-		mog:SetModelPosition(false,nil,nil,nil,elapsed,true);
+		mog:SetModelPosition(false,nil,nil,nil,self.elapsed,true);
 		mog:UpdateModelPosition(false);
 	elseif self.model and (not sync) then
 		mog:UpdateModelPosition(false);
@@ -455,6 +454,8 @@ mog.modelUpdater:SetScript("OnUpdate",function(self,elapsed)
 			v.model.model:SetSequence(254);
 		end
 	end
+	
+	self.elapsed = 0;
 end);
 
 function mog:StartModelUpdater(model,btn)
