@@ -171,6 +171,16 @@ function wishlist:OnEnter(frame, value)
 	if type(value) == "table" then
 		mog.Set_OnEnter(frame, value)
 	else
+		GameTooltip.MogIt = true
+		
+		if IsShiftKeyDown() then
+			GameTooltip:SetItemByID(value)
+			for _, frame in pairs(GameTooltip.shoppingTooltips) do
+				frame:Hide()
+			end
+			return
+		end
+		
 		local name, link, _, _, _, _, _, _, _, texture = GetItemInfo(value)
 		GameTooltip:AddDoubleLine(link, mog.GetItemSourceShort(value))
 		
