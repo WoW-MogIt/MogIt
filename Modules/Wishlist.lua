@@ -67,6 +67,11 @@ function wishlist:MogItLoaded()
 		MogIt_Character = nil
 	end
 	
+	-- add alternate items table to sets
+	for i, set in ipairs(db.profile.sets) do
+		set.alternateItems = set.alternateItems or {}
+	end
+	
 	db.RegisterCallback(self, "OnProfileChanged", onProfileUpdated)
 	db.RegisterCallback(self, "OnProfileCopied", onProfileUpdated)
 	db.RegisterCallback(self, "OnProfileReset", onProfileUpdated)
@@ -241,30 +246,52 @@ function wishlist:GetCurrentProfile()
 	return self.db:GetCurrentProfile()
 end
 	
-function wishlist:AddItem(itemID, setName, slot)
+function wishlist:AddItem(itemID, setName, slot, isAlternate)
+	-- don't add single items that are already on the wishlist
 	if not setName and self:IsItemInWishlist(itemID) then
 		return false
 	end
+	-- if a valid set name was provided, the item is supposed to go into the set, otherwise be added as a single item
 	local set = self:GetSet(setName)
 	if set then
 		slot = slot or mog.slotsType[select(9, GetItemInfo(itemID))]
-		set.items[slot] = itemID
+		if isAlternate then
+			local altItems = set.alternateItems[slot] or {}
+			set.alternateItems[slot] = altItems
+			tinsert(altItems, itemID)
+		else
+			set.items[slot] = itemID
+		end
 	else
 		tinsert(self.db.profile.items, itemID)
 	end
 	return true
 end
 
-function wishlist:DeleteItem(itemID, setName)
+function wishlist:DeleteItem(itemID, setName, isAlternate)
 	-- if not setName and self:IsItemInWishlist(itemID) then
 		-- return false
 	-- end
 	if setName then
 		local set = self:GetSet(setName)
-		for slot, item in pairs(set.items) do
-			if item == itemID then
-				set.items[slot] = nil
-				return
+		if isAlternate then
+			for slot, items in pairs(set.alternateItems) do
+				for i, item in ipairs(items) do
+					if item == itemID then
+						tremove(items, i)
+						if #items == 0 then
+							set.alternateItems[slot] = nil
+						end
+						return
+					end
+				end
+			end
+		else
+			for slot, item in pairs(set.items) do
+				if item == itemID then
+					set.items[slot] = nil
+					return
+				end
 			end
 		end
 	else
@@ -283,7 +310,11 @@ function wishlist:CreateSet(name)
 	if self:IsSetInWishlist(name) then
 		return false
 	end
-	tinsert(self.db.profile.sets, {name = name, items = {}})
+	tinsert(self.db.profile.sets, {
+		name = name,
+		items = {},
+		alternateItems = {},
+	})
 	return true
 end
 
@@ -312,11 +343,25 @@ function wishlist:IsItemInWishlist(itemID)
 			return true
 		end
 	end
+	for i, set in ipairs(self:GetSets()) do
+		for slot, item in pairs(set.items) do
+			if item == itemID then
+				return true
+			end
+		end
+		for slot, items in pairs(set.alternateItems) do
+			for i, item in ipairs(items) do
+				if item == itemID then
+					return true
+				end
+			end
+		end
+	end
 	return false
 end
 
 function wishlist:IsSetInWishlist(setName)
-	for i, set in ipairs(self.db.profile.sets) do
+	for i, set in ipairs(self:GetSets()) do
 		if set.name == setName then
 			return true
 		end
