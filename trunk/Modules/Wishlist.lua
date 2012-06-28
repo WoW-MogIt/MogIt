@@ -253,7 +253,7 @@ end
 function wishlist:GetCurrentProfile()
 	return self.db:GetCurrentProfile()
 end
-	
+
 function wishlist:AddItem(itemID, setName, slot, isAlternate)
 	-- don't add single items that are already on the wishlist
 	if not setName and self:IsItemInWishlist(itemID) then
@@ -315,7 +315,7 @@ function wishlist:DeleteItem(itemID, setName, isAlternate)
 end
 
 function wishlist:CreateSet(name)
-	if self:IsSetInWishlist(name) then
+	if self:GetSet(name) then
 		return false
 	end
 	tinsert(self.db.profile.sets, {
@@ -346,32 +346,24 @@ function wishlist:DeleteSet(setName, noConfirm)
 end
 
 function wishlist:IsItemInWishlist(itemID)
+	local token = mog.tokens[itemID]
 	for i, v in ipairs(self.db.profile.items) do
-		if v == itemID then
+		if v == itemID or (token and token[v]) then
 			return true
 		end
 	end
 	for i, set in ipairs(self:GetSets()) do
 		for slot, item in pairs(set.items) do
-			if item == itemID then
+			if item == itemID or (token and token[v]) then
 				return true
 			end
 		end
 		for slot, items in pairs(set.alternateItems) do
 			for i, item in ipairs(items) do
-				if item == itemID then
+				if item == itemID or (token and token[v]) then
 					return true
 				end
 			end
-		end
-	end
-	return false
-end
-
-function wishlist:IsSetInWishlist(setName)
-	for i, set in ipairs(self:GetSets()) do
-		if set.name == setName then
-			return true
 		end
 	end
 	return false
