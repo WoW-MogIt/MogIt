@@ -121,6 +121,17 @@ function mog:BuildList(top,module)
 	mog.filt.models:SetText(#mog.list);
 	doBuildList = false;
 end
+
+-- GetItemInfo wrapper that queues a buildList if item info is not cached
+local GetItemInfo = GetItemInfo
+
+function mog.GetItemInfo(...)
+	if not GetItemInfo(...) then
+		doBuildList = true
+		return
+	end
+	return GetItemInfo(...)
+end
 --//
 
 
@@ -195,7 +206,9 @@ mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 		mog.tooltip.model:SetUnit("PLAYER");
 	elseif event == "GET_ITEM_INFO_RECEIVED" then
 		doBuildList = true
-		self:SetScript("OnUpdate", mog.ItemInfoReceived);
+		-- if doBuildList then
+			self:SetScript("OnUpdate", mog.ItemInfoReceived);
+		-- end
 	elseif event == "PLAYER_EQUIPMENT_CHANGED" then
 		if mog.db.profile.gridDress == "equipped" then
 			mog.scroll:update();
