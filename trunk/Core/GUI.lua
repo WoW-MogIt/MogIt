@@ -237,6 +237,96 @@ mog.menu.options:SetPoint("LEFT",mog.menu.preview,"RIGHT",5,0);
 --//
 
 
+--// Race Menu
+local races = {
+   [1] = "HUMAN",
+   [2] = "ORC",
+   [3] = "DWARF",
+   [4] = "NIGHTELF",
+   [5] = "SCOURGE",
+   [6] = "TAUREN",
+   [7] = "GNOME",
+   [8] = "TROLL",
+   [9] = "GOBLIN",
+   [10] = "BLOODELF",
+   [11] = "DRAENEI",
+   [22] = "WORGEN",
+}
+
+local gender = {
+	[0] = "Male",
+	[1] = "Female",
+}
+
+local menuModelNames = {
+	HUMAN = "Human",
+	ORC = "Orc",
+	DWARF = "Dwarf",
+	NIGHTELF = "Nightelf",
+	SCOURGE = "Undead",
+	TAUREN = "Tauren",
+	GNOME = "Gnome",
+	TROLL = "Troll",
+	GOBLIN = "Goblin",
+	BLOODELF = "Bloodelf",
+	DRAENEI = "Draenei",
+	WORGEN = "Worgen",
+}
+
+local _, playerRace = UnitRace("player")
+local playerGender = UnitSex("player") - 2
+
+local displayRace
+local displayGender
+
+function mog:SetDisplayRace(race, gender)
+	if race == playerRace and gender == playerGender then
+		race = nil
+		gender = nil
+	end
+	displayRace = race
+	displayGender = gender
+	for i, frame in ipairs(mog.models) do
+		mog:SetModelPosition(frame,0,0,0,0);
+		mog:UpdateModelPosition(frame);
+		if race then
+			frame.model:SetCustomRace(race, gender);
+		else
+			frame.model:SetUnit("player")
+		end
+		mog:ModelUpdate(frame);
+	end
+end
+
+local function onClick(self, gender)
+	mog:SetDisplayRace(self.value, gender);
+end
+
+mog.menu.race = CreateFrame("Frame", "MogItCatalogueRace", mog.frame, "UIDropDownMenuTemplate");
+mog.menu.race:SetPoint("LEFT",mog.menu.options,"RIGHT",5,-2);
+mog.menu.race.initialize = function(self, level)
+	if level == 1 then
+		for i, race in pairs(races) do
+			local info = UIDropDownMenu_CreateInfo()
+			info.text = race
+			info.value = i
+			info.hasArrow = true
+			UIDropDownMenu_AddButton(info, level)
+		end
+	elseif level == 2 then
+		for i = 0, 1 do
+			local info = UIDropDownMenu_CreateInfo()
+			info.text = gender[i]
+			info.value = UIDROPDOWNMENU_MENU_VALUE
+			info.func = onClick
+			info.arg1 = i
+			UIDropDownMenu_AddButton(info, level)
+		end
+	end
+end
+--//
+
+
 --// Scroll Frame
 mog.scroll = CreateFrame("Slider","MogItScroll",mog.frame,"UIPanelScrollBarTrimTemplate");
 mog.scroll:Hide();
@@ -527,7 +617,11 @@ function mog:CreateModel(view)
 		
 		f.model = CreateFrame("DressUpModel",nil,f);
 		f.model:SetAllPoints(f);
-		f.model:SetUnit("PLAYER");
+		if displayRace then
+			f.model:SetCustomRace(displayRace, displayGender);
+		else
+			f.model:SetUnit("PLAYER");
+		end
 		f.model:SetModelScale(2);
 		f.model:SetPosition(0,0,0);
 		f.model.parent = f;
@@ -563,7 +657,6 @@ function mog:DeleteModel(f)
 end
 
 function mog.ModelOnShow(self)
-	mog:UpdateModelPosition(self);
 	local lvl = self:GetParent():GetFrameLevel();
 	if self:GetFrameLevel() <= lvl then
 		self:SetFrameLevel(lvl+1);
@@ -572,8 +665,14 @@ function mog.ModelOnShow(self)
 		self.model:Undress();
 		mog:DressModel(self.model);
 	else
+		if displayRace then
+			self.model:SetCustomRace(displayRace, displayGender);
+		else
+			self.model:SetUnit("PLAYER");
+		end
 		mog:ModelUpdate(self);
 	end
+	mog:UpdateModelPosition(self);
 end
 
 function mog.ModelOnHide(self)
