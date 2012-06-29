@@ -6,5 +6,6 @@
 <Script file="Wishlist.lua"/>
 <Script file="Base.lua"/>
 <Script file="Extra.lua"/>
+<Script file="Tokens.lua"/>
 
 </Ui>

@@ -97,13 +97,11 @@ function mog.Item_OnEnter(self, data)
 	GameTooltip:AddLine(" ");
 	GameTooltip:AddDoubleLine(ID..":", item, nil, nil, nil, 1, 1, 1);
 	
-	if itemName then
-		-- need to hack a random suffix into the link, or those items will be thought not moggable because they have no stats
-		local canBeChanged, noChangeReason, canBeSource, noSourceReason = GetItemTransmogrifyInfo(item);
-		if not canBeSource then
-			GameTooltip:AddLine(" ");
-			GameTooltip:AddLine(ERR_TRANSMOGRIFY_INVALID_SOURCE, 1, 0, 0);
-		end
+	-- add wishlist info about this item
+	if mog.wishlist:IsItemInWishlist(item) then
+		self:AddLine(" ");
+		self:AddLine(L["This item is on your wishlist."], 1, 1, 0);
+		self:AddTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcon_1");
 	end
 	
 	GameTooltip:Show();

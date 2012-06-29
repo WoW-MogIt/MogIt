@@ -110,7 +110,7 @@ function mog.tooltip.ShowItem(self)
 	
 	if mog.db.profile.tooltip and (not mog.tooltip.mod[mog.db.profile.tooltipMod] or mog.tooltip.mod[mog.db.profile.tooltipMod]()) then
 		local owner = self:GetOwner();
-		if itemLink and owner then --and not (owner.MogItModel or owner.MogItSlot) then
+		if itemLink and owner and not self.MogIt then --and not (owner.MogItModel or owner.MogItSlot) then
 			if mog.tooltip.item ~= itemLink then
 				mog.tooltip.item = itemLink;
 				local _,_,quality,_,_,class,subclass,_,slot = GetItemInfo(itemLink);
