@@ -361,8 +361,10 @@ do
 			wishlist = true,
 			text = L["Remove from set"],
 			func = function(self, set)
-				mog.wishlist:DeleteItem(self.value, set.name)
-				mog:BuildList(nil, "Wishlist")
+				local slot = mog.wishlist:DeleteItem(self.value, set.name)
+				if slot then
+					set.frame.model:UndressSlot(GetInventorySlotInfo(slot))
+				end
 				CloseDropDownMenus()
 			end,
 		},

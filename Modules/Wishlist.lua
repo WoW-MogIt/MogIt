@@ -280,12 +280,12 @@ function wishlist:AddItem(itemID, setName, slot, isAlternate)
 	return true
 end
 
+-- deletes an item from the database
+-- if setName not provided, will look for a single item
+-- if isAlternate is not true, will look among the primary items
 function wishlist:DeleteItem(itemID, setName, isAlternate)
-	-- if not setName and self:IsItemInWishlist(itemID) then
-		-- return false
-	-- end
 	if setName then
-		local set = self:GetSet(setName)
+		local set = assert(self:GetSet(setName), format("Set '%s' does not exist."))
 		if isAlternate then
 			for slot, items in pairs(set.alternateItems) do
 				for i, item in ipairs(items) do
@@ -302,7 +302,7 @@ function wishlist:DeleteItem(itemID, setName, isAlternate)
 			for slot, item in pairs(set.items) do
 				if item == itemID then
 					set.items[slot] = nil
-					return
+					return slot
 				end
 			end
 		end
@@ -349,26 +349,22 @@ function wishlist:DeleteSet(setName, noConfirm)
 	end
 end
 
-function wishlist:IsItemInWishlist(itemID, noSet)
-	local token = mog.tokens[itemID]
-	for i, v in ipairs(self.db.profile.items) do
-		if v == itemID or (token and token[v]) then
+local function tableFind(tbl, value, token)
+	for i, v in pairs(tbl) do
+		if v == value or (token and token[v]) then
 			return true
 		end
 	end
+end
+
+function wishlist:IsItemInWishlist(itemID, noSet)
+	local token = mog.tokens[itemID]
+	tableFind(self.db.profile.items, token)
 	if not noSet then
 		for i, set in ipairs(self:GetSets()) do
-			for slot, item in pairs(set.items) do
-				if item == itemID or (token and token[v]) then
-					return true
-				end
-			end
+			tableFind(set.items, token)
 			for slot, items in pairs(set.alternateItems) do
-				for i, item in ipairs(items) do
-					if item == itemID or (token and token[v]) then
-						return true
-					end
-				end
+				tableFind(items, token)
 			end
 		end
 	end
@@ -398,8 +394,11 @@ end
 
 local setFuncs = {
 	addItem = function(self, item)
-		wishlist:AddItem(item, self.value)
-		mog:BuildList(nil, "Wishlist")
+		if wishlist:GetSetItems(self.value)[mog.slotsType[select(9, GetItemInfo(item))]] then
+			StaticPopup_Show("MOGIT_WISHLIST_ADD_SET_ITEM", GetItemInfo(item), self.value, self)
+		elseif wishlist:AddItem(item, self.value) then
+			mog:BuildList(nil, "Wishlist")
+		end
 		CloseDropDownMenus()
 	end,
 }
@@ -425,20 +424,20 @@ function wishlist:AddSetMenuItems(level, func, arg1, profile)
 end
 
 do
-	local function onAccept(self)
+	local function onAccept(self, data)
 		local text = self.editBox:GetText()
 		local create = wishlist:CreateSet(text)
 		if not create then
 			print("MogIt: A set with this name already exists.")
 			return
 		end
-		if self.data then
-			if type(self.data) == "table" then
-				for slot, v in pairs(self.data.items) do
+		if data then
+			if type(data) == "table" then
+				for slot, v in pairs(data.items) do
 					wishlist:AddItem(v, text, slot)
 				end
 			else
-				wishlist:AddItem(self.data, text)
+				wishlist:AddItem(data, text)
 			end
 		end
 		mog:BuildList(nil, "Wishlist")
@@ -450,9 +449,9 @@ do
 		button2 = CANCEL,
 		hasEditBox = true,
 		OnAccept = onAccept,
-		EditBoxOnEnterPressed = function(self)
+		EditBoxOnEnterPressed = function(self, data)
 			local parent = self:GetParent()
-			onAccept(parent)
+			onAccept(parent, data)
 			parent:Hide()
 		end,
 		OnShow = function(self)
@@ -465,14 +464,14 @@ do
 end
 
 do
-	local function onAccept(self)
+	local function onAccept(self, data)
 		local text = self.editBox:GetText()
 		local set = wishlist:GetSet(text)
 		if set then
 			print("MogIt: A set with this name already exists.")
 			return
 		end
-		self.data.name = text
+		data.name = text
 		mog:BuildList(nil, "Wishlist")
 	end
 	
@@ -482,13 +481,13 @@ do
 		button2 = CANCEL,
 		hasEditBox = true,
 		OnAccept = onAccept,
-		EditBoxOnEnterPressed = function(self)
+		EditBoxOnEnterPressed = function(self, data)
 			local parent = self:GetParent()
-			onAccept(parent)
+			onAccept(parent, data)
 			parent:Hide()
 		end,
-		OnShow = function(self)
-			self.editBox:SetText(self.data.name)
+		OnShow = function(self, data)
+			self.editBox:SetText(data.name)
 			self.editBox:HighlightText()
 		end,
 		whileDead = true,
@@ -498,10 +497,10 @@ end
 
 StaticPopupDialogs["MOGIT_WISHLIST_DELETE_SET"] = {
 	text = L["Delete set '%s'?"],
-	button1 = OKAY,
-	button2 = CANCEL,
-	OnAccept = function(self)
-		wishlist:DeleteSet(self.data, true)
+	button1 = YES,
+	button2 = NO,
+	OnAccept = function(self, data)
+		wishlist:DeleteSet(data, true)
 	end,
 	whileDead = true,
 	timeout = 0,
@@ -509,15 +508,31 @@ StaticPopupDialogs["MOGIT_WISHLIST_DELETE_SET"] = {
 
 StaticPopupDialogs["MOGIT_WISHLIST_OVERWRITE_SET"] = {
 	text = L["Overwrite set '%s'?"],
-	button1 = OKAY,
-	button2 = CANCEL,
-	OnAccept = function(self)
+	button1 = YES,
+	button2 = NO,
+	OnAccept = function(self, data)
 		-- first clear all items since every slot might not be used
-		wipe(wishlist:GetSet(self.data.name).items)
-		for slot, v in pairs(self.data.items) do
-			wishlist:AddItem(v, self.data.name, slot)
+		wipe(wishlist:GetSet(data.name).items)
+		for slot, v in pairs(data.items) do
+			wishlist:AddItem(v, data.name, slot)
 		end
 		mog:BuildList(nil, "Wishlist")
+	end,
+	whileDead = true,
+	timeout = 0,
+}
+
+StaticPopupDialogs["MOGIT_WISHLIST_ADD_SET_ITEM"] = {
+	text = L["Add %s to set '%s'?"],
+	button1 = OKAY,
+	button2 = CANCEL,
+	button3 = "Add alt",
+	OnAccept = function(self, data)
+		wishlist:AddItem(data.arg1, data.value)
+		mog:BuildList(nil, "Wishlist")
+	end,
+	OnAlt = function(self, data)
+		wishlist:AddItem(data.arg1, data.value, nil, true)
 	end,
 	whileDead = true,
 	timeout = 0,
