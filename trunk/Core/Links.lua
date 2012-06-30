@@ -76,7 +76,7 @@ local old_SetItemRef = SetItemRef;
 function SetItemRef(link,...)
 	if link:find("^MogIt") then
 		if IsModifiedClick("CHATLINK") then
-			ChatEdit_InsertLink(link)
+			ChatEdit_InsertLink("["..link.."]")
 		else
 			mog:AddToPreview(mog:LinkToSet(link));
 		end

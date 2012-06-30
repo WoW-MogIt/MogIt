@@ -396,6 +396,7 @@ function mog.scroll.update(self,value,offset,onscroll)
 		if value then
 			wipe(frame.data);
 			frame.data.value = value;
+			frame.data.frame = frame;
 			for k, v in pairs(frame.indicators) do
 				v:Hide();
 			end
