@@ -205,13 +205,21 @@ mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 		mog:UpdateGUI();
 		mog.tooltip.model:SetUnit("PLAYER");
 	elseif event == "GET_ITEM_INFO_RECEIVED" then
-		doBuildList = true
+		doBuildList = true;
 		-- if doBuildList then
 			self:SetScript("OnUpdate", mog.ItemInfoReceived);
 		-- end
 	elseif event == "PLAYER_EQUIPMENT_CHANGED" then
 		if mog.db.profile.gridDress == "equipped" then
-			mog.scroll:update();
+			local slot, hasItem = arg1, ...;
+			for i, frame in ipairs(mog.models) do
+				if hasItem then
+					frame.model:TryOn(GetInventoryItemID("player", slot));
+				else
+					frame.model:UndressSlot(slot);
+				end
+				frame.model:TryOn(frame.data.item);
+			end
 		end
 	elseif event == "ADDON_LOADED" then
 		if arg1 == MogIt then
