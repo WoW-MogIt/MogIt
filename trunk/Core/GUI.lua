@@ -390,12 +390,12 @@ function mog.scroll.update(self,value,offset,onscroll)
 	end
 	
 	local owner = GameTooltip:IsShown() and GameTooltip:GetOwner();	
-	local id,frame,index;
 	for id,frame in ipairs(mog.models) do
-		index = ((value-1)*models)+id;
-		if mog.list[index] then
+		local index = ((value-1)*models)+id;
+		local value = mog.list[index];
+		if value then
 			wipe(frame.data);
-			frame.data.index = index;
+			frame.data.value = value;
 			for k, v in pairs(frame.indicators) do
 				v:Hide();
 			end
@@ -430,7 +430,7 @@ end
 
 function mog:ModelUpdate(frame)
 	if mog.active and mog.active.FrameUpdate then
-		mog.active:FrameUpdate(frame,mog.list[frame.data.index]);
+		mog.active:FrameUpdate(frame,frame.data.value);
 	end
 end
 --//
@@ -684,7 +684,7 @@ end
 
 function mog.ModelOnClick(self,btn,...)
 	if mog.active and mog.active.OnClick then
-		mog.active:OnClick(self,btn,mog.list[self.data.index],...);
+		mog.active:OnClick(self,btn,self.data.value,...);
 	end
 end
 
@@ -698,7 +698,7 @@ end
 
 function mog.ModelOnEnter(self,...)
 	if mog.active and mog.active.OnEnter then
-		mog.active:OnEnter(self,mog.list[self.data.index],...);
+		mog.active:OnEnter(self,self.data.value,...);
 	end
 end
 
@@ -772,7 +772,7 @@ mog:CreateIndicator("hasItem", function(model)
 	hasItem:SetPoint("BOTTOMRIGHT", -8, 8);
 	return hasItem;
 end)
-	
+
 mog:CreateIndicator("wishlist", function(model)
 	local wishlist = model:CreateTexture(nil, "OVERLAY");
 	wishlist:SetTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcon_1");

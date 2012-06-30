@@ -75,7 +75,11 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL",filter);
 local old_SetItemRef = SetItemRef;
 function SetItemRef(link,...)
 	if link:find("^MogIt") then
-		mog:AddToPreview(mog:LinkToSet(link));
+		if IsModifiedClick("CHATLINK") then
+			ChatEdit_InsertLink(link)
+		else
+			mog:AddToPreview(mog:LinkToSet(link));
+		end
 	else
 		return old_SetItemRef(link,...);
 	end

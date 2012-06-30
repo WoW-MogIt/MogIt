@@ -3,7 +3,7 @@ local L = mog.L;
 
 local function itemLabel(itemID, textHeight)
 	local name, link = GetItemInfo(itemID);
-	return format("|T%s:%d|t %s", GetItemIcon(itemID), textHeight or 0, link or name or "");
+	return format("|T%s:%d|t %s", GetItemIcon(itemID), textHeight or 0, link or name or RED_FONT_COLOR_CODE..RETRIEVING_ITEM_INFO..FONT_COLOR_CODE_CLOSE);
 end
 
 function mog.Item_FrameUpdate(self, data)
@@ -98,10 +98,17 @@ function mog.Item_OnEnter(self, data)
 	GameTooltip:AddDoubleLine(ID..":", item, nil, nil, nil, 1, 1, 1);
 	
 	-- add wishlist info about this item
+	if GetItemCount(item, true) > 0 then
+		GameTooltip:AddLine(" ");
+		GameTooltip:AddLine(L["You have this item."], 1, 1, 1);
+		GameTooltip:AddTexture("Interface\\RaidFrame\\ReadyCheck-Ready");
+	end
+	
+	-- add wishlist info about this item
 	if mog.wishlist:IsItemInWishlist(item) then
-		self:AddLine(" ");
-		self:AddLine(L["This item is on your wishlist."], 1, 1, 0);
-		self:AddTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcon_1");
+		GameTooltip:AddLine(" ");
+		GameTooltip:AddLine(L["This item is on your wishlist."], 1, 1, 1);
+		GameTooltip:AddTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcon_1");
 	end
 	
 	GameTooltip:Show();
@@ -138,12 +145,6 @@ do
 		arg1.item = arg1.items[arg2];
 	end
 	
-	-- create a new set and add the item to it
-	local function newSetOnClick(self)
-		StaticPopup_Show("MOGIT_WISHLIST_CREATE_SET", nil, nil, self.value);
-		CloseDropDownMenus();
-	end
-	
 	local function menuAddItem(data, itemID, index)
 		local name, link = GetItemInfo(itemID);
 		local info = UIDropDownMenu_CreateInfo();
@@ -156,6 +157,12 @@ do
 		info.arg2 = index;
 		info.menuList = data;
 		UIDropDownMenu_AddButton(info);
+	end
+	
+	-- create a new set and add the item to it
+	local function newSetOnClick(self)
+		StaticPopup_Show("MOGIT_WISHLIST_CREATE_SET", nil, nil, self.value);
+		CloseDropDownMenus();
 	end
 	
 	local menu = {
@@ -190,6 +197,16 @@ do
 		},
 	}
 	
+	local function addItemOptions(itemID, data, level)
+		for i, info in ipairs(menu) do
+			if info.wishlist == nil or info.wishlist == data.isSaved then
+				info.value = UIDROPDOWNMENU_MENU_VALUE;
+				info.notCheckable = true;
+				UIDropDownMenu_AddButton(info, level);
+			end
+		end
+	end
+	
 	mog.Item_Menu = CreateFrame("Frame");
 	mog.Item_Menu.displayMode = "MENU";
 	mog.Item_Menu.initialize = function(self, level, data)
@@ -203,13 +220,7 @@ do
 				menuAddItem(data, data.item);
 			end
 		elseif level == 2 then
-			for i, info in ipairs(menu) do
-				if info.wishlist == nil or info.wishlist == data.isSaved then
-					info.value = UIDROPDOWNMENU_MENU_VALUE;
-					info.notCheckable = true;
-					UIDropDownMenu_AddButton(info, level);
-				end
-			end
+			addItemOptions(UIDROPDOWNMENU_MENU_VALUE, data, level)
 		elseif level == 3 then
 			mog.wishlist:AddSetMenuItems(level, "addItem", UIDROPDOWNMENU_MENU_VALUE);
 			
@@ -259,8 +270,7 @@ function mog.Set_OnEnter(self, data)
 	for i, slot in ipairs(mog.slots) do
 		local itemID = data.items[slot] or data.items[i]
 		if itemID then
-			local name, link = GetItemInfo(itemID);
-			GameTooltip:AddDoubleLine(itemLabel(itemID), mog.GetItemSourceShort(itemID));
+			GameTooltip:AddDoubleLine(itemLabel(itemID)..(GetItemCount(itemID, true) > 0 and " |TInterface\\RaidFrame\\ReadyCheck-Ready:0|t" or ""), mog.GetItemSourceShort(itemID));
 		end
 	end
 	

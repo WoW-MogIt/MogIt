@@ -182,7 +182,11 @@ function wishlist:OnEnter(frame, value)
 		end
 		
 		local name, link, _, _, _, _, _, _, _, texture = GetItemInfo(value)
-		GameTooltip:AddDoubleLine(link, mog.GetItemSourceShort(value))
+		if link then
+			GameTooltip:AddDoubleLine(link, mog.GetItemSourceShort(value))
+		else
+			GameTooltip:AddLine(RETRIEVING_ITEM_INFO, RED_FONT_COLOR.r, RED_FONT_COLOR.g, RED_FONT_COLOR.b)
+		end
 		
 		local displayIDs = mog:GetData("display", mog:GetData("item", value, "display"), "items")
 		if displayIDs and #displayIDs > 1 then
@@ -256,7 +260,7 @@ end
 
 function wishlist:AddItem(itemID, setName, slot, isAlternate)
 	-- don't add single items that are already on the wishlist
-	if not setName and self:IsItemInWishlist(itemID) then
+	if not setName and self:IsItemInWishlist(itemID, true) then
 		return false
 	end
 	-- if a valid set name was provided, the item is supposed to go into the set, otherwise be added as a single item
@@ -345,23 +349,25 @@ function wishlist:DeleteSet(setName, noConfirm)
 	end
 end
 
-function wishlist:IsItemInWishlist(itemID)
+function wishlist:IsItemInWishlist(itemID, noSet)
 	local token = mog.tokens[itemID]
 	for i, v in ipairs(self.db.profile.items) do
 		if v == itemID or (token and token[v]) then
 			return true
 		end
 	end
-	for i, set in ipairs(self:GetSets()) do
-		for slot, item in pairs(set.items) do
-			if item == itemID or (token and token[v]) then
-				return true
-			end
-		end
-		for slot, items in pairs(set.alternateItems) do
-			for i, item in ipairs(items) do
+	if not noSet then
+		for i, set in ipairs(self:GetSets()) do
+			for slot, item in pairs(set.items) do
 				if item == itemID or (token and token[v]) then
 					return true
+				end
+			end
+			for slot, items in pairs(set.alternateItems) do
+				for i, item in ipairs(items) do
+					if item == itemID or (token and token[v]) then
+						return true
+					end
 				end
 			end
 		end

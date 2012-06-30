@@ -138,7 +138,7 @@ end
 --// Events
 function mog.ItemInfoReceived()
 	local owner = GameTooltip:IsShown() and GameTooltip:GetOwner();
-	if owner and owner.MogItModel then
+	if owner and GameTooltip.MogIt then
 		mog.ModelOnEnter(owner);
 	end
 	if mog.IsDropdownShown(mog.Item_Menu) then
