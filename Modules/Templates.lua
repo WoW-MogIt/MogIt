@@ -6,6 +6,41 @@ local function itemLabel(itemID, textHeight)
 	return format("|T%s:%d|t %s", GetItemIcon(itemID), textHeight or 0, link or name or RED_FONT_COLOR_CODE..RETRIEVING_ITEM_INFO..FONT_COLOR_CODE_CLOSE)
 end
 
+local function createItemMenu(items, func, data)
+	if #items > 0 then
+		items = mog.slots
+	end
+	
+	for i, v in ipairs(items) do
+		local itemID = 
+		if item then
+			local info = UIDropDownMenu_CreateInfo()
+			info.text = itemLabel(itemID, 16)
+			info.value = itemID
+			info.func = itemOnClick
+			info.checked = (i == data.cycle)
+			info.hasArrow = true
+			info.arg1 = data
+			info.arg2 = i
+			info.menuList = itemOptionsMenu
+			UIDropDownMenu_AddButton(info)
+		end
+	end
+		
+		for i, slot in ipairs(mog.slots) do
+			local itemID = data.items[slot] or data.items[i]
+			if itemID then
+			local info = UIDropDownMenu_CreateInfo()
+			info.text = itemLabel(itemID, 16)
+			info.value = itemID
+			info.hasArrow = true
+			info.notCheckable = true
+			info.menuList = data
+			UIDropDownMenu_AddButton(info, level)
+			end
+		end
+end
+
 -- create a new set and add the item to it
 local function newSetOnClick(self)
 	StaticPopup_Show("MOGIT_WISHLIST_CREATE_SET", nil, nil, self.value)
@@ -349,13 +384,13 @@ do
 
 	mog.Set_Menu = CreateFrame("Frame")
 	mog.Set_Menu.displayMode = "MENU"
-	mog.Set_Menu.initialize = function(self, level, data)
+	mog.Set_Menu.initialize = function(self, level, menuList)
 		local data = self.data
-		if level == 1 then
+		
+		if not menuList then
 			for i, slot in ipairs(mog.slots) do
 				local itemID = data.items[slot] or data.items[i]
 				if itemID then
-					local itemName, itemLink = GetItemInfo(itemID)
 					local info = UIDropDownMenu_CreateInfo()
 					info.text = itemLabel(itemID, 16)
 					info.value = itemID
@@ -374,18 +409,19 @@ do
 					UIDropDownMenu_AddButton(v, level)
 				end
 			end
-		elseif level == 2 then
-			for i, v in ipairs(itemOptionsMenu) do
+		end
+		
+		if type(menuList) == "function" then
+			menuList(level)
+		else
+			for i, v in ipairs(menuList) do
 				if v.wishlist == nil or v.wishlist == data.isSaved then
 					v.value = UIDROPDOWNMENU_MENU_VALUE
 					v.notCheckable = true
 					v.arg1 = data
-					v.menuList = data
 					UIDropDownMenu_AddButton(v, level)
 				end
 			end
-		elseif level == 3 then
-			mog.wishlist:AddSetMenuItems(level, "addItem", UIDROPDOWNMENU_MENU_VALUE)
 		end
 	end
 end
