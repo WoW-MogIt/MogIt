@@ -285,7 +285,7 @@ end
 -- if isAlternate is not true, will look among the primary items
 function wishlist:DeleteItem(itemID, setName, isAlternate)
 	if setName then
-		local set = assert(self:GetSet(setName), format("Set '%s' does not exist."))
+		local set = assert(self:GetSet(setName), format("Set '%s' does not exist.", setName))
 		if isAlternate then
 			for slot, items in pairs(set.alternateItems) do
 				for i, item in ipairs(items) do
@@ -524,16 +524,20 @@ StaticPopupDialogs["MOGIT_WISHLIST_OVERWRITE_SET"] = {
 
 StaticPopupDialogs["MOGIT_WISHLIST_ADD_SET_ITEM"] = {
 	text = L["Add %s to set '%s'?"],
-	button1 = OKAY,
-	button2 = CANCEL,
+	button1 = "Replace",
+	button2 = "Add replace",
 	button3 = "Add alt",
 	OnAccept = function(self, data)
 		wishlist:AddItem(data.arg1, data.value)
 		mog:BuildList(nil, "Wishlist")
+	end,
+	OnCancel = function(self, data)
+		print("Replace the active item and move it to alternate items")
 	end,
 	OnAlt = function(self, data)
 		wishlist:AddItem(data.arg1, data.value, nil, true)
 	end,
 	whileDead = true,
 	timeout = 0,
+	noCancelOnEscape = true,
 }
