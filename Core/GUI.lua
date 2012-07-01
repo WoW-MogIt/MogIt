@@ -757,9 +757,9 @@ end
 
 
 mog:CreateIndicator("label", function(model)
-	local label = model:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge");
-	label:SetPoint("TOPLEFT", 16, -16);
-	label:SetPoint("BOTTOMRIGHT", -16, 16);
+	local label = model:CreateFontString(nil, "OVERLAY", "GameFontNormalMed3");
+	label:SetPoint("TOPLEFT", 12, -12);
+	label:SetPoint("BOTTOMRIGHT", -12, 12);
 	label:SetJustifyV("BOTTOM");
 	label:SetJustifyH("CENTER");
 	label:SetNonSpaceWrap(true);
