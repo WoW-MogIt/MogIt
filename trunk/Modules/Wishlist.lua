@@ -359,12 +359,12 @@ end
 
 function wishlist:IsItemInWishlist(itemID, noSet)
 	local token = mog.tokens[itemID]
-	tableFind(self.db.profile.items, token)
+	if tableFind(self.db.profile.items, itemID, token) then return true end
 	if not noSet then
 		for i, set in ipairs(self:GetSets()) do
-			tableFind(set.items, token)
+			if tableFind(set.items, itemID, token) then return true end
 			for slot, items in pairs(set.alternateItems) do
-				tableFind(items, token)
+				if tableFind(items, itemID, token) then return true end
 			end
 		end
 	end
