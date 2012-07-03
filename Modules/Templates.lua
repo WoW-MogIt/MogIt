@@ -110,7 +110,7 @@ function mog.Item_FrameUpdate(self, data)
 	else
 		self.model:Undress()
 	end
-	mog:DressModel(self.model)
+	mog:DressModel(self)
 	self.model:TryOn(data.item)
 end
 

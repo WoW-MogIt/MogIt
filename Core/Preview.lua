@@ -374,16 +374,15 @@ end
 function mog.view.delItem(slot)
 	mog.view.slots[slot].item = nil;
 	mog.view.setTexture(slot);
-	mog.view.model.model:UndressSlot(slot); -- needs cleanup
-	-- mog:DressModel(mog.view.model.model);
+	mog.view.model.model:UndressSlot(GetInventorySlotInfo(slot)); -- needs cleanup
+	-- mog:DressModel(mog.view.model);
 end
 
-function mog:DressModel(model)
-	do return end
-	if mog.db.profile.gridDress == "preview" or (model == mog.view.model.model) then
+function mog:DressModel(frame)
+	if mog.db.profile.gridDress == "preview" or (frame == mog.view.model) then
 		for k,v in pairs(mog.view.slots) do
 			if v.item then
-				model:TryOn(v.item);
+				frame.model:TryOn(v.item);
 			end
 		end
 	end
