@@ -664,7 +664,7 @@ function mog.ModelOnShow(self)
 	end
 	if self == mog.view.model then
 		self.model:Undress();
-		mog:DressModel(self.model);
+		mog:DressModel(self);
 	else
 		if displayRace then
 			self.model:SetCustomRace(displayRace, displayGender);
