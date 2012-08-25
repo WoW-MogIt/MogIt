@@ -112,51 +112,62 @@ function mog:SetModule(module,text)
 	mog.frame.path:SetText(text or module.label or module.name or "");
 end
 
-local doBuildList
 function mog:BuildList(top,module)
 	if (module and mog.active and mog.active.name ~= module) then return end;
 	mog.list = mog.active and mog.active:BuildList() or {};
 	mog:SortList(nil,true);
 	mog.scroll:update(top and 1);
 	mog.filt.models:SetText(#mog.list);
-	doBuildList = false;
+end
+--//
+
+
+--// Item Cache
+local GetItemInfo = GetItemInfo;
+mog.cacheQueue = {};
+mog.cacheFuncs = {
+	BuildList = mog.BuildList;
+	ModelOnEnter = function()
+		local owner = GameTooltip:IsShown() and GameTooltip:GetOwner();
+		if owner and owner.type == "catalogue" then
+			mog.ModelOnEnter(owner);
+		end
+	end,
+	ItemMenu = function()
+		if mog.IsDropdownShown(mog.Item_Menu) then
+			HideDropDownMenu(1);
+			ToggleDropDownMenu(nil,nil,mog.Item_Menu,"cursor",0,0,mog.Item_Menu.menuList);
+		end
+	end,
+	SetMenu = function()
+		if mog.IsDropdownShown(mog.Set_Menu) then
+			HideDropDownMenu(1);
+			ToggleDropDownMenu(nil,nil,mog.Set_Menu,"cursor",0,0,mog.Set_Menu.menuList);
+		end
+	end,
+};
+
+function mog:GetItemInfo(type,...)
+	if GetItemInfo(...) then
+		return GetItemInfo(...);
+	elseif mog.cacheFuncs[type] then
+		mog.cacheQueue[type] = true;
+	end
 end
 
--- GetItemInfo wrapper that queues a buildList if item info is not cached
-local GetItemInfo = GetItemInfo
-
-function mog.GetItemInfo(...)
-	if not GetItemInfo(...) then
-		doBuildList = true
-		return
+function mog.ItemInfoReceived()
+	for k,v in pairs(mog.cacheQueue) do
+		if v and mog.cacheFuncs[k] then
+			mog.cacheFuncs[k]();
+		end
+		mog.cacheQueue[k] = nil;
 	end
-	return GetItemInfo(...)
+	mog.frame:SetScript("OnUpdate", nil);
 end
 --//
 
 
 --// Events
-function mog.ItemInfoReceived()
-	local owner = GameTooltip:IsShown() and GameTooltip:GetOwner();
-	if owner and GameTooltip.MogIt then
-		mog.ModelOnEnter(owner);
-	end
-	if mog.IsDropdownShown(mog.Item_Menu) then
-		HideDropDownMenu(1);
-		ToggleDropDownMenu(nil,nil,mog.Item_Menu,"cursor",0,0,mog.Item_Menu.menuList);
-	elseif mog.IsDropdownShown(mog.Set_Menu) then
-		HideDropDownMenu(1);
-		ToggleDropDownMenu(nil,nil,mog.Set_Menu,"cursor",0,0,mog.Set_Menu.menuList);
-	end
-	
-	if doBuildList then
-		mog.BuildList();
-	end
-	
-	mog.frame:SetScript("OnUpdate", nil);
-end
-
-
 local defaults = {
 	profile = {
 		clearOnPreviewSet = false,
@@ -170,8 +181,8 @@ local defaults = {
 		rows = 2;
 		columns = 3,
 		sync = true,
-		rotateSynced = false,
-		rotateNoSynced = false,
+		--rotateSynced = false,
+		--rotateNoSynced = false,
 		
 		tooltip = true,
 		tooltipWidth = 300,
@@ -186,16 +197,19 @@ local defaults = {
 
 function mog.LoadSettings()
 	mog:UpdateGUI();
+	
 	if mog.db.profile.minimap.hide then
 		mog.LDBI:Hide("MogIt");
 	else
 		mog.LDBI:Show("MogIt");
 	end
+	
 	if mog.db.profile.tooltipRotate then
 		mog.tooltip.rotate:Show();
 	else
 		mog.tooltip.rotate:Hide();
 	end
+	
 	mog.scroll:update();
 end
 
@@ -205,10 +219,7 @@ mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 		mog:UpdateGUI();
 		mog.tooltip.model:SetUnit("PLAYER");
 	elseif event == "GET_ITEM_INFO_RECEIVED" then
-		doBuildList = true;
-		-- if doBuildList then
-			self:SetScript("OnUpdate", mog.ItemInfoReceived);
-		-- end
+		self:SetScript("OnUpdate", mog.ItemInfoReceived);
 	elseif event == "PLAYER_EQUIPMENT_CHANGED" then
 		if mog.db.profile.gridDress == "equipped" then
 			local slot, hasItem = arg1, ...;
