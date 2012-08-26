@@ -2,7 +2,7 @@ local MogIt, mog = ...
 local L = mog.L
 
 local function itemLabel(itemID, textHeight)
-	local name, link = GetItemInfo(itemID)
+	local name, link = GetItemInfo(itemID) -- need changing to mog:GII
 	return format("|T%s:%d|t %s", GetItemIcon(itemID), textHeight or 0, link or name or RED_FONT_COLOR_CODE..RETRIEVING_ITEM_INFO..FONT_COLOR_CODE_CLOSE)
 end
 
@@ -104,14 +104,10 @@ local function createMenu(self, level, menuList)
 end
 
 function mog.Item_FrameUpdate(self, data)
-	if not (self and data and data.item) then return end
-	if mog.db.profile.gridDress == "equipped" then
-		self.model:Dress()
-	else
-		self.model:Undress()
-	end
-	mog:DressModel(self)
-	self.model:TryOn(data.item)
+	if not (self and data and data.items and data.items and data.cycle) then return end
+	mog:BuildModel(self);
+	mog:DressModel(self);
+	self.model:TryOn(data.items[data.cycle])
 end
 
 local sourceLabels = {
@@ -121,17 +117,16 @@ local sourceLabels = {
 GameTooltip:RegisterEvent("MODIFIER_STATE_CHANGED")
 GameTooltip:HookScript("OnEvent", function(self, event, key, state)
 	local owner = self:GetOwner()
-	if owner and self.MogIt then
+	if owner and (owner.type == "preview" or owner.type == "catalogue") then
 		mog.ModelOnEnter(owner)
 	end
 end)
 
 function mog.Item_OnEnter(self, data)
-	local item = data.item
+	local item = data.items[data.cycle];
 	if not (self and item) then return end
 	
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-	GameTooltip.MogIt = true
 	
 	if IsShiftKeyDown() then
 		GameTooltip:SetItemByID(item)
@@ -141,7 +136,7 @@ function mog.Item_OnEnter(self, data)
 		return
 	end
 	
-	local itemName, _, _, itemLevel = GetItemInfo(item)
+	local itemName, _, _, itemLevel = mog:GetItemInfo("ModelOnEnter",item)
 	--GameTooltip:AddLine(self.display, 1, 1, 1)
 	--GameTooltip:AddLine(" ")
 	
@@ -212,11 +207,11 @@ function mog.Item_OnEnter(self, data)
 end
 
 function mog.Item_OnClick(self, btn, data, isSaved)
-	local item = data.item
+	local item = data.items[data.cycle];
 	if not (self and item) then return end
 	
 	if btn == "LeftButton" then
-		if not HandleModifiedItemClick(select(2, GetItemInfo(item))) and data.items then
+		if not HandleModifiedItemClick(select(2, GetItemInfo(item))) and data.items then -- needs changing to mog:GII
 			data.cycle = (data.cycle % #data.items) + 1
 			data.item = data.items[data.cycle]
 			mog.ModelOnEnter(self)
@@ -241,7 +236,6 @@ end
 do
 	local function itemOnClick(self, data, index)
 		data.cycle = index
-		data.item = data.items[index]
 	end
 	
 	mog.Item_Menu = CreateFrame("Frame")

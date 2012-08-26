@@ -97,6 +97,8 @@ function mog:CreateModelFrame(parent)
 	f:RegisterForDrag("LeftButton","RightButton");
 	f:SetScript("OnDragStart",mog.ModelOnDragStart);
 	f:SetScript("OnDragStop",mog.ModelOnDragStop);
+	
+	return f;
 end
 
 function mog:DeleteModelFrame(f)
@@ -197,7 +199,7 @@ mog.modelUpdater:SetScript("OnUpdate",function(self,elapsed)
 	end
 	
 	self.pX,self.pY = cX,cY;
-end
+end);
 
 function mog:StartModelUpdater(model,btn)
 	mog.modelUpdater.btn = btn;
@@ -231,7 +233,7 @@ function mog.ModelOnShow(self)
 		mog:BuildModel(self);
 		mog:DressModel(self);
 	else
-		mog:ModelUpdate(self);
+		mog:ModelUpdate(self,self.data.value);
 	end
 	mog:PositionModel(self);
 end
@@ -265,7 +267,7 @@ end
 
 function mog.ModelOnLeave(self,...)
 	if mog.active and mog.active.OnLeave then
-		mog.active:OnLeave(self,...);
+		mog.active:OnLeave(self,self.data.value,...);
 	else
 		GameTooltip:Hide();
 	end
@@ -370,9 +372,9 @@ function mog.scroll.update(self,value,offset,onscroll)
 			end
 			frame:SetAlpha(1);
 			if frame:IsShown() then
-				mog:ModelUpdate(frame);
+				mog:ModelUpdate(frame,value);
 				if owner == frame then
-					mog.ModelOnEnter(frame);
+					mog.ModelOnEnter(frame,value);
 				end
 			else
 				frame:Show();
@@ -398,9 +400,9 @@ function mog:UpdateScroll(value,offset)
 	mog.scroll:update(value,offset);
 end
 
-function mog:ModelUpdate(frame)
+function mog:ModelUpdate(frame,value)
 	if mog.active and mog.active.FrameUpdate then
-		mog.active:FrameUpdate(frame,frame.data.value);
+		mog.active:FrameUpdate(frame,value);
 	end
 end
 --//
