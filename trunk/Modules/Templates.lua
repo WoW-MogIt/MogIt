@@ -136,7 +136,7 @@ function mog.Item_OnEnter(self, data)
 		return
 	end
 	
-	local itemName, _, _, itemLevel = mog:GetItemInfo("ModelOnEnter",item)
+	local itemName, _, _, itemLevel = mog:GetItemInfo(item,"ModelOnEnter")
 	--GameTooltip:AddLine(self.display, 1, 1, 1)
 	--GameTooltip:AddLine(" ")
 	
@@ -275,8 +275,8 @@ end
 
 function mog.Set_FrameUpdate(self, data)
 	if not (self and data and data.items) then return end
-	self:ShowIndicator("label")
-	self:SetText(data.name)
+	mog:ShowIndicator(self,"label")
+	self:SetText(data.name) -- needs fixing
 	self.model:Undress()
 	for k, v in pairs(data.items) do
 		self.model:TryOn(v)
