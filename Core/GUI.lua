@@ -73,8 +73,11 @@ function mog:CreateModelFrame(parent)
 	end
 	
 	local f = CreateFrame("Button",nil,parent);
+	f:Hide();
+	
 	f.type = (parent == mog.view) and "preview" or "catalogue";
 	f.data = {parent = parent};
+	f.indicators = {};
 	
 	f.model = CreateFrame("DressUpModel",nil,f);
 	f.model:SetAllPoints(f);
@@ -84,11 +87,6 @@ function mog:CreateModelFrame(parent)
 	f.bg = f:CreateTexture(nil,"BACKGROUND");
 	f.bg:SetAllPoints(f);
 	f.bg:SetTexture(0.3,0.3,0.3,0.2);
-	
-	f.indicators = {};
-	for k,v in pairs(mog.indicators) do
-		mog.CreateModelIndicator(f,k);
-	end
 	
 	f:SetScript("OnUpdate",mog.ModelOnUpdate);
 	f:SetScript("OnShow",mog.ModelOnShow);
@@ -112,6 +110,7 @@ function mog:DeleteModelFrame(f)
 	end
 	wipe(f.data);
 	f:SetAlpha(1);
+	f:Enable();
 	tinsert(mog.modelBin,f);
 end
 
@@ -120,9 +119,6 @@ function mog:CreateCatalogueModel()
 	f:SetScript("OnClick",mog.ModelOnClick);
 	f:SetScript("OnEnter",mog.ModelOnEnter);
 	f:SetScript("OnLeave",mog.ModelOnLeave);
-	for ind,func in pairs(mog.indicators) do
-		mog.CreateModelIndicator(f,ind);
-	end
 	tinsert(mog.models,f);
 	return f;
 end
@@ -168,8 +164,8 @@ mog.modelUpdater = CreateFrame("Frame",nil,UIParent);
 mog.modelUpdater:Hide();
 mog.modelUpdater:SetScript("OnUpdate",function(self,elapsed)
 	local cX,cY = GetCursorPosition();
-	local dX = self.pX + (cx-self.pX)/50;
-	local dY = self.pY + (cy-self.pY)/50;
+	local dX = (cX-self.pX)/50;
+	local dY = (cY-self.pY)/50;
 	
 	if (mog.db.profile.sync or self.model.type == "catalogue") then
 		if self.btn == "LeftButton" then
@@ -183,9 +179,9 @@ mog.modelUpdater:SetScript("OnUpdate",function(self,elapsed)
 			mog:PositionModel(model);
 		end
 		if mog.db.profile.sync then
-			for id,preview in ipairs(mog.previews) do
-				mog:PositionModel(preview.model);
-			end
+			--for id,preview in ipairs(mog.previews) do
+			--	mog:PositionModel(preview.model);
+			--end
 		end
 	else
 		if self.btn == "LeftButton" then
@@ -278,26 +274,16 @@ end
 --// Indicators
 mog.indicators = {};
 
-function mog.CreateModelIndicator(frame,name)
-	if frame.indicators[name] then return end;
-	frame.indicators[name] = mog.indicators[name](frame.model);
-end
-
 function mog:CreateIndicator(name,func)
 	if mog.indicators[name] then return end;
 	mog.indicators[name] = func;
-	for _,frame in ipairs(mog.models) do
-		mog.CreateModelIndicator(frame,name);
-	end
-end
-
-function mog:GetIndicator(frame,name)
-	return frame.indicators[name];
 end
 
 function mog:ShowIndicator(frame,name)
 	if not mog.indicators[name] then return end;
-	mog:CreateModelIndicator(frame,name);
+	if not frame.indicators[name] then
+		frame.indicators[name] = mog.indicators[name](frame.model);
+	end
 	frame.indicators[name]:Show();
 end
 --//
@@ -377,6 +363,7 @@ function mog.scroll.update(self,value,offset,onscroll)
 				v:Hide();
 			end
 			frame:SetAlpha(1);
+			frame:Enable();
 			if frame:IsShown() then
 				mog:ModelUpdate(frame,value);
 				if owner == frame then
@@ -387,6 +374,7 @@ function mog.scroll.update(self,value,offset,onscroll)
 			end
 		else
 			frame:SetAlpha(0);
+			frame:Disable();
 		end
 	end
 	
@@ -641,6 +629,7 @@ mog.menu.catalogue = mog.CreateMenu(mog.frame,L["Catalogue"],function(tier)
 		info.text = L["Sorting"];
 		info.value = "sorting";
 		info.notCheckable = true;
+		info.hasArrow = true;
 		info.disabled = not (mog.active and mog.active.sorting and #mog.active.sorting > 0);
 		UIDropDownMenu_AddButton(info,tier);
 	elseif mog.menu.tier[2] == "sorting" then

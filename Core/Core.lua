@@ -326,7 +326,6 @@ mog.slots = {
 	"FeetSlot",
 	"MainHandSlot",
 	"SecondaryHandSlot",
-	"RangedSlot",
 };
 
 mog.slotsType = {
@@ -346,9 +345,6 @@ mog.slotsType = {
 	INVTYPE_WEAPONOFFHAND = "SecondaryHandSlot",
 	INVTYPE_SHIELD = "SecondaryHandSlot",
 	INVTYPE_HOLDABLE = "SecondaryHandSlot",
-	INVTYPE_RANGED = "RangedSlot",
-	INVTYPE_RANGEDRIGHT = "RangedSlot",
-	INVTYPE_THROWN = "RangedSlot",
 	INVTYPE_HAND = "HandsSlot",
 	INVTYPE_TABARD = "TabardSlot",
 };
