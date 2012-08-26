@@ -2,14 +2,6 @@ local MogIt,mog = ...;
 local L = mog.L;
 
 
-mog.models = {};
-mog.bin = {};
-mog.posX = 0;
-mog.posY = 0;
-mog.posZ = 0;
-mog.face = 0;
-
-
 --// mog.frame
 mog.frame:SetPoint("CENTER",UIParent,"CENTER");
 mog.frame:SetSize(252,108);
@@ -22,14 +14,6 @@ mog.frame:SetResizable(true);
 mog.frame:SetUserPlaced(true);
 mog.frame:SetScript("OnMouseDown",mog.frame.StartMoving);
 mog.frame:SetScript("OnMouseUp",mog.frame.StopMovingOrSizing);
-mog.frame:SetScript("OnShow",function(self)
-	mog.modelUpdater:Show();
-end);
-mog.frame:SetScript("OnHide",function(self)
-	if not mog.view:IsShown() then
-		mog.modelUpdater:Hide();
-	end
-end);
 tinsert(UISpecialFrames,"MogItFrame");
 
 mog.frame.TitleText:SetText("MogIt");
@@ -68,6 +52,423 @@ mog.frame.path:SetPoint("BOTTOMLEFT",mog.frame,"BOTTOMLEFT",17,10);
 mog.frame.page = mog.frame:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall");
 mog.frame.page:SetPoint("BOTTOMRIGHT",mog.frame,"BOTTOMRIGHT",-17,10);
 --//
+
+
+--// Model Frames
+mog.models = {};
+mog.modelBin = {};
+mog.posX = 0;
+mog.posY = 0;
+mog.posZ = 0;
+mog.face = 0;
+
+function mog:CreateModelFrame(parent)
+	if mog.modelBin[1] then
+		local f = mog.ModelBin[1];
+		f.parent = parent;
+		f:SetParent(parent);
+		f:Show();
+		tremove(mog.modelBin,1);
+		return f;
+	end
+	
+	local f = CreateFrame("Button",nil,parent);
+	f.type = (parent == mog.view) and "preview" or "catalogue";
+	f.data = {parent = parent};
+	
+	f.model = CreateFrame("DressUpModel",nil,f);
+	f.model:SetAllPoints(f);
+	f.model:SetModelScale(2);
+	f.model:SetPosition(0,0,0);
+	
+	f.bg = f:CreateTexture(nil,"BACKGROUND");
+	f.bg:SetAllPoints(f);
+	f.bg:SetTexture(0.3,0.3,0.3,0.2);
+	
+	f.indicators = {};
+	for k,v in pairs(mog.indicators) do
+		mog.CreateModelIndicator(f,k);
+	end
+	
+	f:SetScript("OnUpdate",mog.ModelOnUpdate);
+	f:SetScript("OnShow",mog.ModelOnShow);
+	f:SetScript("OnHide",mog.ModelOnHide);
+	f:RegisterForClicks("AnyUp");
+	f:RegisterForDrag("LeftButton","RightButton");
+	f:SetScript("OnDragStart",mog.ModelOnDragStart);
+	f:SetScript("OnDragStop",mog.ModelOnDragStop);
+end
+
+function mog:DeleteModelFrame(f)
+	f:Hide();
+	f:ClearAllPoints();
+	f:SetScript("OnClick",nil);
+	f:SetScript("OnEnter",nil);
+	f:SetScript("OnLeave",nil);
+	for ind,frame in pairs(f.indicators) do
+		frame:Hide();
+	end
+	wipe(f.data);
+	f:SetAlpha(1);
+	tinsert(mog.modelBin,f);
+end
+
+function mog:CreateCatalogueModel()
+	local f = mog:CreateModelFrame(mog.scroll);
+	f:SetScript("OnClick",mog.ModelOnClick);
+	f:SetScript("OnEnter",mog.ModelOnEnter);
+	f:SetScript("OnLeave",mog.ModelOnLeave);
+	for ind,func in pairs(mog.indicators) do
+		mog.CreateModelIndicator(f,ind);
+	end
+	tinsert(mog.models,f);
+	return f;
+end
+
+function mog:DeleteCatalogueModel(n)
+	mog:DeleteModelFrame(mog.models[n]);
+	tremove(mog.models,n);
+end
+
+function mog:BuildModel(self)
+	self.model:SetCustomRace(self.data.race or (self.type == "catalogue" and mog.displayRace),self.data.gender or (self.type == "catalogue" and mog.displayGender));
+end
+
+function mog:DressModel(self)
+	if mog.db.profile.gridDress == "equipped" and self.type ~= "preview" then
+		self.model:Dress();
+	else
+		self.model:Undress();
+	end
+
+	local slots = (self.type == "preview" and self.data.parent.slots) or (mog.db.profile.gridDress == "preview" and mog.activePreview and mog.activePreview.slots);
+	if slots then
+		for id,slot in pairs(slots) do
+			if slot.data[1] then
+				self.model:TryOn(slot.data[1]);
+			end
+		end
+	end
+end
+
+function mog:PositionModel(self)
+	if self.model:IsVisible() then
+		local sync = (mog.db.profile.sync or self.type == "catalogue");
+		self.model:SetPosition(sync and mog.posZ or self.data.posZ or 0,sync and mog.posX or self.data.posX or 0,sync and mog.posY or self.data.posY or 0);
+		self.model:SetFacing(sync and mog.face or self.data.face or 0);
+	end
+end
+--//
+
+
+--// Model Updater
+mog.modelUpdater = CreateFrame("Frame",nil,UIParent);
+mog.modelUpdater:Hide();
+mog.modelUpdater:SetScript("OnUpdate",function(self,elapsed)
+	local cX,cY = GetCursorPosition();
+	local dX = self.pX + (cx-self.pX)/50;
+	local dY = self.pY + (cy-self.pY)/50;
+	
+	if (mog.db.profile.sync or self.model.type == "catalogue") then
+		if self.btn == "LeftButton" then
+			mog.posZ = mog.posZ + dY;
+			mog.face = mog.face + dX;
+		elseif self.btn == "RightButton" then
+			mog.posX = mog.posX + dX;
+			mog.posY = mog.posY + dY;
+		end
+		for id,model in ipairs(mog.models) do
+			mog:PositionModel(model);
+		end
+		if mog.db.profile.sync then
+			for id,preview in ipairs(mog.previews) do
+				mog:PositionModel(preview.model);
+			end
+		end
+	else
+		if self.btn == "LeftButton" then
+			self.model.data.posZ = self.model.data.posZ + dY;
+			self.model.data.face = self.model.data.face + dX;
+		elseif self.btn == "RightButton" then
+			self.model.data.posX = self.model.data.posX + dX;
+			self.model.data.posY = self.model.data.posY + dY;
+		end
+		mog:PositionModel(self.model);
+	end
+	
+	self.pX,self.pY = cX,cY;
+end
+
+function mog:StartModelUpdater(model,btn)
+	mog.modelUpdater.btn = btn;
+	mog.modelUpdater.model = model;
+	mog.modelUpdater.pX,mog.modelUpdater.pY = GetCursorPosition();
+	mog.modelUpdater:Show();
+end
+
+function mog:StopModelUpdater()
+	mog.modelUpdater:Hide();
+	mog.modelUpdater.btn = nil;
+	mog.modelUpdater.model = nil;
+end
+--//
+
+
+--// Model Functions
+function mog.ModelOnUpdate(self)
+	--56, 108, 237, 238, 239, 243, 249, 250, 251, 252, 253, 254, 255
+	if mog.db.profile.noAnim then
+		self.model:SetSequence(254);
+	end
+end
+
+function mog.ModelOnShow(self)
+	local lvl = self:GetParent():GetFrameLevel();
+	if self:GetFrameLevel() <= lvl then
+		self:SetFrameLevel(lvl+1);
+	end
+	if self.type == "preview" then
+		mog:BuildModel(self);
+		mog:DressModel(self);
+	else
+		mog:ModelUpdate(self);
+	end
+	mog:PositionModel(self);
+end
+
+function mog.ModelOnHide(self)
+	if mog.modelUpdater.model == self then
+		mog:StopModelUpdater();
+	end
+	self.model:SetPosition(0,0,0);
+end
+
+function mog.ModelOnClick(self,btn,...)
+	if mog.active and mog.active.OnClick then
+		mog.active:OnClick(self,btn,self.data.value,...);
+	end
+end
+
+function mog.ModelOnDragStart(self,btn)
+	mog:StartModelUpdater(self,btn);
+end
+
+function mog.ModelOnDragStop(self,btn)
+	mog:StopModelUpdater();
+end
+
+function mog.ModelOnEnter(self,...)
+	if mog.active and mog.active.OnEnter then
+		mog.active:OnEnter(self,self.data.value,...);
+	end
+end
+
+function mog.ModelOnLeave(self,...)
+	if mog.active and mog.active.OnLeave then
+		mog.active:OnLeave(self,...);
+	else
+		GameTooltip:Hide();
+	end
+end
+--//
+
+
+--// Indicators
+mog.indicators = {};
+
+function mog.CreateModelIndicator(frame,name)
+	if frame.indicators[name] then return end;
+	frame.indicators[name] = mog.indicators[name](frame.model);
+end
+
+function mog:CreateIndicator(name,func)
+	if mog.indicators[name] then return end;
+	mog.indicators[name] = func;
+	for _,frame in ipairs(mog.models) do
+		mog.CreateModelIndicator(frame,name);
+	end
+end
+
+function mog:GetIndicator(frame,name)
+	return frame.indicators[name];
+end
+--//
+
+
+--// Scroll Frame
+mog.scroll = CreateFrame("Slider","MogItScroll",mog.frame,"UIPanelScrollBarTrimTemplate");
+mog.scroll:Hide();
+mog.scroll:SetPoint("TOPRIGHT",mog.frame.Inset,"TOPRIGHT",1,-17);
+mog.scroll:SetPoint("BOTTOMRIGHT",mog.frame.Inset,"BOTTOMRIGHT",1,16);
+mog.scroll:SetValueStep(1);
+mog.scroll:SetScript("OnValueChanged",function(self,value)
+	self:update(nil,nil,value);
+end);
+
+mog.scroll.up = MogItScrollScrollUpButton;
+mog.scroll.down = MogItScrollScrollDownButton;
+mog.scroll.up:SetScript("OnClick",function(self)
+	mog.scroll:update(nil,-1);
+end);
+mog.scroll.down:SetScript("OnClick",function(self)
+	mog.scroll:update(nil,1);
+end);
+
+function mog.scroll.update(self,value,offset,onscroll)
+	local models = #mog.models;
+	local total = ceil(#mog.list/models);
+	
+	if onscroll then
+		value = onscroll;
+	else
+		if total > 0 then
+			self:SetMinMaxValues(1,total);
+		end
+		if total > 1 then
+			self:Show();
+		else
+			self:Hide();
+		end
+		
+		local old = self:GetValue();
+		value = (value or old or 1) + (offset or 0);
+		if value ~= old then
+			self:SetValue(value);
+			return;
+		end
+	end
+
+	if value == 1 then
+		self.up:Disable();
+	else
+		self.up:Enable();
+	end
+	if value == total then
+		self.down:Disable();
+	else
+		self.down:Enable();
+	end
+	
+	if mog.IsDropdownShown(mog.Item_Menu) or mog.IsDropdownShown(mog.Set_Menu) then
+		HideDropDownMenu(1);
+	end
+	
+	if mog.active and mog.active.OnScroll then
+		mog.active:OnScroll();
+	end
+	
+	local owner = GameTooltip:IsShown() and GameTooltip:GetOwner();	
+	for id,frame in ipairs(mog.models) do
+		local index = ((value-1)*models)+id;
+		local value = mog.list[index];
+		if value then
+			wipe(frame.data);
+			frame.data.value = value;
+			frame.data.frame = frame;
+			for k, v in pairs(frame.indicators) do
+				v:Hide();
+			end
+			frame:SetAlpha(1);
+			if frame:IsShown() then
+				mog:ModelUpdate(frame);
+				if owner == frame then
+					mog.ModelOnEnter(frame);
+				end
+			else
+				frame:Show();
+			end
+		else
+			frame:SetAlpha(0);
+		end
+	end
+	
+	if total > 0 then
+		mog.frame.page:SetText(MERCHANT_PAGE_NUMBER:format(value,total));
+		mog.frame.page:Show();
+	else
+		mog.frame.page:Hide();
+	end
+end
+
+mog.frame:SetScript("OnMouseWheel",function(self,offset)
+	mog.scroll:update(nil,offset > 0 and -1 or 1);
+end);
+
+function mog:UpdateScroll(value,offset)
+	mog.scroll:update(value,offset);
+end
+
+function mog:ModelUpdate(frame)
+	if mog.active and mog.active.FrameUpdate then
+		mog.active:FrameUpdate(frame,frame.data.value);
+	end
+end
+--//
+
+--// GUI
+function mog:UpdateGUI(resize)
+	local rows,columns = mog.db.profile.rows,mog.db.profile.columns;
+	local total = rows*columns;
+	local current = #mog.models;
+	local width,height = mog.db.profile.width,mog.db.profile.height;
+	
+	if not resize then
+		if current > total then
+			for i=current,(total+1),-1 do
+				mog:DeleteCatalogueModel(i);
+			end
+		elseif current < total then
+			for i=(current+1),total,1 do
+				mog:CreateCatalogueModel();
+			end
+		end
+		mog.frame:SetSize(((width+5)*columns)-5+(4+10)+(10+18+4),((height+5)*rows)-5+(60+10)+(10+26));
+		if mog.frame:IsShown() then
+			mog.scroll:update();
+		end
+	end
+	
+	for row=1,rows do
+		for column=1,columns do
+			local n = ((row-1)*columns)+column;
+			if not resize then
+				if n==1 then
+					mog.models[n]:SetPoint("TOPLEFT",mog.frame.Inset,"TOPLEFT",10,-10);
+				elseif column==1 then
+					mog.models[n]:SetPoint("TOPLEFT",mog.models[n-columns],"BOTTOMLEFT",0,-5);
+				else
+					mog.models[n]:SetPoint("TOPLEFT",mog.models[n-1],"TOPRIGHT",5,0);
+				end
+			end
+			mog.models[n]:SetSize(width,height);
+		end
+	end
+end
+--//
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 --// Toolbar
@@ -172,6 +573,43 @@ mog.menu.modules:SetPoint("TOPLEFT",mog.frame,"TOPLEFT",62,-31);
 
 
 --// Catalogue Menu
+--// Race Menu
+local races = {
+   [1] = "HUMAN",
+   [2] = "ORC",
+   [3] = "DWARF",
+   [4] = "NIGHTELF",
+   [5] = "SCOURGE",
+   [6] = "TAUREN",
+   [7] = "GNOME",
+   [8] = "TROLL",
+   [9] = "GOBLIN",
+   [10] = "BLOODELF",
+   [11] = "DRAENEI",
+   [22] = "WORGEN",
+}
+
+local gender = {
+	[0] = "Male",
+	[1] = "Female",
+}
+
+local menuModelNames = {
+	HUMAN = "Human",
+	ORC = "Orc",
+	DWARF = "Dwarf",
+	NIGHTELF = "Nightelf",
+	SCOURGE = "Undead",
+	TAUREN = "Tauren",
+	GNOME = "Gnome",
+	TROLL = "Troll",
+	GOBLIN = "Goblin",
+	BLOODELF = "Bloodelf",
+	DRAENEI = "Draenei",
+	WORGEN = "Worgen",
+}
+--//
+
 function mog:ToggleFilters()
 	if mog.filt:IsShown() then
 		mog.filt:Hide();
@@ -237,523 +675,9 @@ mog.menu.options:SetPoint("LEFT",mog.menu.preview,"RIGHT",5,0);
 --//
 
 
---// Race Menu
-local races = {
-   [1] = "HUMAN",
-   [2] = "ORC",
-   [3] = "DWARF",
-   [4] = "NIGHTELF",
-   [5] = "SCOURGE",
-   [6] = "TAUREN",
-   [7] = "GNOME",
-   [8] = "TROLL",
-   [9] = "GOBLIN",
-   [10] = "BLOODELF",
-   [11] = "DRAENEI",
-   [22] = "WORGEN",
-}
-
-local gender = {
-	[0] = "Male",
-	[1] = "Female",
-}
-
-local menuModelNames = {
-	HUMAN = "Human",
-	ORC = "Orc",
-	DWARF = "Dwarf",
-	NIGHTELF = "Nightelf",
-	SCOURGE = "Undead",
-	TAUREN = "Tauren",
-	GNOME = "Gnome",
-	TROLL = "Troll",
-	GOBLIN = "Goblin",
-	BLOODELF = "Bloodelf",
-	DRAENEI = "Draenei",
-	WORGEN = "Worgen",
-}
-
-local _, playerRace = UnitRace("player")
-local playerGender = UnitSex("player") - 2
-
-local displayRace
-local displayGender
-
-function mog:SetDisplayRace(race, gender)
-	if race == playerRace and gender == playerGender then
-		race = nil
-		gender = nil
-	end
-	displayRace = race
-	displayGender = gender
-	for i, frame in ipairs(mog.models) do
-		mog:SetModelPosition(frame,0,0,0,0);
-		mog:UpdateModelPosition(frame);
-		if race then
-			frame.model:SetCustomRace(race, gender);
-		else
-			frame.model:SetUnit("player")
-		end
-		mog:ModelUpdate(frame);
-	end
-end
-
-local function onClick(self, gender)
-	mog:SetDisplayRace(self.value, gender);
-end
-
-mog.menu.race = CreateFrame("Frame", "MogItCatalogueRace", mog.frame, "UIDropDownMenuTemplate");
-mog.menu.race:SetPoint("LEFT",mog.menu.options,"RIGHT",5,-2);
-mog.menu.race.initialize = function(self, level)
-	if level == 1 then
-		for i, race in pairs(races) do
-			local info = UIDropDownMenu_CreateInfo()
-			info.text = race
-			info.value = i
-			info.hasArrow = true
-			UIDropDownMenu_AddButton(info, level)
-		end
-	elseif level == 2 then
-		for i = 0, 1 do
-			local info = UIDropDownMenu_CreateInfo()
-			info.text = gender[i]
-			info.value = UIDROPDOWNMENU_MENU_VALUE
-			info.func = onClick
-			info.arg1 = i
-			UIDropDownMenu_AddButton(info, level)
-		end
-	end
-end
---//
 
 
---// Scroll Frame
-mog.scroll = CreateFrame("Slider","MogItScroll",mog.frame,"UIPanelScrollBarTrimTemplate");
-mog.scroll:Hide();
-mog.scroll:SetPoint("TOPRIGHT",mog.frame.Inset,"TOPRIGHT",1,-17);
-mog.scroll:SetPoint("BOTTOMRIGHT",mog.frame.Inset,"BOTTOMRIGHT",1,16);
-mog.scroll:SetValueStep(1);
-mog.scroll:SetScript("OnValueChanged",function(self,value)
-	self:update(nil,nil,value);
-end);
 
-mog.scroll.up = MogItScrollScrollUpButton;
-mog.scroll.down = MogItScrollScrollDownButton;
-mog.scroll.up:SetScript("OnClick",function(self)
-	mog.scroll:update(nil,-1);
-end);
-mog.scroll.down:SetScript("OnClick",function(self)
-	mog.scroll:update(nil,1);
-end);
-
-function mog.scroll.update(self,value,offset,onscroll)
-	local models = #mog.models;
-	local total = ceil(#mog.list/models);
-	
-	if onscroll then
-		value = onscroll;
-	else
-		if total > 0 then
-			self:SetMinMaxValues(1,total);
-		end
-		if total > 1 then
-			self:Show();
-		else
-			self:Hide();
-		end
-		
-		local old = self:GetValue();
-		value = (value or old or 1) + (offset or 0);
-		if value ~= old then
-			self:SetValue(value);
-			return;
-		end
-	end
-
-	if value == 1 then
-		self.up:Disable();
-	else
-		self.up:Enable();
-	end
-	if value == total then
-		self.down:Disable();
-	else
-		self.down:Enable();
-	end
-	
-	if mog.IsDropdownShown(mog.Item_Menu) or mog.IsDropdownShown(mog.Set_Menu) then
-		HideDropDownMenu(1);
-	end
-	
-	if mog.active and mog.active.OnScroll then
-		mog.active:OnScroll();
-	end
-	
-	local owner = GameTooltip:IsShown() and GameTooltip:GetOwner();	
-	for id,frame in ipairs(mog.models) do
-		local index = ((value-1)*models)+id;
-		local value = mog.list[index];
-		if value then
-			wipe(frame.data);
-			frame.data.value = value;
-			frame.data.frame = frame;
-			for k, v in pairs(frame.indicators) do
-				v:Hide();
-			end
-			if frame:IsShown() then
-				mog:ModelUpdate(frame);
-				if owner == frame then
-					mog.ModelOnEnter(frame);
-				end
-			else
-				frame:Show();
-			end
-		else
-			frame:Hide();
-		end
-	end
-	
-	if total > 0 then
-		mog.frame.page:SetText(MERCHANT_PAGE_NUMBER:format(value,total));
-		mog.frame.page:Show();
-	else
-		mog.frame.page:Hide();
-	end
-end
-
-mog.frame:SetScript("OnMouseWheel",function(self,offset)
-	mog.scroll:update(nil,offset > 0 and -1 or 1);
-end);
-
-function mog:UpdateScroll(value,offset)
-	mog.scroll:update(value,offset);
-end
-
-function mog:ModelUpdate(frame)
-	if mog.active and mog.active.FrameUpdate then
-		mog.active:FrameUpdate(frame,frame.data.value);
-	end
-end
---//
-
-
---// Model Positioning
-function mog:IsModelSynced(model)
-	return (model == true) or (model and (not model.nosync) and (model.type == "catalogue" or (mog.db.profile.sync and model.type == "preview")));
-end
-
-function mog:PositionModel(model,posX,posY,posZ,face)
-	model.model:SetFacing(face);
-	if model.model:IsVisible() then
-		model.model:SetPosition(posZ,posX,posY);
-	end
-end
-
-function mog:GetModelPosition(model)
-	local data = mog:IsModelSynced(model) and mog or model;
-	return (data.posX or mog.posX or 0),(data.posY or mog.posY or 0),(data.posZ or mog.posZ or 0),(data.face or mog.face or 0);
-end
-
-function mog:SetModelPosition(model,posX,posY,posZ,face,delta)
-	local data = mog:IsModelSynced(model) and mog or model;
-	if data then
-		data.posX = delta and ((data.posX or 0) + (posX or 0)) or posX or data.posX or mog.posX or 0;
-		data.posY = delta and ((data.posY or 0) + (posY or 0)) or posY or data.posY or mog.posY or 0;
-		data.posZ = delta and ((data.posZ or 0) + (posZ or 0)) or posZ or data.posZ or mog.posZ or 0;
-		data.face = delta and ((data.face or 0) + (face or 0)) or face or data.face or mog.face or 0;
-	end
-	if not model then
-		for k,v in ipairs(mog.models) do
-			if not mog:IsModelSynced(v) then
-				mog:SetModelPosition(v,posX,posY,posZ,face,delta);
-			end
-		end
-		for k,v in ipairs(mog.view.frames) do
-			v = v.model;
-			if not mog:IsModelSynced(v) then
-				mog:SetModelPosition(v,posX,posY,posZ,face,delta);
-			end
-		end
-	end
-end
-
-function mog:UpdateModelPosition(model)
-	if model and (model ~= true) then
-		mog:PositionModel(model,mog:GetModelPosition(model));
-	else
-		for k,v in ipairs(mog.models) do
-			if mog:IsModelSynced(v) then
-				if (model == true) then
-					mog:UpdateModelPosition(v);
-				end
-			elseif (not model) then
-				mog:UpdateModelPosition(v);
-			end
-		end
-		for k,v in ipairs(mog.view.frames) do
-			v = v.model;
-			if mog:IsModelSynced(v) then
-				if (model == true) then
-					mog:UpdateModelPosition(v);
-				end
-			elseif (not model) then
-				mog:UpdateModelPosition(v);
-			end
-		end
-	end
-end
-
-mog.modelUpdater = CreateFrame("Frame",nil,UIParent);
-mog.modelUpdater:Hide();
-mog.modelUpdater.elapsed = 0;
-mog.modelUpdater:SetScript("OnUpdate",function(self,elapsed)
-	self.elapsed = self.elapsed + elapsed;
-	if self.elapsed < 0.05 then return end;
-	
-	local sync;
-	if self.model then
-		sync = mog:IsModelSynced(self.model);
-		local cx,cy = GetCursorPosition();
-		if self.btn == "LeftButton" then
-			mog:SetModelPosition(self.model,nil,nil,(cy-self.py)/50,(cx-self.px)/50,true);
-		elseif self.btn == "RightButton" then
-			mog:SetModelPosition(self.model,(cx-self.px)/50,(cy-self.py)/50,nil,nil,true);
-		end
-		self.px,self.py = cx,cy;
-	end
-	
-	if mog.db.profile.rotateSynced then
-		mog:SetModelPosition(true,nil,nil,nil,self.elapsed,true);
-		mog:UpdateModelPosition(true);
-	elseif self.model and sync then
-		mog:UpdateModelPosition(true);
-	end
-	
-	if mog.db.profile.rotateNoSynced then
-		mog:SetModelPosition(false,nil,nil,nil,self.elapsed,true);
-		mog:UpdateModelPosition(false);
-	elseif self.model and (not sync) then
-		mog:UpdateModelPosition(false);
-	end
-	
-	--56, 108, 237, 238, 239, 243, 249, 250, 251, 252, 253, 254, 255
-	if mog.db.profile.noAnim then
-		for k,v in ipairs(mog.models) do
-			v.model:SetSequence(254);
-		end
-		for k,v in ipairs(mog.view.frames) do
-			v.model.model:SetSequence(254);
-		end
-	end
-	
-	self.elapsed = 0;
-end);
-
-function mog:StartModelUpdater(model,btn)
-	mog.modelUpdater.btn = btn;
-	mog.modelUpdater.model = model;
-	mog.modelUpdater.px,mog.modelUpdater.py = GetCursorPosition();
-end
-
-function mog:StopModelUpdater()
-	mog.modelUpdater.btn = nil;
-	mog.modelUpdater.model = nil;
-end
---//
-
-
---// Indicators
-mog.indicators = {};
-
-function mog.CreateModelIndicator(frame,name)
-	if frame.indicators[name] then return end;
-	frame.indicators[name] = mog.indicators[name](frame.model);
-end
-
-function mog:CreateIndicator(name,func)
-	if mog.indicators[name] then return end;
-	mog.indicators[name] = func;
-	for k,frame in ipairs(mog.models) do
-		mog.CreateModelIndicator(frame,name);
-	end
-end
-
-function mog:ShowIndicator(name)
-	if self.indicators[name] then
-		self.indicators[name]:Show();
-	end
-end
-
-function mog:GetIndicator(frame,name)
-	return frame.indicators[name];
-end
-
-function mog:SetText(text)
-	if self.indicators.label then
-		self.indicators.label:SetText(text);
-	end
-end
---//
-
-
---// Model Frames
-function mog:CreateModel(view)
-	local f;
-	if (not view) and mog.bin[1] then
-		f = mog.bin[1];
-		tremove(mog.bin,1);
-	else
-		f = CreateFrame("Button",nil,view and mog.view or mog.frame);
-		f:Hide();
-		f.type = view and "preview" or "catalogue";
-		f.data = {};
-		
-		f:SetScript("OnShow",mog.ModelOnShow);
-		f:SetScript("OnHide",mog.ModelOnHide);
-		--f:SetScript("OnUpdate",mog.ModelOnUpdate);
-		
-		f:RegisterForDrag("LeftButton","RightButton");
-		f:SetScript("OnDragStart",mog.ModelOnDragStart);
-		f:SetScript("OnDragStop",mog.ModelOnDragStop);
-		
-		f.model = CreateFrame("DressUpModel",nil,f);
-		f.model:SetAllPoints(f);
-		if displayRace then
-			f.model:SetCustomRace(displayRace, displayGender);
-		else
-			f.model:SetUnit("PLAYER");
-		end
-		f.model:SetModelScale(2);
-		f.model:SetPosition(0,0,0);
-		f.model.parent = f;
-		
-		f.bg = f:CreateTexture(nil,"BACKGROUND");
-		f.bg:SetAllPoints(f);
-		f.bg:SetTexture(0.3,0.3,0.3,0.2);
-		
-		if not view then
-			f:RegisterForClicks("AnyUp");
-			f:SetScript("OnClick",mog.ModelOnClick);
-			f:SetScript("OnEnter",mog.ModelOnEnter);
-			f:SetScript("OnLeave",mog.ModelOnLeave);
-			
-			f.indicators = {};
-			f.ShowIndicator = mog.ShowIndicator;
-			f.SetText = mog.SetText;
-			for k,v in pairs(mog.indicators) do
-				mog.CreateModelIndicator(f,k);
-			end
-		end
-	end
-	if not view then
-		tinsert(mog.models,f);
-	end
-	return f;
-end
-
-function mog:DeleteModel(f)
-	mog.models[f]:Hide();
-	tinsert(mog.bin,mog.models[f]);
-	tremove(mog.models,f);
-end
-
-function mog.ModelOnShow(self)
-	local lvl = self:GetParent():GetFrameLevel();
-	if self:GetFrameLevel() <= lvl then
-		self:SetFrameLevel(lvl+1);
-	end
-	if self == mog.view.model then
-		self.model:Undress();
-		mog:DressModel(self);
-	else
-		if displayRace then
-			self.model:SetCustomRace(displayRace, displayGender);
-		else
-			self.model:SetUnit("PLAYER");
-		end
-		mog:ModelUpdate(self);
-	end
-	mog:UpdateModelPosition(self);
-end
-
-function mog.ModelOnHide(self)
-	if mog.modelUpdater.model == self then
-		mog:StopModelUpdater();
-	end
-	self.model:SetPosition(0,0,0);
-end
-
-function mog.ModelOnClick(self,btn,...)
-	if mog.active and mog.active.OnClick then
-		mog.active:OnClick(self,btn,self.data.value,...);
-	end
-end
-
-function mog.ModelOnDragStart(self,btn)
-	mog:StartModelUpdater(self,btn);
-end
-
-function mog.ModelOnDragStop(self,btn)
-	mog:StopModelUpdater();
-end
-
-function mog.ModelOnEnter(self,...)
-	if mog.active and mog.active.OnEnter then
-		mog.active:OnEnter(self,self.data.value,...);
-	end
-end
-
-function mog.ModelOnLeave(self,...)
-	if mog.active and mog.active.OnLeave then
-		mog.active:OnLeave(self,...);
-	else
-		GameTooltip:Hide();
-	end
-	GameTooltip.MogIt = nil;
-end
---//
-
-
---// GUI
-function mog:UpdateGUI(resize)
-	local rows,columns = mog.db.profile.rows,mog.db.profile.columns;
-	local total = rows*columns;
-	local current = #mog.models;
-	local width,height = mog.db.profile.width,mog.db.profile.height;
-	
-	if not resize then
-		if current > total then
-			for i=current,(total+1),-1 do
-				mog:DeleteModel(i);
-			end
-		elseif current < total then
-			for i=(current+1),total,1 do
-				mog:CreateModel();
-			end
-		end
-		mog.frame:SetSize(((width+5)*columns)-5+(4+10)+(10+18+4),((height+5)*rows)-5+(60+10)+(10+26));
-		if mog.frame:IsShown() then
-			mog.scroll:update();
-		end
-	end
-	
-	for row=1,rows do
-		for column=1,columns do
-			local n = ((row-1)*columns)+column;
-			if not resize then
-				if n==1 then
-					mog.models[n]:SetPoint("TOPLEFT",mog.frame.Inset,"TOPLEFT",10,-10);
-				elseif column==1 then
-					mog.models[n]:SetPoint("TOPLEFT",mog.models[n-columns],"BOTTOMLEFT",0,-5);
-				else
-					mog.models[n]:SetPoint("TOPLEFT",mog.models[n-1],"TOPRIGHT",5,0);
-				end
-			end
-			mog.models[n]:SetSize(width,height);
-		end
-	end
-end
---//
 
 
 mog:CreateIndicator("label", function(model)
@@ -781,16 +705,6 @@ mog:CreateIndicator("wishlist", function(model)
 	wishlist:SetPoint("TOPRIGHT", -8, -8);
 	return wishlist;
 end)
-
-
-
-
-
-
-
-
-
-
 
 
 
