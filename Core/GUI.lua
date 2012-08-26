@@ -294,6 +294,12 @@ end
 function mog:GetIndicator(frame,name)
 	return frame.indicators[name];
 end
+
+function mog:ShowIndicator(frame,name)
+	if not mog.indicators[name] then return end;
+	mog:CreateModelIndicator(frame,name);
+	frame.indicators[name]:Show();
+end
 --//
 
 

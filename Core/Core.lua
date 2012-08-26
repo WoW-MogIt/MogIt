@@ -147,9 +147,9 @@ mog.cacheFuncs = {
 	end,
 };
 
-function mog:GetItemInfo(type,...)
-	if GetItemInfo(...) then
-		return GetItemInfo(...);
+function mog:GetItemInfo(id,type)
+	if GetItemInfo(id) then
+		return GetItemInfo(id);
 	elseif mog.cacheFuncs[type] then
 		mog.cacheQueue[type] = true;
 	end

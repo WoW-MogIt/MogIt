@@ -100,10 +100,10 @@ function mog.base.FrameUpdate(module,self,value)
 	self.data.cycle = 1;
 	for i, v in ipairs(self.data.items) do
 		if GetItemCount(v, true) > 0 then
-			self:ShowIndicator("hasItem");
+			mog:ShowIndicator(self,"hasItem");
 		end
 		if mog.wishlist:IsItemInWishlist(v) then
-			self:ShowIndicator("wishlist");
+			mog:ShowIndicator(self,"wishlist");
 		end
 	end
 	mog.Item_FrameUpdate(self,self.data);
@@ -162,9 +162,9 @@ end
 
 function mog.base.GetFilterArgs(filter,item)
 	if filter == "name" then
-		return mog:GetItemInfo("BuildList",item);
+		return mog:GetItemInfo(item,"BuildList");
 	elseif filter == "itemLevel" then
-		return select(4,mog:GetItemInfo("BuildList",item));
+		return select(4,mog:GetItemInfo(item,"BuildList"));
 	elseif filter == "source" then
 		return mog:GetData("item", item, "source"),mog:GetData("item", item, "sourceinfo");
 	else
