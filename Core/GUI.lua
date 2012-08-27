@@ -408,6 +408,7 @@ function mog:ModelUpdate(frame,value)
 end
 --//
 
+
 --// GUI
 function mog:GetModelSize()
 	local x = floor((mog.db.profile.gridWidth+5-(4+10)-(10+18+4))/mog.db.profile.columns)-5;
