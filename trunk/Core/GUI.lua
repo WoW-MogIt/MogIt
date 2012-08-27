@@ -82,6 +82,7 @@ function mog:CreateModelFrame(parent)
 	f.model = CreateFrame("DressUpModel",nil,f);
 	f.model:SetAllPoints(f);
 	f.model:SetModelScale(2);
+	f.model:SetUnit("PLAYER");
 	f.model:SetPosition(0,0,0);
 	
 	f.bg = f:CreateTexture(nil,"BACKGROUND");
