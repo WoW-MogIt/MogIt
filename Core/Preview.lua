@@ -141,7 +141,7 @@ function mog:CreatePreview()
 		f.slots[slot]:SetScript("OnLeave",slotOnLeave);
 	end
 
-	--[[
+	--[=[
 		f.save = CreateFrame("Button","MogItPreview"..mog.view.num.."Save",f,"UIPanelButtonTemplate2");
 		f.save:SetPoint("TOPLEFT",10,-30);
 		f.save:SetWidth(100);
@@ -177,7 +177,7 @@ function mog:CreatePreview()
 		f.link:SetWidth(100);
 		f.link:SetText(L["Chat Link"]);
 		f.link:SetScript("OnClick",linkOnClick);
-		--]]
+		--]=]
 		
 	tinsert(mog.previews,f);
 	return f;
@@ -199,7 +199,7 @@ end
 
 
 
-
+--[=[
 local function saveOnClick(self,btn)
 	ToggleDropDownMenu(nil, nil, self.menu, self, 0, 0)
 end
@@ -234,22 +234,12 @@ local function linkOnClick(self,btn)
 	end
 	ChatEdit_InsertLink(mog:SetToLink(tbl));
 end
-
-
---//
-
-
---// Create Preview
-
---//
-
-
---// Delete Preview
-
---//
+--]=]
 
 
 
+
+--[=[
 
 
 local newSet = {items = {}}
@@ -325,7 +315,7 @@ loadMenu.initialize = function(self, level)
 end
 -- mog.view.load.menu = loadMenu
 
-
+--]=]
 
 
 
@@ -409,16 +399,6 @@ function mog.view.delItem(slot)
 	mog.view.setTexture(slot);
 	mog.view.model.model:UndressSlot(GetInventorySlotInfo(slot)); -- needs cleanup
 	-- mog:DressModel(mog.view.model);
-end
-
-function mog:DressModel(frame)
-	if mog.db.profile.gridDress == "preview" or (frame == mog.view.model) then
-		for k,v in pairs(mog.view.slots) do
-			if v.item then
-				frame.model:TryOn(v.item);
-			end
-		end
-	end
 end
 
 hooksecurefunc("HandleModifiedItemClick",function(link)

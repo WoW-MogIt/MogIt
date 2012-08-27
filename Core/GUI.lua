@@ -227,8 +227,8 @@ function mog.ModelOnShow(self)
 	if self:GetFrameLevel() <= lvl then
 		self:SetFrameLevel(lvl+1);
 	end
+	mog:BuildModel(self);
 	if self.type == "preview" then
-		mog:BuildModel(self);
 		mog:DressModel(self);
 	else
 		mog:ModelUpdate(self,self.data.value);
