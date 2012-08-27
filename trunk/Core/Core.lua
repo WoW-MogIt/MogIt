@@ -216,9 +216,7 @@ end
 
 mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 	if event == "PLAYER_LOGIN" then
-		-- mog.view.model.model:SetUnit("PLAYER");
 		mog:UpdateGUI();
-		mog.tooltip.model:SetUnit("PLAYER");
 	elseif event == "GET_ITEM_INFO_RECEIVED" then
 		self:SetScript("OnUpdate", mog.ItemInfoReceived);
 	elseif event == "PLAYER_EQUIPMENT_CHANGED" then
