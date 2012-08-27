@@ -84,8 +84,9 @@ mog:AddURL("MMO-Champion",{
 });
 
 mog:AddURL("WOWDB",{
-	--fav = "Interface\\AddOns\\MogIt\\Images\\",
+	fav = "Interface\\AddOns\\MogIt\\Images\\fav_mmo",
 	item = "http://www.wowdb.com/items/%d",
+	set = "http://www.wowdb.com/item-sets/%d",
 	npc = "http://www.wowdb.com/npcs/%d",
 	spell = "http://www.wowdb.com/spells/%d",
 });
