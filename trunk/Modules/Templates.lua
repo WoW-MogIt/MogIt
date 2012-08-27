@@ -105,7 +105,6 @@ end
 
 function mog.Item_FrameUpdate(self, data)
 	if not (self and data and data.items and data.items and data.cycle) then return end
-	mog:BuildModel(self);
 	mog:DressModel(self);
 	self.model:TryOn(data.items[data.cycle])
 end

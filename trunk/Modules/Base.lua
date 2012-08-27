@@ -81,7 +81,7 @@ function mog.base.Dropdown(module,tier)
 		info.value = module;
 		info.colorCode = "\124cFF"..(module.loaded and "00FF00" or "FF0000");
 		info.hasArrow = module.loaded;
-		info.keepShownOnClick = true;
+		info.keepShownOnClick = not module.loaded;
 		info.notCheckable = true;
 		info.func = mog.base.DropdownTier1;
 		UIDropDownMenu_AddButton(info,tier);
@@ -134,32 +134,27 @@ local function itemSort(a, b)
 	end
 end
 
+local function buildList(module,slot,list,items)
+	for _,item in ipairs(slot) do
+		if mog:CheckFilters(module,item) then
+			local display = mog:GetData("item", item, "display");
+			if not items[display] then
+				items[display] = {};
+				tinsert(list,items[display]);
+			end
+			tinsert(items[display],item);
+		end
+	end
+end
+
 function mog.base.BuildList(module)
 	wipe(list);
 	local items = {};
 	if module.active then
-		for _,item in ipairs(module.active.list) do
-			if mog:CheckFilters(module,item) then
-				local display = mog:GetData("item", item, "display");
-				if not items[display] then
-					items[display] = {};
-					tinsert(list,items[display]);
-				end
-				tinsert(items[display],item);
-			end
-		end
+		buildList(module,module.active.list,list,items);
 	else
 		for _,data in pairs(module.slots) do
-			for _,item in ipairs(data.list) do
-				if mog:CheckFilters(module,item) then
-					local display = mog:GetData("item", item, "display");
-					if not items[display] then
-						items[display] = {};
-						tinsert(list,items[display]);
-					end
-					tinsert(items[display],item);
-				end
-			end
+			buildList(module,data.list,list,items);
 		end
 	end
 	for _,tbl in ipairs(list) do
