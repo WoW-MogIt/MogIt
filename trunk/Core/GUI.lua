@@ -64,10 +64,10 @@ mog.face = 0;
 
 function mog:CreateModelFrame(parent)
 	if mog.modelBin[1] then
-		local f = mog.ModelBin[1];
+		local f = mog.modelBin[1];
 		f.parent = parent;
 		f:SetParent(parent);
-		f:Show();
+		--f:Show();
 		tremove(mog.modelBin,1);
 		return f;
 	end
@@ -75,7 +75,7 @@ function mog:CreateModelFrame(parent)
 	local f = CreateFrame("Button",nil,parent);
 	f:Hide();
 	
-	f.type = (parent == mog.view) and "preview" or "catalogue";
+	f.type = (parent == mog.scroll) and "catalogue" or "preview";
 	f.data = {parent = parent};
 	f.indicators = {};
 	
@@ -105,6 +105,8 @@ function mog:DeleteModelFrame(f)
 	f:SetScript("OnClick",nil);
 	f:SetScript("OnEnter",nil);
 	f:SetScript("OnLeave",nil);
+	f:SetScript("OnMouseWheel",nil);
+	f:EnableMouseWheel(false);
 	for ind,frame in pairs(f.indicators) do
 		frame:Hide();
 	end
@@ -142,8 +144,8 @@ function mog:DressModel(self)
 	local slots = (self.type == "preview" and self.data.parent.slots) or (mog.db.profile.gridDress == "preview" and mog.activePreview and mog.activePreview.slots);
 	if slots then
 		for id,slot in pairs(slots) do
-			if slot.data[1] then
-				self.model:TryOn(slot.data[1]);
+			if slot.items[1] then
+				self.model:TryOn(slot.items[1]);
 			end
 		end
 	end
@@ -152,8 +154,8 @@ end
 function mog:PositionModel(self)
 	if self.model:IsVisible() then
 		local sync = (mog.db.profile.sync or self.type == "catalogue");
-		self.model:SetPosition(sync and mog.posZ or self.data.posZ or 0,sync and mog.posX or self.data.posX or 0,sync and mog.posY or self.data.posY or 0);
-		self.model:SetFacing(sync and mog.face or self.data.face or 0);
+		self.model:SetPosition((not sync and self.data.posZ) or mog.posZ or 0,(not sync and self.data.posX) or mog.posX or 0,(not sync and self.data.posY) or mog.posY or 0);
+		self.model:SetFacing((not sync and self.data.face) or mog.face or 0);
 	end
 end
 --//
@@ -179,17 +181,17 @@ mog.modelUpdater:SetScript("OnUpdate",function(self,elapsed)
 			mog:PositionModel(model);
 		end
 		if mog.db.profile.sync then
-			--for id,preview in ipairs(mog.previews) do
-			--	mog:PositionModel(preview.model);
-			--end
+			for id,preview in ipairs(mog.previews) do
+				mog:PositionModel(preview.model);
+			end
 		end
 	else
 		if self.btn == "LeftButton" then
-			self.model.data.posZ = self.model.data.posZ + dY;
-			self.model.data.face = self.model.data.face + dX;
+			self.model.data.posZ = (self.model.data.posZ or mog.posZ or 0) + dY;
+			self.model.data.face = (self.model.data.face or mog.face or 0) + dX;
 		elseif self.btn == "RightButton" then
-			self.model.data.posX = self.model.data.posX + dX;
-			self.model.data.posY = self.model.data.posY + dY;
+			self.model.data.posX = (self.model.data.posX or mog.posX or 0) + dX;
+			self.model.data.posY = (self.model.data.posY or mog.posY or 0) + dY;
 		end
 		mog:PositionModel(self.model);
 	end

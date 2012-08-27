@@ -3,6 +3,7 @@ local L = mog.L
 
 local wishlist = mog:RegisterModule("Wishlist", mog.moduleVersion)
 mog.wishlist = wishlist
+wishlist.base = true;
 
 local function onProfileUpdated(self, event)
 	mog:BuildList(true, "Wishlist")

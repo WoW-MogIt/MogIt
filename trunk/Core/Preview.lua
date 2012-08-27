@@ -4,19 +4,7 @@ local L = mog.L;
 
 mog.view = CreateFrame("Frame","MogItPreview",UIParent);
 mog.view:SetAllPoints(UIParent);
-mog.view:SetScript("OnShow",function(self)
-	mog.modelUpdater:Show();
-end);
-mog.view:SetScript("OnHide",function(self)
-	if not mog.frame:IsShown() then
-		mog.modelUpdater:Hide();
-	end
-end);
 tinsert(UISpecialFrames,"MogItPreview");
-
-mog.view.bin = {};
-mog.view.frames = {};
-mog.view.num = 0;
 
 
 --// Preview Functions
@@ -33,9 +21,184 @@ local function resizeOnMouseUp(self)
 end
 
 local function modelOnMouseWheel(self,v)
-	mog.posZ = mog.posZ + ((v > 0 and 0.6) or -0.6);
-	mog.updateModels();
+	local delta = ((v > 0 and 0.6) or -0.6);
+	if mog.db.profile.sync then
+		mog.posZ = mog.posZ + delta;
+		for id,model in ipairs(mog.models) do
+			mog:PositionModel(model);
+		end
+		for id,preview in ipairs(mog.previews) do
+			mog:PositionModel(preview.model);
+		end
+	else
+		self.data.posZ = (self.data.posZ or mog.posZ or 0) + delta;
+		mog:PositionModel(self);
+	end
 end
+
+local function slotTexture(f,slot,texture)
+	SetItemButtonTexture(f.slots[slot],texture or select(2,GetInventorySlotInfo(slot)));
+end
+
+local function slotOnEnter(self)
+	if self.items[1] then
+		mog.Item_OnEnter(self,self);
+	else
+		GameTooltip:SetOwner(self,"ANCHOR_RIGHT");
+		GameTooltip:SetText(_G[strupper(self.slot)]);
+	end
+end
+
+local function slotOnLeave(self)
+	GameTooltip:Hide();
+end
+
+local function slotOnClick(self,btn)
+	if btn == "RightButton" and IsControlKeyDown() then
+		--mog.view.delItem(self.slot);
+		--if mog.db.profile.gridDress then
+		--	mog.scroll:update();
+		--end
+		slotOnEnter(self);
+	else
+		mog.Item_OnClick(self,btn,self);
+	end
+end
+--//
+
+
+--// Preview Frame
+mog.previews = {};
+mog.previewBin = {};
+mog.previewNum = 0;
+
+function mog:CreatePreview()
+	if mog.previewBin[1] then
+		local f = mog.previewBin[1];
+		tremove(mog.previewBin,1);
+		return f;
+	end
+	
+	mog.previewNum = mog.previewNum + 1;
+	local f = CreateFrame("Frame","MogItPreview"..mog.previewNum,mog.view,"ButtonFrameTemplate");
+	f.id = mog.previewNum;
+		
+	f:SetPoint("CENTER",mog.view,"CENTER");
+	f:SetSize(335,385);
+	f:SetToplevel(true);
+	f:SetClampedToScreen(true);
+	f:EnableMouse(true);
+	f:SetMovable(true);
+	f:SetResizable(true);
+
+	_G["MogItPreview"..f.id.."Bg"]:SetVertexColor(0.8,0.3,0.8);
+	_G["MogItPreview"..f.id.."TitleText"]:SetText(L["Preview"].." "..f.id);
+	f.portraitFrame:Hide();
+	f.topLeftCorner:Show();
+	f.topBorderBar:SetPoint("TOPLEFT",f.topLeftCorner,"TOPRIGHT",0,0);
+	f.leftBorderBar:SetPoint("TOPLEFT",f.topLeftCorner,"BOTTOMLEFT",0,0);
+	
+	f.resize = CreateFrame("Frame",nil,f);
+	f.resize:SetSize(16,16);
+	f.resize:SetPoint("BOTTOMRIGHT",f,"BOTTOMRIGHT",-4,3);
+	f.resize:EnableMouse(true);
+	f.resize:SetScript("OnMouseDown",resizeOnMouseDown);
+	f.resize:SetScript("OnMouseUp",resizeOnMouseUp);
+	f.resize:SetScript("OnHide",resizeOnMouseUp);
+	f.resize.texture = f.resize:CreateTexture(nil,"OVERLAY");
+	f.resize.texture:SetTexture("Interface\\AddOns\\MogIt\\Images\\Resize");
+	f.resize.texture:SetAllPoints(f.resize);
+	
+	f.model = mog:CreateModelFrame(f);
+	f.model:Show();
+	f.model:EnableMouseWheel(true);
+	f.model:SetScript("OnMouseWheel",modelOnMouseWheel);
+	f.model:SetPoint("TOPLEFT",f.Inset,"TOPLEFT",49,-8);
+	f.model:SetPoint("BOTTOMRIGHT",f.Inset,"BOTTOMRIGHT",-49,8);
+	
+	f:SetScript("OnMouseDown",f.StartMoving);
+	f:SetScript("OnMouseUp",f.StopMovingOrSizing);
+	
+	f.slots = {};
+	for i=1,13 do
+		local slot = mog:GetSlot(i);
+		f.slots[slot] = CreateFrame("Button","MogItPreview"..f.id..slot,f,"ItemButtonTemplate");
+		f.slots[slot].slot = slot;
+		f.slots[slot].items = {};
+		if i == 1 then
+			f.slots[slot]:SetPoint("TOPLEFT",f.Inset,"TOPLEFT",8,-8);
+		elseif i == 8 then
+			f.slots[slot]:SetPoint("TOPRIGHT",f.Inset,"TOPRIGHT",-7,-8);
+		elseif i == 12 then
+			f.slots[slot]:SetPoint("TOP",f.slots[mog:GetSlot(11)],"BOTTOM",0,-45);
+		else
+			f.slots[slot]:SetPoint("TOP",f.slots[mog:GetSlot(i-1)],"BOTTOM",0,-4);
+		end
+		slotTexture(f,slot);
+		f.slots[slot]:RegisterForClicks("AnyUp");
+		f.slots[slot]:SetScript("OnClick",slotOnClick);
+		f.slots[slot]:SetScript("OnEnter",slotOnEnter);
+		f.slots[slot]:SetScript("OnLeave",slotOnLeave);
+	end
+
+	--[[
+		f.save = CreateFrame("Button","MogItPreview"..mog.view.num.."Save",f,"UIPanelButtonTemplate2");
+		f.save:SetPoint("TOPLEFT",10,-30);
+		f.save:SetWidth(100);
+		f.save:SetText(L["Save"]);
+		f.save:SetScript("OnClick",saveOnClick);
+		
+		f.load = CreateFrame("Button","MogItPreview"..mog.view.num.."Load",f,"UIPanelButtonTemplate2");
+		f.load:SetPoint("LEFT",f.save,"RIGHT",8,0);
+		f.load:SetWidth(100);
+		f.load:SetText(L["Load"]);
+		f.load:SetScript("OnClick",loadOnClick);
+		
+		f.clear = CreateFrame("Button","MogItPreview"..mog.view.num.."Clear",f,"UIPanelButtonTemplate2");
+		f.clear:SetPoint("TOPRIGHT",f,"TOPRIGHT",-10,-30);
+		f.clear:SetWidth(100);
+		f.clear:SetText(L["Clear"]);
+		f.clear:SetScript("OnClick",clearOnClick);
+
+		f.add = CreateFrame("Button","MogItPreview"..mog.view.num.."AddItem",f,"MagicButtonTemplate");
+		f.add:SetPoint("BOTTOMLEFT",f,"BOTTOMLEFT",5,5);
+		f.add:SetWidth(100);
+		f.add:SetText(L["Add Item"]);
+		f.add:SetScript("OnClick",addOnClick);
+
+		f.import = CreateFrame("Button","MogItPreview"..mog.view.num.."Import",f,"MagicButtonTemplate");
+		f.import:SetPoint("TOPLEFT",f.add,"TOPRIGHT");
+		f.import:SetWidth(100);
+		f.import:SetText(L["Import"]);
+		f.import:SetScript("OnClick",importOnClick);
+
+		f.link = CreateFrame("Button","MogItPreview"..mog.view.num.."Link",f,"MagicButtonTemplate");
+		f.link:SetPoint("TOPLEFT",f.import,"TOPRIGHT");
+		f.link:SetWidth(100);
+		f.link:SetText(L["Chat Link"]);
+		f.link:SetScript("OnClick",linkOnClick);
+		--]]
+		
+	tinsert(mog.previews,f);
+	return f;
+end
+
+function mog:DeletePreview(f)
+	f:Hide();
+	f:ClearAllPoints();
+	f:SetPoint("CENTER",mog.view,"CENTER");
+	--wipe(f.data);
+	tinsert(mog.previewBin,f);
+end
+--//
+
+
+
+
+
+
+
+
 
 local function saveOnClick(self,btn)
 	ToggleDropDownMenu(nil, nil, self.menu, self, 0, 0)
@@ -72,142 +235,12 @@ local function linkOnClick(self,btn)
 	ChatEdit_InsertLink(mog:SetToLink(tbl));
 end
 
-local function slotTexture(f,slot,texture)
-	SetItemButtonTexture(f.slots[slot],texture or select(2,GetInventorySlotInfo(slot)));
-end
 
-local function slotOnEnter(self)
-	if self.item then
-		mog.Item_OnEnter(self,self);
-		--GameTooltip:SetItemByID(self.item);
-	else
-		GameTooltip:SetOwner(self,"ANCHOR_RIGHT");
-		GameTooltip:SetText(_G[strupper(self.slot)]);
-	end
-end
-
-local function slotOnLeave(self)
-	GameTooltip:Hide();
-end
-
-local function slotOnClick(self,btn)
-	if btn == "RightButton" and IsControlKeyDown() then
-		mog.view.delItem(self.slot);
-		if mog.db.profile.gridDress then
-			mog.scroll:update();
-		end
-		slot_OnEnter(self);
-	else
-		mog.Item_OnClick(self,btn,self);
-	end
-end
 --//
 
 
 --// Create Preview
-function mog:CreatePreview()
-	local f;
-	if mog.view.bin[1] then
-		f = mog.view.bin[1];
-		tremove(mog.view.bin,1);
-		f:Show();
-	else
-		mog.view.num = mog.view.num + 1;
-		f = CreateFrame("Frame","MogItPreview"..mog.view.num,mog.view,"ButtonFrameTemplate");
-		f.id = mog.view.num;
-		
-		f:SetPoint("CENTER",mog.view,"CENTER");
-		f:SetSize(335,385);
-		f:SetToplevel(true);
-		f:SetClampedToScreen(true);
-		f:EnableMouse(true);
-		f:SetMovable(true);
-		f:SetResizable(true);
-		f:SetScript("OnMouseDown",f.StartMoving);
-		f:SetScript("OnMouseUp",f.StopMovingOrSizing);
 
-		_G["MogItPreview"..mog.view.num.."Bg"]:SetVertexColor(0.8,0.3,0.8);
-		_G["MogItPreview"..mog.view.num.."TitleText"]:SetText(L["Preview"].." "..mog.view.num);
-		f.portraitFrame:Hide();
-		f.topLeftCorner:Show();
-		f.topBorderBar:SetPoint("TOPLEFT",f.topLeftCorner,"TOPRIGHT",0,0);
-		f.leftBorderBar:SetPoint("TOPLEFT",f.topLeftCorner,"BOTTOMLEFT",0,0);
-
-		f.resize = CreateFrame("Frame",nil,f);
-		f.resize:SetSize(16,16);
-		f.resize:SetPoint("BOTTOMRIGHT",f,"BOTTOMRIGHT",-4,3);
-		f.resize:EnableMouse(true);
-		f.resize:SetScript("OnMouseDown",resizeOnMouseDown);
-		f.resize:SetScript("OnMouseUp",resizeOnMouseUp);
-		f.resize:SetScript("OnHide",resizeOnMouseUp);
-		f.resize.texture = f.resize:CreateTexture(nil,"OVERLAY");
-		f.resize.texture:SetTexture("Interface\\AddOns\\MogIt\\Images\\Resize");
-		f.resize.texture:SetAllPoints(f.resize);
-		
-		f.model = mog.addModel(true);
-		f.model:SetPoint("TOPLEFT",f.Inset,"TOPLEFT",49,-8);
-		f.model:SetPoint("BOTTOMRIGHT",f.Inset,"BOTTOMRIGHT",-49,8);
-		f.model:EnableMouseWheel(true);
-		f.model:SetScript("OnMouseWheel",modelOnMouseWheel);
-
-		f.save = CreateFrame("Button","MogItPreview"..mog.view.num.."Save",f,"UIPanelButtonTemplate2");
-		f.save:SetPoint("TOPLEFT",10,-30);
-		f.save:SetWidth(100);
-		f.save:SetText(L["Save"]);
-		f.save:SetScript("OnClick",saveOnClick);
-		
-		f.load = CreateFrame("Button","MogItPreview"..mog.view.num.."Load",f,"UIPanelButtonTemplate2");
-		f.load:SetPoint("LEFT",f.save,"RIGHT",8,0);
-		f.load:SetWidth(100);
-		f.load:SetText(L["Load"]);
-		f.load:SetScript("OnClick",loadOnClick);
-		
-		f.clear = CreateFrame("Button","MogItPreview"..mog.view.num.."Clear",f,"UIPanelButtonTemplate2");
-		f.clear:SetPoint("TOPRIGHT",f,"TOPRIGHT",-10,-30);
-		f.clear:SetWidth(100);
-		f.clear:SetText(L["Clear"]);
-		f.clear:SetScript("OnClick",clearOnClick);
-
-		f.add = CreateFrame("Button","MogItPreview"..mog.view.num.."AddItem",f,"MagicButtonTemplate");
-		f.add:SetPoint("BOTTOMLEFT",f,"BOTTOMLEFT",5,5);
-		f.add:SetWidth(100);
-		f.add:SetText(L["Add Item"]);
-		f.add:SetScript("OnClick",addOnClick);
-
-		f.import = CreateFrame("Button","MogItPreview"..mog.view.num.."Import",f,"MagicButtonTemplate");
-		f.import:SetPoint("TOPLEFT",f.add,"TOPRIGHT");
-		f.import:SetWidth(100);
-		f.import:SetText(L["Import"]);
-		f.import:SetScript("OnClick",importOnClick);
-
-		f.link = CreateFrame("Button","MogItPreview"..mog.view.num.."Link",f,"MagicButtonTemplate");
-		f.link:SetPoint("TOPLEFT",f.import,"TOPRIGHT");
-		f.link:SetWidth(100);
-		f.link:SetText(L["Chat Link"]);
-		f.link:SetScript("OnClick",linkOnClick);
-		
-		f.slots = {};
-		for i=1,14 do
-			local slot = mog:GetSlot(i);
-			f.slots[slot] = CreateFrame("Button","MogItPreview"..mog.view.num..slot,f,"ItemButtonTemplate");
-			f.slots[slot].slot = slot;
-			if i == 1 then
-				f.slots[slot]:SetPoint("TOPLEFT",f.Inset,"TOPLEFT",8,-8);
-			elseif i == 8 then
-				f.slots[slot]:SetPoint("TOPRIGHT",f.Inset,"TOPRIGHT",-7,-8);
-			else
-				f.slots[slot]:SetPoint("TOP",f.slots[mog:GetSlot(i-1)],"BOTTOM",0,-4);
-			end
-			slotTexture(f,slot);
-			f.slots[slot]:RegisterForClicks("AnyUp");
-			f.slots[slot]:SetScript("OnClick",slotOnClick);
-			f.slots[slot]:SetScript("OnEnter",slotOnEnter);
-			f.slots[slot]:SetScript("OnLeave",slotOnLeave);
-		end
-	end
-	tinsert(mog.view.frames,f);
-	return f;
-end
 --//
 
 

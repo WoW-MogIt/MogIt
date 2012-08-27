@@ -59,7 +59,10 @@ end
 local list = {};
 
 function mog.base.DropdownTier1(self)
-	if not self.value.loaded then
+	if self.value.loaded then
+		self.value.active = nil;
+		mog:SetModule(self.value,self.value.label);
+	else
 		LoadAddOn(self.value.name);
 	end
 end
@@ -134,14 +137,29 @@ end
 function mog.base.BuildList(module)
 	wipe(list);
 	local items = {};
-	for _,item in ipairs(module.active.list) do
-		if mog:CheckFilters(module,item) then
-			local display = mog:GetData("item", item, "display");
-			if not items[display] then
-				items[display] = {};
-				tinsert(list,items[display]);
+	if module.active then
+		for _,item in ipairs(module.active.list) do
+			if mog:CheckFilters(module,item) then
+				local display = mog:GetData("item", item, "display");
+				if not items[display] then
+					items[display] = {};
+					tinsert(list,items[display]);
+				end
+				tinsert(items[display],item);
 			end
-			tinsert(items[display],item);
+		end
+	else
+		for _,data in pairs(module.slots) do
+			for _,item in ipairs(data.list) do
+				if mog:CheckFilters(module,item) then
+					local display = mog:GetData("item", item, "display");
+					if not items[display] then
+						items[display] = {};
+						tinsert(list,items[display]);
+					end
+					tinsert(items[display],item);
+				end
+			end
 		end
 	end
 	for _,tbl in ipairs(list) do
