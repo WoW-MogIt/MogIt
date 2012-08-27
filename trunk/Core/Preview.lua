@@ -186,7 +186,7 @@ function mog.view.AddItem(item,preview)
 			
 		
 
-
+--[[
 		
 		if slot == "INVTYPE_WEAPON" then
 			if mog.view.twohand or mog.view.mainhand or (not mog.view.slots.MainHandSlot.item) then
@@ -219,10 +219,10 @@ function mog.view.AddItem(item,preview)
 			mog.view.twohand = nil;
 		end
 		
-		
+		--]]
 		
 		preview.slots[mog:GetSlot(slot)].items[1] = item;
-		slotTexture(mog:GetSlot(slot)],texture);
+		slotTexture(mog:GetSlot(slot),texture);
 		if preview:IsVisible() then
 			preview.model:TryOn(item);
 		end
