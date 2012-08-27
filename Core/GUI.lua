@@ -3,7 +3,7 @@ local L = mog.L;
 
 
 --// mog.frame
-mog.frame:SetPoint("CENTER",UIParent,"CENTER");
+mog.frame:SetPoint("CENTER");
 mog.frame:SetSize(252,108);
 mog.frame:SetToplevel(true);
 mog.frame:SetClampedToScreen(true);
@@ -11,9 +11,13 @@ mog.frame:EnableMouse(true);
 mog.frame:EnableMouseWheel(true);
 mog.frame:SetMovable(true);
 mog.frame:SetResizable(true);
-mog.frame:SetUserPlaced(true);
+mog.frame:SetDontSavePosition(true);
 mog.frame:SetScript("OnMouseDown",mog.frame.StartMoving);
-mog.frame:SetScript("OnMouseUp",mog.frame.StopMovingOrSizing);
+mog.frame:SetScript("OnMouseUp",function(self)
+	self:StopMovingOrSizing();
+	local profile = mog.db.profile;
+	profile.point, profile.x, profile.y = select(3, self:GetPoint());
+end);
 tinsert(UISpecialFrames,"MogItFrame");
 
 mog.frame.TitleText:SetText("MogIt");
@@ -406,10 +410,11 @@ end
 
 --// GUI
 function mog:UpdateGUI(resize)
-	local rows,columns = mog.db.profile.rows,mog.db.profile.columns;
+	local profile = mog.db.profile;
+	local rows,columns = profile.rows,profile.columns;
 	local total = rows*columns;
 	local current = #mog.models;
-	local width,height = mog.db.profile.width,mog.db.profile.height;
+	local width,height = profile.width,profile.height;
 	
 	if not resize then
 		if current > total then
@@ -421,6 +426,7 @@ function mog:UpdateGUI(resize)
 				mog:CreateCatalogueModel();
 			end
 		end
+		mog.frame:SetPoint(profile.point, profile.x, profile.y);
 		mog.frame:SetSize(((width+5)*columns)-5+(4+10)+(10+18+4),((height+5)*rows)-5+(60+10)+(10+26));
 		if mog.frame:IsShown() then
 			mog.scroll:update();

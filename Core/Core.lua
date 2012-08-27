@@ -176,6 +176,7 @@ local defaults = {
 		url = "Battle.net",
 		
 		gridDress = "preview",
+		point = "CENTER",
 		width = 200,
 		height = 200,
 		rows = 2;
