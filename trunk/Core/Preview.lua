@@ -76,6 +76,7 @@ function mog:CreatePreview()
 	if mog.previewBin[1] then
 		local f = mog.previewBin[1];
 		tremove(mog.previewBin,1);
+		tinsert(mog.previews,f);
 		return f;
 	end
 	
@@ -116,7 +117,7 @@ function mog:CreatePreview()
 	f.model:SetPoint("TOPLEFT",f.Inset,"TOPLEFT",49,-8);
 	f.model:SetPoint("BOTTOMRIGHT",f.Inset,"BOTTOMRIGHT",-49,8);
 	
-	f:SetScript("OnMouseDown",f.StartMoving);
+	f:SetScript("OnMouseDown",f.StartSizing);
 	f:SetScript("OnMouseUp",f.StopMovingOrSizing);
 	
 	f.slots = {};
@@ -140,44 +141,6 @@ function mog:CreatePreview()
 		f.slots[slot]:SetScript("OnEnter",slotOnEnter);
 		f.slots[slot]:SetScript("OnLeave",slotOnLeave);
 	end
-
-	--[=[
-		f.save = CreateFrame("Button","MogItPreview"..mog.view.num.."Save",f,"UIPanelButtonTemplate2");
-		f.save:SetPoint("TOPLEFT",10,-30);
-		f.save:SetWidth(100);
-		f.save:SetText(L["Save"]);
-		f.save:SetScript("OnClick",saveOnClick);
-		
-		f.load = CreateFrame("Button","MogItPreview"..mog.view.num.."Load",f,"UIPanelButtonTemplate2");
-		f.load:SetPoint("LEFT",f.save,"RIGHT",8,0);
-		f.load:SetWidth(100);
-		f.load:SetText(L["Load"]);
-		f.load:SetScript("OnClick",loadOnClick);
-		
-		f.clear = CreateFrame("Button","MogItPreview"..mog.view.num.."Clear",f,"UIPanelButtonTemplate2");
-		f.clear:SetPoint("TOPRIGHT",f,"TOPRIGHT",-10,-30);
-		f.clear:SetWidth(100);
-		f.clear:SetText(L["Clear"]);
-		f.clear:SetScript("OnClick",clearOnClick);
-
-		f.add = CreateFrame("Button","MogItPreview"..mog.view.num.."AddItem",f,"MagicButtonTemplate");
-		f.add:SetPoint("BOTTOMLEFT",f,"BOTTOMLEFT",5,5);
-		f.add:SetWidth(100);
-		f.add:SetText(L["Add Item"]);
-		f.add:SetScript("OnClick",addOnClick);
-
-		f.import = CreateFrame("Button","MogItPreview"..mog.view.num.."Import",f,"MagicButtonTemplate");
-		f.import:SetPoint("TOPLEFT",f.add,"TOPRIGHT");
-		f.import:SetWidth(100);
-		f.import:SetText(L["Import"]);
-		f.import:SetScript("OnClick",importOnClick);
-
-		f.link = CreateFrame("Button","MogItPreview"..mog.view.num.."Link",f,"MagicButtonTemplate");
-		f.link:SetPoint("TOPLEFT",f.import,"TOPRIGHT");
-		f.link:SetWidth(100);
-		f.link:SetText(L["Chat Link"]);
-		f.link:SetScript("OnClick",linkOnClick);
-		--]=]
 		
 	tinsert(mog.previews,f);
 	return f;
@@ -187,12 +150,288 @@ function mog:DeletePreview(f)
 	f:Hide();
 	f:ClearAllPoints();
 	f:SetPoint("CENTER",mog.view,"CENTER");
-	--wipe(f.data);
+	for slot,data in pairs(f.slots) do
+		mog.view.DelItem(slot,f);
+	end
 	tinsert(mog.previewBin,f);
+	if mog.activePreview == f then
+		mog.activePreview = nil;
+	end
+end
+
+mog.view.queue = {};
+mog.cacheFuncs.PreviewAddItem = function()
+	for _,action in ipairs(mog.view.queue) do
+		mog.view.AddItem(action[1],action[2]);
+	end
+	wipe(mog.view.queue);
+end
+
+mog.playerClass = select(2,UnitClass("PLAYER"));
+function mog.view.AddItem(item,preview)
+	if not (item and preview) then return end;
+	
+	local slot,texture = select(9,mog:GetItemInfo(item,"PreviewAddItem"));
+	if not slot then
+		tinsert(mog.view.queue,{item,preview});
+		return;
+	end
+	
+	if mog:GetSlot(slot) then
+		if slot == "INVTYPE_2HWEAPON" then
+			if mog.playerClass == "WARRIOR" and IsSpellKnown(46917) then
+				slot = "INVTYPE_WEAPON";
+			end
+		end
+			
+		
+
+
+		
+		if slot == "INVTYPE_WEAPON" then
+			if mog.view.twohand or mog.view.mainhand or (not mog.view.slots.MainHandSlot.item) then
+				slot = "INVTYPE_WEAPONMAINHAND";
+			else
+				
+			end
+				
+	
+		
+		and (not mog.view.twohand) then
+			if mog.view.slots.MainHandSlot.item and ((not mog.view.slots.SecondaryHandSlot.item) or mog.view.slots.MainHandSlot.item == item) then
+				slot = "INVTYPE_WEAPONOFFHAND";
+			end
+		end
+		
+		if slot == "INVTYPE_2HWEAPON" then
+			mog.view.DelItem("SecondaryHandSlot");
+			mog.view.twohand = true;
+			--mog.view.mainhand = true;
+		elseif slot == "INVTYPE_WEAPONOFFHAND" then
+			if mog.view.twohand then
+				mog.view.DelItem("MainHandSlot");
+			end
+			mog.view.twohand = nil;
+			--mog.view.mainhand = true;
+		elseif slot == "INVTYPE_WEAPON" then
+			mog.view.twohand = nil;
+		elseif slot == "INVTYPE_WEAPONMAINHAND" then
+			mog.view.twohand = nil;
+		end
+		
+		
+		
+		preview.slots[mog:GetSlot(slot)].items[1] = item;
+		slotTexture(mog:GetSlot(slot)],texture);
+		if preview:IsVisible() then
+			preview.model:TryOn(item);
+		end
+	end
+end
+
+function mog.view.DelItem(slot,preview)
+	if not (preview and slot) then return end;
+	preview.slots[slot].items[1] = nil;
+	slotTexture(slot);
+	if preview:IsVisible() then
+		preview.model:UndressSlot(GetInventorySlotInfo(slot));
+	end
+end
+
+function mog:AddToPreview(item,preview)
+	if not item then return end;
+	preview = preview or mog.activePreview or mog:CreatePreview();
+	
+	if type(item) == "number" then
+		mog.view.AddItem(item,preview);
+	elseif type(item) == "string" then
+		mog.view.AddItem(tonumber(item:match("item:(%d+)")),preview);
+	elseif type(item) == "table" then
+		for k,v in pairs(item) do
+			mog.view.AddItem(v,preview);
+		end
+	end
+	
+	ShowUIPanel(mog.view);
+	if mog.db.profile.gridDress == "preview" and mog.activePreview == preview then
+		mog.scroll:update();
+	end
 end
 --//
 
 
+--// Hooks
+hooksecurefunc("HandleModifiedItemClick",function(link)
+	if link then
+		if (GetMouseButtonClicked() == "RightButton") and IsControlKeyDown() then
+			mog:AddToPreview(link);
+		end
+	end
+end);
+
+local function hookInspectUI()
+	local function inspect_OnClick(self,btn)
+		if InspectFrame.unit and self.hasItem then
+			if btn == "RightButton" and IsControlKeyDown() then
+				mog:AddToPreview(GetInventoryItemID(InspectFrame.unit,GetInventorySlotInfo(self.slot)));
+			end
+		end
+	end
+	for k,v in ipairs(mog.slots) do
+		_G["Inspect"..v].slot = v;
+		_G["Inspect"..v]:RegisterForClicks("AnyUp");
+		_G["Inspect"..v]:HookScript("OnClick",inspect_OnClick);
+	end
+	hookInspectUI = nil;
+end
+if InspectFrame then
+	hookInspectUI();
+end
+
+local function hookGuildBankUI()
+	local old = GuildBankColumn1Button1:GetScript("OnClick");
+	local function guildbank_OnClick(self,btn,...)
+		if btn == "RightButton" and IsControlKeyDown() then
+			mog:AddToPreview(GetGuildBankItemLink(GetCurrentGuildBankTab(),self:GetID()));
+		else
+			return old(self,btn,...);
+		end
+	end
+	for column=1,NUM_GUILDBANK_COLUMNS do
+		for row=1,NUM_SLOTS_PER_GUILDBANK_GROUP do
+			_G["GuildBankColumn"..column.."Button"..row]:SetScript("OnClick",guildbank_OnClick);
+		end
+	end
+	hookGuildBankUI = nil;
+end
+if GuildBankFrame then
+	hookGuildBankUI();
+end
+
+local old_SetItemRef = SetItemRef;
+function SetItemRef(link,text,btn,...)
+	local id = tonumber(link:match("^item:(%d+)"));
+	if id and btn == "RightButton" and IsControlKeyDown() then
+		mog:AddToPreview(id);
+	else
+		return old_SetItemRef(link,text,btn,...);
+	end
+end
+
+mog.view:SetScript("OnEvent",function(self,event,arg1,...)
+	if event == "ADDON_LOADED" then
+		if arg1 == "Blizzard_InspectUI" then
+			hookInspectUI();
+		elseif arg1 == "Blizzard_GuildBankUI" then
+			hookGuildBankUI();
+		end
+	end
+end);
+mog.view:RegisterEvent("ADDON_LOADED");
+--//
+
+
+--// Popups
+StaticPopupDialogs["MOGIT_PREVIEW_ADDITEM"] = {
+	text = L["Type the item ID or url in the text box below"],
+	button1 = ADD,
+	button2 = CANCEL,
+	hasEditBox = 1,
+	maxLetters = 512,
+	editBoxWidth = 260,
+	OnShow = function(self,item)
+		self.editBox:SetFocus();
+	end,
+	OnAccept = function(self)
+		local text = self.editBox:GetText();
+		text = text and text:match("(%d+).-$");
+		mog:AddToPreview(tonumber(text));
+	end,
+	OnCancel = function(self) end,
+	EditBoxOnEnterPressed = function(self)
+		local text = self:GetText();
+		text = text and text:match("(%d+).-$");
+		mog:AddToPreview(tonumber(text));
+		self:GetParent():Hide();
+	end,
+	EditBoxOnEscapePressed = function(self)
+		self:GetParent():Hide();
+	end,
+	timeout = 0,
+	exclusive = 1,
+	whileDead = 1,
+	hideOnEscape = 1
+};
+
+StaticPopupDialogs["MOGIT_PREVIEW_IMPORT"] = {
+	text = L["Copy and paste a Wowhead Compare URL into the text box below to import"],
+	button1 = L["Import"],
+	button2 = CANCEL,
+	hasEditBox = 1,
+	maxLetters = 512,
+	editBoxWidth = 260,
+	OnShow = function(self,item)
+		local str;
+		for k,v in pairs(mog.view.slots) do
+			if v.item then
+				if str then
+					str = str..":"..v.item;
+				else
+					str = L["http://www.wowhead.com/"].."compare?items="..v.item;
+				end
+			end
+		end
+		self.editBox:SetText(str or "");
+		self.editBox:SetFocus();
+		self.editBox:HighlightText();
+	end,
+	OnAccept = function(self)
+		local items = self.editBox:GetText();
+		items = items and items:match("compare%?items=([^;#]+)");
+		if items then
+			local tbl = {};
+			for item in items:gmatch("([^:]+)") do
+				item = item:match("^(%d+)");
+				table.insert(tbl,tonumber(item));
+			end
+			mog:AddToPreview(tbl);
+		end
+	end,
+	OnCancel = function(self) end,
+	EditBoxOnEnterPressed = function(self)
+		self:GetParent():Hide();
+		local items = self:GetText();
+		items = items and items:match("compare%?items=([^;#]+)");
+		if items then
+			local tbl = {};
+			for item in items:gmatch("([^:]+)") do
+				item = item:match("^(%d+)");
+				table.insert(tbl,tonumber(item));
+			end
+			mog:AddToPreview(tbl);
+		end
+	end,
+	EditBoxOnEscapePressed = function(self)
+		self:GetParent():Hide();
+	end,
+	timeout = 0,
+	exclusive = 1,
+	whileDead = 1,
+	hideOnEscape = 1
+};
+--//
+
+
+
+--[[
+
+one handed weapons first go into main hand slot, then alternate between off and main hand, does not have to be same item
+
+equipping any non one handed weapon will cause the next one handed weapon to go into main hand
+
+equipping a right handed ranged weapon (gun, crossbow, thrown) will cause the next two one hand weapons to go into main hand (above rule still applies)
+
+]]
 
 
 
@@ -317,252 +556,40 @@ end
 
 --]=]
 
-
-
---[[
-
-one handed weapons first go into main hand slot, then alternate between off and main hand, does not have to be same item
-
-equipping any non one handed weapon will cause the next one handed weapon to go into main hand
-
-equipping a right handed ranged weapon (gun, crossbow, thrown) will cause the next two one hand weapons to go into main hand (above rule still applies)
-
-]]
-
-mog.view.wait = {};
-function mog.view.addItem(item)
-	if not item then return end;
-	local slot,texture = select(9,GetItemInfo(item));
-	if not slot then
-		mog.view.wait[item] = (mog.view.wait[item] or 0) + 1;
-		return;
-	end
-	if mog.slotsType[slot] then
-		if slot == "INVTYPE_2HWEAPON" then
-			if select(2,UnitClass("PLAYER")) == "WARRIOR" and (select(5,GetTalentInfo(2,20)) or 0) > 0 then
-				slot = "INVTYPE_WEAPON";
-			end
-		end
-		if slot == "INVTYPE_WEAPON" and not mog.view.twohand then
-			if mog.view.slots.MainHandSlot.item and ((not mog.view.slots.SecondaryHandSlot.item) or mog.view.slots.MainHandSlot.item == item) then
-				slot = "INVTYPE_WEAPONOFFHAND";
-			end
-		end
+	--[=[
+		f.save = CreateFrame("Button","MogItPreview"..mog.view.num.."Save",f,"UIPanelButtonTemplate2");
+		f.save:SetPoint("TOPLEFT",10,-30);
+		f.save:SetWidth(100);
+		f.save:SetText(L["Save"]);
+		f.save:SetScript("OnClick",saveOnClick);
 		
-		if slot == "INVTYPE_2HWEAPON" then
-			mog.view.delItem("SecondaryHandSlot");
-			mog.view.twohand = true;
-		elseif slot == "INVTYPE_WEAPONOFFHAND" then
-			if mog.view.twohand then
-				mog.view.delItem("MainHandSlot");
-			end
-			mog.view.twohand = nil;
-		elseif slot == "INVTYPE_WEAPON" then
-			mog.view.twohand = nil;
-		elseif slot == "INVTYPE_WEAPONMAINHAND" then
-			mog.view.twohand = nil;
-		end
+		f.load = CreateFrame("Button","MogItPreview"..mog.view.num.."Load",f,"UIPanelButtonTemplate2");
+		f.load:SetPoint("LEFT",f.save,"RIGHT",8,0);
+		f.load:SetWidth(100);
+		f.load:SetText(L["Load"]);
+		f.load:SetScript("OnClick",loadOnClick);
 		
-		mog.view.slots[mog.slotsType[slot]].item = item;
-		-- item history
-		mog.view.setTexture(mog.slotsType[slot],texture);
-		if mog.view:IsShown() then
-			mog.view.model.model:TryOn(item);
-		end
-	end
-end
+		f.clear = CreateFrame("Button","MogItPreview"..mog.view.num.."Clear",f,"UIPanelButtonTemplate2");
+		f.clear:SetPoint("TOPRIGHT",f,"TOPRIGHT",-10,-30);
+		f.clear:SetWidth(100);
+		f.clear:SetText(L["Clear"]);
+		f.clear:SetScript("OnClick",clearOnClick);
 
-function mog:AddToPreview(item)
-	if not item then return end;
-	if type(item) == "number" then
-		mog.view.addItem(item);
-	elseif type(item) == "string" then
-		mog.view.addItem(tonumber(item:match("item:(%d+)")));
-	elseif type(item) == "table" then
-		if mog.db.profile.clearOnPreviewSet then
-			for k,v in pairs(mog.view.slots) do
-				mog.view.delItem(k);
-			end
-		end
-		for k,v in pairs(item) do
-			mog.view.addItem(v);
-		end
-	end
-	ShowUIPanel(mog.view);
-	if mog.db.profile.gridDress == "preview" then
-		mog.scroll:update();
-	end
-end
+		f.add = CreateFrame("Button","MogItPreview"..mog.view.num.."AddItem",f,"MagicButtonTemplate");
+		f.add:SetPoint("BOTTOMLEFT",f,"BOTTOMLEFT",5,5);
+		f.add:SetWidth(100);
+		f.add:SetText(L["Add Item"]);
+		f.add:SetScript("OnClick",addOnClick);
 
-function mog.view.delItem(slot)
-	mog.view.slots[slot].item = nil;
-	mog.view.setTexture(slot);
-	mog.view.model.model:UndressSlot(GetInventorySlotInfo(slot)); -- needs cleanup
-	-- mog:DressModel(mog.view.model);
-end
+		f.import = CreateFrame("Button","MogItPreview"..mog.view.num.."Import",f,"MagicButtonTemplate");
+		f.import:SetPoint("TOPLEFT",f.add,"TOPRIGHT");
+		f.import:SetWidth(100);
+		f.import:SetText(L["Import"]);
+		f.import:SetScript("OnClick",importOnClick);
 
-hooksecurefunc("HandleModifiedItemClick",function(link)
-	if link then
-		if (GetMouseButtonClicked() == "RightButton") and IsControlKeyDown() then
-			mog:AddToPreview(link);
-		end
-	end
-end);
-
-local function hookInspectUI()
-	local function inspect_OnClick(self,btn)
-		if InspectFrame.unit and self.hasItem then
-			if btn == "RightButton" and IsControlKeyDown() then
-				mog:AddToPreview(GetInventoryItemID(InspectFrame.unit,GetInventorySlotInfo(self.slot)));
-			end
-		end
-	end
-	for k,v in ipairs(mog.slots) do
-		_G["Inspect"..v].slot = v;
-		_G["Inspect"..v]:RegisterForClicks("AnyUp");
-		_G["Inspect"..v]:HookScript("OnClick",inspect_OnClick);
-	end
-	hookInspectUI = nil;
-end
-if InspectFrame then
-	hookInspectUI();
-end
-
-local function hookGuildBankUI()
-	local old = GuildBankColumn1Button1:GetScript("OnClick");
-	local function guildbank_OnClick(self,btn,...)
-		if btn == "RightButton" and IsControlKeyDown() then
-			mog:AddToPreview(GetGuildBankItemLink(GetCurrentGuildBankTab(),self:GetID()));
-		else
-			return old(self,btn,...);
-		end
-	end
-	for column=1,NUM_GUILDBANK_COLUMNS do
-		for row=1,NUM_SLOTS_PER_GUILDBANK_GROUP do
-			_G["GuildBankColumn"..column.."Button"..row]:SetScript("OnClick",guildbank_OnClick);
-		end
-	end
-	hookGuildBankUI = nil;
-end
-if GuildBankFrame then
-	hookGuildBankUI();
-end
-
-local old_SetItemRef = SetItemRef;
-function SetItemRef(link,text,btn,...)
-	local id = tonumber(link:match("^item:(%d+)"));
-	if id and btn == "RightButton" and IsControlKeyDown() then
-		mog:AddToPreview(id);
-	else
-		return old_SetItemRef(link,text,btn,...);
-	end
-end
-
-mog.view:SetScript("OnEvent",function(self,event,arg1,...)
-	if event == "GET_ITEM_INFO_RECEIVED" then
-		for k,v in pairs(mog.view.wait) do
-			if select(9,GetItemInfo(k)) then
-				for i=1,v do
-					mog:AddToPreview(k);
-				end
-				mog.view.wait[k] = nil;
-			end
-		end
-	elseif event == "ADDON_LOADED" then
-		if arg1 == "Blizzard_InspectUI" then
-			hookInspectUI();
-		elseif arg1 == "Blizzard_GuildBankUI" then
-			hookGuildBankUI();
-		end
-	end
-end);
-mog.view:RegisterEvent("ADDON_LOADED");
-mog.view:RegisterEvent("GET_ITEM_INFO_RECEIVED");
-
-StaticPopupDialogs["MOGIT_PREVIEW_ADDITEM"] = {
-	text = L["Type the item ID or url in the text box below"],
-	button1 = ADD,
-	button2 = CANCEL,
-	hasEditBox = 1,
-	maxLetters = 512,
-	editBoxWidth = 260,
-	OnShow = function(self,item)
-		self.editBox:SetFocus();
-	end,
-	OnAccept = function(self)
-		local text = self.editBox:GetText();
-		text = text and text:match("(%d+).-$");
-		mog:AddToPreview(tonumber(text));
-	end,
-	OnCancel = function(self) end,
-	EditBoxOnEnterPressed = function(self)
-		local text = self:GetText();
-		text = text and text:match("(%d+).-$");
-		mog:AddToPreview(tonumber(text));
-		self:GetParent():Hide();
-	end,
-	EditBoxOnEscapePressed = function(self)
-		self:GetParent():Hide();
-	end,
-	timeout = 0,
-	exclusive = 1,
-	whileDead = 1,
-	hideOnEscape = 1
-};
-
-StaticPopupDialogs["MOGIT_PREVIEW_IMPORT"] = {
-	text = L["Copy and paste a Wowhead Compare URL into the text box below to import"],
-	button1 = L["Import"],
-	button2 = CANCEL,
-	hasEditBox = 1,
-	maxLetters = 512,
-	editBoxWidth = 260,
-	OnShow = function(self,item)
-		local str;
-		for k,v in pairs(mog.view.slots) do
-			if v.item then
-				if str then
-					str = str..":"..v.item;
-				else
-					str = L["http://www.wowhead.com/"].."compare?items="..v.item;
-				end
-			end
-		end
-		self.editBox:SetText(str or "");
-		self.editBox:SetFocus();
-		self.editBox:HighlightText();
-	end,
-	OnAccept = function(self)
-		local items = self.editBox:GetText();
-		items = items and items:match("compare%?items=([^;#]+)");
-		if items then
-			local tbl = {};
-			for item in items:gmatch("([^:]+)") do
-				item = item:match("^(%d+)");
-				table.insert(tbl,tonumber(item));
-			end
-			mog:AddToPreview(tbl);
-		end
-	end,
-	OnCancel = function(self) end,
-	EditBoxOnEnterPressed = function(self)
-		self:GetParent():Hide();
-		local items = self:GetText();
-		items = items and items:match("compare%?items=([^;#]+)");
-		if items then
-			local tbl = {};
-			for item in items:gmatch("([^:]+)") do
-				item = item:match("^(%d+)");
-				table.insert(tbl,tonumber(item));
-			end
-			mog:AddToPreview(tbl);
-		end
-	end,
-	EditBoxOnEscapePressed = function(self)
-		self:GetParent():Hide();
-	end,
-	timeout = 0,
-	exclusive = 1,
-	whileDead = 1,
-	hideOnEscape = 1
-};
+		f.link = CreateFrame("Button","MogItPreview"..mog.view.num.."Link",f,"MagicButtonTemplate");
+		f.link:SetPoint("TOPLEFT",f.import,"TOPRIGHT");
+		f.link:SetWidth(100);
+		f.link:SetText(L["Chat Link"]);
+		f.link:SetScript("OnClick",linkOnClick);
+		--]=]
