@@ -177,8 +177,8 @@ local defaults = {
 		
 		gridDress = "preview",
 		point = "CENTER",
-		width = 200,
-		height = 200,
+		gridWidth = 600,
+		gridHeight = 400,
 		rows = 2;
 		columns = 3,
 		sync = true,

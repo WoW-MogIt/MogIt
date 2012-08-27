@@ -31,8 +31,8 @@ mog.frame.resize:SetSize(16,16);
 mog.frame.resize:SetPoint("BOTTOMRIGHT",mog.frame,"BOTTOMRIGHT",-4,3);
 mog.frame.resize:EnableMouse(true);
 function mog.frame.resize.update(self)
-	mog.db.profile.width = floor((mog.frame:GetWidth()+5-(4+10)-(10+18+4))/mog.db.profile.columns)-5;
-	mog.db.profile.height = floor((mog.frame:GetHeight()+5-(60+10)-(10+26))/mog.db.profile.rows)-5;
+	mog.db.profile.gridWidth = mog.frame:GetWidth();
+	mog.db.profile.gridHeight = mog.frame:GetHeight();
 	mog:UpdateGUI(true);
 end
 mog.frame.resize:SetScript("OnMouseDown",function(self)
@@ -409,12 +409,18 @@ end
 --//
 
 --// GUI
+function mog:GetModelSize()
+	local x = floor((mog.db.profile.gridWidth+5-(4+10)-(10+18+4))/mog.db.profile.columns)-5;
+	local y = floor((mog.db.profile.gridHeight+5-(60+10)-(10+26))/mog.db.profile.rows)-5;
+	return x,y;
+end
+
 function mog:UpdateGUI(resize)
 	local profile = mog.db.profile;
 	local rows,columns = profile.rows,profile.columns;
 	local total = rows*columns;
 	local current = #mog.models;
-	local width,height = profile.width,profile.height;
+	local modelWidth,modelHeight = mog:GetModelSize();
 	
 	if not resize then
 		if current > total then
@@ -427,7 +433,7 @@ function mog:UpdateGUI(resize)
 			end
 		end
 		mog.frame:SetPoint(profile.point, profile.x, profile.y);
-		mog.frame:SetSize(((width+5)*columns)-5+(4+10)+(10+18+4),((height+5)*rows)-5+(60+10)+(10+26));
+		mog.frame:SetSize(profile.gridWidth,profile.gridHeight);
 		if mog.frame:IsShown() then
 			mog.scroll:update();
 		end
@@ -445,7 +451,7 @@ function mog:UpdateGUI(resize)
 					mog.models[n]:SetPoint("TOPLEFT",mog.models[n-1],"TOPRIGHT",5,0);
 				end
 			end
-			mog.models[n]:SetSize(width,height);
+			mog.models[n]:SetSize(modelWidth,modelHeight);
 		end
 	end
 end
