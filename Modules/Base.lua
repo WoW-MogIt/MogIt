@@ -49,9 +49,11 @@ function mog.base.AddNPC(id,name)
 	mog:AddData("npc", id, "name", LBB[name] or name);
 end
 
+--[=[
 function mog.base.AddObject(id,name)
 	mog:AddData("object", id, "name", LBB[name] or name);
 end
+--]=]
 --//
 
 
