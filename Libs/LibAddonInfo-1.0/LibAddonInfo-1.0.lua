@@ -41,13 +41,13 @@ else
 	L["Click and press Ctrl-C to copy"] = "Click and press Ctrl-C to copy";
 end
 
-function lib:CreateFrame(addon,parent)
+function lib:CreateFrame(addon,parent,path)
 	local frame = CreateFrame("Frame",nil,UIParent);
 	frame:Hide();
-	frame.addon = addon:gsub(" ","");
-	
+	frame.addon = addon:gsub(" ","");	
 	frame.name = parent and L["About"] or frame.addon;
 	frame.parent = parent;
+	frame.path = path;
 	InterfaceOptions_AddCategory(frame);
 	
 	lib:CreateLayout(frame);
@@ -108,8 +108,7 @@ end
 local fields = {"Version", "Author", "X-Category", "X-License", "X-Email", "Email", "eMail", "X-Website", "X-Credits", "X-Localizations", "X-Donate"};
 local haseditbox = {["X-Website"] = true, ["X-Email"] = true, ["Email"] = true, ["eMail"] = true, ["X-Donate"] = true};
 
-local path = debugstack();
-path = path:match("Ons\\(.+)\\LibAddonInfo%-1%.0%.lua:");
+local path;
 local flags = {
 	["enus"] = "English",
 	["frfr"] = "French",
@@ -128,7 +127,7 @@ local function FormatLocale(newline,str)
 	local flag = str:lower();
 	if flags[flag] then
 		if path then
-			output = "|TInterface\\AddOns\\"..path.."\\Images\\"..flag..":16|t ";
+			output = "|T"..path.."\\"..flag..":16|t ";
 		else
 			output = "";
 		end
@@ -187,8 +186,9 @@ function lib:CreateLayout(frame)
 			elseif field == "Version" then
 				value = value:gsub("@project.revision@","Repository");
 			elseif field == "X-Localizations" then
-				--value = value:gsub("%s*[,]%s*","\n");
+				path = frame.path;
 				value = value:gsub("(,?)%s*([^,]+)%s*",FormatLocale);
+				--value = value:gsub("%s*[,]%s*","\n");
 			end
 			value = (haseditbox[field] and "|cff9999ff" or "")..value;
 			frame.info[field]:SetText(value);
