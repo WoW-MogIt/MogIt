@@ -224,7 +224,9 @@ mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 			local slot, hasItem = arg1, ...;
 			for i, frame in ipairs(mog.models) do
 				if hasItem then
-					frame.model:TryOn(GetInventoryItemID("player", slot));
+					if (slot ~= GetInventorySlotInfo("HeadSlot") or ShowingHelm()) and (slot ~= GetInventorySlotInfo("BackSlot") or ShowingCloak()) then
+						frame.model:TryOn(select(6, GetTransmogrifySlotInfo(slot)));
+					end
 				else
 					frame.model:UndressSlot(slot);
 				end

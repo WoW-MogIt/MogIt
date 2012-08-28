@@ -59,6 +59,11 @@ mog.frame.page:SetPoint("BOTTOMRIGHT",mog.frame,"BOTTOMRIGHT",-17,10);
 
 
 --// Model Frames
+local mixins = {
+	"ShowIndicator",
+	"SetText",
+}
+
 mog.models = {};
 mog.modelBin = {};
 mog.posX = 0;
@@ -79,7 +84,7 @@ function mog:CreateModelFrame(parent)
 	local f = CreateFrame("Button",nil,parent);
 	f:Hide();
 	
-	f.type = (parent == mog.scroll) and "catalogue" or "preview";
+	f.type = (parent == mog.frame) and "catalogue" or "preview";
 	f.data = {parent = parent};
 	f.indicators = {};
 	
@@ -100,6 +105,10 @@ function mog:CreateModelFrame(parent)
 	f:RegisterForDrag("LeftButton","RightButton");
 	f:SetScript("OnDragStart",mog.ModelOnDragStart);
 	f:SetScript("OnDragStop",mog.ModelOnDragStop);
+	
+	for i, v in ipairs(mixins) do
+		f[v] = mog[v];
+	end
 	
 	return f;
 end
@@ -122,7 +131,7 @@ function mog:DeleteModelFrame(f)
 end
 
 function mog:CreateCatalogueModel()
-	local f = mog:CreateModelFrame(mog.scroll);
+	local f = mog:CreateModelFrame(mog.frame);
 	f:SetScript("OnClick",mog.ModelOnClick);
 	f:SetScript("OnEnter",mog.ModelOnEnter);
 	f:SetScript("OnLeave",mog.ModelOnLeave);
@@ -286,12 +295,19 @@ function mog:CreateIndicator(name,func)
 	mog.indicators[name] = func;
 end
 
-function mog:ShowIndicator(frame,name)
+function mog:ShowIndicator(name)
 	if not mog.indicators[name] then return end;
-	if not frame.indicators[name] then
-		frame.indicators[name] = mog.indicators[name](frame.model);
+	if not self.indicators[name] then
+		self.indicators[name] = mog.indicators[name](self.model);
 	end
-	frame.indicators[name]:Show();
+	self.indicators[name]:Show();
+end
+
+function mog:SetText(text)
+	if not self.indicators.label then
+		self.indicators.label = mog.indicators.label(self.model);
+	end
+	self.indicators.label:SetText(text);
 end
 --//
 
@@ -620,33 +636,62 @@ local menuModelNames = {
 	DRAENEI = "Draenei",
 	WORGEN = "Worgen",
 }
---//
+
+local dressOptions = {
+	none = NONE,
+	preview = L["Preview"],
+	equipped = L["Equipped"],
+}
+
+local function setGridDress(self)
+	mog.db.profile.gridDress = self.value;
+	mog.scroll:update();
+end
 
 function mog:ToggleFilters()
-	if mog.filt:IsShown() then
-		mog.filt:Hide();
-	else
-		mog.filt:Show();
-	end
+	mog.filt:SetShown(mog.filt:IsShown());
 end
 
 mog.sorting = {};
 
 mog.menu.catalogue = mog.CreateMenu(mog.frame,L["Catalogue"],function(tier)
 	if tier == 1 then
-		local info;
-		info = UIDropDownMenu_CreateInfo();
+		local info = UIDropDownMenu_CreateInfo();
 		info.text = mog.filt:IsShown() and L["Hide Filters"] or L["Show Filters"];
 		info.notCheckable = true;
 		info.func = mog.ToggleFilters;
 		UIDropDownMenu_AddButton(info,tier);
 		
-		info = UIDropDownMenu_CreateInfo();
+		local info = UIDropDownMenu_CreateInfo();
 		info.text = L["Sorting"];
 		info.value = "sorting";
 		info.notCheckable = true;
 		info.hasArrow = true;
 		info.disabled = not (mog.active and mog.active.sorting and #mog.active.sorting > 0);
+		UIDropDownMenu_AddButton(info,tier);
+		
+		local info = UIDropDownMenu_CreateInfo();
+		info.text = "Race";
+		info.value = "race";
+		info.notCheckable = true;
+		info.hasArrow = true;
+		-- info.disabled = not (mog.active and mog.active.sorting and #mog.active.sorting > 0);
+		UIDropDownMenu_AddButton(info,tier);
+		
+		local info = UIDropDownMenu_CreateInfo();
+		info.text = "Sechs";
+		info.value = "gender";
+		info.notCheckable = true;
+		info.hasArrow = true;
+		-- info.disabled = not (mog.active and mog.active.sorting and #mog.active.sorting > 0);
+		UIDropDownMenu_AddButton(info,tier);
+		
+		local info = UIDropDownMenu_CreateInfo();
+		info.text = L["Dress models"];
+		info.value = "gridDress";
+		info.notCheckable = true;
+		info.hasArrow = true;
+		-- info.disabled = not (mog.active and mog.active.sorting and #mog.active.sorting > 0);
 		UIDropDownMenu_AddButton(info,tier);
 	elseif mog.menu.tier[2] == "sorting" then
 		if tier == 2 then
@@ -659,6 +704,42 @@ mog.menu.catalogue = mog.CreateMenu(mog.frame,L["Catalogue"],function(tier)
 			end
 		elseif mog.menu.tier[3] and mog.menu.tier[3].Dropdown then
 			mog.menu.tier[3].Dropdown(mog.active,tier);
+		end
+	elseif mog.menu.tier[2] == "race" then
+		if tier == 2 then
+			for i, race in pairs(races) do -- pairs may yield unexpected order
+				local info = UIDropDownMenu_CreateInfo();
+				info.text = menuModelNames[race];
+				info.value = race;
+				-- info.func = setRace;
+				-- info.checked = selectedRace == race;
+				info.keepShownOnClick = true;
+				UIDropDownMenu_AddButton(info,tier);
+			end
+		end
+	elseif mog.menu.tier[2] == "gender" then
+		if tier == 2 then
+			for i, gender in pairs(gender) do -- pairs may yield unexpected order
+				local info = UIDropDownMenu_CreateInfo();
+				info.text = gender;
+				info.value = i;
+				-- info.func = setGender;
+				-- info.checked = selectedGender == race;
+				info.keepShownOnClick = true;
+				UIDropDownMenu_AddButton(info,tier);
+			end
+		end
+	elseif mog.menu.tier[2] == "gridDress" then
+		if tier == 2 then
+			for k, v in pairs(dressOptions) do
+				local info = UIDropDownMenu_CreateInfo();
+				info.text = v;
+				info.value = k;
+				info.func = setGridDress;
+				info.checked = mog.db.profile.gridDress == k;
+				info.keepShownOnClick = true;
+				UIDropDownMenu_AddButton(info,tier);
+			end
 		end
 	end
 end);

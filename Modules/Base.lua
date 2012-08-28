@@ -101,12 +101,13 @@ end
 function mog.base.FrameUpdate(module,self,value)
 	self.data.items = value;
 	self.data.cycle = 1;
+	self.data.item = self.data.items[self.data.cycle];
 	for i, v in ipairs(self.data.items) do
 		if GetItemCount(v, true) > 0 then
-			mog:ShowIndicator(self,"hasItem");
+			self:ShowIndicator("hasItem");
 		end
 		if mog.wishlist:IsItemInWishlist(v) then
-			mog:ShowIndicator(self,"wishlist");
+			self:ShowIndicator("wishlist");
 		end
 	end
 	mog.Item_FrameUpdate(self,self.data);
