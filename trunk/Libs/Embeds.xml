@@ -17,5 +17,6 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 
 <Include file="LibBabble-Boss-3.0\lib.xml" />
 <Include file="LibBabble-Inventory-3.0\lib.xml" />
+<Include file="LibBabble-Race-3.0\lib.xml" />
 
 </Ui>
