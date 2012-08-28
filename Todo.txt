@@ -19,12 +19,18 @@ GUI:
 - Fix Sorting -> Display ID error
 
 Templates:
-- Add to Preview -> New level of tiers
+- Add to Preview -> New tier (activePreview / new / list of previews)
 
 Options:
 - Remove "Undress before previewing" - also from defaults in Core
 - Remove "Dress models"
 - Should we move "No animation" and "URL website" to Catalogue dropdown?
+
+Wishlist:
+- mog:GetItemInfo
+
+Tokens:
+- Tier token system for tooltipModel and Wishlist/Templates?
 
 Checks:
 - Check all files (errors, changes, localization)
