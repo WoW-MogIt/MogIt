@@ -2,7 +2,7 @@
 local L = mog.L;
 
 function mog.createOptions()
-	local about = LibStub("LibAddonInfo-1.0"):CreateFrame(MogIt);
+	local about = LibStub("LibAddonInfo-1.0"):CreateFrame(MogIt,nil,"Interface\\AddOns\\Mogit\\Images");
 
 	local config = LibStub("AceConfig-3.0");
 	local dialog = LibStub("AceConfigDialog-3.0");
