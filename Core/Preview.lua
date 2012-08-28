@@ -117,7 +117,7 @@ function mog:CreatePreview()
 	f.model:SetPoint("TOPLEFT",f.Inset,"TOPLEFT",49,-8);
 	f.model:SetPoint("BOTTOMRIGHT",f.Inset,"BOTTOMRIGHT",-49,8);
 	
-	f:SetScript("OnMouseDown",f.StartSizing);
+	f:SetScript("OnMouseDown",f.StartMoving);
 	f:SetScript("OnMouseUp",f.StopMovingOrSizing);
 	
 	f.slots = {};
@@ -256,6 +256,8 @@ function mog:AddToPreview(item,preview)
 	if mog.db.profile.gridDress == "preview" and mog.activePreview == preview then
 		mog.scroll:update();
 	end
+	
+	return preview;
 end
 --//
 

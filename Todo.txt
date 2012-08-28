@@ -1,0 +1,24 @@
+DataExtractor
+- Finish update and run
+
+Preview:
+- mog.view.AddItem (dual wield logic)
+- mog.activePreview
+- Toolbars on each preview
+- On CreatePreview, :Raise() the new preview
+- Either show mog.view by default or have 1 empty preview ready?
+- On closing a preview, delete it (or confirmation popup?)
+
+GUI:
+- SetAnimation instead of SetSequence
+- Race / Gender in Catalogue menu
+- Dress models: fix check mark and models repositioning when changed
+- Preview menu (New Preview, Hide/Show Previews, Close All Previews, Synchronize movement)
+
+Templates:
+- Add to Preview -> New level of tiers
+
+Options:
+- Remove "Undress before previewing" - also from defaults in Core
+- Remove "Dress models"
+- Should we move "No animation" and "URL website" to Catalogue dropdown?
