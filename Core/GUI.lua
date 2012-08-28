@@ -649,7 +649,7 @@ local function setGridDress(self)
 end
 
 function mog:ToggleFilters()
-	mog.filt:SetShown(mog.filt:IsShown());
+	mog.filt:SetShown(not mog.filt:IsShown());
 end
 
 mog.sorting = {};
