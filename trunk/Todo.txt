@@ -14,6 +14,9 @@ GUI:
 - Race / Gender in Catalogue menu
 - Dress models: fix check mark and models repositioning when changed
 - Preview menu (New Preview, Hide/Show Previews, Close All Previews, Synchronize movement)
+- Add a "Help" menu button and create some form of popup which contains something passed by each module (template one too?)
+- Disable modules (or the bracket text) in the module dropdown if version isnt compatible?
+- Fix Sorting -> Display ID error
 
 Templates:
 - Add to Preview -> New level of tiers
@@ -22,3 +25,9 @@ Options:
 - Remove "Undress before previewing" - also from defaults in Core
 - Remove "Dress models"
 - Should we move "No animation" and "URL website" to Catalogue dropdown?
+
+Checks:
+- Check all files (errors, changes, localization)
+
+Modules:
+- Update external modules
