@@ -32,7 +32,7 @@ mog:CreateSort("level",{
 		info.value = "level";
 		info.func = dropdownTier1;
 		info.checked = mog.sorting.active == "level";
-		UIDropDownMenu_AddButton(info);
+		UIDropDownMenu_AddButton(info,tier);
 	end,
 	Sort = function(args)
 		wipe(itemCache);

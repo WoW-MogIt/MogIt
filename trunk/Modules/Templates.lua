@@ -46,7 +46,6 @@ local itemOptionsMenu = {
 	},
 	{
 		wishlist = true,
-		-- text = L["Remove from set"],
 		text = L["Delete"],
 		func = function(self, set)
 			if set.name then
@@ -65,7 +64,10 @@ local itemOptionsMenu = {
 
 local function createItemMenu(data, func)
 	local items = data.items
-	if not items then return end
+	-- not listing the items if it's only 1 and it's not a set
+	if not items or (data.item and #items == 1) then
+		return
+	end
 	local isArray = #items > 0
 	
 	for i, v in ipairs(isArray and items or mog.slots) do
@@ -104,9 +106,9 @@ local function createMenu(self, level, menuList)
 end
 
 function mog.Item_FrameUpdate(self, data)
-	if not (self and data and data.items and data.items and data.cycle) then return end
-	mog:DressModel(self);
-	self.model:TryOn(data.items[data.cycle])
+	if not (self and data and data.item) then return end
+	mog:DressModel(self)
+	self.model:TryOn(data.item)
 end
 
 local sourceLabels = {
@@ -122,7 +124,7 @@ GameTooltip:HookScript("OnEvent", function(self, event, key, state)
 end)
 
 function mog.Item_OnEnter(self, data)
-	local item = data.items[data.cycle];
+	local item = data.item
 	if not (self and item) then return end
 	
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
@@ -135,7 +137,7 @@ function mog.Item_OnEnter(self, data)
 		return
 	end
 	
-	local itemName, _, _, itemLevel = mog:GetItemInfo(item,"ModelOnEnter")
+	local itemName, _, _, itemLevel = mog:GetItemInfo(item, "ModelOnEnter")
 	--GameTooltip:AddLine(self.display, 1, 1, 1)
 	--GameTooltip:AddLine(" ")
 	
@@ -206,7 +208,7 @@ function mog.Item_OnEnter(self, data)
 end
 
 function mog.Item_OnClick(self, btn, data, isSaved)
-	local item = data.items[data.cycle];
+	local item = data.item
 	if not (self and item) then return end
 	
 	if btn == "LeftButton" then
@@ -235,6 +237,7 @@ end
 do
 	local function itemOnClick(self, data, index)
 		data.cycle = index
+		data.item = data.items[index]
 	end
 	
 	mog.Item_Menu = CreateFrame("Frame")
@@ -274,8 +277,8 @@ end
 
 function mog.Set_FrameUpdate(self, data)
 	if not (self and data and data.items) then return end
-	mog:ShowIndicator(self,"label")
-	self:SetText(data.name) -- needs fixing
+	self:ShowIndicator("label")
+	self:SetText(data.name)
 	self.model:Undress()
 	for k, v in pairs(data.items) do
 		self.model:TryOn(v)

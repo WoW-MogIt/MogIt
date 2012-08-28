@@ -21,21 +21,6 @@ function wishlist:MogItLoaded()
 	local db = AceDB:New("MogItWishlist", defaults)
 	self.db = db
 	
-	-- convert old database
-	if MogIt_Wishlist then -- v1.1.4
-		local tbl = {}
-		for k, v in pairs(MogIt_Wishlist.display) do
-			tinsert(tbl, k)
-		end
-		sort(tbl, function(a, b)
-			return MogIt_Wishlist.time[a] < MogIt_Wishlist.time[b]
-		end)
-		for k, v in ipairs(tbl) do
-			tinsert(self.db.profile.items, tonumber(type(MogIt_Wishlist.display[v]) == "table" and MogIt_Wishlist.display[v][1] or MogIt_Wishlist.display[v]))
-		end
-		MogIt_Wishlist = nil
-	end
-	
 	local function upgradeDB(dbTable)
 		db.profile.items = dbTable.wishlist.items
 		db.profile.sets = dbTable.wishlist.sets
