@@ -167,7 +167,7 @@ function wishlist:OnEnter(frame, value)
 			return
 		end
 		
-		local name, link, _, _, _, _, _, _, _, texture = GetItemInfo(value)
+		local name, link, quality = GetItemInfo(value)
 		if link then
 			GameTooltip:AddDoubleLine(link, mog.GetItemSourceShort(value))
 		else
@@ -180,7 +180,7 @@ function wishlist:OnEnter(frame, value)
 			GameTooltip:AddLine(L["Other items using this appearance:"])
 			for i, itemID in ipairs(displayIDs) do
 				if itemID ~= value then
-					local name, link, _, _, _, _, _, _, _, texture = GetItemInfo(itemID)
+					local name, link, quality = GetItemInfo(itemID)
 					GameTooltip:AddDoubleLine(link, mog.GetItemSourceShort(itemID))
 				end
 			end

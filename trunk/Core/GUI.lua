@@ -637,6 +637,14 @@ local menuModelNames = {
 	WORGEN = "Worgen",
 }
 
+local function setDisplayModel(self, arg1)
+	mog[arg1] = self.value;
+	for i, model in ipairs(mog.models) do
+		mog:BuildModel(model);
+	end
+	CloseDropDownMenus(1);
+end
+
 local dressOptions = {
 	none = NONE,
 	preview = L["Preview"],
@@ -646,6 +654,7 @@ local dressOptions = {
 local function setGridDress(self)
 	mog.db.profile.gridDress = self.value;
 	mog.scroll:update();
+	CloseDropDownMenus(1);
 end
 
 function mog:ToggleFilters()
@@ -710,10 +719,11 @@ mog.menu.catalogue = mog.CreateMenu(mog.frame,L["Catalogue"],function(tier)
 			for i, race in pairs(races) do -- pairs may yield unexpected order
 				local info = UIDropDownMenu_CreateInfo();
 				info.text = menuModelNames[race];
-				info.value = race;
-				-- info.func = setRace;
-				-- info.checked = selectedRace == race;
+				info.value = i;
+				info.func = setDisplayModel;
+				info.checked = mog.displayRace == i;
 				info.keepShownOnClick = true;
+				info.arg1 = "displayRace";
 				UIDropDownMenu_AddButton(info,tier);
 			end
 		end
@@ -723,9 +733,10 @@ mog.menu.catalogue = mog.CreateMenu(mog.frame,L["Catalogue"],function(tier)
 				local info = UIDropDownMenu_CreateInfo();
 				info.text = gender;
 				info.value = i;
-				-- info.func = setGender;
-				-- info.checked = selectedGender == race;
+				info.func = setDisplayModel;
+				info.checked = mog.displayGender == i;
 				info.keepShownOnClick = true;
+				info.arg1 = "displayGender";
 				UIDropDownMenu_AddButton(info,tier);
 			end
 		end

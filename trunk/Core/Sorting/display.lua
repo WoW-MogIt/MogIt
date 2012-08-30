@@ -5,6 +5,10 @@ local function dropdownTier1(self)
 	mog:SortList("display");
 end
 
+local function displayIDSort(a, b)
+	return mog:GetData("item", a[1], "display") > mog:GetData("item", b[1], "display");
+end
+
 mog:CreateSort("display",{
 	label = L["Display ID"],
 	Dropdown = function(module,tier)
@@ -16,6 +20,6 @@ mog:CreateSort("display",{
 		UIDropDownMenu_AddButton(info,tier);
 	end,
 	Sort = function(args)
-		table.sort(mog.list, function(a, b) return a > b end);
+		table.sort(mog.list, displayIDSort);
 	end,
 });

@@ -2,8 +2,58 @@ local MogIt, mog = ...
 local L = mog.L
 
 local function itemLabel(itemID, textHeight)
-	local name, link = GetItemInfo(itemID) -- need changing to mog:GII
-	return format("|T%s:%d|t %s", GetItemIcon(itemID), textHeight or 0, link or name or RED_FONT_COLOR_CODE..RETRIEVING_ITEM_INFO..FONT_COLOR_CODE_CLOSE)
+	local name, _, quality = GetItemInfo(itemID) -- need changing to mog:GII
+	if name then
+		return format("|T%s:%d|t |c%s%s|r", GetItemIcon(itemID), textHeight or 0, select(4, GetItemQualityColor(quality)), name)
+	else
+		return format("|T%s:%d|t %s", GetItemIcon(itemID), textHeight or 0, RED_FONT_COLOR_CODE..RETRIEVING_ITEM_INFO..FONT_COLOR_CODE_CLOSE)
+	end
+end
+
+function mog.GetItemSourceInfo(itemID)
+	local source, info;
+	local sourceType = mog:GetData("item", itemID, "source");
+	local sourceID = mog:GetData("item", itemID, "sourceid");
+	local sourceInfo = mog:GetData("item", itemID, "sourceinfo");
+	
+	if sourceType == 1 and sourceID then -- Drop
+		source = mog:GetData("npc", sourceID, "name");
+	-- elseif sourceType == 3 then -- Quest
+	elseif sourceType == 5 and sourceInfo then -- Crafted
+		source = L.professions[sourceInfo];
+	elseif sourceType == 6 and sourceID then -- Achievement
+		local _, name, _, complete = GetAchievementInfo(sourceID);
+		source = name;
+		info = complete;
+	end
+	
+	local zone = mog:GetData("item", itemID, "zone");
+	if zone then
+		zone = GetMapNameByID(zone);
+		if zone then
+			local diff = L.diffs[sourceInfo];
+			if sourceType == 1 and diff then
+				zone = format("%s (%s)", zone, diff);
+			end
+		end
+	end
+	
+	return L.source[sourceType], source, zone, info;
+end
+
+function mog.GetItemSourceShort(itemID)
+	local sourceType, source, zone, info = mog.GetItemSourceInfo(itemID);
+	if zone then
+		if source then
+			sourceType = source;
+		end
+		source = zone;
+	end
+	if source then
+		return format("%s (%s)", sourceType, source)
+	else
+		return sourceType
+	end
 end
 
 -- create a new set and add the item to it
@@ -173,11 +223,11 @@ function mog.Item_OnEnter(self, data)
 		local str
 		for k, v in pairs(L.classBits) do
 			if bit.band(mog:GetData("item", item, "class"), v) > 0 then
-				local color = RAID_CLASS_COLORS[k]
+				local color = RAID_CLASS_COLORS[k].colorStr
 				if str then
-					str = str..", "..string.format("\124cff%.2x%.2x%.2x", color.r * 255, color.g * 255, color.b * 255)..LOCALIZED_CLASS_NAMES_MALE[k].."\124r"
+					str = format("%s, |c%s%s|r", str, color, LOCALIZED_CLASS_NAMES_MALE[k])
 				else
-					str = string.format("\124cff%.2x%.2x%.2x", color.r * 255, color.g * 255, color.b * 255)..LOCALIZED_CLASS_NAMES_MALE[k].."\124r"
+					str = format("|c%s%s|r", color, LOCALIZED_CLASS_NAMES_MALE[k])
 				end
 			end
 		end
