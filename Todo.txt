@@ -16,7 +16,6 @@ GUI:
 - Preview menu (New Preview, Hide/Show Previews, Close All Previews, Synchronize movement)
 - Add a "Help" menu button and create some form of popup which contains something passed by each module (template one too?)
 - Disable modules (or the bracket text) in the module dropdown if version isnt compatible?
-- Fix Sorting -> Display ID error
 
 Templates:
 - Add to Preview -> New tier (activePreview / new / list of previews)
@@ -28,9 +27,6 @@ Options:
 
 Wishlist:
 - mog:GetItemInfo
-
-Tokens:
-- Tier token system for tooltipModel and Wishlist/Templates?
 
 Checks:
 - Check all files (errors, changes, localization)

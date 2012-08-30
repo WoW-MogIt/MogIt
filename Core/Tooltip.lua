@@ -5,6 +5,8 @@ local IsDressableItem = IsDressableItem;
 local GetScreenWidth = GetScreenWidth;
 local GetScreenHeight = GetScreenHeight;
 
+local class = L.classBits[select(2,UnitClass("PLAYER"))];
+
 
 --// Tooltip
 mog.tooltip = CreateFrame("Frame","MogItTooltip",UIParent);
@@ -38,7 +40,7 @@ mog.tooltip:SetScript("OnEvent", function(self, event)
 	elseif event == "PLAYER_REGEN_DISABLED" then
 		ClearOverrideBindings(mog.tooltip);
 	elseif event == "PLAYER_REGEN_ENABLED" then
-		if self:IsShown() and  mog.db.profile.tooltipMouse then
+		if self:IsShown() and mog.db.profile.tooltipMouse then
 			SetOverrideBinding(mog.tooltip,true,"MOUSEWHEELUP","MogIt_TooltipScrollUp");
 			SetOverrideBinding(mog.tooltip,true,"MOUSEWHEELDOWN","MogIt_TooltipScrollDown");
 		end
@@ -57,13 +59,26 @@ mog.tooltip.model:SetPoint("BOTTOMRIGHT",mog.tooltip,"BOTTOMRIGHT",-5,5);
 
 function mog.tooltip.ShowItem(self)
 	local _,itemLink = self:GetItem();
+	if not itemLink then
+		return;
+	end
+	local itemID = tonumber(itemLink:match("item:(%d+)"));
 	
 	if mog.db.profile.tooltip and (not mog.tooltip.mod[mog.db.profile.tooltipMod] or mog.tooltip.mod[mog.db.profile.tooltipMod]()) then
 		local owner = self:GetOwner();
 		if itemLink and owner and not self.MogIt then --and not (owner.MogItModel or owner.MogItSlot) then
 			if mog.tooltip.item ~= itemLink then
 				mog.tooltip.item = itemLink;
-				local _,_,quality,_,_,class,subclass,_,slot = GetItemInfo(itemLink);
+				local token = mog.tokens[itemID];
+				if token then
+					for item, classBit in pairs(token) do
+						if bit.band(class, classBit) > 0 then
+							itemLink = item;
+							break;
+						end
+					end
+				end
+				local slot = select(9,GetItemInfo(itemLink));
 				if (not mog.db.profile.tooltipMog or select(3, GetItemTransmogrifyInfo(itemLink))) and mog.tooltip.slots[slot] and IsDressableItem(itemLink) then
 					mog.tooltip.model:SetFacing(mog.tooltip.slots[slot]-(mog.db.profile.tooltipRotate and 0.5 or 0));
 					mog.tooltip:Show();
@@ -90,7 +105,7 @@ function mog.tooltip.ShowItem(self)
 	end
 	
 	-- add wishlist info about this item
-	if not self.MogIt and itemLink and mog.wishlist:IsItemInWishlist(tonumber(itemLink:match("item:(%d+)"))) then
+	if not self.MogIt and mog.wishlist:IsItemInWishlist(itemID) then
 		self:AddLine(" ");
 		self:AddLine(L["This item is on your wishlist."], 1, 1, 0);
 		self:AddTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcon_1");
