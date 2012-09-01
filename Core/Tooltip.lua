@@ -64,9 +64,9 @@ function mog.tooltip.ShowItem(self)
 	end
 	local itemID = tonumber(itemLink:match("item:(%d+)"));
 	
-	if mog.db.profile.tooltip and (not mog.tooltip.mod[mog.db.profile.tooltipMod] or mog.tooltip.mod[mog.db.profile.tooltipMod]()) then
-		local owner = self:GetOwner();
-		if itemLink and owner and not self.MogIt then --and not (owner.MogItModel or owner.MogItSlot) then
+	local db = mog.db.profile
+	if db.tooltip and (not mog.tooltip.mod[db.tooltipMod] or mog.tooltip.mod[db.tooltipMod]()) then
+		if not self[mog] then
 			if mog.tooltip.item ~= itemLink then
 				mog.tooltip.item = itemLink;
 				local token = mog.tokens[itemID];
@@ -79,8 +79,8 @@ function mog.tooltip.ShowItem(self)
 					end
 				end
 				local slot = select(9,GetItemInfo(itemLink));
-				if (not mog.db.profile.tooltipMog or select(3, GetItemTransmogrifyInfo(itemLink))) and mog.tooltip.slots[slot] and IsDressableItem(itemLink) then
-					mog.tooltip.model:SetFacing(mog.tooltip.slots[slot]-(mog.db.profile.tooltipRotate and 0.5 or 0));
+				if (not db.tooltipMog or select(3, GetItemTransmogrifyInfo(itemLink))) and mog.tooltip.slots[slot] and IsDressableItem(itemLink) then
+					mog.tooltip.model:SetFacing(mog.tooltip.slots[slot]-(db.tooltipRotate and 0.5 or 0));
 					mog.tooltip:Show();
 					mog.tooltip.owner = self;
 					--if mog.global.tooltipAnchor then
@@ -89,7 +89,7 @@ function mog.tooltip.ShowItem(self)
 					--	mog.tooltip:ClearAllPoints();
 					--	mog.tooltip:SetPoint("BOTTOMRIGHT","UIParent","BOTTOMRIGHT",-CONTAINER_OFFSET_X - 13,CONTAINER_OFFSET_Y);
 					--end
-					if mog.db.profile.tooltipDress then
+					if db.tooltipDress then
 						mog.tooltip.model:Dress();
 					else
 						mog.tooltip.model:Undress();
@@ -100,12 +100,12 @@ function mog.tooltip.ShowItem(self)
 				end
 			end
 		else
-			mog.tooltip:Hide();
+			-- mog.tooltip:Hide();
 		end
 	end
 	
 	-- add wishlist info about this item
-	if not self.MogIt and mog.wishlist:IsItemInWishlist(itemID) then
+	if not self[mog] and mog.wishlist:IsItemInWishlist(itemID) then
 		self:AddLine(" ");
 		self:AddLine(L["This item is on your wishlist."], 1, 1, 0);
 		self:AddTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcon_1");

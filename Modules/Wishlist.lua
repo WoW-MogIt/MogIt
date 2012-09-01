@@ -3,7 +3,7 @@ local L = mog.L
 
 local wishlist = mog:RegisterModule("Wishlist", mog.moduleVersion)
 mog.wishlist = wishlist
-wishlist.base = true;
+wishlist.base = true
 
 local function onProfileUpdated(self, event)
 	mog:BuildList(true, "Wishlist")
@@ -152,46 +152,11 @@ function wishlist:FrameUpdate(frame, value, index)
 end
 
 function wishlist:OnEnter(frame, value)
-	GameTooltip:SetOwner(frame, "ANCHOR_RIGHT")
-	
 	if type(value) == "table" then
 		mog.Set_OnEnter(frame, value)
 	else
-		GameTooltip.MogIt = true
-		
-		if IsShiftKeyDown() then
-			GameTooltip:SetItemByID(value)
-			for _, frame in pairs(GameTooltip.shoppingTooltips) do
-				frame:Hide()
-			end
-			return
-		end
-		
-		local name, link, quality = GetItemInfo(value)
-		if link then
-			GameTooltip:AddDoubleLine(link, mog.GetItemSourceShort(value))
-		else
-			GameTooltip:AddLine(RETRIEVING_ITEM_INFO, RED_FONT_COLOR.r, RED_FONT_COLOR.g, RED_FONT_COLOR.b)
-		end
-		
-		local displayIDs = mog:GetData("display", mog:GetData("item", value, "display"), "items")
-		if displayIDs and #displayIDs > 1 then
-			GameTooltip:AddLine(" ")
-			GameTooltip:AddLine(L["Other items using this appearance:"])
-			for i, itemID in ipairs(displayIDs) do
-				if itemID ~= value then
-					local name, link, quality = GetItemInfo(itemID)
-					GameTooltip:AddDoubleLine(link, mog.GetItemSourceShort(itemID))
-				end
-			end
-		end
+		mog.Item_OnEnter(frame, value, mog:GetData("display", mog:GetData("item", value, "display"), "items"))
 	end
-	
-	-- if L.filters.slot[item] then
-		-- GameTooltip:AddDoubleLine(L["Slot"]..":",L.slots[L.filters.slot[item]],nil,nil,nil,1,1,1);
-	-- end
-
-	GameTooltip:Show()
 end
 
 function wishlist:OnClick(frame, button, value)
@@ -380,9 +345,7 @@ end
 
 local setFuncs = {
 	addItem = function(self, item)
-		if wishlist:GetSetItems(self.value)[mog.slotsType[select(9, GetItemInfo(item))]] then
-			StaticPopup_Show("MOGIT_WISHLIST_ADD_SET_ITEM", GetItemInfo(item), self.value, self)
-		elseif wishlist:AddItem(item, self.value) then
+		if wishlist:AddItem(item, self.value) then
 			mog:BuildList(nil, "Wishlist")
 		end
 		CloseDropDownMenus()
@@ -506,24 +469,4 @@ StaticPopupDialogs["MOGIT_WISHLIST_OVERWRITE_SET"] = {
 	end,
 	whileDead = true,
 	timeout = 0,
-}
-
-StaticPopupDialogs["MOGIT_WISHLIST_ADD_SET_ITEM"] = {
-	text = L["Add %s to set '%s'?"],
-	button1 = "Replace",
-	button2 = "Add replace",
-	button3 = "Add alt",
-	OnAccept = function(self, data)
-		wishlist:AddItem(data.arg1, data.value)
-		mog:BuildList(nil, "Wishlist")
-	end,
-	OnCancel = function(self, data)
-		print("Replace the active item and move it to alternate items")
-	end,
-	OnAlt = function(self, data)
-		wishlist:AddItem(data.arg1, data.value, nil, true)
-	end,
-	whileDead = true,
-	timeout = 0,
-	noCancelOnEscape = true,
 }

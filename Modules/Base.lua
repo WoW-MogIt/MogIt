@@ -103,12 +103,12 @@ end
 function mog.base.FrameUpdate(module,self,value)
 	self.data.items = value;
 	self.data.cycle = 1;
-	self.data.item = self.data.items[self.data.cycle];
-	for i, v in ipairs(self.data.items) do
-		if GetItemCount(v, true) > 0 then
+	self.data.item = value[self.data.cycle];
+	for i, item in ipairs(value) do
+		if GetItemCount(item, true) > 0 then
 			self:ShowIndicator("hasItem");
 		end
-		if mog.wishlist:IsItemInWishlist(v) then
+		if mog.wishlist:IsItemInWishlist(item) then
 			self:ShowIndicator("wishlist");
 		end
 	end
@@ -116,7 +116,8 @@ function mog.base.FrameUpdate(module,self,value)
 end
 
 function mog.base.OnEnter(module,self,value)
-	mog.Item_OnEnter(self,self.data);
+	local data = self.data;
+	mog.Item_OnEnter(self,data.item,data.items,data.cycle);
 end
 
 function mog.base.OnClick(module,self,btn,value)
