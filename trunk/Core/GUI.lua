@@ -374,7 +374,6 @@ function mog.scroll.update(self,value,offset,onscroll)
 		mog.active:OnScroll();
 	end
 	
-	local owner = GameTooltip:IsShown() and GameTooltip:GetOwner();	
 	for id,frame in ipairs(mog.models) do
 		local index = ((value-1)*models)+id;
 		local value = mog.list[index];
@@ -389,7 +388,7 @@ function mog.scroll.update(self,value,offset,onscroll)
 			frame:Enable();
 			if frame:IsShown() then
 				mog:ModelUpdate(frame,value);
-				if owner == frame then
+				if GameTooltip:IsOwned(frame) then
 					mog.ModelOnEnter(frame,value);
 				end
 			else

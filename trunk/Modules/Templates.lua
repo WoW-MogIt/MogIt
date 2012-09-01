@@ -48,12 +48,11 @@ function mog.GetItemSourceShort(itemID)
 			sourceType = source;
 		end
 		source = zone;
+		if sourceType == L.source[3] then
+			source = format("%s (%s)", source, sourceType)
+		end
 	end
-	if source then
-		return format("%s (%s)", sourceType, source)
-	else
-		return sourceType
-	end
+	return source or sourceType
 end
 
 -- create a new set and add the item to it
@@ -156,7 +155,6 @@ local function createMenu(self, level, menuList)
 end
 
 function mog.Item_FrameUpdate(self, data)
-	if not (self and data and data.item) then return end
 	mog:DressModel(self)
 	self.model:TryOn(data.item)
 end
@@ -168,16 +166,17 @@ local sourceLabels = {
 GameTooltip:RegisterEvent("MODIFIER_STATE_CHANGED")
 GameTooltip:HookScript("OnEvent", function(self, event, key, state)
 	local owner = self:GetOwner()
-	if owner and (owner.type == "preview" or owner.type == "catalogue") then
+	if owner and self[mog] then
 		mog.ModelOnEnter(owner)
 	end
 end)
+GameTooltip:HookScript("OnTooltipCleared", function(self)
+	self[mog] = nil
+end)
 
-function mog.Item_OnEnter(self, data)
-	local item = data.item
-	if not (self and item) then return end
-	
+function mog.Item_OnEnter(self, item, items, cycle)
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+	GameTooltip[mog] = true
 	
 	if IsShiftKeyDown() then
 		GameTooltip:SetItemByID(item)
@@ -191,8 +190,8 @@ function mog.Item_OnEnter(self, data)
 	--GameTooltip:AddLine(self.display, 1, 1, 1)
 	--GameTooltip:AddLine(" ")
 	
-	if data.items and #data.items > 1 then
-		GameTooltip:AddDoubleLine(itemLabel(item), L["Item %d/%d"]:format(data.cycle, #data.items), nil, nil, nil, 1, 0, 0)
+	if cycle and #items > 1 then
+		GameTooltip:AddDoubleLine(itemLabel(item), L["Item %d/%d"]:format(cycle, #items), nil, nil, nil, 1, 0, 0)
 	else
 		GameTooltip:AddLine(itemLabel(item))
 	end
@@ -248,14 +247,34 @@ function mog.Item_OnEnter(self, data)
 	end
 	
 	-- add wishlist info about this item
-	if mog.wishlist:IsItemInWishlist(item) then
+	if mog.active.name ~= "Wishlist" and mog.wishlist:IsItemInWishlist(item) then
 		GameTooltip:AddLine(" ")
 		GameTooltip:AddLine(L["This item is on your wishlist."], 1, 1, 1)
 		GameTooltip:AddTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcon_1")
 	end
 	
+	if not items then
+		GameTooltip:AddLine(" ")
+		GameTooltip:AddLine(L["Load module to see other items using this appearance."], nil, nil, nil, true)
+	elseif #items > 1 then
+		GameTooltip:AddLine(" ")
+		GameTooltip:AddLine(L["Other items using this appearance:"])
+		for i, v in ipairs(items) do
+			if v ~= item then
+				GameTooltip:AddDoubleLine(itemLabel(v), mog.GetItemSourceShort(v), nil, nil, nil, 1, 1, 1)
+				if GetItemCount(v, true) > 0 then
+					GameTooltip:AddTexture("Interface\\RaidFrame\\ReadyCheck-Ready")
+				end
+			end
+		end
+	end
+	
 	GameTooltip:Show()
 end
+
+-- function mog.Item_OnEnter(self, data)
+	-- mog.Item_OnEnter(self, data.item, data.items, data.cycle)
+-- end
 
 function mog.Item_OnClick(self, btn, data, isSaved)
 	local item = data.item
@@ -326,7 +345,6 @@ end
 --]=]
 
 function mog.Set_FrameUpdate(self, data)
-	if not (self and data and data.items) then return end
 	self:ShowIndicator("label")
 	self:SetText(data.name)
 	self.model:Undress()
@@ -336,15 +354,13 @@ function mog.Set_FrameUpdate(self, data)
 end
 
 function mog.Set_OnEnter(self, data)
-	if not (self and data and data.items) then return end
-	
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 	
 	GameTooltip:AddLine(data.name)
 	for i, slot in ipairs(mog.slots) do
 		local itemID = data.items[slot] or data.items[i]
 		if itemID then
-			GameTooltip:AddDoubleLine(itemLabel(itemID)..(GetItemCount(itemID, true) > 0 and " |TInterface\\RaidFrame\\ReadyCheck-Ready:0|t" or ""), mog.GetItemSourceShort(itemID))
+			GameTooltip:AddDoubleLine((GetItemCount(itemID, true) > 0 and "|TInterface\\RaidFrame\\ReadyCheck-Ready:0|t " or "")..itemLabel(itemID), mog.GetItemSourceShort(itemID), nil, nil, nil, 1, 1, 1)
 		end
 	end
 	
@@ -352,8 +368,6 @@ function mog.Set_OnEnter(self, data)
 end
 
 function mog.Set_OnClick(self, btn, data, isSaved)
-	if not (self and data and data.items) then return end
-	
 	if btn == "LeftButton" then
 		if IsShiftKeyDown() then
 			ChatEdit_InsertLink(mog:SetToLink(data.items))
