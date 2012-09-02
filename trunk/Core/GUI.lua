@@ -98,7 +98,6 @@ function mog:CreateModelFrame(parent)
 	f.bg:SetAllPoints(f);
 	f.bg:SetTexture(0.3,0.3,0.3,0.2);
 	
-	f:SetScript("OnUpdate",mog.ModelOnUpdate);
 	f:SetScript("OnShow",mog.ModelOnShow);
 	f:SetScript("OnHide",mog.ModelOnHide);
 	f:RegisterForClicks("AnyUp");
@@ -229,13 +228,6 @@ end
 
 
 --// Model Functions
-function mog.ModelOnUpdate(self)
-	--56, 108, 237, 238, 239, 243, 249, 250, 251, 252, 253, 254, 255
-	if mog.db.profile.noAnim then
-		self.model:SetSequence(254);
-	end
-end
-
 function mog.ModelOnShow(self)
 	local lvl = self:GetParent():GetFrameLevel();
 	if self:GetFrameLevel() <= lvl then
@@ -490,41 +482,29 @@ end
 
 
 
-
-
-
-
-
-
-
-
---// Toolbar
-mog.menu = CreateFrame("Frame","MogItMenu",mog.frame);
-mog.menu.displayMode = "MENU";
-mog.menu.initialize = function(self,level)
-	if mog.menu.active and mog.menu.active.func then
-		mog.menu.tier[level] = UIDROPDOWNMENU_MENU_VALUE;
-		mog.menu.active.func(level);
+local function menuBarInitialize(self, level)
+	if self.active and self.active.func then
+		self.tier[level] = UIDROPDOWNMENU_MENU_VALUE;
+		self.active.func(level);
 	end
 end
-mog.menu.tier = {};
 
-local function menuOnClick(self,btn)
-	if mog.menu.active ~= self then
+local function menuOnClick(self, btn)
+	if self.menuBar.active ~= self then
 		HideDropDownMenu(1);
 	end
-	mog.menu.active = self;
+	self.menuBar.active = self;
 	if self.func then
-		ToggleDropDownMenu(1,nil,mog.menu,self,0,0,self,self);
+		ToggleDropDownMenu(1,nil,self.menuBar,self,0,0,self,self);
 	end
 end
 
 local function menuOnEnter(self)
-	if mog.menu.active ~= self and mog.IsDropdownShown(mog.menu) then
+	if self.menuBar.active ~= self and mog.IsDropdownShown(self.menuBar) then
 		HideDropDownMenu(1);
 		if self.func then
-			mog.menu.active = self;
-			ToggleDropDownMenu(1,nil,mog.menu,self,0,0,self,self);
+			self.menuBar.active = self;
+			ToggleDropDownMenu(1,nil,self.menuBar,self,0,0,self,self);
 		end
 	end
 	self.nt:SetTexture(1,0.82,0,1);
@@ -534,12 +514,13 @@ local function menuOnLeave(self)
 	self.nt:SetTexture(0,0,0,0);
 end
 
-function mog.CreateMenu(parent,label,func)
-	local f = CreateFrame("Button",nil,parent);
+local function createMenu(menuBar, label, func)
+	local f = CreateFrame("Button", nil, menuBar.parent);
 	f:SetText(label);
 	f:SetNormalFontObject(GameFontNormal);
 	f:SetHighlightFontObject(GameFontBlack);
-	f:SetSize(f:GetFontString():GetStringWidth()+10,f:GetFontString():GetStringHeight()+10);
+	f:SetSize(f:GetFontString():GetStringWidth()+10, f:GetFontString():GetStringHeight()+10);
+	f.menuBar = menuBar
 	
 	f.nt = f:CreateTexture(nil,"BACKGROUND");
 	--nt:SetTexture(0.8,0.3,0.8,1);
@@ -554,11 +535,23 @@ function mog.CreateMenu(parent,label,func)
 	
 	return f;
 end
---//
 
+function mog.CreateMenuBar(parent, name)
+	local menuBar = CreateFrame("Frame", name, parent);
+	menuBar.displayMode = "MENU";
+	menuBar.initialize = menuBarInitialize
+	menuBar.CreateMenu = createMenu;
+	menuBar.parent = parent
+	menuBar.tier = {};
+	return menuBar;
+end
+
+
+--// Toolbar
+mog.menu = mog.CreateMenuBar(mog.frame, "MogItMenu");
 
 --// Modules Menu
-mog.menu.modules = mog.CreateMenu(mog.frame,L["Modules"],function(tier)
+mog.menu.modules = mog.menu:CreateMenu(L["Modules"], function(tier)
 	if tier == 1 then
 		local info;
 		info = UIDropDownMenu_CreateInfo();
@@ -595,7 +588,7 @@ mog.menu.modules = mog.CreateMenu(mog.frame,L["Modules"],function(tier)
 		mog.menu.tier[2]:Dropdown(tier);
 	end
 end);
-mog.menu.modules:SetPoint("TOPLEFT",mog.frame,"TOPLEFT",62,-31);
+mog.menu.modules:SetPoint("TOPLEFT", mog.frame, "TOPLEFT", 62, -31);
 --//
 
 
@@ -662,7 +655,7 @@ end
 
 mog.sorting = {};
 
-mog.menu.catalogue = mog.CreateMenu(mog.frame,L["Catalogue"],function(tier)
+mog.menu.catalogue = mog.menu:CreateMenu(L["Catalogue"],function(tier)
 	if tier == 1 then
 		local info = UIDropDownMenu_CreateInfo();
 		info.text = mog.filt:IsShown() and L["Hide Filters"] or L["Show Filters"];
@@ -753,15 +746,15 @@ mog.menu.catalogue = mog.CreateMenu(mog.frame,L["Catalogue"],function(tier)
 		end
 	end
 end);
-mog.menu.catalogue:SetPoint("LEFT",mog.menu.modules,"RIGHT",5,0);
+mog.menu.catalogue:SetPoint("LEFT", mog.menu.modules, "RIGHT", 5, 0);
 --//
 
 
 --// Preview Menu
-mog.menu.preview = mog.CreateMenu(mog.frame,L["Preview"],function(tier)
+mog.menu.preview = mog.menu:CreateMenu(L["Preview"], function(tier)
 	
 end);
-mog.menu.preview:SetPoint("LEFT",mog.menu.catalogue,"RIGHT",5,0);
+mog.menu.preview:SetPoint("LEFT", mog.menu.catalogue, "RIGHT", 5, 0);
 --//
 
 
@@ -773,17 +766,13 @@ function mog:ToggleOptions()
 	InterfaceOptionsFrame_OpenToCategory(MogIt);
 end
 
-mog.menu.options = mog.CreateMenu(mog.frame,L["Options"]);
-mog.menu.options:SetScript("OnClick",mog.ToggleOptions);
-mog.menu.options:SetPoint("LEFT",mog.menu.preview,"RIGHT",5,0);
+mog.menu.options = mog.menu:CreateMenu(L["Options"]);
+mog.menu.options:SetScript("OnClick", mog.ToggleOptions);
+mog.menu.options:SetPoint("LEFT", mog.menu.preview, "RIGHT", 5, 0);
 --//
 
 
-
-
-
-
-
+--// Indicators
 mog:CreateIndicator("label", function(model)
 	local label = model:CreateFontString(nil, "OVERLAY", "GameFontNormalMed3");
 	label:SetPoint("TOPLEFT", 12, -12);
@@ -809,10 +798,6 @@ mog:CreateIndicator("wishlist", function(model)
 	wishlist:SetPoint("TOPRIGHT", -8, -8);
 	return wishlist;
 end)
-
-
-
-
 
 
 --[[

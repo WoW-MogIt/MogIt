@@ -64,6 +64,225 @@ local function slotOnClick(self,btn)
 		mog.Item_OnClick(self,btn,self);
 	end
 end
+
+--// Toolbar
+local newSet = {items = {}}
+
+local function onClick(self)
+	newSet.name = self.value
+	wipe(newSet.items)
+	for slot, v in pairs(mog.view.slots) do
+		newSet.items[slot] = v.item
+	end
+	StaticPopup_Show("MOGIT_WISHLIST_OVERWRITE_SET", self.value, nil, newSet)
+end
+
+local function newSetOnClick(self)
+	wipe(newSet.items)
+	newSet.name = "Set "..(#mog.wishlist:GetSets() + 1)
+	for slot, v in pairs(mog.view.slots) do
+		newSet.items[slot] = v.item
+	end
+	StaticPopup_Show("MOGIT_WISHLIST_CREATE_SET", nil, nil, newSet)
+end
+
+local function saveInitialize(level)
+	mog.wishlist:AddSetMenuItems(level, onClick)
+	
+	local info = UIDropDownMenu_CreateInfo()
+	info.text = L["New set"]
+	info.func = newSetOnClick
+	info.colorCode = GREEN_FONT_COLOR_CODE
+	info.notCheckable = true
+	UIDropDownMenu_AddButton(info, level)
+end
+
+local function onClick(self, profile)
+	for k, v in pairs(mog.view.slots) do
+		mog.view.delItem(k)
+	end
+	for slot, itemID in pairs(mog.wishlist:GetSetItems(self.value, profile)) do
+		mog:AddToPreview(itemID)
+	end
+	CloseDropDownMenus()
+end
+
+local function loadInitialize(level)
+	if level == 1 then
+		mog.wishlist:AddSetMenuItems(level, onClick)
+		
+		local info = UIDropDownMenu_CreateInfo()
+		info.text = L["Other profiles"]
+		info.hasArrow = true
+		info.notCheckable = true
+		UIDropDownMenu_AddButton(info, level)
+	elseif level == 2 then
+		local curProfile = mog.wishlist:GetCurrentProfile()
+		for i, profile in ipairs(mog.wishlist:GetProfiles()) do
+			if profile ~= curProfile then
+				local info = UIDropDownMenu_CreateInfo()
+				info.text = profile
+				info.hasArrow = true
+				info.notCheckable = true
+				UIDropDownMenu_AddButton(info, level)
+			end
+		end
+	elseif level == 3 then
+		mog.wishlist:AddSetMenuItems(level, onClick, UIDROPDOWNMENU_MENU_VALUE, UIDROPDOWNMENU_MENU_VALUE)
+	end
+end;
+
+local races = {
+   [1] = "HUMAN",
+   [2] = "ORC",
+   [3] = "DWARF",
+   [4] = "NIGHTELF",
+   [5] = "SCOURGE",
+   [6] = "TAUREN",
+   [7] = "GNOME",
+   [8] = "TROLL",
+   [9] = "GOBLIN",
+   [10] = "BLOODELF",
+   [11] = "DRAENEI",
+   [22] = "WORGEN",
+}
+
+local gender = {
+	[0] = "Male",
+	[1] = "Female",
+}
+
+local menuModelNames = {
+	HUMAN = "Human",
+	ORC = "Orc",
+	DWARF = "Dwarf",
+	NIGHTELF = "Nightelf",
+	SCOURGE = "Undead",
+	TAUREN = "Tauren",
+	GNOME = "Gnome",
+	TROLL = "Troll",
+	GOBLIN = "Goblin",
+	BLOODELF = "Bloodelf",
+	DRAENEI = "Draenei",
+	WORGEN = "Worgen",
+}
+
+local function setDisplayModel(self, arg1)
+	mog[arg1] = self.value;
+	for i, model in ipairs(mog.models) do
+		mog:BuildModel(model);
+	end
+	CloseDropDownMenus(1);
+end
+
+local function stopDis(tier)
+	if tier == 1 then
+		local info = UIDropDownMenu_CreateInfo();
+		info.text = "Race";
+		info.value = "race";
+		info.notCheckable = true;
+		info.hasArrow = true;
+		UIDropDownMenu_AddButton(info,tier);
+		
+		local info = UIDropDownMenu_CreateInfo();
+		info.text = "Sechs";
+		info.value = "gender";
+		info.notCheckable = true;
+		info.hasArrow = true;
+		UIDropDownMenu_AddButton(info,tier);
+	elseif menuBar.tier[2] == "race" then
+		if tier == 2 then
+			for i, race in pairs(races) do -- pairs may yield unexpected order
+				local info = UIDropDownMenu_CreateInfo();
+				info.text = menuModelNames[race];
+				info.value = i;
+				info.func = setDisplayModel;
+				info.checked = mog.displayRace == i;
+				info.keepShownOnClick = true;
+				info.arg1 = "displayRace";
+				UIDropDownMenu_AddButton(info,tier);
+			end
+		end
+	elseif menuBar.tier[2] == "gender" then
+		if tier == 2 then
+			for i, gender in pairs(gender) do -- pairs may yield unexpected order
+				local info = UIDropDownMenu_CreateInfo();
+				info.text = gender;
+				info.value = i;
+				info.func = setDisplayModel;
+				info.checked = mog.displayGender == i;
+				info.keepShownOnClick = true;
+				info.arg1 = "displayGender";
+				UIDropDownMenu_AddButton(info,tier);
+			end
+		end
+	end
+end
+
+local function createMenuBar(parent)
+	local menuBar = mog.CreateMenuBar(parent)
+	--[=[
+	local function clearOnClick(self,btn)
+		for k,v in pairs(mog.view.slots) do
+			mog.view.delItem(k);
+		end
+		if mog.db.profile.gridDress then
+			mog.scroll:update();
+		end
+	end
+
+	local function addOnClick(self,btn)
+		StaticPopup_Show("MOGIT_PREVIEW_ADDITEM");
+	end
+
+	local function importOnClick(self,btn)
+		StaticPopup_Show("MOGIT_PREVIEW_IMPORT");
+	end
+
+	local function linkOnClick(self,btn)
+		local tbl = {};
+		for k,v in pairs(mog.view.slots) do
+			if v.item then
+				table.insert(tbl,v.item);
+			end
+		end
+		ChatEdit_InsertLink(mog:SetToLink(tbl));
+	end
+
+		f.clear = CreateFrame("Button","MogItPreview"..mog.view.num.."Clear",f,"UIPanelButtonTemplate2");
+		f.clear:SetPoint("TOPRIGHT",f,"TOPRIGHT",-10,-30);
+		f.clear:SetWidth(100);
+		f.clear:SetText(L["Clear"]);
+		f.clear:SetScript("OnClick",clearOnClick);
+
+		f.add = CreateFrame("Button","MogItPreview"..mog.view.num.."AddItem",f,"MagicButtonTemplate");
+		f.add:SetPoint("BOTTOMLEFT",f,"BOTTOMLEFT",5,5);
+		f.add:SetWidth(100);
+		f.add:SetText(L["Add Item"]);
+		f.add:SetScript("OnClick",addOnClick);
+
+		f.import = CreateFrame("Button","MogItPreview"..mog.view.num.."Import",f,"MagicButtonTemplate");
+		f.import:SetPoint("TOPLEFT",f.add,"TOPRIGHT");
+		f.import:SetWidth(100);
+		f.import:SetText(L["Import"]);
+		f.import:SetScript("OnClick",importOnClick);
+
+		f.link = CreateFrame("Button","MogItPreview"..mog.view.num.."Link",f,"MagicButtonTemplate");
+		f.link:SetPoint("TOPLEFT",f.import,"TOPRIGHT");
+		f.link:SetWidth(100);
+		f.link:SetText(L["Chat Link"]);
+		f.link:SetScript("OnClick",linkOnClick);
+	--]=]
+
+	menuBar.save = menuBar:CreateMenu(L["Save"], saveInitialize);
+	menuBar.save:SetPoint("TOPLEFT", parent, 62, -31);
+
+	menuBar.load = menuBar:CreateMenu(L["Load"], loadInitialize);
+	menuBar.load:SetPoint("LEFT", mog.save, "RIGHT", 5, 0);
+
+	menuBar.catalogue = menuBar:CreateMenu(L["Catalogue"], stopDis);
+	menuBar.catalogue:SetPoint("LEFT", menuBar.load, "RIGHT", 5, 0);
+end
 --//
 
 
@@ -141,6 +360,8 @@ function mog:CreatePreview()
 		f.slots[slot]:SetScript("OnEnter",slotOnEnter);
 		f.slots[slot]:SetScript("OnLeave",slotOnLeave);
 	end
+	
+	createMenuBar(f);
 		
 	tinsert(mog.previews,f);
 	return f;
@@ -434,164 +655,3 @@ equipping any non one handed weapon will cause the next one handed weapon to go 
 equipping a right handed ranged weapon (gun, crossbow, thrown) will cause the next two one hand weapons to go into main hand (above rule still applies)
 
 ]]
-
-
-
-
-
-
---[=[
-local function saveOnClick(self,btn)
-	ToggleDropDownMenu(nil, nil, self.menu, self, 0, 0)
-end
-
-local function loadOnClick(self,btn)
-	ToggleDropDownMenu(nil, nil, self.menu, self, 0, 0)
-end
-
-local function clearOnClick(self,btn)
-	for k,v in pairs(mog.view.slots) do
-		mog.view.delItem(k);
-	end
-	if mog.db.profile.gridDress then
-		mog.scroll:update();
-	end
-end
-
-local function addOnClick(self,btn)
-	StaticPopup_Show("MOGIT_PREVIEW_ADDITEM");
-end
-
-local function importOnClick(self,btn)
-	StaticPopup_Show("MOGIT_PREVIEW_IMPORT");
-end
-
-local function linkOnClick(self,btn)
-	local tbl = {};
-	for k,v in pairs(mog.view.slots) do
-		if v.item then
-			table.insert(tbl,v.item);
-		end
-	end
-	ChatEdit_InsertLink(mog:SetToLink(tbl));
-end
---]=]
-
-
-
-
---[=[
-
-
-local newSet = {items = {}}
-
-local function onClick(self)
-	newSet.name = self.value
-	wipe(newSet.items)
-	for slot, v in pairs(mog.view.slots) do
-		newSet.items[slot] = v.item
-	end
-	StaticPopup_Show("MOGIT_WISHLIST_OVERWRITE_SET", self.value, nil, newSet)
-end
-
-local function newSetOnClick(self)
-	wipe(newSet.items)
-	newSet.name = "Set "..(#mog.wishlist:GetSets() + 1)
-	for slot, v in pairs(mog.view.slots) do
-		newSet.items[slot] = v.item
-	end
-	StaticPopup_Show("MOGIT_WISHLIST_CREATE_SET", nil, nil, newSet)
-end
-
-local saveMenu = CreateFrame("Frame")
-saveMenu.displayMode = "MENU"
-saveMenu.initialize = function(self, level)
-	mog.wishlist:AddSetMenuItems(level, onClick)
-	
-	local info = UIDropDownMenu_CreateInfo()
-	info.text = L["New set"]
-	info.func = newSetOnClick
-	info.colorCode = GREEN_FONT_COLOR_CODE
-	info.notCheckable = true
-	UIDropDownMenu_AddButton(info, level)
-end
--- mog.view.save.menu = saveMenu
-
-
-local function onClick(self, profile)
-	for k, v in pairs(mog.view.slots) do
-		mog.view.delItem(k)
-	end
-	for slot, itemID in pairs(mog.wishlist:GetSetItems(self.value, profile)) do
-		mog:AddToPreview(itemID)
-	end
-	CloseDropDownMenus()
-end
-
-local loadMenu = CreateFrame("Frame")
-loadMenu.displayMode = "MENU"
-loadMenu.initialize = function(self, level)
-	if level == 1 then
-		mog.wishlist:AddSetMenuItems(level, onClick)
-		
-		local info = UIDropDownMenu_CreateInfo()
-		info.text = L["Other profiles"]
-		info.hasArrow = true
-		info.notCheckable = true
-		UIDropDownMenu_AddButton(info, level)
-	elseif level == 2 then
-		local curProfile = mog.wishlist:GetCurrentProfile()
-		for i, profile in ipairs(mog.wishlist:GetProfiles()) do
-			if profile ~= curProfile then
-				local info = UIDropDownMenu_CreateInfo()
-				info.text = profile
-				info.hasArrow = true
-				info.notCheckable = true
-				UIDropDownMenu_AddButton(info, level)
-			end
-		end
-	elseif level == 3 then
-		mog.wishlist:AddSetMenuItems(level, onClick, UIDROPDOWNMENU_MENU_VALUE, UIDROPDOWNMENU_MENU_VALUE)
-	end
-end
--- mog.view.load.menu = loadMenu
-
---]=]
-
-	--[=[
-		f.save = CreateFrame("Button","MogItPreview"..mog.view.num.."Save",f,"UIPanelButtonTemplate2");
-		f.save:SetPoint("TOPLEFT",10,-30);
-		f.save:SetWidth(100);
-		f.save:SetText(L["Save"]);
-		f.save:SetScript("OnClick",saveOnClick);
-		
-		f.load = CreateFrame("Button","MogItPreview"..mog.view.num.."Load",f,"UIPanelButtonTemplate2");
-		f.load:SetPoint("LEFT",f.save,"RIGHT",8,0);
-		f.load:SetWidth(100);
-		f.load:SetText(L["Load"]);
-		f.load:SetScript("OnClick",loadOnClick);
-		
-		f.clear = CreateFrame("Button","MogItPreview"..mog.view.num.."Clear",f,"UIPanelButtonTemplate2");
-		f.clear:SetPoint("TOPRIGHT",f,"TOPRIGHT",-10,-30);
-		f.clear:SetWidth(100);
-		f.clear:SetText(L["Clear"]);
-		f.clear:SetScript("OnClick",clearOnClick);
-
-		f.add = CreateFrame("Button","MogItPreview"..mog.view.num.."AddItem",f,"MagicButtonTemplate");
-		f.add:SetPoint("BOTTOMLEFT",f,"BOTTOMLEFT",5,5);
-		f.add:SetWidth(100);
-		f.add:SetText(L["Add Item"]);
-		f.add:SetScript("OnClick",addOnClick);
-
-		f.import = CreateFrame("Button","MogItPreview"..mog.view.num.."Import",f,"MagicButtonTemplate");
-		f.import:SetPoint("TOPLEFT",f.add,"TOPRIGHT");
-		f.import:SetWidth(100);
-		f.import:SetText(L["Import"]);
-		f.import:SetScript("OnClick",importOnClick);
-
-		f.link = CreateFrame("Button","MogItPreview"..mog.view.num.."Link",f,"MagicButtonTemplate");
-		f.link:SetPoint("TOPLEFT",f.import,"TOPRIGHT");
-		f.link:SetWidth(100);
-		f.link:SetText(L["Chat Link"]);
-		f.link:SetScript("OnClick",linkOnClick);
-		--]=]
