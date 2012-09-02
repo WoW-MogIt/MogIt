@@ -12,5 +12,6 @@
 <Script file="source.lua"/>
 <Script file="slot.lua"/>
 <Script file="quality.lua"/>
+<Script file="bind.lua"/>
 
 </Ui>

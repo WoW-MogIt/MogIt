@@ -32,5 +32,8 @@ Wishlist:
 Checks:
 - Check all files (errors, changes, localization)
 
+Links
+- Open new preview + set race/gender
+
 Modules:
 - Update external modules

@@ -1,27 +1,33 @@
-﻿## Interface: 40300
-## Author: Aelobin (The Maelstrom EU)
-## Version: 2.2.1
+## Interface: 50000
+## Author: Aelobin (The Maelstrom EU) & Lombra (Shattered Hand EU)
+## Version: 3.0.0
 ## LoadOnDemand: 1
 ## RequiredDeps: MogIt
 ## X-MogItModuleVersion: 1
 
 ## Title: MogIt_Mail
-## Title-deDE: MogIt_Kette
 ## Title-frFR: MogIt_Mailles
+## Title-deDE: MogIt_Kette
 ## Title-esES: MogIt_Mallas
+## Title-esMX: MogIt_Mallas
 ## Title-ruRU: MogIt_Кольчуга
 ## Title-koKR: MogIt_사슬
-## Title-zhTW: MogIt_鎖甲
 ## Title-zhCN: MogIt_锁甲
+## Title-zhTW: MogIt_鎖甲
+## Title-ptBR: MogIt_Malha
+## Title-itIT: MogIt_Mail
 
 ## Notes: MogIt Data
-## Notes-deDE: MogIt Daten
 ## Notes-frFR: MogIt Données
+## Notes-deDE: MogIt Daten
 ## Notes-esES: MogIt Datos
+## Notes-esMX: MogIt Datos
 ## Notes-ruRU: MogIt данные
 ## Notes-koKR: MogIt 데이터
-## Notes-zhTW: MogIt 的數據
 ## Notes-zhCN: MogIt 数据
+## Notes-zhTW: MogIt 的數據
+## Notes-ptBR: MogIt Dados
+## Notes-itIT: MogIt Dati
 
 Bosses.lua
 Colours.lua

@@ -88,9 +88,9 @@ L.classBits = {
 };
 
 L.bind = {
-	[0] = NONE,
-	[1] = ITEM_BIND_ON_PICKUP,
+	[1] = NONE,
 	[2] = ITEM_BIND_ON_EQUIP,
-	[5] = ITEM_BIND_TO_BNETACCOUNT,
+	[3] = ITEM_BIND_ON_PICKUP,
+	[4] = ITEM_BIND_TO_BNETACCOUNT,
 };
 --//

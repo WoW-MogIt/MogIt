@@ -22,13 +22,14 @@ function mog.base.AddSlot(slot,addon)
 	end
 	local list = module.slots[slot].list;
 	
-	return function(id,display,quality,lvl,faction,class,slot,source,sourceid,zone,sourceinfo)
+	return function(id,display,quality,lvl,faction,class,bind,slot,source,sourceid,zone,sourceinfo)
 		tinsert(list,id);
 		mog:AddData("item", id, "display", display);
 		mog:AddData("item", id, "quality", quality);
 		mog:AddData("item", id, "level", lvl);
 		mog:AddData("item", id, "faction", faction);
 		mog:AddData("item", id, "class", class);
+		mog:AddData("item", id, "bind", bind);
 		mog:AddData("item", id, "slot", slot);
 		mog:AddData("item", id, "source", source);
 		mog:AddData("item", id, "sourceid", sourceid);
@@ -243,6 +244,7 @@ for _,addon in ipairs(addons) do
 				"class",
 				"source",
 				"quality",
+				"bind",
 				(v == "MogIt_OneHanded" and "slot") or nil,
 			},
 			sorting = {
