@@ -1,7 +1,7 @@
 local MogIt,mog = ...;
 local L = mog.L;
 
-local f = mog:CreateFilter("slot");
+local f = mog:CreateFilter("bind");
 local selected;
 local num;
 local all;
