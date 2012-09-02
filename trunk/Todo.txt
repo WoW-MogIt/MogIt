@@ -10,9 +10,9 @@ Preview:
 - On closing a preview, delete it (or confirmation popup?)
 
 GUI:
+- Hidden helm/cloak showing on models
 - SetAnimation instead of SetSequence
-- Race / Gender in Catalogue menu (get working and localise)
-- Fix dress model after setting custom race!
+- Localise Gender in Catalogue menu (?)
 - Dress models: fix check mark and models repositioning when changed
 - Preview menu (New Preview, Hide/Show Previews, Close All Previews, Synchronize movement)
 - Add a "Help" menu button and create some form of popup which contains something passed by each module (template one too?)
