@@ -5,6 +5,7 @@ local L = mog.L;
 mog.view = CreateFrame("Frame","MogItPreview",UIParent);
 mog.view:SetAllPoints(UIParent);
 tinsert(UISpecialFrames,"MogItPreview");
+--ShowUIPanel(mog.view);
 
 
 --// Preview Functions
@@ -31,7 +32,7 @@ local function modelOnMouseWheel(self,v)
 			mog:PositionModel(preview.model);
 		end
 	else
-		self.data.posZ = (self.data.posZ or mog.posZ or 0) + delta;
+		self.data.posZ = (self.parent.data.posZ or mog.posZ or 0) + delta;
 		mog:PositionModel(self);
 	end
 end
@@ -55,22 +56,32 @@ end
 
 local function slotOnClick(self,btn)
 	if btn == "RightButton" and IsControlKeyDown() then
-		--mog.view.delItem(self.slot);
-		--if mog.db.profile.gridDress then
-		--	mog.scroll:update();
-		--end
+		local preview = self:GetParent();
+		mog.view.DelItem(self.slot,preview);
+		if mog.db.profile.gridDress == "preview" and mog.activePreview == preview then
+			mog.scroll:update();
+		end
 		slotOnEnter(self);
 	else
 		mog.Item_OnClick(self,btn,self);
 	end
 end
 
+local function previewOnClose(self,btn)
+	local preview = self:GetParent();
+	mog:DeletePreview(preview);
+end
+--//
+
+
 --// Toolbar
 local newSet = {items = {}}
 
+--> If possible, move Save and Load to within a "File" dropdown
 local function onClick(self)
 	newSet.name = self.value
 	wipe(newSet.items)
+	--> Need to change mog.view to preview somehow
 	for slot, v in pairs(mog.view.slots) do
 		newSet.items[slot] = v.item
 	end
@@ -80,6 +91,7 @@ end
 local function newSetOnClick(self)
 	wipe(newSet.items)
 	newSet.name = "Set "..(#mog.wishlist:GetSets() + 1)
+	--> Need to change mog.view to preview somehow
 	for slot, v in pairs(mog.view.slots) do
 		newSet.items[slot] = v.item
 	end
@@ -95,14 +107,17 @@ local function saveInitialize(level)
 	info.colorCode = GREEN_FONT_COLOR_CODE
 	info.notCheckable = true
 	UIDropDownMenu_AddButton(info, level)
+	
+	--> Add save list?
 end
 
 local function onClick(self, profile)
-	for k, v in pairs(mog.view.slots) do
-		mog.view.delItem(k)
+	local preview = self:GetParent();
+	for k, v in pairs(preview.slots) do
+		mog.view.DelItem(k)
 	end
 	for slot, itemID in pairs(mog.wishlist:GetSetItems(self.value, profile)) do
-		mog:AddToPreview(itemID)
+		mog:AddToPreview(itemID,preview)
 	end
 	CloseDropDownMenus()
 end
@@ -132,6 +147,7 @@ local function loadInitialize(level)
 	end
 end;
 
+--> Does the races dropdown need updating to be like the (ordered) catalogue one?
 local races = {
    [1] = "HUMAN",
    [2] = "ORC",
@@ -167,6 +183,7 @@ local menuModelNames = {
 	WORGEN = "Worgen",
 }
 
+--> Fix for previews
 local function setDisplayModel(self, arg1)
 	mog[arg1] = self.value;
 	for i, model in ipairs(mog.models) do
@@ -185,7 +202,7 @@ local function stopDis(tier)
 		UIDropDownMenu_AddButton(info,tier);
 		
 		local info = UIDropDownMenu_CreateInfo();
-		info.text = "Sechs";
+		info.text = "Gender";
 		info.value = "gender";
 		info.notCheckable = true;
 		info.hasArrow = true;
@@ -278,7 +295,7 @@ local function createMenuBar(parent)
 	menuBar.save:SetPoint("TOPLEFT", parent, 62, -31);
 
 	menuBar.load = menuBar:CreateMenu(L["Load"], loadInitialize);
-	menuBar.load:SetPoint("LEFT", mog.save, "RIGHT", 5, 0);
+	menuBar.load:SetPoint("LEFT", menuBar.save, "RIGHT", 5, 0);
 
 	menuBar.catalogue = menuBar:CreateMenu(L["Catalogue"], stopDis);
 	menuBar.catalogue:SetPoint("LEFT", menuBar.load, "RIGHT", 5, 0);
@@ -294,6 +311,7 @@ mog.previewNum = 0;
 function mog:CreatePreview()
 	if mog.previewBin[1] then
 		local f = mog.previewBin[1];
+		f:Show();
 		tremove(mog.previewBin,1);
 		tinsert(mog.previews,f);
 		return f;
@@ -302,6 +320,7 @@ function mog:CreatePreview()
 	mog.previewNum = mog.previewNum + 1;
 	local f = CreateFrame("Frame","MogItPreview"..mog.previewNum,mog.view,"ButtonFrameTemplate");
 	f.id = mog.previewNum;
+	f.data = {};
 		
 	f:SetPoint("CENTER",mog.view,"CENTER");
 	f:SetSize(335,385);
@@ -310,7 +329,9 @@ function mog:CreatePreview()
 	f:EnableMouse(true);
 	f:SetMovable(true);
 	f:SetResizable(true);
+	f:Raise();
 
+	_G["MogItPreview"..f.id.."CloseButton"]:HookScript("OnClick",previewOnClose);
 	_G["MogItPreview"..f.id.."Bg"]:SetVertexColor(0.8,0.3,0.8);
 	_G["MogItPreview"..f.id.."TitleText"]:SetText(L["Preview"].." "..f.id);
 	f.portraitFrame:Hide();
@@ -373,6 +394,7 @@ function mog:DeletePreview(f)
 	for slot,data in pairs(f.slots) do
 		mog.view.DelItem(slot,f);
 	end
+	wipe(f.data);
 	tinsert(mog.previewBin,f);
 	if mog.activePreview == f then
 		mog.activePreview = nil;
@@ -381,7 +403,7 @@ end
 
 mog.view.queue = {};
 mog.cacheFuncs.PreviewAddItem = function()
-	for _,action in ipairs(mog.view.queue) do
+	for i,action in ipairs(mog.view.queue) do
 		mog.view.AddItem(action[1],action[2]);
 	end
 	wipe(mog.view.queue);
@@ -405,11 +427,11 @@ function mog.view.AddItem(item,preview)
 		end
 			
 		if slot == "INVTYPE_WEAPON" then
-			if (not preview.slots.MainHandSlot.item) or preview.twohand then
+			if (not preview.slots.MainHandSlot.item) or preview.data.twohand then
 				slot = "INVTYPE_WEAPONMAINHAND";
 			elseif (not preview.slots.SecondaryHandSlot.item) then
 				slot = "INVTYPE_WEAPONOFFHAND";
-			elseif preview.mainhand then
+			elseif preview.data.mainhand then
 				slot = "INVTYPE_WEAPONMAINHAND";
 			else
 				slot = "INVTYPE_WEAPONOFFHAND";
@@ -417,19 +439,20 @@ function mog.view.AddItem(item,preview)
 		
 			if slot == "INVTYPE_2HWEAPON" then
 				mog.view.DelItem("SecondaryHandSlot",preview);
-				preview.twohand = true;
+				preview.data.twohand = true;
 			elseif slot == "INVTYPE_WEAPONMAINHAND" or slot == "INVTYPE_WEAPON" then
-				preview.twohand = nil;
-				preview.mainhand = nil;
+				preview.data.twohand = nil;
+				preview.data.mainhand = nil;
 			elseif slot == "INVTYPE_WEAPONOFFHAND" then
-				if preview.twohand then
+				if preview.data.twohand then
 					mog.view.DelItem("MainHandSlot",preview);
 				end
-				preview.twohand = nil;
-				preview.mainhand = true;
+				preview.data.twohand = nil;
+				preview.data.mainhand = true;
 			end
 		end
 		
+		--> Undress/TryOn weapon slots if weapon changed?
 		preview.slots[mog:GetSlot(slot)].item = item;
 		slotTexture(preview,mog:GetSlot(slot),texture);
 		if preview:IsVisible() then
@@ -635,11 +658,8 @@ StaticPopupDialogs["MOGIT_PREVIEW_IMPORT"] = {
 
 
 --[[
-
-one handed weapons first go into main hand slot, then alternate between off and main hand, does not have to be same item
-
-equipping any non one handed weapon will cause the next one handed weapon to go into main hand
-
-equipping a right handed ranged weapon (gun, crossbow, thrown) will cause the next two one hand weapons to go into main hand (above rule still applies)
-
+One-Handed Weapon Logic
+- First goes into main hand, then alternates
+- Equipping 2h weapon causes to next to go into main hand
+- Equipping a right handed ranged weapon (gun, crossbow, thrown) will cause the next two one hand weapons to go into main hand (above rule still applies)
 ]]

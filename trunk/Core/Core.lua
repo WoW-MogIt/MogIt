@@ -103,7 +103,7 @@ function mog:RegisterModule(name,version,data)
 end
 
 function mog:SetModule(module,text)
-	if mog.active and mog.active ~= module and mog.active.UnList then
+	if mog.active and mog.active ~= module and mog.active.Unlist then
 		mog.active:Unlist(module);
 	end
 	mog.active = module;
@@ -128,6 +128,7 @@ mog.cacheQueue = {};
 mog.cacheFuncs = {
 	BuildList = mog.BuildList;
 	ModelOnEnter = function()
+		--> Does this need GameTooltip[mog] ?
 		local owner = GameTooltip:IsShown() and GameTooltip:GetOwner();
 		if owner and owner.type == "catalogue" then
 			mog.ModelOnEnter(owner);
@@ -170,17 +171,16 @@ end
 --// Events
 local defaults = {
 	profile = {
-		clearOnPreviewSet = false,
 		noAnim = false,
 		minimap = {},
 		url = "Battle.net",
 		
-		gridDress = "preview",
 		point = "CENTER",
 		gridWidth = 600,
 		gridHeight = 400,
 		rows = 2;
 		columns = 3,
+		gridDress = "preview",
 		sync = true,
 		--rotateSynced = false,
 		--rotateNoSynced = false,
@@ -264,8 +264,6 @@ mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 				HideDropDownMenu(1);
 				ToggleDropDownMenu(1,mog.modules[arg1],mog.menu,mog.menu.modules,0,0);
 			end
-		elseif arg1 == "AtlasLoot" then
-			mog.tooltip.hookAtlasLoot();
 		end
 	end
 end);
@@ -354,19 +352,3 @@ function mog:GetSlot(id)
 	return mog.slots[id] or mog.slotsType[id];
 end
 --//
-
-
-
-
-
-
-
-
-
-
-
-
--- temporary wrappers
-function mog.AddMob(id, name)
-	mog:AddData("npc", id, "name", name)
-end

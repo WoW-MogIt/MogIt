@@ -190,7 +190,7 @@ function mog:DeleteCatalogueModel(n)
 end
 
 function mog:BuildModel(self)
-	self.model:SetCustomRace(self.data.race or (self.type == "catalogue" and mog.displayRace),self.data.gender or (self.type == "catalogue" and mog.displayGender));
+	self.model:SetCustomRace((self.type == "preview" and self.parent.data.race) or mog.displayRace,(self.type == "preview" and self.parent.data.gender) or mog.displayGender);
 end
 
 function mog:DressModel(self)
@@ -204,7 +204,7 @@ function mog:DressModel(self)
 		self.model:Undress();
 	end
 
-	local slots = (self.type == "preview" and self.data.parent.slots) or (mog.db.profile.gridDress == "preview" and mog.activePreview and mog.activePreview.slots);
+	local slots = (self.type == "preview" and self.parent.slots) or (mog.db.profile.gridDress == "preview" and mog.activePreview and mog.activePreview.slots);
 	if slots then
 		for id,slot in pairs(slots) do
 			if slot.item then
@@ -217,8 +217,8 @@ end
 function mog:PositionModel(self)
 	if self.model:IsVisible() then
 		local sync = (mog.db.profile.sync or self.type == "catalogue");
-		self.model:SetPosition((not sync and self.data.posZ) or mog.posZ or 0,(not sync and self.data.posX) or mog.posX or 0,(not sync and self.data.posY) or mog.posY or 0);
-		self.model:SetFacing((not sync and self.data.face) or mog.face or 0);
+		self.model:SetPosition((not sync and self.parent.data.posZ) or mog.posZ or 0,(not sync and self.parent.data.posX) or mog.posX or 0,(not sync and self.parent.data.posY) or mog.posY or 0);
+		self.model:SetFacing((not sync and self.parent.data.face) or mog.face or 0);
 	end
 end
 --//
@@ -516,22 +516,7 @@ end
 --//
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+--// Toolbar
 local function menuBarInitialize(self, level)
 	if self.active and self.active.func then
 		self.tier[level] = UIDROPDOWNMENU_MENU_VALUE;
@@ -596,11 +581,11 @@ function mog.CreateMenuBar(parent, name)
 	return menuBar;
 end
 
-
---// Toolbar
 mog.menu = mog.CreateMenuBar(mog.frame, "MogItMenu");
+--//
 
---// Modules Menu
+
+--// Module Menu
 mog.menu.modules = mog.menu:CreateMenu(L["Modules"], function(tier)
 	if tier == 1 then
 		local info;
@@ -643,7 +628,6 @@ mog.menu.modules:SetPoint("TOPLEFT", mog.frame, "TOPLEFT", 62, -31);
 
 
 --// Catalogue Menu
---// Race Menu
 local function setDisplayModel(self, arg1)
 	mog[arg1] = self.value;
 	for i, model in ipairs(mog.models) do
@@ -698,7 +682,7 @@ mog.menu.catalogue = mog.menu:CreateMenu(L["Catalogue"],function(tier)
 		UIDropDownMenu_AddButton(info,tier);
 		
 		local info = UIDropDownMenu_CreateInfo();
-		info.text = "Sechs";
+		info.text = "Gender";
 		info.value = "gender";
 		info.notCheckable = true;
 		info.hasArrow = true;
@@ -770,7 +754,10 @@ mog.menu.catalogue:SetPoint("LEFT", mog.menu.modules, "RIGHT", 5, 0);
 
 --// Preview Menu
 mog.menu.preview = mog.menu:CreateMenu(L["Preview"], function(tier)
-	
+	-- New Preview
+	-- Show/Hide All Previews (mog.view:IsShown)
+	-- Close All Previews (only add this option if it has a confirmation popup)
+	-- Synchronize Preview Positioning
 end);
 mog.menu.preview:SetPoint("LEFT", mog.menu.catalogue, "RIGHT", 5, 0);
 --//
@@ -790,7 +777,7 @@ mog.menu.options:SetPoint("LEFT", mog.menu.preview, "RIGHT", 5, 0);
 --//
 
 
---// Indicators
+--// Default Indicators
 mog:CreateIndicator("label", function(model)
 	local label = model:CreateFontString(nil, "OVERLAY", "GameFontNormalMed3");
 	label:SetPoint("TOPLEFT", 12, -12);
@@ -816,30 +803,4 @@ mog:CreateIndicator("wishlist", function(model)
 	wishlist:SetPoint("TOPRIGHT", -8, -8);
 	return wishlist;
 end)
-
-
---[[
-	-- f.c1Bg = f:CreateTexture()
-	-- f.c1Bg:SetTexture(0, 0, 0)
-	-- f.c1Bg:SetSize(32, 32)
-	-- f.c1Bg:SetPoint("BOTTOM", 0, 8)
-	-- f.c1 = f:CreateTexture()
-	-- f.c1:SetPoint("TOPLEFT", f.c1Bg, 4, -4)
-	-- f.c1:SetPoint("BOTTOMRIGHT", f.c1Bg, -4, 4)
-	
-	-- f.c2Bg = f:CreateTexture()
-	-- f.c2Bg:SetTexture(0, 0, 0)
-	-- f.c2Bg:SetSize(32, 32)
-	-- f.c2Bg:SetPoint("RIGHT", f.c1Bg, "LEFT", -8, 0)
-	-- f.c2 = f:CreateTexture()
-	-- f.c2:SetPoint("TOPLEFT", f.c2Bg, 4, -4)
-	-- f.c2:SetPoint("BOTTOMRIGHT", f.c2Bg, -4, 4)
-	
-	-- f.c3Bg = f:CreateTexture()
-	-- f.c3Bg:SetTexture(0, 0, 0)
-	-- f.c3Bg:SetSize(32, 32)
-	-- f.c3Bg:SetPoint("LEFT", f.c1Bg, "RIGHT", 8, 0)
-	-- f.c3 = f:CreateTexture()
-	-- f.c3:SetPoint("TOPLEFT", f.c3Bg, 4, -4)
-	-- f.c3:SetPoint("BOTTOMRIGHT", f.c3Bg, -4, 4)
-]]
+--//

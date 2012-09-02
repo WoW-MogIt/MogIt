@@ -34,7 +34,7 @@ mog.tooltip:SetScript("OnHide",function(self)
 	end
 end);
 
-mog.tooltip:SetScript("OnEvent", function(self, event)
+mog.tooltip:SetScript("OnEvent", function(self, event, arg1)
 	if event == "PLAYER_LOGIN" then
 		mog.tooltip.model:SetUnit("PLAYER");
 	elseif event == "PLAYER_REGEN_DISABLED" then
@@ -44,11 +44,16 @@ mog.tooltip:SetScript("OnEvent", function(self, event)
 			SetOverrideBinding(mog.tooltip,true,"MOUSEWHEELUP","MogIt_TooltipScrollUp");
 			SetOverrideBinding(mog.tooltip,true,"MOUSEWHEELDOWN","MogIt_TooltipScrollDown");
 		end
+	elseif event == "ADDON_LOADED" then
+		if arg1 == "AtlasLoot" then
+			mog.tooltip.hookAtlasLoot();
+		end
 	end
 end);
 mog.tooltip:RegisterEvent("PLAYER_LOGIN");
 mog.tooltip:RegisterEvent("PLAYER_REGEN_DISABLED");
 mog.tooltip:RegisterEvent("PLAYER_REGEN_ENABLED");
+mog.tooltip:RegisterEvent("ADDON_LOADED");
 --//
 
 
