@@ -129,8 +129,8 @@ mog.cacheFuncs = {
 	BuildList = mog.BuildList;
 	ModelOnEnter = function()
 		--> Does this need GameTooltip[mog] ?
-		local owner = GameTooltip:IsShown() and GameTooltip:GetOwner();
-		if owner and owner.type == "catalogue" then
+		local owner = GameTooltip:GetOwner();
+		if owner and GameTooltip[mog] then
 			mog.ModelOnEnter(owner);
 		end
 	end,
