@@ -157,8 +157,8 @@ function mog:DressModel(self)
 	local slots = (self.type == "preview" and self.data.parent.slots) or (mog.db.profile.gridDress == "preview" and mog.activePreview and mog.activePreview.slots);
 	if slots then
 		for id,slot in pairs(slots) do
-			if slot.items[1] then
-				self.model:TryOn(slot.items[1]);
+			if slot.item then
+				self.model:TryOn(slot.item);
 			end
 		end
 	end
