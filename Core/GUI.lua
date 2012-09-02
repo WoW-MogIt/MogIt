@@ -130,7 +130,8 @@ function mog:CreateModelFrame(parent)
 	f:Hide();
 	
 	f.type = (parent == mog.frame) and "catalogue" or "preview";
-	f.data = {parent = parent};
+	f.parent = parent;
+	f.data = {};
 	f.indicators = {};
 	
 	f.model = CreateFrame("DressUpModel",nil,f);
@@ -646,8 +647,10 @@ mog.menu.modules:SetPoint("TOPLEFT", mog.frame, "TOPLEFT", 62, -31);
 local function setDisplayModel(self, arg1)
 	mog[arg1] = self.value;
 	for i, model in ipairs(mog.models) do
-		mog:BuildModel(model);
-		mog:ModelUpdate(model, model.data.value);
+		if model:IsEnabled() then
+			mog:BuildModel(model);
+			mog:ModelUpdate(model, model.data.value);
+		end
 	end
 	CloseDropDownMenus(1);
 end
