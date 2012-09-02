@@ -595,38 +595,40 @@ mog.menu.modules:SetPoint("TOPLEFT", mog.frame, "TOPLEFT", 62, -31);
 --// Catalogue Menu
 --// Race Menu
 local races = {
-   [1] = "HUMAN",
-   [2] = "ORC",
-   [3] = "DWARF",
-   [4] = "NIGHTELF",
-   [5] = "SCOURGE",
-   [6] = "TAUREN",
-   [7] = "GNOME",
-   [8] = "TROLL",
-   [9] = "GOBLIN",
-   [10] = "BLOODELF",
-   [11] = "DRAENEI",
-   [22] = "WORGEN",
+   "Human",
+   "Dwarf",
+   "Gnome",
+   "Night Elf",
+   "Draenei",
+   "Worgen",
+   "Orc",
+   "Undead",
+   "Tauren",
+   "Troll",
+   "Blood Elf",
+   "Goblin",
+   "Pandaren",
+}
+
+local raceID = {
+   ["Human"] = 1,
+   ["Orc"] = 2,
+   ["Dwarf"] = 3,
+   ["Night Elf"] = 4,
+   ["Undead"] = 5,
+   ["Tauren"] = 6,
+   ["Gnome"] = 7,
+   ["Troll"] = 8,
+   ["Goblin"] = 9,
+   ["Blood Elf"] = 10,
+   ["Draenei"] = 11,
+   ["Worgen"] = 22,
+   ["Pandaren"] = 24,
 }
 
 local gender = {
 	[0] = "Male",
 	[1] = "Female",
-}
-
-local menuModelNames = {
-	HUMAN = "Human",
-	ORC = "Orc",
-	DWARF = "Dwarf",
-	NIGHTELF = "Nightelf",
-	SCOURGE = "Undead",
-	TAUREN = "Tauren",
-	GNOME = "Gnome",
-	TROLL = "Troll",
-	GOBLIN = "Goblin",
-	BLOODELF = "Bloodelf",
-	DRAENEI = "Draenei",
-	WORGEN = "Worgen",
 }
 
 local function setDisplayModel(self, arg1)
@@ -654,6 +656,11 @@ function mog:ToggleFilters()
 end
 
 mog.sorting = {};
+
+mog.displayRace = raceID[select(2, UnitRace("player"))]
+mog.displayGender = UnitSex("player") - 2
+
+local LBR = LibStub("LibBabble-Race-3.0"):GetUnstrictLookupTable();
 
 mog.menu.catalogue = mog.menu:CreateMenu(L["Catalogue"],function(tier)
 	if tier == 1 then
@@ -708,12 +715,12 @@ mog.menu.catalogue = mog.menu:CreateMenu(L["Catalogue"],function(tier)
 		end
 	elseif mog.menu.tier[2] == "race" then
 		if tier == 2 then
-			for i, race in pairs(races) do -- pairs may yield unexpected order
+			for i, race in ipairs(races) do -- pairs may yield unexpected order
 				local info = UIDropDownMenu_CreateInfo();
-				info.text = menuModelNames[race];
-				info.value = i;
+				info.text = LBR[race] or race; -- fall back to English 'race' until there's pandaren localisation
+				info.value = raceID[race];
 				info.func = setDisplayModel;
-				info.checked = mog.displayRace == i;
+				info.checked = mog.displayRace == raceID[race];
 				info.keepShownOnClick = true;
 				info.arg1 = "displayRace";
 				UIDropDownMenu_AddButton(info,tier);
