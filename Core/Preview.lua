@@ -41,7 +41,7 @@ local function slotTexture(f,slot,texture)
 end
 
 local function slotOnEnter(self)
-	if self.items[1] then
+	if self.item then
 		mog.Item_OnEnter(self,self);
 	else
 		GameTooltip:SetOwner(self,"ANCHOR_RIGHT");
@@ -344,7 +344,6 @@ function mog:CreatePreview()
 		local slot = mog:GetSlot(i);
 		f.slots[slot] = CreateFrame("Button","MogItPreview"..f.id..slot,f,"ItemButtonTemplate");
 		f.slots[slot].slot = slot;
-		f.slots[slot].items = {};
 		if i == 1 then
 			f.slots[slot]:SetPoint("TOPLEFT",f.Inset,"TOPLEFT",8,-8);
 		elseif i == 8 then
@@ -405,55 +404,44 @@ function mog.view.AddItem(item,preview)
 			end
 		end
 			
-		
-
---[[
-		
 		if slot == "INVTYPE_WEAPON" then
-			if mog.view.twohand or mog.view.mainhand or (not mog.view.slots.MainHandSlot.item) then
+			if (not preview.slots.MainHandSlot.item) or preview.twohand then
+				slot = "INVTYPE_WEAPONMAINHAND";
+			elseif (not preview.slots.SecondaryHandSlot.item) then
+				slot = "INVTYPE_WEAPONOFFHAND";
+			elseif preview.mainhand then
 				slot = "INVTYPE_WEAPONMAINHAND";
 			else
-				
-			end
-				
-	
-		
-		and (not mog.view.twohand) then
-			if mog.view.slots.MainHandSlot.item and ((not mog.view.slots.SecondaryHandSlot.item) or mog.view.slots.MainHandSlot.item == item) then
 				slot = "INVTYPE_WEAPONOFFHAND";
 			end
-		end
 		
-		if slot == "INVTYPE_2HWEAPON" then
-			mog.view.DelItem("SecondaryHandSlot");
-			mog.view.twohand = true;
-			--mog.view.mainhand = true;
-		elseif slot == "INVTYPE_WEAPONOFFHAND" then
-			if mog.view.twohand then
-				mog.view.DelItem("MainHandSlot");
+			if slot == "INVTYPE_2HWEAPON" then
+				mog.view.DelItem("SecondaryHandSlot",preview);
+				preview.twohand = true;
+			elseif slot == "INVTYPE_WEAPONMAINHAND" or slot == "INVTYPE_WEAPON" then
+				preview.twohand = nil;
+				preview.mainhand = nil;
+			elseif slot == "INVTYPE_WEAPONOFFHAND" then
+				if preview.twohand then
+					mog.view.DelItem("MainHandSlot",preview);
+				end
+				preview.twohand = nil;
+				preview.mainhand = true;
 			end
-			mog.view.twohand = nil;
-			--mog.view.mainhand = true;
-		elseif slot == "INVTYPE_WEAPON" then
-			mog.view.twohand = nil;
-		elseif slot == "INVTYPE_WEAPONMAINHAND" then
-			mog.view.twohand = nil;
 		end
 		
-		--]]
-		
-		preview.slots[mog:GetSlot(slot)].items[1] = item;
-		slotTexture(mog:GetSlot(slot),texture);
+		preview.slots[mog:GetSlot(slot)].item = item;
+		slotTexture(preview,mog:GetSlot(slot),texture);
 		if preview:IsVisible() then
-			preview.model:TryOn(item);
+			preview.model.model:TryOn(item);
 		end
 	end
 end
 
 function mog.view.DelItem(slot,preview)
 	if not (preview and slot) then return end;
-	preview.slots[slot].items[1] = nil;
-	slotTexture(slot);
+	preview.slots[slot].item = nil;
+	slotTexture(preview,slot);
 	if preview:IsVisible() then
 		preview.model:UndressSlot(GetInventorySlotInfo(slot));
 	end
