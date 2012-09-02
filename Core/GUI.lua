@@ -571,8 +571,8 @@ local function createMenu(menuBar, label, func)
 	return f;
 end
 
-function mog.CreateMenuBar(parent, name)
-	local menuBar = CreateFrame("Frame", name, parent);
+function mog.CreateMenuBar(parent)
+	local menuBar = CreateFrame("Frame");
 	menuBar.displayMode = "MENU";
 	menuBar.initialize = menuBarInitialize
 	menuBar.CreateMenu = createMenu;
@@ -581,7 +581,7 @@ function mog.CreateMenuBar(parent, name)
 	return menuBar;
 end
 
-mog.menu = mog.CreateMenuBar(mog.frame, "MogItMenu");
+mog.menu = mog.CreateMenuBar(mog.frame);
 --//
 
 
