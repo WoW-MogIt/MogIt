@@ -1,6 +1,51 @@
 local MogIt,mog = ...;
 local L = mog.L;
 
+local LBR = LibStub("LibBabble-Race-3.0"):GetUnstrictLookupTable();
+
+local races = {
+   "Human",
+   "Dwarf",
+   "Gnome",
+   "Night Elf",
+   "Draenei",
+   "Worgen",
+   "Orc",
+   "Undead",
+   "Tauren",
+   "Troll",
+   "Blood Elf",
+   "Goblin",
+   "Pandaren",
+}
+
+local raceID = {
+   ["Human"] = 1,
+   ["Orc"] = 2,
+   ["Dwarf"] = 3,
+   ["Night Elf"] = 4,
+   ["Undead"] = 5,
+   ["Tauren"] = 6,
+   ["Gnome"] = 7,
+   ["Troll"] = 8,
+   ["Goblin"] = 9,
+   ["Blood Elf"] = 10,
+   ["Draenei"] = 11,
+   ["Worgen"] = 22,
+   ["Pandaren"] = 24,
+}
+
+local gender = {
+	[0] = "Male",
+	[1] = "Female",
+}
+
+local myRace = raceID[select(2, UnitRace("player"))]
+local myGender = UnitSex("player") - 2
+
+mog.displayRace = myRace
+mog.displayGender = myGender
+
 
 --// mog.frame
 mog.frame:SetPoint("CENTER");
@@ -149,7 +194,11 @@ end
 
 function mog:DressModel(self)
 	if mog.db.profile.gridDress == "equipped" and self.type ~= "preview" then
-		self.model:Dress();
+		if mog.displayRace == myRace and mog.displayGender == myGender then
+			self.model:Dress();
+		else
+			mog:BuildModel(self);
+		end
 	else
 		self.model:Undress();
 	end
@@ -594,47 +643,11 @@ mog.menu.modules:SetPoint("TOPLEFT", mog.frame, "TOPLEFT", 62, -31);
 
 --// Catalogue Menu
 --// Race Menu
-local races = {
-   "Human",
-   "Dwarf",
-   "Gnome",
-   "Night Elf",
-   "Draenei",
-   "Worgen",
-   "Orc",
-   "Undead",
-   "Tauren",
-   "Troll",
-   "Blood Elf",
-   "Goblin",
-   "Pandaren",
-}
-
-local raceID = {
-   ["Human"] = 1,
-   ["Orc"] = 2,
-   ["Dwarf"] = 3,
-   ["Night Elf"] = 4,
-   ["Undead"] = 5,
-   ["Tauren"] = 6,
-   ["Gnome"] = 7,
-   ["Troll"] = 8,
-   ["Goblin"] = 9,
-   ["Blood Elf"] = 10,
-   ["Draenei"] = 11,
-   ["Worgen"] = 22,
-   ["Pandaren"] = 24,
-}
-
-local gender = {
-	[0] = "Male",
-	[1] = "Female",
-}
-
 local function setDisplayModel(self, arg1)
 	mog[arg1] = self.value;
 	for i, model in ipairs(mog.models) do
 		mog:BuildModel(model);
+		mog:ModelUpdate(model, model.data.value);
 	end
 	CloseDropDownMenus(1);
 end
@@ -656,11 +669,6 @@ function mog:ToggleFilters()
 end
 
 mog.sorting = {};
-
-mog.displayRace = raceID[select(2, UnitRace("player"))]
-mog.displayGender = UnitSex("player") - 2
-
-local LBR = LibStub("LibBabble-Race-3.0"):GetUnstrictLookupTable();
 
 mog.menu.catalogue = mog.menu:CreateMenu(L["Catalogue"],function(tier)
 	if tier == 1 then
