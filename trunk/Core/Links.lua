@@ -7,7 +7,7 @@ local maxlen = 3;
 
 local function toBase(num)
 	local str;
-	if num <= 0 then
+	if (not num) or (num <= 0) then
 		str = "0";
 	else
 		str = "";
