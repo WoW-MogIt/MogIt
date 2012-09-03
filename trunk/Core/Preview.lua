@@ -112,25 +112,74 @@ local function setDisplayModel(self, arg1)
 	CloseDropDownMenus(1);
 end
 
+local function clearOnClick(self,btn)
+	for k,v in pairs(currentPreview.slots) do
+		mog.view.DelItem(k,currentPreview);
+	end
+	if mog.activePreview == currentPreview and mog.db.profile.gridDress == "preview" then
+		mog.scroll:update();
+	end
+end
+
+local function addOnClick(self,btn)
+	StaticPopup_Show("MOGIT_PREVIEW_ADDITEM"); -- pass preview into
+end
+
+local function importOnClick(self,btn)
+	StaticPopup_Show("MOGIT_PREVIEW_IMPORT"); -- pass preview into
+end
+
+local function linkOnClick(self,btn)
+	local tbl = {};
+	for k,v in pairs(currentPreview.slots) do
+		if v.item then
+			table.insert(tbl,v.item);
+		end
+	end
+	ChatEdit_InsertLink(mog:SetToLink(tbl,currentPreview.data.displayRace,currentPreview.data.displayGender));
+end
+
 local function previewInitialize(self, level)
 	if level == 1 then
 		currentPreview = self.parent;
 		
 		local info = UIDropDownMenu_CreateInfo();
-		info.text = "Race";
+		info.text = L["Race"];
 		info.value = "race";
 		info.notCheckable = true;
 		info.hasArrow = true;
 		UIDropDownMenu_AddButton(info, level);
 		
 		local info = UIDropDownMenu_CreateInfo();
-		info.text = "Gender";
+		info.text = L["Gender"];
 		info.value = "gender";
 		info.notCheckable = true;
 		info.hasArrow = true;
 		UIDropDownMenu_AddButton(info, level);
-	
-	-- nono
+		
+		local info = UIDropDownMenu_CreateInfo();
+		info.text = L["Add Item"];
+		info.notCheckable = true;
+		info.func = addOnClick;
+		UIDropDownMenu_AddButton(info, level);
+		
+		local info = UIDropDownMenu_CreateInfo();
+		info.text = L["Chat Link"];
+		info.notCheckable = true;
+		info.func = linkOnClick;
+		UIDropDownMenu_AddButton(info, level);
+		
+		local info = UIDropDownMenu_CreateInfo();
+		info.text = L["Import / Export"];
+		info.notCheckable = true;
+		info.func = importOnClick;
+		UIDropDownMenu_AddButton(info, level);
+		
+		local info = UIDropDownMenu_CreateInfo();
+		info.text = L["Clear"];
+		info.notCheckable = true;
+		info.func = clearOnClick;
+		UIDropDownMenu_AddButton(info, level);
 	elseif self.tier[2] == "race" then
 		mog:CreateRaceMenu(level, setDisplayModel, self.parent.data.displayRace)
 	elseif self.tier[2] == "gender" then
@@ -220,32 +269,7 @@ end;
 local function createMenuBar(parent)
 	local menuBar = mog.CreateMenuBar(parent)
 	--[=[
-	local function clearOnClick(self,btn)
-		for k,v in pairs(mog.view.slots) do
-			mog.view.delItem(k);
-		end
-		if mog.db.profile.gridDress then
-			mog.scroll:update();
-		end
-	end
 
-	local function addOnClick(self,btn)
-		StaticPopup_Show("MOGIT_PREVIEW_ADDITEM");
-	end
-
-	local function importOnClick(self,btn)
-		StaticPopup_Show("MOGIT_PREVIEW_IMPORT");
-	end
-
-	local function linkOnClick(self,btn)
-		local tbl = {};
-		for k,v in pairs(mog.view.slots) do
-			if v.item then
-				table.insert(tbl,v.item);
-			end
-		end
-		ChatEdit_InsertLink(mog:SetToLink(tbl));
-	end
 
 		f.clear = CreateFrame("Button","MogItPreview"..mog.view.num.."Clear",f,"UIPanelButtonTemplate2");
 		f.clear:SetPoint("TOPRIGHT",f,"TOPRIGHT",-10,-30);
