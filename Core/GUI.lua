@@ -36,8 +36,8 @@ local raceID = {
 }
 
 local gender = {
-	[0] = "Male",
-	[1] = "Female",
+	[0] = MALE,
+	[1] = FEMALE,
 }
 
 local myRace = raceID[select(2, UnitRace("player"))]
@@ -720,7 +720,6 @@ mog.menu.catalogue = mog.menu:CreateMenu(L["Catalogue"], function(self, tier)
 		info.value = "race";
 		info.notCheckable = true;
 		info.hasArrow = true;
-		-- info.disabled = not (mog.active and mog.active.sorting and #mog.active.sorting > 0);
 		UIDropDownMenu_AddButton(info,tier);
 		
 		local info = UIDropDownMenu_CreateInfo();
@@ -728,7 +727,6 @@ mog.menu.catalogue = mog.menu:CreateMenu(L["Catalogue"], function(self, tier)
 		info.value = "gender";
 		info.notCheckable = true;
 		info.hasArrow = true;
-		-- info.disabled = not (mog.active and mog.active.sorting and #mog.active.sorting > 0);
 		UIDropDownMenu_AddButton(info,tier);
 		
 		local info = UIDropDownMenu_CreateInfo();
@@ -736,7 +734,6 @@ mog.menu.catalogue = mog.menu:CreateMenu(L["Catalogue"], function(self, tier)
 		info.value = "gridDress";
 		info.notCheckable = true;
 		info.hasArrow = true;
-		-- info.disabled = not (mog.active and mog.active.sorting and #mog.active.sorting > 0);
 		UIDropDownMenu_AddButton(info,tier);
 	elseif self.tier[2] == "sorting" then
 		if tier == 2 then
