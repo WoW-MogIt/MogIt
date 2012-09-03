@@ -268,14 +268,15 @@ end;
 --// Toolbar
 local function helpOnEnter(self)
 	self.nt:SetTexture(1,0.82,0,1);
-	GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT");
+	GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT");
 	GameTooltip:AddLine(L["How to use"]);
 	GameTooltip:AddLine(" ");
-	GameTooltip:AddLine(L["Model Controls"]);
+	GameTooltip:AddLine(L["Basic Controls"]);
 	GameTooltip:AddLine(L["Left click and drag horizontally to rotate"],1,1,1);
 	GameTooltip:AddLine(L["Left click and drag vertically to zoom"],1,1,1);
 	GameTooltip:AddLine(L["Right click and drag to move"],1,1,1);
 	GameTooltip:AddLine(L["Click the bottom right corner and drag to resize"],1,1,1);
+	GameTooltip:AddLine(L["Click the \"Activate\" button to set this as the active preview"],1,1,1);
 	GameTooltip:AddLine(" ");
 	GameTooltip:AddLine(L["Slot Controls"]);
 	GameTooltip:AddLine(L["Shift + Left click to link an item to chat"],1,1,1);
