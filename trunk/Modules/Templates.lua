@@ -286,8 +286,8 @@ function mog.ShowItemTooltip(self, item, items, cycle)
 	end
 	
 	if not items then
-		GameTooltip:AddLine(" ")
-		GameTooltip:AddLine(L["Load module to see other items using this appearance."], nil, nil, nil, true)
+		--GameTooltip:AddLine(" ")
+		--GameTooltip:AddLine(L["Load module to see other items using this appearance."], nil, nil, nil, true)
 	elseif #items > 1 then
 		GameTooltip:AddLine(" ")
 		GameTooltip:AddLine(L["Other items using this appearance:"])
@@ -309,7 +309,7 @@ function mog.Item_OnClick(self, btn, data, isSaved)
 	if not (self and item) then return end
 	
 	if btn == "LeftButton" then
-		if not HandleModifiedItemClick(select(2, GetItemInfo(item))) and data.items then -- needs changing to mog:GII -- nono
+		if not HandleModifiedItemClick(select(2, GetItemInfo(item))) and data.items then
 			data.cycle = (data.cycle % #data.items) + 1
 			data.item = data.items[data.cycle]
 			self:OnEnter()
