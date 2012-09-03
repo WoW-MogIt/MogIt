@@ -87,12 +87,13 @@ function SetItemRef(link,...)
 		else
 			local preview = mog:CreatePreview();
 			local set,race,gender = mog:LinkToSet(link);
-			mog:AddToPreview(set,preview);
 			if race and gender then
 				preview.data.displayRace = race;
 				preview.data.displayGender = gender;
 				mog:BuildModel(preview.model);
+				preview.model.model:Undress();
 			end
+			mog:AddToPreview(set,preview);
 		end
 	else
 		return old_SetItemRef(link,...);

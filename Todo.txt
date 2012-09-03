@@ -6,8 +6,6 @@ General:
 Preview:
 [?] mog.view.AddItem Undress weapons and re-equip
 [A] Preview menu: mog.activePreview, chat links, add item, import, export
-[L] add race/gender options to Preview menu
-[L] pass the preview frame into save/load menus for slot pairs
 [L (WAT)] Confirmation on closing a preview
 [!] Previews bugging when opening from a link (gender not changing, all items equipped, etc)
 
