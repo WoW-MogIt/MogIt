@@ -181,20 +181,13 @@ function wishlist:BuildList()
 	return list
 end
 
-local help = {
-	-- L["Change item"],	L["Left click"],
-	L["Chat link"],			L["Shift + Left click"],
-	L["Try on"],			L["Ctrl + Left click"],
-	L["Wishlist menu"],		L["Right click"],
-	L["Item URL"],			L["Shift + Right click"],
-	L["Add to preview"],	L["Ctrl + Right click"],
+wishlist.Help = {
+	L["Right click for additional options"],
+	L["Shift-left click to link"],
+	L["Shift-right click for item URL"],
+	L["Ctrl-left click to try on in dressing room"],
+	L["Ctrl-right click to preview with MogIt"],
 }
-
-function wishlist:Help()
-	for i = 1, #help, 2 do
-		GameTooltip:AddDoubleLine(help[i], help[i + 1], 0, 1, 0, 1, 1, 1)
-	end
-end
 
 local t = {}
 

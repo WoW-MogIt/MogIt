@@ -816,6 +816,30 @@ mog.menu.options:SetScript("OnClick", mog.ToggleOptions);
 mog.menu.options:SetPoint("LEFT", mog.menu.preview, "RIGHT", 5, 0);
 --//
 
+local help = mog.menu:CreateMenu(L["Help"])
+help:SetNormalFontObject(GameFontHighlight)
+help:SetPoint("LEFT", mog.menu.options, "RIGHT", 5, 0)
+help:SetScript("OnClick", nil);
+help:SetScript("OnEnter", function(self)
+	GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
+	GameTooltip:AddLine(L["How to use"]);
+	-- GameTooltip:AddLine(L["Left click-horizontal drag to ."], 0, 1, 0);
+	GameTooltip:AddLine(L["Left click and drag to zoom and rotate"], 0, 1, 0);
+	GameTooltip:AddLine(L["Right click drag to move"], 0, 1, 0);
+	local info = mog.active and mog.active.Help
+	if info then
+		for i, v in ipairs(info) do
+			GameTooltip:AddLine(v, 0, 1, 0);
+		end
+	end
+	GameTooltip:Show()
+	self.nt:SetTexture(1, 0.82, 0, 1);
+end);
+help:SetScript("OnLeave", function(self)
+	GameTooltip_Hide()
+	self.nt:SetTexture(0, 0, 0, 0);
+end);
+
 
 --// Default Indicators
 mog:CreateIndicator("label", function(model)
