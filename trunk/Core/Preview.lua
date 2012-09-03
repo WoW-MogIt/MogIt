@@ -13,6 +13,22 @@ tinsert(UISpecialFrames,"MogItPreview");
 --ShowUIPanel(mog.view);
 
 
+function mog:ActivatePreview(preview)
+	mog.activePreview = preview;
+	_G["MogItPreview"..preview.id.."Bg"]:SetVertexColor(0.8,0.3,0.8);
+	preview.activate:Disable();
+	for k,v in ipairs(mog.previews) do
+		if v ~= preview then
+			_G["MogItPreview"..v.id.."Bg"]:SetVertexColor(1,1,1);
+			v.activate:Enable();
+		end
+	end
+	if mog.db.profile.gridDress == "preview" then
+		mog.scroll:update();
+	end
+end
+
+
 --// Preview Functions
 local function resizeOnMouseDown(self)
 	local f = self:GetParent();
@@ -76,6 +92,10 @@ local function previewOnClose(self,btn)
 	local preview = self:GetParent();
 	mog:DeletePreview(preview);
 end
+
+local function previewActivate(self)
+	mog:ActivatePreview(self:GetParent());
+end
 --//
 
 
@@ -92,6 +112,8 @@ local function previewInitialize(self, level)
 	local info = UIDropDownMenu_CreateInfo()
 	info.text = L["Active Preview"]
 	info.func = previewActive;
+	info.value = self.parent;
+	info.checked = mog.activePreview == self.parent;
 	UIDropDownMenu_AddButton(info, level)
 end
 
@@ -101,7 +123,7 @@ local function onClick(self)
 	newSet.name = self.value
 	wipe(newSet.items)
 	--> Need to change mog.view to preview somehow
-	for slot, v in pairs(mog.view.slots) do
+	for slot, v in pairs(self.arg1.slots) do
 		newSet.items[slot] = v.item
 	end
 	StaticPopup_Show("MOGIT_WISHLIST_OVERWRITE_SET", self.value, nil, newSet)
@@ -111,42 +133,43 @@ local function newSetOnClick(self)
 	wipe(newSet.items)
 	newSet.name = "Set "..(#mog.wishlist:GetSets() + 1)
 	--> Need to change mog.view to preview somehow
-	for slot, v in pairs(mog.view.slots) do
+	for slot, v in pairs(self.arg1.slots) do
 		newSet.items[slot] = v.item
 	end
 	StaticPopup_Show("MOGIT_WISHLIST_CREATE_SET", nil, nil, newSet)
 end
 
 local function saveInitialize(self, level)
-	mog.wishlist:AddSetMenuItems(level, onClick)
+	mog.wishlist:AddSetMenuItems(level, onClick, self.parent)
 	
 	local info = UIDropDownMenu_CreateInfo()
 	info.text = L["New set"]
 	info.func = newSetOnClick
+	info.arg1 = self.parent;
 	info.colorCode = GREEN_FONT_COLOR_CODE
 	info.notCheckable = true
 	UIDropDownMenu_AddButton(info, level)
 end
 
 local function onClick(self, profile)
-	local preview = self:GetParent();
-	for k, v in pairs(preview.slots) do
+	for k, v in pairs(self.arg1.slots) do
 		mog.view.DelItem(k)
 	end
 	for slot, itemID in pairs(mog.wishlist:GetSetItems(self.value, profile)) do
-		mog:AddToPreview(itemID,preview)
+		mog:AddToPreview(itemID,self.arg1)
 	end
 	CloseDropDownMenus()
 end
 
 local function loadInitialize(self, level)
 	if level == 1 then
-		mog.wishlist:AddSetMenuItems(level, onClick)
+		mog.wishlist:AddSetMenuItems(level, onClick, self.parent)
 		
 		local info = UIDropDownMenu_CreateInfo()
 		info.text = L["Other profiles"]
 		info.hasArrow = true
 		info.notCheckable = true
+		info.arg1 = self.parent;
 		UIDropDownMenu_AddButton(info, level)
 	elseif level == 2 then
 		local curProfile = mog.wishlist:GetCurrentProfile()
@@ -156,6 +179,7 @@ local function loadInitialize(self, level)
 				info.text = profile
 				info.hasArrow = true
 				info.notCheckable = true
+				info.arg1 = self.parent;
 				UIDropDownMenu_AddButton(info, level)
 			end
 		end
@@ -329,6 +353,7 @@ function mog:CreatePreview()
 	if mog.previewBin[1] then
 		local f = mog.previewBin[1];
 		f:Show();
+		mog:ActivatePreview(f);
 		tremove(mog.previewBin,1);
 		tinsert(mog.previews,f);
 		return f;
@@ -349,7 +374,7 @@ function mog:CreatePreview()
 	f:Raise();
 
 	_G["MogItPreview"..f.id.."CloseButton"]:HookScript("OnClick",previewOnClose);
-	_G["MogItPreview"..f.id.."Bg"]:SetVertexColor(0.8,0.3,0.8);
+	--_G["MogItPreview"..f.id.."Bg"]:SetVertexColor(0.8,0.3,0.8);
 	_G["MogItPreview"..f.id.."TitleText"]:SetText(L["Preview"].." "..f.id);
 	f.portraitFrame:Hide();
 	f.topLeftCorner:Show();
@@ -373,6 +398,12 @@ function mog:CreatePreview()
 	f.model:SetScript("OnMouseWheel",modelOnMouseWheel);
 	f.model:SetPoint("TOPLEFT",f.Inset,"TOPLEFT",49,-8);
 	f.model:SetPoint("BOTTOMRIGHT",f.Inset,"BOTTOMRIGHT",-49,8);
+	
+	f.activate = CreateFrame("Button","MogItPreview"..f.id.."Activate",f,"MagicButtonTemplate");
+	f.activate:SetText(L["Activate"]);
+	f.activate:SetPoint("BOTTOMLEFT",f,"BOTTOMLEFT",5,5);
+	f.activate:SetWidth(100);
+	f.activate:SetScript("OnClick",previewActivate);
 	
 	f:SetScript("OnMouseDown",f.StartMoving);
 	f:SetScript("OnMouseUp",f.StopMovingOrSizing);
@@ -399,6 +430,7 @@ function mog:CreatePreview()
 	end
 	
 	createMenuBar(f);
+	mog:ActivatePreview(f);
 		
 	tinsert(mog.previews,f);
 	return f;
