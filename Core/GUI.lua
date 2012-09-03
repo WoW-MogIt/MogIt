@@ -716,7 +716,7 @@ mog.menu.catalogue = mog.menu:CreateMenu(L["Catalogue"], function(self, tier)
 		UIDropDownMenu_AddButton(info,tier);
 		
 		local info = UIDropDownMenu_CreateInfo();
-		info.text = "Race";
+		info.text = RACE;
 		info.value = "race";
 		info.notCheckable = true;
 		info.hasArrow = true;
