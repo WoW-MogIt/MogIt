@@ -53,7 +53,7 @@ local function modelOnMouseWheel(self,v)
 			mog:PositionModel(preview.model);
 		end
 	else
-		self.data.posZ = (self.parent.data.posZ or mog.posZ or 0) + delta;
+		self.parent.data.posZ = (self.parent.data.posZ or mog.posZ or 0) + delta;
 		mog:PositionModel(self);
 	end
 end
@@ -99,7 +99,7 @@ end
 --//
 
 
---// Toolbar
+--// Preview Menu
 local currentPreview;
 
 local function setDisplayModel(self, arg1)
@@ -137,7 +137,10 @@ local function previewInitialize(self, level)
 		mog:CreateGenderMenu(level, setDisplayModel, self.parent.data.displayGender)
 	end
 end
+--//
 
+
+--// Save Menu
 local newSet = {items = {}}
 
 local function onClick(self)
@@ -170,7 +173,10 @@ local function saveInitialize(self, level)
 	info.notCheckable = true
 	UIDropDownMenu_AddButton(info, level)
 end
+--//
 
+
+--// Load Menu
 local function onClick(self, profile)
 	for k, v in pairs(currentPreview.slots) do
 		mog.view.DelItem(k,currentPreview)
@@ -207,7 +213,10 @@ local function loadInitialize(self, level)
 		mog.wishlist:AddSetMenuItems(level, onClick, UIDROPDOWNMENU_MENU_VALUE, UIDROPDOWNMENU_MENU_VALUE)
 	end
 end;
+--//
 
+
+--// Toolbar
 local function createMenuBar(parent)
 	local menuBar = mog.CreateMenuBar(parent)
 	--[=[
@@ -266,11 +275,11 @@ local function createMenuBar(parent)
 	menuBar.preview = menuBar:CreateMenu(L["Preview"], previewInitialize);
 	menuBar.preview:SetPoint("TOPLEFT", parent, 62, -31);
 
-	menuBar.save = menuBar:CreateMenu(L["Save"], saveInitialize);
-	menuBar.save:SetPoint("LEFT", menuBar.preview, "RIGHT", 5, 0);
-
 	menuBar.load = menuBar:CreateMenu(L["Load"], loadInitialize);
-	menuBar.load:SetPoint("LEFT", menuBar.save, "RIGHT", 5, 0);
+	menuBar.load:SetPoint("LEFT", menuBar.preview, "RIGHT", 5, 0);
+	
+	menuBar.save = menuBar:CreateMenu(L["Save"], saveInitialize);
+	menuBar.save:SetPoint("LEFT", menuBar.load, "RIGHT", 5, 0);
 end
 --//
 
@@ -327,6 +336,7 @@ function mog:CreatePreview()
 	f.resize.texture:SetAllPoints(f.resize);
 	
 	f.model = mog:CreateModelFrame(f);
+	f.model.type = "preview";
 	f.model:Show();
 	f.model:EnableMouseWheel(true);
 	f.model:SetScript("OnMouseWheel",modelOnMouseWheel);
@@ -647,7 +657,6 @@ StaticPopupDialogs["MOGIT_PREVIEW_IMPORT"] = {
 	hideOnEscape = 1
 };
 --//
-
 
 
 --[[

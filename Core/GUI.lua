@@ -131,7 +131,6 @@ function mog:CreateModelFrame(parent)
 	local f = CreateFrame("Button",nil,parent);
 	f:Hide();
 	
-	f.type = (parent == mog.frame) and "catalogue" or "preview";
 	f.parent = parent;
 	f.data = {};
 	f.indicators = {};
@@ -175,6 +174,7 @@ end
 
 function mog:CreateCatalogueModel()
 	local f = mog:CreateModelFrame(mog.frame);
+	f.type = "catalogue";
 	f:SetScript("OnClick", mog.ModelOnClick);
 	f:SetScript("OnEnter", mog.ModelOnEnter);
 	f:SetScript("OnLeave", mog.ModelOnLeave);
@@ -258,11 +258,11 @@ mog.modelUpdater:SetScript("OnUpdate",function(self,elapsed)
 		end
 	else
 		if self.btn == "LeftButton" then
-			self.model.data.posZ = (self.model.data.posZ or mog.posZ or 0) + dY;
-			self.model.data.face = (self.model.data.face or mog.face or 0) + dX;
+			self.model.parent.data.posZ = (self.model.parent.data.posZ or mog.posZ or 0) + dY;
+			self.model.parent.data.face = (self.model.parent.data.face or mog.face or 0) + dX;
 		elseif self.btn == "RightButton" then
-			self.model.data.posX = (self.model.data.posX or mog.posX or 0) + dX;
-			self.model.data.posY = (self.model.data.posY or mog.posY or 0) + dY;
+			self.model.parent.data.posX = (self.model.parent.data.posX or mog.posX or 0) + dX;
+			self.model.parent.data.posY = (self.model.parent.data.posY or mog.posY or 0) + dY;
 		end
 		mog:PositionModel(self.model);
 	end
@@ -773,11 +773,39 @@ mog.menu.catalogue:SetPoint("LEFT", mog.menu.modules, "RIGHT", 5, 0);
 
 
 --// Preview Menu
+local function newPreview()
+	mog:CreatePreview();
+	ShowUIPanel(mog.view);
+end
+
+local function syncPreviews()
+	mog.db.profile.sync = not mog.db.profile.sync;
+end
+
 mog.menu.preview = mog.menu:CreateMenu(L["Preview"], function(self, tier)
-	-- New Preview
-	-- Show/Hide All Previews (mog.view:IsShown)
-	-- Close All Previews (only add this option if it has a confirmation popup)
-	-- Synchronize Preview Positioning
+	local info = UIDropDownMenu_CreateInfo();
+	info.text = L["New Preview"];
+	info.notCheckable = true;
+	info.func = newPreview;
+	UIDropDownMenu_AddButton(info,tier);
+	
+	local info = UIDropDownMenu_CreateInfo();
+	info.text = mog.view:IsShown() and L["Hide Previews"] or L["Show Previews"];
+	info.notCheckable = true;
+	info.func = mog.TogglePreview;
+	UIDropDownMenu_AddButton(info,tier);
+	
+	local info = UIDropDownMenu_CreateInfo();
+	info.text = L["Close All Previews"];
+	info.notCheckable = true;
+	--info.func = confirmation popup
+	UIDropDownMenu_AddButton(info,tier);
+	
+	local info = UIDropDownMenu_CreateInfo();
+	info.text = L["Synchronize Positioning"];
+	info.checked = mog.db.profile.sync;
+	info.func = syncPreviews;
+	UIDropDownMenu_AddButton(info,tier);
 end);
 mog.menu.preview:SetPoint("LEFT", mog.menu.catalogue, "RIGHT", 5, 0);
 --//
