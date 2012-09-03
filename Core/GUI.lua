@@ -207,7 +207,12 @@ function mog:DressModel(self)
 		self.model:Undress();
 	end
 
-	local slots = (self.type == "preview" and self.parent.slots) or (mog.db.profile.gridDress == "preview" and mog.activePreview and mog.activePreview.slots);
+	local slots;
+	if self.type == "preview" then
+		slots = self.parent.slots;
+	elseif (mog.db.profile.gridDress == "preview") and mog.activePreview then
+		slots = mog.activePreview.slots;
+	end
 	if slots then
 		for id,slot in pairs(slots) do
 			if slot.item then
