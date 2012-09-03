@@ -4,6 +4,11 @@ local L = mog.L;
 
 mog.view = CreateFrame("Frame","MogItPreview",UIParent);
 mog.view:SetAllPoints(UIParent);
+mog.view:SetScript("OnShow",function(self)
+	if #mog.previews == 0 then
+		mog:CreatePreview();
+	end
+end);
 tinsert(UISpecialFrames,"MogItPreview");
 --ShowUIPanel(mog.view);
 
@@ -75,9 +80,23 @@ end
 
 
 --// Toolbar
+local function previewActive(self)
+	if self.value == mog.activePreview then
+		mog.activePreview = nil;
+	else
+		mog.activePreview = self.value;
+	end
+end
+
+local function previewInitialize(level)
+	local info = UIDropDownMenu_CreateInfo()
+	info.text = L["Active Preview"]
+	info.func = previewActive;
+	UIDropDownMenu_AddButton(info, level)
+end
+
 local newSet = {items = {}}
 
---> If possible, move Save and Load to within a "File" dropdown
 local function onClick(self)
 	newSet.name = self.value
 	wipe(newSet.items)
@@ -107,8 +126,6 @@ local function saveInitialize(level)
 	info.colorCode = GREEN_FONT_COLOR_CODE
 	info.notCheckable = true
 	UIDropDownMenu_AddButton(info, level)
-	
-	--> Add save list?
 end
 
 local function onClick(self, profile)
@@ -290,15 +307,15 @@ local function createMenuBar(parent)
 		f.link:SetText(L["Chat Link"]);
 		f.link:SetScript("OnClick",linkOnClick);
 	--]=]
+	
+	menuBar.preview = menuBar:CreateMenu(L["Preview"], previewInitialize);
+	menuBar.preview:SetPoint("TOPLEFT", parent, 62, -31);
 
 	menuBar.save = menuBar:CreateMenu(L["Save"], saveInitialize);
-	menuBar.save:SetPoint("TOPLEFT", parent, 62, -31);
+	menuBar.save:SetPoint("LEFT", menuBar.preview, "RIGHT", 5, 0);
 
 	menuBar.load = menuBar:CreateMenu(L["Load"], loadInitialize);
 	menuBar.load:SetPoint("LEFT", menuBar.save, "RIGHT", 5, 0);
-
-	menuBar.catalogue = menuBar:CreateMenu(L["Catalogue"], stopDis);
-	menuBar.catalogue:SetPoint("LEFT", menuBar.load, "RIGHT", 5, 0);
 end
 --//
 
@@ -396,6 +413,12 @@ function mog:DeletePreview(f)
 	end
 	wipe(f.data);
 	tinsert(mog.previewBin,f);
+	for k,v in ipairs(mog.previews) do
+		if v == f then
+			tremove(mog.previews,k);
+			break;
+		end
+	end
 	if mog.activePreview == f then
 		mog.activePreview = nil;
 	end
@@ -466,7 +489,7 @@ function mog.view.DelItem(slot,preview)
 	preview.slots[slot].item = nil;
 	slotTexture(preview,slot);
 	if preview:IsVisible() then
-		preview.model:UndressSlot(GetInventorySlotInfo(slot));
+		preview.model.model:UndressSlot(GetInventorySlotInfo(slot));
 	end
 end
 

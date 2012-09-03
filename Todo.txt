@@ -1,39 +1,37 @@
-DataExtractor
-- Finish update and run
+General:
+- Check for errors
+[A] Check for Localization
 
 Preview:
-- mog.view.AddItem (dual wield logic)
-- mog.activePreview
-- Toolbars on each preview
-- On CreatePreview, :Raise() the new preview
-- Either show mog.view by default or have 1 empty preview ready?
-- On closing a preview, delete it (or confirmation popup?)
+? mog.view.AddItem Undress weapons and re-equip
+[A] mog.activePreview
+[L] add race/gender options to Preview menu
+[L] pass the preview frame into save/load menus for slot pairs
+[L] Confirmation on closing a preview
 
 GUI:
-- Hidden helm/cloak showing on models
-- SetAnimation instead of SetSequence
-- Localise Gender in Catalogue menu (?)
-- Dress models: fix check mark and models repositioning when changed
-- Preview menu (New Preview, Hide/Show Previews, Close All Previews, Synchronize movement)
-- Add a "Help" menu button and create some form of popup which contains something passed by each module (template one too?)
-- Disable modules (or the bracket text) in the module dropdown if version isnt compatible?
+? Hidden helm/cloak showing on models
+? SetAnimation instead of SetSequence
+[L] Catalogue menu: Dress models - possible to fix models repositioning when changed to equipped?
+[A] Preview menu: New Preview, Hide/Show Previews, Close All Previews, Synchronize movement
+? Add a "Help" menu button and create some form of popup which contains something passed by each module (template one too?)
+? Disable modules (or the bracket text) in the module dropdown if version isnt compatible?
 
 Templates:
-- Add to Preview -> New tier (activePreview / new / list of previews)
-
-Options:
-- Remove "Undress before previewing" - also from defaults in Core
-- Remove "Dress models"
-- Should we move "No animation" and "URL website" to Catalogue dropdown?
+[L] Add to Preview -> New tier (New Preview, Active Preview, list of previews)
+[L] Check all code for bugs, mog:GetItemInfo, etc
 
 Wishlist:
-- mog:GetItemInfo
+[L] Check mog:GetItemInfo is fully implemented
 
-Checks:
-- Check all files (errors, changes, localization)
+Help:
+? Help frame + menu button
 
-Links
-- Open new preview + set race/gender
+Links:
+[A] Open new preview + set race/gender on click
+
+Tooltip:
+[L] Check the GameTooltip[mog] system is working
 
 Modules:
-- Update external modules
+[A] Update extra modules
