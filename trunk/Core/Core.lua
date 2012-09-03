@@ -125,6 +125,7 @@ end
 --// Item Cache
 local GetItemInfo = GetItemInfo;
 
+mog.cacheFrame = CreateFrame("Frame");
 local cacheQueue = {};
 local cacheFuncs = {
 	BuildList = mog.BuildList;
@@ -166,7 +167,7 @@ function mog.ItemInfoReceived()
 		cacheFuncs[k]();
 	end
 	wipe(cacheQueue);
-	mog.frame:SetScript("OnUpdate", nil);
+	mog.cacheFrame:SetScript("OnUpdate", nil);
 end
 --//
 
@@ -225,7 +226,7 @@ mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 	if event == "PLAYER_LOGIN" then
 		mog:UpdateGUI();
 	elseif event == "GET_ITEM_INFO_RECEIVED" then
-		self:SetScript("OnUpdate", mog.ItemInfoReceived);
+		mog.cacheFrame:SetScript("OnUpdate", mog.ItemInfoReceived);
 	elseif event == "PLAYER_EQUIPMENT_CHANGED" then
 		if mog.db.profile.gridDress == "equipped" then
 			local slot, hasItem = arg1, ...;
