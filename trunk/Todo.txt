@@ -8,32 +8,21 @@ Preview:
 [A] Preview menu: mog.activePreview, chat links, add item, import, export
 [L] add race/gender options to Preview menu
 [L] pass the preview frame into save/load menus for slot pairs
-[L] Confirmation on closing a preview
+[L (WAT)] Confirmation on closing a preview
 [!] Previews bugging when opening from a link (gender not changing, all items equipped, etc)
 
 GUI:
 [?] Hidden helm/cloak showing on models
 [?] SetAnimation instead of SetSequence
-[L] Catalogue menu: Dress models - possible to fix models repositioning when changed to equipped?
 [A] Preview menu: New Preview, Hide/Show Previews, Close All Previews, Synchronize movement
 [?] Add a "Help" menu button and create some form of popup which contains something passed by each module (template one too?)
 [?] Disable modules (or the bracket text) in the module dropdown if version isnt compatible?
-
-Templates:
-[L] Add to Preview -> New tier (New Preview, Active Preview, list of previews)
-[L] Check all code for bugs, mog:GetItemInfo, etc
-
-Wishlist:
-[L] Check mog:GetItemInfo is fully implemented
 
 Help:
 [?] Help frame + menu button
 
 Links:
 [A] Open new preview + set race/gender on click
-
-Tooltip:
-[L] Check the GameTooltip[mog] system is working
 
 Modules:
 [A] Update extra modules

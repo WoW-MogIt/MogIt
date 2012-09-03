@@ -634,10 +634,14 @@ mog.menu.modules:SetPoint("TOPLEFT", mog.frame, "TOPLEFT", 62, -31);
 local function setDisplayModel(self, arg1)
 	mog[arg1] = self.value;
 	for i, model in ipairs(mog.models) do
+		-- reset positions first since they tend to go nuts when manipulating the model
+		model.model:SetPosition(0, 0, 0)
 		if model:IsEnabled() then
 			mog:BuildModel(model);
 			mog:ModelUpdate(model, model.data.value);
 		end
+		-- and restore to previous position
+		mog:PositionModel(model)
 	end
 	CloseDropDownMenus(1);
 end
@@ -650,7 +654,13 @@ local dressOptions = {
 
 local function setGridDress(self)
 	mog.db.profile.gridDress = self.value;
+	for i, model in ipairs(mog.models) do
+		model.model:SetPosition(0, 0, 0)
+	end
 	mog.scroll:update();
+	for i, model in ipairs(mog.models) do
+		mog:PositionModel(model)
+	end
 	CloseDropDownMenus(1);
 end
 
