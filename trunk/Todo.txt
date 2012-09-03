@@ -3,7 +3,6 @@ General:
 
 Preview:
 [?] mog.view.AddItem Undress weapons and re-equip
-[!] Previews bugging when opening from a link (gender not changing, all items equipped, etc)
 
 GUI:
 [?] Hidden helm/cloak showing on models
