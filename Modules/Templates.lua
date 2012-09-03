@@ -22,7 +22,10 @@ function mog.GetItemSourceInfo(itemID)
 	
 	if sourceType == 1 and sourceID then -- Drop
 		source = mog:GetData("npc", sourceID, "name");
-	-- elseif sourceType == 3 then -- Quest
+	elseif sourceType == 3 then -- Quest
+		if sourceID then
+			info = IsQuestFlaggedCompleted(sourceID) or false;
+		end
 	elseif sourceType == 5 and sourceInfo then -- Crafted
 		source = L.professions[sourceInfo];
 	elseif sourceType == 6 and sourceID then -- Achievement
@@ -234,7 +237,7 @@ function mog.ShowItemTooltip(self, item, items, cycle)
 		if source then
 			GameTooltip:AddDoubleLine((sourceLabels[sourceType] or sourceType)..":", source, nil, nil, nil, 1, 1, 1)
 		end
-		if info then
+		if info ~= nil then
 			GameTooltip:AddDoubleLine(STATUS..":", info and COMPLETE or INCOMPLETE, nil, nil, nil, 1, 1, 1)
 		end
 	end
