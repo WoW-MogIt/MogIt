@@ -132,7 +132,6 @@ local cacheFuncs = {
 	ModelOnEnter = function()
 		local owner = GameTooltip:GetOwner();
 		if owner and GameTooltip[mog] then
-			print("callback")
 			mog.ModelOnEnter(owner);
 		end
 	end,
@@ -155,15 +154,12 @@ function mog:GetItemInfo(id,type)
 	if GetItemInfo(id) then
 		return GetItemInfo(id);
 	elseif cacheFuncs[type] then
-		print("request item info", type, id)
 		cacheQueue[type] = true;
 	end
 end
 
 function mog.ItemInfoReceived()
-	print"item info received"
 	for k in pairs(cacheQueue) do
-		print(nil, k)
 		cacheFuncs[k]();
 	end
 	wipe(cacheQueue);

@@ -212,8 +212,6 @@ function mog.ShowItemTooltip(self, item, items, cycle)
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 	GameTooltip[mog] = true
 	
-	print"ShowItemTooltip"
-	
 	if IsShiftKeyDown() then
 		GameTooltip:SetItemByID(item)
 		for _, frame in pairs(GameTooltip.shoppingTooltips) do
