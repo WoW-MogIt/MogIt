@@ -237,9 +237,9 @@ for _, addon in ipairs(addons) do
 			Help = mog.base.Help,
 			GetFilterArgs = mog.base.GetFilterArgs,
 			filters = {
-				-- "name",
+				"name",
 				"level",
-				-- "itemLevel",
+				"itemLevel",
 				"faction",
 				"class",
 				"source",
@@ -260,6 +260,3 @@ for _, addon in ipairs(addons) do
 	end
 end
 --//
-
-
--- options to disable filters/info?

@@ -88,21 +88,8 @@ local function slotOnClick(self,btn)
 	end
 end
 
-StaticPopupDialogs["MOGA_CLOSE_WINDO"] = {
-	text = "u close windo?",
-	button1 = NO,
-	button2 = NO..NO,
-	OnAccept = function(self, frame)
-		frame:Hide();
-		mog:DeletePreview(frame);
-	end,
-	hideOnEscape = true,
-	whileDead = true,
-	timeout = 0,
-}
-
 local function previewOnClose(self)
-	StaticPopup_Show("MOGA_CLOSE_WINDO", nil, nil, self:GetParent());
+	StaticPopup_Show("MOGIT_PREVIEW_CLOSE", nil, nil, self:GetParent());
 end
 
 local function previewActivate(self)
@@ -149,6 +136,7 @@ local function linkOnClick(self,btn)
 		end
 	end
 	ChatEdit_InsertLink(mog:SetToLink(tbl,currentPreview.data.displayRace,currentPreview.data.displayGender));
+	--ChatFrame_OpenChat(link);
 end
 
 local function previewInitialize(self, level)
@@ -315,7 +303,7 @@ function mog:CreatePreview()
 		displayRace = mog.playerRace,
 		displayGender = mog.playerGender,
 	};
-		
+	
 	f:SetPoint("CENTER",mog.view,"CENTER");
 	f:SetSize(335,385);
 	f:SetToplevel(true);
@@ -327,7 +315,7 @@ function mog:CreatePreview()
 
 	_G["MogItPreview"..f.id.."CloseButton"]:SetScript("OnClick",previewOnClose);
 	--_G["MogItPreview"..f.id.."Bg"]:SetVertexColor(0.8,0.3,0.8);
-	_G["MogItPreview"..f.id.."TitleText"]:SetText(L["Preview"].." "..f.id);
+	_G["MogItPreview"..f.id.."TitleText"]:SetText(L["Preview %d"]:format(f.id));
 	f.portraitFrame:Hide();
 	f.topLeftCorner:Show();
 	f.topBorderBar:SetPoint("TOPLEFT",f.topLeftCorner,"TOPRIGHT",0,0);
@@ -661,6 +649,18 @@ StaticPopupDialogs["MOGIT_PREVIEW_IMPORT"] = {
 	exclusive = 1,
 	whileDead = 1,
 };
+
+StaticPopupDialogs["MOGIT_PREVIEW_CLOSE"] = {
+	text = L["Are you sure you want to close this set?"],
+	button1 = YES,
+	button2 = NO,
+	OnAccept = function(self, frame)
+		mog:DeletePreview(frame);
+	end,
+	hideOnEscape = true,
+	whileDead = true,
+	timeout = 0,
+}
 --//
 
 
