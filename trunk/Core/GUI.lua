@@ -174,21 +174,21 @@ function mog:DeleteModelFrame(f)
 	wipe(f.data);
 	f:SetAlpha(1);
 	f:Enable();
-	tinsert(mog.modelBin,f);
+	tinsert(mog.modelBin, f);
 end
 
 function mog:CreateCatalogueModel()
 	local f = mog:CreateModelFrame(mog.frame);
-	f:SetScript("OnClick",mog.ModelOnClick);
-	f:SetScript("OnEnter",mog.ModelOnEnter);
-	f:SetScript("OnLeave",mog.ModelOnLeave);
-	tinsert(mog.models,f);
+	f:SetScript("OnClick", mog.ModelOnClick);
+	f:SetScript("OnEnter", mog.ModelOnEnter);
+	f:SetScript("OnLeave", mog.ModelOnLeave);
+	tinsert(mog.models, f);
 	return f;
 end
 
 function mog:DeleteCatalogueModel(n)
 	mog:DeleteModelFrame(mog.models[n]);
-	tremove(mog.models,n);
+	tremove(mog.models, n);
 end
 
 function mog:BuildModel(self)
@@ -197,6 +197,7 @@ end
 
 function mog:DressModel(self)
 	if mog.db.profile.gridDress == "equipped" and self.type ~= "preview" then
+		-- :Dress resets the custom race, and :SetCustomRace does :Dress, so if we're using a custom race, just :SetCustomRace again instead of :Dress
 		if mog.displayRace == myRace and mog.displayGender == myGender then
 			self.model:Dress();
 		else
@@ -264,7 +265,7 @@ mog.modelUpdater:SetScript("OnUpdate",function(self,elapsed)
 	self.pX,self.pY = cX,cY;
 end);
 
-function mog:StartModelUpdater(model,btn)
+function mog:StartModelUpdater(model, btn)
 	mog.modelUpdater.btn = btn;
 	mog.modelUpdater.model = model;
 	mog.modelUpdater.pX,mog.modelUpdater.pY = GetCursorPosition();
@@ -289,7 +290,7 @@ function mog.ModelOnShow(self)
 	if self.type == "preview" then
 		mog:DressModel(self);
 	else
-		mog:ModelUpdate(self,self.data.value);
+		mog:ModelUpdate(self, self.data.value);
 	end
 	mog:PositionModel(self);
 end
@@ -301,29 +302,29 @@ function mog.ModelOnHide(self)
 	self.model:SetPosition(0,0,0);
 end
 
-function mog.ModelOnClick(self,btn,...)
+function mog.ModelOnClick(self, btn, ...)
 	if mog.active and mog.active.OnClick then
-		mog.active:OnClick(self,btn,self.data.value,...);
+		mog.active:OnClick(self, btn, self.data.value, ...);
 	end
 end
 
-function mog.ModelOnDragStart(self,btn)
-	mog:StartModelUpdater(self,btn);
+function mog.ModelOnDragStart(self, btn)
+	mog:StartModelUpdater(self, btn);
 end
 
-function mog.ModelOnDragStop(self,btn)
+function mog.ModelOnDragStop(self, btn)
 	mog:StopModelUpdater();
 end
 
-function mog.ModelOnEnter(self,...)
+function mog.ModelOnEnter(self, ...)
 	if mog.active and mog.active.OnEnter then
-		mog.active:OnEnter(self,self.data.value,...);
+		mog.active:OnEnter(self, self.data.value,...);
 	end
 end
 
-function mog.ModelOnLeave(self,...)
+function mog.ModelOnLeave(self, ...)
 	if mog.active and mog.active.OnLeave then
-		mog.active:OnLeave(self,self.data.value,...);
+		mog.active:OnLeave(self, self.data.value, ...);
 	else
 		GameTooltip:Hide();
 	end
@@ -421,23 +422,23 @@ function mog.scroll.update(self,value,offset,onscroll)
 	for id,frame in ipairs(mog.models) do
 		local index = ((value-1)*models)+id;
 		local value = mog.list[index];
+		wipe(frame.data);
 		if value then
-			wipe(frame.data);
 			frame.data.value = value;
 			frame.data.frame = frame;
 			for k, v in pairs(frame.indicators) do
 				v:Hide();
 			end
-			frame:SetAlpha(1);
-			frame:Enable();
 			if frame:IsShown() then
-				mog:ModelUpdate(frame,value);
+				mog:ModelUpdate(frame, value);
 				if GameTooltip:IsOwned(frame) then
-					mog.ModelOnEnter(frame,value);
+					mog.ModelOnEnter(frame, value);
 				end
 			else
 				frame:Show();
 			end
+			frame:SetAlpha(1);
+			frame:Enable();
 		else
 			frame:SetAlpha(0);
 			frame:Disable();

@@ -182,6 +182,8 @@ function mog.Item_OnEnter(self, item, items, cycle)
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 	GameTooltip[mog] = true
 	
+	print"Item_OnEnter"
+	
 	if IsShiftKeyDown() then
 		GameTooltip:SetItemByID(item)
 		for _, frame in pairs(GameTooltip.shoppingTooltips) do
@@ -244,7 +246,7 @@ function mog.Item_OnEnter(self, item, items, cycle)
 	GameTooltip:AddDoubleLine(ID..":", item, nil, nil, nil, 1, 1, 1)
 	
 	-- add wishlist info about this item
-	if GetItemCount(item, true) > 0 then
+	if mog:HasItem(item) then
 		GameTooltip:AddLine(" ")
 		GameTooltip:AddLine(L["You have this item."], 1, 1, 1)
 		GameTooltip:AddTexture("Interface\\RaidFrame\\ReadyCheck-Ready")
@@ -266,7 +268,7 @@ function mog.Item_OnEnter(self, item, items, cycle)
 		for i, v in ipairs(items) do
 			if v ~= item then
 				GameTooltip:AddDoubleLine(itemLabel(v, "ModelOnEnter"), mog.GetItemSourceShort(v), nil, nil, nil, 1, 1, 1)
-				if GetItemCount(v, true) > 0 then
+				if mog:HasItem(v) then
 					GameTooltip:AddTexture("Interface\\RaidFrame\\ReadyCheck-Ready")
 				end
 			end
@@ -364,7 +366,7 @@ function mog.Set_OnEnter(self, data)
 	for i, slot in ipairs(mog.slots) do
 		local itemID = data.items[slot] or data.items[i]
 		if itemID then
-			GameTooltip:AddDoubleLine((GetItemCount(itemID, true) > 0 and "|TInterface\\RaidFrame\\ReadyCheck-Ready:0|t " or "")..itemLabel(itemID, "ModelOnEnter"), mog.GetItemSourceShort(itemID), nil, nil, nil, 1, 1, 1)
+			GameTooltip:AddDoubleLine((mog:HasItem(item) and "|TInterface\\RaidFrame\\ReadyCheck-Ready:0|t " or "")..itemLabel(itemID, "ModelOnEnter"), mog.GetItemSourceShort(itemID), nil, nil, nil, 1, 1, 1)
 		end
 	end
 	

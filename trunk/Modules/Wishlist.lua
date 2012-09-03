@@ -136,13 +136,13 @@ function wishlist:FrameUpdate(frame, value, index)
 		mog.Set_FrameUpdate(frame, frame.data)
 	else
 		data.item = value
-		if GetItemCount(value, true) > 0 then
+		if mog:HasItem(value) then
 			frame:ShowIndicator("hasItem")
 		end
 		local displayIDs = mog:GetData("display", mog:GetData("item", value, "display"), "items")
 		if displayIDs and #displayIDs > 1 then
 			for i, item in ipairs(displayIDs) do
-				if GetItemCount(item, true) > 0 then
+				if mog:HasItem(item) then
 					frame:ShowIndicator("hasItem")
 				end
 			end
