@@ -88,9 +88,21 @@ local function slotOnClick(self,btn)
 	end
 end
 
-local function previewOnClose(self,btn)
-	local preview = self:GetParent();
-	mog:DeletePreview(preview);
+StaticPopupDialogs["MOGA_CLOSE_WINDO"] = {
+	text = "u close windo?",
+	button1 = NO,
+	button2 = NO..NO,
+	OnAccept = function(self, frame)
+		frame:Hide();
+		mog:DeletePreview(frame);
+	end,
+	hideOnEscape = true,
+	whileDead = true,
+	timeout = 0,
+}
+
+local function previewOnClose(self)
+	StaticPopup_Show("MOGA_CLOSE_WINDO", nil, nil, self:GetParent());
 end
 
 local function previewActivate(self)
@@ -313,7 +325,7 @@ function mog:CreatePreview()
 	f:SetResizable(true);
 	f:Raise();
 
-	_G["MogItPreview"..f.id.."CloseButton"]:HookScript("OnClick",previewOnClose);
+	_G["MogItPreview"..f.id.."CloseButton"]:SetScript("OnClick",previewOnClose);
 	--_G["MogItPreview"..f.id.."Bg"]:SetVertexColor(0.8,0.3,0.8);
 	_G["MogItPreview"..f.id.."TitleText"]:SetText(L["Preview"].." "..f.id);
 	f.portraitFrame:Hide();
