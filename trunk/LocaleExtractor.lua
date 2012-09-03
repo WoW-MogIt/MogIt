@@ -1,5 +1,5 @@
 local strings;
-local output = "L[\"Transmogrification Assistant\"] = true";
+local output;
 
 function getStrings(name)
 	output = output.."\n\n\t--[[ "..name.." ]]--";
@@ -23,7 +23,7 @@ end
 
 function getLocale(file,files)
 	strings = {};
-	output = "";
+	output = "L[\"Transmogrification Assistant\"] = true";
 	for k,v in ipairs(files) do
 		output = output.."\n\n";
 		getStrings(v);
