@@ -805,6 +805,7 @@ mog.menu.preview = mog.menu:CreateMenu(L["Preview"], function(self, tier)
 	info.text = L["Synchronize Positioning"];
 	info.checked = mog.db.profile.sync;
 	info.func = syncPreviews;
+	info.isNotRadio = true;
 	UIDropDownMenu_AddButton(info,tier);
 end);
 mog.menu.preview:SetPoint("LEFT", mog.menu.catalogue, "RIGHT", 5, 0);
