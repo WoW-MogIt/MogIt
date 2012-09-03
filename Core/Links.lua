@@ -6,10 +6,15 @@ local base = #charset;
 local maxlen = 3;
 
 local function toBase(num)
-	local str = "";
-	while num > 0 do
-		str = charset:sub((num%base)+1,(num%base)+1)..str;
-		num = math.floor(num/base);
+	local str;
+	if num <= 0 then
+		str = "0";
+	else
+		str = "";
+		while num > 0 do
+			str = charset:sub((num%base)+1,(num%base)+1)..str;
+			num = math.floor(num/base);
+		end
 	end
 	return str;
 end
@@ -29,7 +34,7 @@ function mog:SetToLink(set,race,gender)
 	end
 	link = link..":";
 	link = link..(race and toBase(race) or mog.playerRace);
-	link = link..(gender and toBase(gender) or mog.playerGender);
+	link = link..(gender or mog.playerGender);
 	link = link.."]";
 	return link;
 end
@@ -44,7 +49,7 @@ function mog:LinkToSet(link)
 		end
 	end
 	race = race and fromBase(race);
-	gender = gender and fromBase(gender);
+	gender = tonumber(gender);
 	return set,race,gender;
 end
 
