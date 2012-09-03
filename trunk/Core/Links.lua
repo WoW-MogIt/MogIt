@@ -29,7 +29,7 @@ function mog:SetToLink(set,race,gender)
 	end
 	link = link..":";
 	link = link..(race and toBase(race) or "0");
-	link = link..(sex and toBase(sex) or "0");
+	link = link..(gender and toBase(gender) or "0");
 	link = link.."]";
 	return link;
 end
@@ -37,13 +37,15 @@ end
 function mog:LinkToSet(link)
 	local set = {};
 	--local items = link:match("MogIt:([^%]:]+)");
-	local items,race,sex = link:match("MogIt:(%w+):?(%w?)(%w?)");
+	local items,race,gender = link:match("MogIt:(%w+):?(%w?)(%w?)");
 	if items then
 		for i=1,#items/maxlen do
 			table.insert(set,fromBase(items:sub((i-1)*maxlen+1,i*maxlen)));
 		end
 	end
-	return set,fromBase(race),fromBase(sex);
+	race = race and race ~= "0" and fromBase(race);
+	gender = gender and gender ~= "0" and fromBase(gender);
+	return set,race,gender;
 end
 
 local function filter(self,event,msg,...)
@@ -78,8 +80,12 @@ function SetItemRef(link,...)
 		if IsModifiedClick("CHATLINK") then
 			ChatEdit_InsertLink("["..link.."]")
 		else
-			local preivew = mog:CreatePreview();
-			mog:AddToPreview(mog:LinkToSet(link),preview);
+			local preview = mog:CreatePreview();
+			local set,race,gender = mog:LinkToSet(link);
+			mog:AddToPreview(set,preview);
+			preview.data.race = race;
+			preview.data.gender = gender;
+			mog:BuildModel(preview.model);
 		end
 	else
 		return old_SetItemRef(link,...);
