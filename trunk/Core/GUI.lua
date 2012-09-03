@@ -796,12 +796,6 @@ mog.menu.preview = mog.menu:CreateMenu(L["Preview"], function(self, tier)
 	UIDropDownMenu_AddButton(info,tier);
 	
 	local info = UIDropDownMenu_CreateInfo();
-	info.text = L["Close All Previews"];
-	info.notCheckable = true;
-	--info.func = confirmation popup
-	UIDropDownMenu_AddButton(info,tier);
-	
-	local info = UIDropDownMenu_CreateInfo();
 	info.text = L["Synchronize Positioning"];
 	info.checked = mog.db.profile.sync;
 	info.func = syncPreviews;

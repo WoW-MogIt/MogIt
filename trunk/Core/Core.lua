@@ -164,8 +164,8 @@ function mog.ItemInfoReceived()
 	for k in pairs(cacheQueue) do
 		print(nil, k)
 		cacheFuncs[k]();
-		cacheQueue[k] = nil;
 	end
+	wipe(cacheQueue);
 	mog.frame:SetScript("OnUpdate", nil);
 end
 --//

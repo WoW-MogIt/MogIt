@@ -122,11 +122,11 @@ local function clearOnClick(self,btn)
 end
 
 local function addOnClick(self,btn)
-	StaticPopup_Show("MOGIT_PREVIEW_ADDITEM"); -- pass preview into
+	StaticPopup_Show("MOGIT_PREVIEW_ADDITEM",nil,nil,currentPreview);
 end
 
 local function importOnClick(self,btn)
-	StaticPopup_Show("MOGIT_PREVIEW_IMPORT"); -- pass preview into
+	StaticPopup_Show("MOGIT_PREVIEW_IMPORT",nil,nil,currentPreview);
 end
 
 local function linkOnClick(self,btn)
@@ -268,33 +268,6 @@ end;
 --// Toolbar
 local function createMenuBar(parent)
 	local menuBar = mog.CreateMenuBar(parent)
-	--[=[
-
-
-		f.clear = CreateFrame("Button","MogItPreview"..mog.view.num.."Clear",f,"UIPanelButtonTemplate2");
-		f.clear:SetPoint("TOPRIGHT",f,"TOPRIGHT",-10,-30);
-		f.clear:SetWidth(100);
-		f.clear:SetText(L["Clear"]);
-		f.clear:SetScript("OnClick",clearOnClick);
-
-		f.add = CreateFrame("Button","MogItPreview"..mog.view.num.."AddItem",f,"MagicButtonTemplate");
-		f.add:SetPoint("BOTTOMLEFT",f,"BOTTOMLEFT",5,5);
-		f.add:SetWidth(100);
-		f.add:SetText(L["Add Item"]);
-		f.add:SetScript("OnClick",addOnClick);
-
-		f.import = CreateFrame("Button","MogItPreview"..mog.view.num.."Import",f,"MagicButtonTemplate");
-		f.import:SetPoint("TOPLEFT",f.add,"TOPRIGHT");
-		f.import:SetWidth(100);
-		f.import:SetText(L["Import"]);
-		f.import:SetScript("OnClick",importOnClick);
-
-		f.link = CreateFrame("Button","MogItPreview"..mog.view.num.."Link",f,"MagicButtonTemplate");
-		f.link:SetPoint("TOPLEFT",f.import,"TOPRIGHT");
-		f.link:SetWidth(100);
-		f.link:SetText(L["Chat Link"]);
-		f.link:SetScript("OnClick",linkOnClick);
-	--]=]
 	
 	menuBar.preview = menuBar:CreateMenu(L["Preview"], previewInitialize);
 	menuBar.preview:SetPoint("TOPLEFT", parent, 62, -31);
@@ -431,7 +404,9 @@ end
 mog.view.queue = {};
 mog.cacheFuncs.PreviewAddItem = function()
 	for i,action in ipairs(mog.view.queue) do
-		mog.view.AddItem(action[1],action[2]);
+		if GetItemInfo(action[1]) then
+			mog.view.AddItem(action[1],action[2]);
+		end
 	end
 	wipe(mog.view.queue);
 end
@@ -600,19 +575,19 @@ StaticPopupDialogs["MOGIT_PREVIEW_ADDITEM"] = {
 	hasEditBox = 1,
 	maxLetters = 512,
 	editBoxWidth = 260,
-	OnShow = function(self,item)
+	OnShow = function(self)
 		self.editBox:SetFocus();
 	end,
-	OnAccept = function(self)
+	OnAccept = function(self,preview)
 		local text = self.editBox:GetText();
 		text = text and text:match("(%d+).-$");
-		mog:AddToPreview(tonumber(text));
+		mog:AddToPreview(tonumber(text),preview);
 	end,
 	OnCancel = function(self) end,
-	EditBoxOnEnterPressed = function(self)
+	EditBoxOnEnterPressed = function(self,preview)
 		local text = self:GetText();
 		text = text and text:match("(%d+).-$");
-		mog:AddToPreview(tonumber(text));
+		mog:AddToPreview(tonumber(text),preview);
 		self:GetParent():Hide();
 	end,
 	EditBoxOnEscapePressed = function(self)
@@ -631,9 +606,9 @@ StaticPopupDialogs["MOGIT_PREVIEW_IMPORT"] = {
 	hasEditBox = 1,
 	maxLetters = 512,
 	editBoxWidth = 260,
-	OnShow = function(self,item)
+	OnShow = function(self,preview)
 		local str;
-		for k,v in pairs(mog.view.slots) do
+		for k,v in pairs(preview.slots) do
 			if v.item then
 				if str then
 					str = str..":"..v.item;
@@ -646,7 +621,7 @@ StaticPopupDialogs["MOGIT_PREVIEW_IMPORT"] = {
 		self.editBox:SetFocus();
 		self.editBox:HighlightText();
 	end,
-	OnAccept = function(self)
+	OnAccept = function(self,preview)
 		local items = self.editBox:GetText();
 		items = items and items:match("compare%?items=([^;#]+)");
 		if items then
@@ -655,11 +630,11 @@ StaticPopupDialogs["MOGIT_PREVIEW_IMPORT"] = {
 				item = item:match("^(%d+)");
 				table.insert(tbl,tonumber(item));
 			end
-			mog:AddToPreview(tbl);
+			mog:AddToPreview(tbl,preview);
 		end
 	end,
 	OnCancel = function(self) end,
-	EditBoxOnEnterPressed = function(self)
+	EditBoxOnEnterPressed = function(self,preview)
 		self:GetParent():Hide();
 		local items = self:GetText();
 		items = items and items:match("compare%?items=([^;#]+)");
@@ -669,7 +644,7 @@ StaticPopupDialogs["MOGIT_PREVIEW_IMPORT"] = {
 				item = item:match("^(%d+)");
 				table.insert(tbl,tonumber(item));
 			end
-			mog:AddToPreview(tbl);
+			mog:AddToPreview(tbl,preview);
 		end
 	end,
 	EditBoxOnEscapePressed = function(self)
