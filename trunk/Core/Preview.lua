@@ -445,6 +445,9 @@ function mog:DeletePreview(f)
 	end
 	if mog.activePreview == f then
 		mog.activePreview = nil;
+		if mog.db.profile.gridDress == "preview" then
+			mog.scroll:update();
+		end
 	end
 end
 
