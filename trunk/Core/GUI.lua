@@ -520,7 +520,7 @@ end
 local function menuBarInitialize(self, level)
 	if self.active and self.active.func then
 		self.tier[level] = UIDROPDOWNMENU_MENU_VALUE;
-		self.active.func(level);
+		self.active.func(self, level);
 	end
 end
 
@@ -586,7 +586,7 @@ mog.menu = mog.CreateMenuBar(mog.frame);
 
 
 --// Module Menu
-mog.menu.modules = mog.menu:CreateMenu(L["Modules"], function(tier)
+mog.menu.modules = mog.menu:CreateMenu(L["Modules"], function(self, tier)
 	if tier == 1 then
 		local info;
 		info = UIDropDownMenu_CreateInfo();
@@ -619,8 +619,8 @@ mog.menu.modules = mog.menu:CreateMenu(L["Modules"], function(tier)
 				v:Dropdown(tier);
 			end
 		end
-	elseif mog.menu.tier[2] and mog.menu.tier[2].Dropdown then
-		mog.menu.tier[2]:Dropdown(tier);
+	elseif self.tier[2] and self.tier[2].Dropdown then
+		self.tier[2]:Dropdown(tier);
 	end
 end);
 mog.menu.modules:SetPoint("TOPLEFT", mog.frame, "TOPLEFT", 62, -31);
@@ -657,7 +657,7 @@ end
 
 mog.sorting = {};
 
-mog.menu.catalogue = mog.menu:CreateMenu(L["Catalogue"],function(tier)
+mog.menu.catalogue = mog.menu:CreateMenu(L["Catalogue"], function(self, tier)
 	if tier == 1 then
 		local info = UIDropDownMenu_CreateInfo();
 		info.text = mog.filt:IsShown() and L["Hide Filters"] or L["Show Filters"];
@@ -696,7 +696,7 @@ mog.menu.catalogue = mog.menu:CreateMenu(L["Catalogue"],function(tier)
 		info.hasArrow = true;
 		-- info.disabled = not (mog.active and mog.active.sorting and #mog.active.sorting > 0);
 		UIDropDownMenu_AddButton(info,tier);
-	elseif mog.menu.tier[2] == "sorting" then
+	elseif self.tier[2] == "sorting" then
 		if tier == 2 then
 			if mog.active and mog.active.sorting then
 				for k,v in ipairs(mog.active.sorting) do
@@ -705,10 +705,10 @@ mog.menu.catalogue = mog.menu:CreateMenu(L["Catalogue"],function(tier)
 					end
 				end
 			end
-		elseif mog.menu.tier[3] and mog.menu.tier[3].Dropdown then
-			mog.menu.tier[3].Dropdown(mog.active,tier);
+		elseif self.tier[3] and self.tier[3].Dropdown then
+			self.tier[3].Dropdown(mog.active,tier);
 		end
-	elseif mog.menu.tier[2] == "race" then
+	elseif self.tier[2] == "race" then
 		if tier == 2 then
 			for i, race in ipairs(races) do -- pairs may yield unexpected order
 				local info = UIDropDownMenu_CreateInfo();
@@ -721,7 +721,7 @@ mog.menu.catalogue = mog.menu:CreateMenu(L["Catalogue"],function(tier)
 				UIDropDownMenu_AddButton(info,tier);
 			end
 		end
-	elseif mog.menu.tier[2] == "gender" then
+	elseif self.tier[2] == "gender" then
 		if tier == 2 then
 			for i, gender in pairs(gender) do -- pairs may yield unexpected order
 				local info = UIDropDownMenu_CreateInfo();
@@ -734,7 +734,7 @@ mog.menu.catalogue = mog.menu:CreateMenu(L["Catalogue"],function(tier)
 				UIDropDownMenu_AddButton(info,tier);
 			end
 		end
-	elseif mog.menu.tier[2] == "gridDress" then
+	elseif self.tier[2] == "gridDress" then
 		if tier == 2 then
 			for k, v in pairs(dressOptions) do
 				local info = UIDropDownMenu_CreateInfo();
@@ -753,7 +753,7 @@ mog.menu.catalogue:SetPoint("LEFT", mog.menu.modules, "RIGHT", 5, 0);
 
 
 --// Preview Menu
-mog.menu.preview = mog.menu:CreateMenu(L["Preview"], function(tier)
+mog.menu.preview = mog.menu:CreateMenu(L["Preview"], function(self, tier)
 	-- New Preview
 	-- Show/Hide All Previews (mog.view:IsShown)
 	-- Close All Previews (only add this option if it has a confirmation popup)

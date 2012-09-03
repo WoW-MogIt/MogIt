@@ -88,7 +88,7 @@ local function previewActive(self)
 	end
 end
 
-local function previewInitialize(level)
+local function previewInitialize(self, level)
 	local info = UIDropDownMenu_CreateInfo()
 	info.text = L["Active Preview"]
 	info.func = previewActive;
@@ -117,7 +117,7 @@ local function newSetOnClick(self)
 	StaticPopup_Show("MOGIT_WISHLIST_CREATE_SET", nil, nil, newSet)
 end
 
-local function saveInitialize(level)
+local function saveInitialize(self, level)
 	mog.wishlist:AddSetMenuItems(level, onClick)
 	
 	local info = UIDropDownMenu_CreateInfo()
@@ -139,7 +139,7 @@ local function onClick(self, profile)
 	CloseDropDownMenus()
 end
 
-local function loadInitialize(level)
+local function loadInitialize(self, level)
 	if level == 1 then
 		mog.wishlist:AddSetMenuItems(level, onClick)
 		
@@ -209,7 +209,7 @@ local function setDisplayModel(self, arg1)
 	CloseDropDownMenus(1);
 end
 
-local function stopDis(tier)
+local function stopDis(self, tier)
 	if tier == 1 then
 		local info = UIDropDownMenu_CreateInfo();
 		info.text = "Race";
