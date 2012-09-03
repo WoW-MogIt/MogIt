@@ -192,7 +192,7 @@ function mog:DeleteCatalogueModel(n)
 end
 
 function mog:BuildModel(self)
-	self.model:SetCustomRace((self.type == "preview" and self.parent.data.race) or mog.displayRace,(self.type == "preview" and self.parent.data.gender) or mog.displayGender);
+	self.model:SetCustomRace((self.type == "preview" and self.parent.data.displayRace) or mog.displayRace,(self.type == "preview" and self.parent.data.displayGender) or mog.displayGender);
 end
 
 function mog:DressModel(self)
