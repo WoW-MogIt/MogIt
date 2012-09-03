@@ -23,7 +23,8 @@ end
 
 function getLocale(file,files)
 	strings = {};
-	output = "L[\"Transmogrification Assistant\"] = true";
+	--output = "L[\"Transmogrification Assistant\"] = true";
+	output = "";
 	for k,v in ipairs(files) do
 		output = output.."\n\n";
 		getStrings(v);
