@@ -268,7 +268,7 @@ end;
 --// Toolbar
 local function helpOnEnter(self)
 	self.nt:SetTexture(1,0.82,0,1);
-	GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT");
+	GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT");
 	GameTooltip:AddLine(L["How to use"]);
 	GameTooltip:AddLine(" ");
 	GameTooltip:AddLine(L["Basic Controls"]);
