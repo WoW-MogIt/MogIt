@@ -1,0 +1,17 @@
+General:
+[!] Check for errors
+
+Preview:
+[?] mog.view.AddItem Undress weapons and re-equip
+
+GUI:
+[?] Hidden helm/cloak showing on models
+[?] SetAnimation instead of SetSequence
+[?] Add a "Help" menu button and create some form of popup which contains something passed by each module (template one too?)
+[?] Disable modules (or the bracket text) in the module dropdown if version isnt compatible?
+
+Help:
+[?] Help frame + menu button
+
+Modules:
+[A] Update extra modules
