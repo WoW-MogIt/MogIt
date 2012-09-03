@@ -201,18 +201,18 @@ GameTooltip:RegisterEvent("MODIFIER_STATE_CHANGED")
 GameTooltip:HookScript("OnEvent", function(self, event, key, state)
 	local owner = self:GetOwner()
 	if owner and self[mog] then
-		mog.ModelOnEnter(owner)
+		owner:OnEnter()
 	end
 end)
 GameTooltip:HookScript("OnTooltipCleared", function(self)
 	self[mog] = nil
 end)
 
-function mog.Item_OnEnter(self, item, items, cycle)
+function mog.ShowItemTooltip(self, item, items, cycle)
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 	GameTooltip[mog] = true
 	
-	print"Item_OnEnter"
+	print"ShowItemTooltip"
 	
 	if IsShiftKeyDown() then
 		GameTooltip:SetItemByID(item)
@@ -223,8 +223,6 @@ function mog.Item_OnEnter(self, item, items, cycle)
 	end
 	
 	local itemName, _, _, itemLevel = mog:GetItemInfo(item, "ModelOnEnter")
-	--GameTooltip:AddLine(self.display, 1, 1, 1)
-	--GameTooltip:AddLine(" ")
 	
 	if cycle and #items > 1 then
 		GameTooltip:AddDoubleLine(itemLabel(item, "ModelOnEnter"), L["Item %d/%d"]:format(cycle, #items), nil, nil, nil, 1, 0, 0)
@@ -308,19 +306,15 @@ function mog.Item_OnEnter(self, item, items, cycle)
 	GameTooltip:Show()
 end
 
--- function mog.Item_OnEnter(self, data)
-	-- mog.Item_OnEnter(self, data.item, data.items, data.cycle)
--- end
-
 function mog.Item_OnClick(self, btn, data, isSaved)
 	local item = data.item
 	if not (self and item) then return end
 	
 	if btn == "LeftButton" then
-		if not HandleModifiedItemClick(select(2, GetItemInfo(item))) and data.items then -- needs changing to mog:GII
+		if not HandleModifiedItemClick(select(2, GetItemInfo(item))) and data.items then -- needs changing to mog:GII -- nono
 			data.cycle = (data.cycle % #data.items) + 1
 			data.item = data.items[data.cycle]
-			mog.ModelOnEnter(self)
+			self:OnEnter()
 		end
 	elseif btn == "RightButton" then
 		if IsControlKeyDown() then
@@ -353,7 +347,6 @@ do
 		if not menuList then
 			if not createItemMenu(data, itemOnClick) then
 				-- this is a single item, so skip directly to the item options menu
-				-- menuList = itemOptionsMenu
 				createMenu(self, level, itemOptionsMenu)
 			end
 			return
@@ -362,23 +355,6 @@ do
 		createMenu(self, level, menuList)
 	end
 end
-
---[=[
-function mog.ItemOnScroll()
-	if UIDropDownMenu_GetCurrentDropDown() == mog.sub.ItemMenu and DropDownList1 and DropDownList1:IsShown() then
-		HideDropDownMenu(1)
-	end
-end
-
-
-function mog.ItemGET_ITEM_INFO_RECEIVED()
-	if UIDropDownMenu_GetCurrentDropDown() == mog.sub.ItemMenu and DropDownList1 and DropDownList1:IsShown() then
-		HideDropDownMenu(1)
-		ToggleDropDownMenu(nil, nil, mog.sub.ItemMenu, "cursor", 0, 0, mog.sub.ItemMenu.menuList)
-	end
-end
-
---]=]
 
 function mog.Set_FrameUpdate(self, data)
 	self:ShowIndicator("label")
@@ -389,12 +365,12 @@ function mog.Set_FrameUpdate(self, data)
 	end
 end
 
-function mog.Set_OnEnter(self, data)
+function mog.ShowSetTooltip(self, items, name)
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 	
-	GameTooltip:AddLine(data.name)
+	GameTooltip:AddLine(name)
 	for i, slot in ipairs(mog.slots) do
-		local itemID = data.items[slot] or data.items[i]
+		local itemID = items[slot] or items[i]
 		if itemID then
 			GameTooltip:AddDoubleLine((mog:HasItem(item) and "|TInterface\\RaidFrame\\ReadyCheck-Ready:0|t " or "")..itemLabel(itemID, "ModelOnEnter"), mog.GetItemSourceShort(itemID), nil, nil, nil, 1, 1, 1)
 		end

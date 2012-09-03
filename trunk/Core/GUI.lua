@@ -153,10 +153,6 @@ function mog:CreateModelFrame(parent)
 	f:SetScript("OnDragStart",mog.ModelOnDragStart);
 	f:SetScript("OnDragStop",mog.ModelOnDragStop);
 	
-	for i, v in ipairs(mixins) do
-		f[v] = mog[v];
-	end
-	
 	return f;
 end
 
@@ -182,6 +178,10 @@ function mog:CreateCatalogueModel()
 	f:SetScript("OnClick", mog.ModelOnClick);
 	f:SetScript("OnEnter", mog.ModelOnEnter);
 	f:SetScript("OnLeave", mog.ModelOnLeave);
+	f.OnEnter = mog.ModelOnEnter;
+	for i, v in ipairs(mixins) do
+		f[v] = mog[v];
+	end
 	tinsert(mog.models, f);
 	return f;
 end
@@ -321,9 +321,9 @@ function mog.ModelOnDragStop(self, btn)
 	mog:StopModelUpdater();
 end
 
-function mog.ModelOnEnter(self, ...)
+function mog.ModelOnEnter(self)
 	if mog.active and mog.active.OnEnter then
-		mog.active:OnEnter(self, self.data.value, ...);
+		mog.active:OnEnter(self, self.data.value);
 	end
 end
 
@@ -437,7 +437,7 @@ function mog.scroll.update(self,value,offset,onscroll)
 			if frame:IsShown() then
 				mog:ModelUpdate(frame, value);
 				if GameTooltip:IsOwned(frame) then
-					mog.ModelOnEnter(frame, value);
+					frame:OnEnter();
 				end
 			else
 				frame:Show();

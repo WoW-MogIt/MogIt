@@ -101,28 +101,28 @@ function mog.base.Dropdown(module,tier)
 	end
 end
 
-function mog.base.FrameUpdate(module, self, value)
-	self.data.items = value;
-	self.data.cycle = 1;
-	self.data.item = value[self.data.cycle];
+function mog.base:FrameUpdate(frame, value)
+	frame.data.items = value;
+	frame.data.cycle = 1;
+	frame.data.item = value[frame.data.cycle];
 	for i, item in ipairs(value) do
 		if mog:HasItem(item) then
-			self:ShowIndicator("hasItem");
+			frame:ShowIndicator("hasItem");
 		end
 		if mog.wishlist:IsItemInWishlist(item) then
-			self:ShowIndicator("wishlist");
+			frame:ShowIndicator("wishlist");
 		end
 	end
-	mog.Item_FrameUpdate(self, self.data);
+	mog.Item_FrameUpdate(frame, frame.data);
 end
 
-function mog.base.OnEnter(module, self, value)
-	local data = self.data;
-	mog.Item_OnEnter(self, data.item, data.items, data.cycle);
+function mog.base:OnEnter(frame, value)
+	local data = frame.data;
+	mog.ShowItemTooltip(frame, data.item, data.items, data.cycle);
 end
 
-function mog.base.OnClick(module, self, btn, value)
-	mog.Item_OnClick(self, btn, self.data);
+function mog.base:OnClick(frame, btn, value)
+	mog.Item_OnClick(frame, btn, frame.data);
 end
 
 function mog.base.Unlist(module)

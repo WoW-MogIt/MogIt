@@ -153,9 +153,9 @@ end
 
 function wishlist:OnEnter(frame, value)
 	if type(value) == "table" then
-		mog.Set_OnEnter(frame, value)
+		mog.ShowSetTooltip(frame, value.items, value.name)
 	else
-		mog.Item_OnEnter(frame, value, mog:GetData("display", mog:GetData("item", value, "display"), "items"))
+		mog.ShowItemTooltip(frame, value, mog:GetData("display", mog:GetData("item", value, "display"), "items"))
 	end
 end
 
