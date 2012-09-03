@@ -145,6 +145,7 @@ function mog:CreateModelFrame(parent)
 	f.bg:SetAllPoints(f);
 	f.bg:SetTexture(0.3,0.3,0.3,0.2);
 	
+	f:SetScript("OnUpdate",mog.ModelOnUpdate);
 	f:SetScript("OnShow",mog.ModelOnShow);
 	f:SetScript("OnHide",mog.ModelOnHide);
 	f:RegisterForClicks("AnyUp");
@@ -286,6 +287,13 @@ end
 
 
 --// Model Functions
+function mog.ModelOnUpdate(self)
+	--56, 108, 237, 238, 239, 243, 249, 250, 251, 252, 253, 254, 255
+	if mog.db.profile.noAnim then
+		self.model:SetSequence(254);
+	end
+end
+
 function mog.ModelOnShow(self)
 	local lvl = self:GetParent():GetFrameLevel();
 	if self:GetFrameLevel() <= lvl then
@@ -817,19 +825,23 @@ mog.menu.options:SetPoint("LEFT", mog.menu.preview, "RIGHT", 5, 0);
 --//
 
 local help = mog.menu:CreateMenu(L["Help"])
-help:SetNormalFontObject(GameFontHighlight)
+-- help:SetNormalFontObject(GameFontHighlight)
 help:SetPoint("LEFT", mog.menu.options, "RIGHT", 5, 0)
 help:SetScript("OnClick", nil);
 help:SetScript("OnEnter", function(self)
 	GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
 	GameTooltip:AddLine(L["How to use"]);
-	-- GameTooltip:AddLine(L["Left click-horizontal drag to ."], 0, 1, 0);
-	GameTooltip:AddLine(L["Left click and drag to zoom and rotate"], 0, 1, 0);
-	GameTooltip:AddLine(L["Right click drag to move"], 0, 1, 0);
+	GameTooltip:AddLine(" ");
+	GameTooltip:AddLine(L["Model controls"]);
+	GameTooltip:AddLine(L["Left click and drag horizontally to rotate"], 1, 1, 1);
+	GameTooltip:AddLine(L["Left click and drag vertically to zoom"], 1, 1, 1);
+	GameTooltip:AddLine(L["Right click and drag to move"], 1, 1, 1);
 	local info = mog.active and mog.active.Help
 	if info then
+		GameTooltip:AddLine(" ");
+		GameTooltip:AddLine(L["Module controls"]);
 		for i, v in ipairs(info) do
-			GameTooltip:AddLine(v, 0, 1, 0);
+			GameTooltip:AddLine(v, 1, 1, 1);
 		end
 	end
 	GameTooltip:Show()
