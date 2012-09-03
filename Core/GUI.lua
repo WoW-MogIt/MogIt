@@ -42,6 +42,8 @@ local gender = {
 
 local myRace = raceID[select(2, UnitRace("player"))]
 local myGender = UnitSex("player") - 2
+mog.playerRace = myRace;
+mog.playerGender = myGender;
 
 mog.displayRace = myRace
 mog.displayGender = myGender

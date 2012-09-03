@@ -28,8 +28,8 @@ function mog:SetToLink(set,race,gender)
 		link = link..("%0"..maxlen.."s"):format(toBase(v));
 	end
 	link = link..":";
-	link = link..(race and toBase(race));
-	link = link..(gender and toBase(gender));
+	link = link..(race and toBase(race) or mog.playerRace);
+	link = link..(gender and toBase(gender) or mog.playerGender);
 	link = link.."]";
 	return link;
 end
