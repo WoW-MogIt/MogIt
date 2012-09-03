@@ -169,14 +169,14 @@ function mog.base.BuildList(module)
 	return list;
 end
 
-function mog.base.Help(module)
-	GameTooltip:AddDoubleLine(L["Change item"],		L["Left click"],			0,1,0,1,1,1);
-	GameTooltip:AddDoubleLine(L["Chat link"],		L["Shift + Left click"],	0,1,0,1,1,1);
-	GameTooltip:AddDoubleLine(L["Try on"],			L["Ctrl + Left click"],		0,1,0,1,1,1);
-	GameTooltip:AddDoubleLine(L["Wishlist menu"],	L["Right click"],			0,1,0,1,1,1);
-	GameTooltip:AddDoubleLine(L["Item URL"],		L["Shift + Right click"],	0,1,0,1,1,1);
-	GameTooltip:AddDoubleLine(L["Add to preview"],	L["Ctrl + Right click"],	0,1,0,1,1,1);
-end
+mog.base.Help = {
+	L["Left click to cycle through items"],
+	L["Right click for additional options"],
+	L["Shift-left click to link"],
+	L["Shift-right click for item URL"],
+	L["Ctrl-left click to try on in dressing room"],
+	L["Ctrl-right click to preview with MogIt"],
+}
 
 function mog.base.GetFilterArgs(filter,item)
 	if filter == "name" then
