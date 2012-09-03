@@ -100,21 +100,12 @@ end
 
 
 --// Toolbar
-local function previewActive(self)
-	if self.value == mog.activePreview then
-		mog.activePreview = nil;
-	else
-		mog.activePreview = self.value;
-	end
-end
+local currentPreview;
 
 local function previewInitialize(self, level)
-	local info = UIDropDownMenu_CreateInfo()
-	info.text = L["Active Preview"]
-	info.func = previewActive;
-	info.value = self.parent;
-	info.checked = mog.activePreview == self.parent;
-	UIDropDownMenu_AddButton(info, level)
+	currentPreview = self.parent;
+	
+	-- nono
 end
 
 local newSet = {items = {}}
@@ -123,7 +114,7 @@ local function onClick(self)
 	newSet.name = self.value
 	wipe(newSet.items)
 	--> Need to change mog.view to preview somehow
-	for slot, v in pairs(self.arg1.slots) do
+	for slot, v in pairs(currentPreview.slots) do
 		newSet.items[slot] = v.item
 	end
 	StaticPopup_Show("MOGIT_WISHLIST_OVERWRITE_SET", self.value, nil, newSet)
@@ -133,43 +124,45 @@ local function newSetOnClick(self)
 	wipe(newSet.items)
 	newSet.name = "Set "..(#mog.wishlist:GetSets() + 1)
 	--> Need to change mog.view to preview somehow
-	for slot, v in pairs(self.arg1.slots) do
+	for slot, v in pairs(currentPreview.slots) do
 		newSet.items[slot] = v.item
 	end
 	StaticPopup_Show("MOGIT_WISHLIST_CREATE_SET", nil, nil, newSet)
 end
 
 local function saveInitialize(self, level)
-	mog.wishlist:AddSetMenuItems(level, onClick, self.parent)
+	currentPreview = self.parent;
+	
+	mog.wishlist:AddSetMenuItems(level, onClick)
 	
 	local info = UIDropDownMenu_CreateInfo()
 	info.text = L["New set"]
 	info.func = newSetOnClick
-	info.arg1 = self.parent;
 	info.colorCode = GREEN_FONT_COLOR_CODE
 	info.notCheckable = true
 	UIDropDownMenu_AddButton(info, level)
 end
 
 local function onClick(self, profile)
-	for k, v in pairs(self.arg1.slots) do
+	for k, v in pairs(currentPreview.slots) do
 		mog.view.DelItem(k)
 	end
 	for slot, itemID in pairs(mog.wishlist:GetSetItems(self.value, profile)) do
-		mog:AddToPreview(itemID,self.arg1)
+		mog:AddToPreview(itemID,currentPreview)
 	end
 	CloseDropDownMenus()
 end
 
 local function loadInitialize(self, level)
+	currentPreview = self.parent;
+	
 	if level == 1 then
-		mog.wishlist:AddSetMenuItems(level, onClick, self.parent)
+		mog.wishlist:AddSetMenuItems(level, onClick)
 		
 		local info = UIDropDownMenu_CreateInfo()
 		info.text = L["Other profiles"]
 		info.hasArrow = true
 		info.notCheckable = true
-		info.arg1 = self.parent;
 		UIDropDownMenu_AddButton(info, level)
 	elseif level == 2 then
 		local curProfile = mog.wishlist:GetCurrentProfile()
@@ -179,7 +172,6 @@ local function loadInitialize(self, level)
 				info.text = profile
 				info.hasArrow = true
 				info.notCheckable = true
-				info.arg1 = self.parent;
 				UIDropDownMenu_AddButton(info, level)
 			end
 		end
