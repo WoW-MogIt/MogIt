@@ -1,26 +1,18 @@
 General:
 [!] Check for errors
-[A] Check for Localization
-[A] Move self.type outside of the model creation function
 
 Preview:
 [?] mog.view.AddItem Undress weapons and re-equip
-[A] Preview menu: mog.activePreview, chat links, add item, import, export
-[L (WAT)] Confirmation on closing a preview
 [!] Previews bugging when opening from a link (gender not changing, all items equipped, etc)
 
 GUI:
 [?] Hidden helm/cloak showing on models
 [?] SetAnimation instead of SetSequence
-[A] Preview menu: New Preview, Hide/Show Previews, Close All Previews, Synchronize movement
 [?] Add a "Help" menu button and create some form of popup which contains something passed by each module (template one too?)
 [?] Disable modules (or the bracket text) in the module dropdown if version isnt compatible?
 
 Help:
 [?] Help frame + menu button
-
-Links:
-[A] Open new preview + set race/gender on click
 
 Modules:
 [A] Update extra modules
