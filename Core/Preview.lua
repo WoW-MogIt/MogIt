@@ -145,7 +145,7 @@ end
 
 local function onClick(self, profile)
 	for k, v in pairs(currentPreview.slots) do
-		mog.view.DelItem(k)
+		mog.view.DelItem(k,currentPreview)
 	end
 	for slot, itemID in pairs(mog.wishlist:GetSetItems(self.value, profile)) do
 		mog:AddToPreview(itemID,currentPreview)
