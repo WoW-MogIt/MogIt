@@ -33,6 +33,10 @@ local raceID = {
    ["Draenei"] = 11,
    ["Worgen"] = 22,
    ["Pandaren"] = 24,
+   
+   ["NightElf"] = 4,
+   ["Scourge"] = 5,
+   ["BloodElf"] = 10,
 }
 
 local gender = {
