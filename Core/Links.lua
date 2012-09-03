@@ -28,8 +28,8 @@ function mog:SetToLink(set,race,gender)
 		link = link..("%0"..maxlen.."s"):format(toBase(v));
 	end
 	link = link..":";
-	link = link..(race and toBase(race) or "0");
-	link = link..(gender and toBase(gender) or "0");
+	link = link..(race and toBase(race));
+	link = link..(gender and toBase(gender));
 	link = link.."]";
 	return link;
 end
@@ -43,8 +43,8 @@ function mog:LinkToSet(link)
 			table.insert(set,fromBase(items:sub((i-1)*maxlen+1,i*maxlen)));
 		end
 	end
-	race = race and race ~= "0" and fromBase(race);
-	gender = gender and gender ~= "0" and fromBase(gender);
+	race = race and fromBase(race);
+	gender = gender and fromBase(gender);
 	return set,race,gender;
 end
 
@@ -83,9 +83,11 @@ function SetItemRef(link,...)
 			local preview = mog:CreatePreview();
 			local set,race,gender = mog:LinkToSet(link);
 			mog:AddToPreview(set,preview);
-			preview.data.race = race;
-			preview.data.gender = gender;
-			mog:BuildModel(preview.model);
+			if race and gender then
+				preview.data.race = race;
+				preview.data.gender = gender;
+				mog:BuildModel(preview.model);
+			end
 		end
 	else
 		return old_SetItemRef(link,...);
