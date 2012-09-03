@@ -34,8 +34,6 @@ function mog.createOptions()
 				end
 			elseif info.arg == "rows" or info.arg == "columns" then
 				mog:UpdateGUI();
-			elseif info.arg == "gridDress" then
-				mog.scroll:update();
 			end
 		end
 	end
@@ -60,13 +58,6 @@ function mog.createOptions()
 				width = "full",
 				arg = "minimap",
 			},
-			clearOnPreviewSet = {
-				type = "toggle",
-				order = 1.5,
-				name = L["Undress before previewing sets"],
-				width = "full",
-				arg = "clearOnPreviewSet",
-			},
 			catalogue = {
 				type = "group",
 				order = 2,
@@ -79,18 +70,6 @@ function mog.createOptions()
 						name = L["No animation"],
 						width = "double",
 						arg = "noAnim",
-					},
-					dress = {
-						type = "select",
-						order = 2,
-						name = L["Dress models"],
-						width = "double",
-						values = {
-							none = NONE,
-							preview = L["Preview"],
-							equipped = L["Equipped"],
-						};
-						arg = "gridDress",
 					},
 					url = {
 						type = "select",

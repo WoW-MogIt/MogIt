@@ -78,7 +78,8 @@ function SetItemRef(link,...)
 		if IsModifiedClick("CHATLINK") then
 			ChatEdit_InsertLink("["..link.."]")
 		else
-			mog:AddToPreview(mog:LinkToSet(link));
+			local preivew = mog:CreatePreview();
+			mog:AddToPreview(mog:LinkToSet(link),preview);
 		end
 	else
 		return old_SetItemRef(link,...);
