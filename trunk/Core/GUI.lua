@@ -323,7 +323,7 @@ end
 
 function mog.ModelOnEnter(self, ...)
 	if mog.active and mog.active.OnEnter then
-		mog.active:OnEnter(self, self.data.value,...);
+		mog.active:OnEnter(self, self.data.value, ...);
 	end
 end
 
@@ -651,6 +651,30 @@ local function setDisplayModel(self, arg1)
 	CloseDropDownMenus(1);
 end
 
+function mog:CreateRaceMenu(level, func, selectedRace)
+	for i, race in ipairs(races) do -- pairs may yield unexpected order
+		local info = UIDropDownMenu_CreateInfo();
+		info.text = LBR[race] or race; -- fall back to English 'race' until there's pandaren localisation
+		info.value = raceID[race];
+		info.func = func;
+		info.checked = selectedRace == raceID[race];
+		info.arg1 = "displayRace";
+		UIDropDownMenu_AddButton(info, level);
+	end
+end
+
+function mog:CreateGenderMenu(level, func, selectedGender)
+	for i, gender in pairs(gender) do -- pairs may yield unexpected order
+		local info = UIDropDownMenu_CreateInfo();
+		info.text = gender;
+		info.value = i;
+		info.func = func;
+		info.checked = selectedGender == i;
+		info.arg1 = "displayGender";
+		UIDropDownMenu_AddButton(info, level);
+	end
+end
+
 local dressOptions = {
 	none = NONE,
 	preview = L["Preview"],
@@ -727,31 +751,9 @@ mog.menu.catalogue = mog.menu:CreateMenu(L["Catalogue"], function(self, tier)
 			self.tier[3].Dropdown(mog.active,tier);
 		end
 	elseif self.tier[2] == "race" then
-		if tier == 2 then
-			for i, race in ipairs(races) do -- pairs may yield unexpected order
-				local info = UIDropDownMenu_CreateInfo();
-				info.text = LBR[race] or race; -- fall back to English 'race' until there's pandaren localisation
-				info.value = raceID[race];
-				info.func = setDisplayModel;
-				info.checked = mog.displayRace == raceID[race];
-				info.keepShownOnClick = true;
-				info.arg1 = "displayRace";
-				UIDropDownMenu_AddButton(info,tier);
-			end
-		end
+		mog:CreateRaceMenu(tier, setDisplayModel, mog.displayRace)
 	elseif self.tier[2] == "gender" then
-		if tier == 2 then
-			for i, gender in pairs(gender) do -- pairs may yield unexpected order
-				local info = UIDropDownMenu_CreateInfo();
-				info.text = gender;
-				info.value = i;
-				info.func = setDisplayModel;
-				info.checked = mog.displayGender == i;
-				info.keepShownOnClick = true;
-				info.arg1 = "displayGender";
-				UIDropDownMenu_AddButton(info,tier);
-			end
-		end
+		mog:CreateGenderMenu(tier, setDisplayModel, mog.displayGender)
 	elseif self.tier[2] == "gridDress" then
 		if tier == 2 then
 			for k, v in pairs(dressOptions) do

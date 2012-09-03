@@ -64,7 +64,7 @@ end
 
 local function slotOnEnter(self)
 	if self.item then
-		mog.Item_OnEnter(self,self.item);
+		mog.Item_OnEnter(self, self.item);
 	else
 		GameTooltip:SetOwner(self,"ANCHOR_RIGHT");
 		GameTooltip:SetText(_G[strupper(self.slot)]);
@@ -102,10 +102,40 @@ end
 --// Toolbar
 local currentPreview;
 
+local function setDisplayModel(self, arg1)
+	currentPreview.data[arg1] = self.value;
+	local model = currentPreview.model;
+	model.model:SetPosition(0, 0, 0);
+	mog:BuildModel(model);
+	mog:DressModel(model);
+	mog:PositionModel(model);
+	CloseDropDownMenus(1);
+end
+
 local function previewInitialize(self, level)
-	currentPreview = self.parent;
+	if level == 1 then
+		currentPreview = self.parent;
+		
+		local info = UIDropDownMenu_CreateInfo();
+		info.text = "Race";
+		info.value = "race";
+		info.notCheckable = true;
+		info.hasArrow = true;
+		UIDropDownMenu_AddButton(info, level);
+		
+		local info = UIDropDownMenu_CreateInfo();
+		info.text = "Gender";
+		info.value = "gender";
+		info.notCheckable = true;
+		info.hasArrow = true;
+		UIDropDownMenu_AddButton(info, level);
 	
 	-- nono
+	elseif self.tier[2] == "race" then
+		mog:CreateRaceMenu(level, setDisplayModel, self.parent.data.displayRace)
+	elseif self.tier[2] == "gender" then
+		mog:CreateGenderMenu(level, setDisplayModel, self.parent.data.displayGender)
+	end
 end
 
 local newSet = {items = {}}
@@ -113,7 +143,6 @@ local newSet = {items = {}}
 local function onClick(self)
 	newSet.name = self.value
 	wipe(newSet.items)
-	--> Need to change mog.view to preview somehow
 	for slot, v in pairs(currentPreview.slots) do
 		newSet.items[slot] = v.item
 	end
@@ -123,7 +152,6 @@ end
 local function newSetOnClick(self)
 	wipe(newSet.items)
 	newSet.name = "Set "..(#mog.wishlist:GetSets() + 1)
-	--> Need to change mog.view to preview somehow
 	for slot, v in pairs(currentPreview.slots) do
 		newSet.items[slot] = v.item
 	end
@@ -179,95 +207,6 @@ local function loadInitialize(self, level)
 		mog.wishlist:AddSetMenuItems(level, onClick, UIDROPDOWNMENU_MENU_VALUE, UIDROPDOWNMENU_MENU_VALUE)
 	end
 end;
-
---> Does the races dropdown need updating to be like the (ordered) catalogue one?
-local races = {
-   [1] = "HUMAN",
-   [2] = "ORC",
-   [3] = "DWARF",
-   [4] = "NIGHTELF",
-   [5] = "SCOURGE",
-   [6] = "TAUREN",
-   [7] = "GNOME",
-   [8] = "TROLL",
-   [9] = "GOBLIN",
-   [10] = "BLOODELF",
-   [11] = "DRAENEI",
-   [22] = "WORGEN",
-}
-
-local gender = {
-	[0] = "Male",
-	[1] = "Female",
-}
-
-local menuModelNames = {
-	HUMAN = "Human",
-	ORC = "Orc",
-	DWARF = "Dwarf",
-	NIGHTELF = "Nightelf",
-	SCOURGE = "Undead",
-	TAUREN = "Tauren",
-	GNOME = "Gnome",
-	TROLL = "Troll",
-	GOBLIN = "Goblin",
-	BLOODELF = "Bloodelf",
-	DRAENEI = "Draenei",
-	WORGEN = "Worgen",
-}
-
---> Fix for previews
-local function setDisplayModel(self, arg1)
-	mog[arg1] = self.value;
-	for i, model in ipairs(mog.models) do
-		mog:BuildModel(model);
-	end
-	CloseDropDownMenus(1);
-end
-
-local function stopDis(self, tier)
-	if tier == 1 then
-		local info = UIDropDownMenu_CreateInfo();
-		info.text = "Race";
-		info.value = "race";
-		info.notCheckable = true;
-		info.hasArrow = true;
-		UIDropDownMenu_AddButton(info,tier);
-		
-		local info = UIDropDownMenu_CreateInfo();
-		info.text = "Gender";
-		info.value = "gender";
-		info.notCheckable = true;
-		info.hasArrow = true;
-		UIDropDownMenu_AddButton(info,tier);
-	elseif menuBar.tier[2] == "race" then
-		if tier == 2 then
-			for i, race in pairs(races) do -- pairs may yield unexpected order
-				local info = UIDropDownMenu_CreateInfo();
-				info.text = menuModelNames[race];
-				info.value = i;
-				info.func = setDisplayModel;
-				info.checked = mog.displayRace == i;
-				info.keepShownOnClick = true;
-				info.arg1 = "displayRace";
-				UIDropDownMenu_AddButton(info,tier);
-			end
-		end
-	elseif menuBar.tier[2] == "gender" then
-		if tier == 2 then
-			for i, gender in pairs(gender) do -- pairs may yield unexpected order
-				local info = UIDropDownMenu_CreateInfo();
-				info.text = gender;
-				info.value = i;
-				info.func = setDisplayModel;
-				info.checked = mog.displayGender == i;
-				info.keepShownOnClick = true;
-				info.arg1 = "displayGender";
-				UIDropDownMenu_AddButton(info,tier);
-			end
-		end
-	end
-end
 
 local function createMenuBar(parent)
 	local menuBar = mog.CreateMenuBar(parent)
@@ -354,7 +293,10 @@ function mog:CreatePreview()
 	mog.previewNum = mog.previewNum + 1;
 	local f = CreateFrame("Frame","MogItPreview"..mog.previewNum,mog.view,"ButtonFrameTemplate");
 	f.id = mog.previewNum;
-	f.data = {};
+	f.data = {
+		displayRace = mog.playerRace,
+		displayGender = mog.playerGender,
+	};
 		
 	f:SetPoint("CENTER",mog.view,"CENTER");
 	f:SetSize(335,385);
