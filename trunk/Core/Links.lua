@@ -42,7 +42,7 @@ end
 function mog:LinkToSet(link)
 	local set = {};
 	--local items = link:match("MogIt:([^%]:]+)");
-	local items,race,gender = link:match("MogIt:(%w+):?(%w?)(%w?)");
+	local items,race,gender = link:match("MogIt:(%w*):?(%w?)(%w?)");
 	if items then
 		for i=1,#items/maxlen do
 			table.insert(set,fromBase(items:sub((i-1)*maxlen+1,i*maxlen)));

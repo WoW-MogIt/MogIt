@@ -186,8 +186,6 @@ local defaults = {
 		columns = 3,
 		gridDress = "preview",
 		sync = true,
-		--rotateSynced = false,
-		--rotateNoSynced = false,
 		
 		tooltip = true,
 		tooltipWidth = 300,

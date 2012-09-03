@@ -144,7 +144,7 @@ local function previewInitialize(self, level)
 		currentPreview = self.parent;
 		
 		local info = UIDropDownMenu_CreateInfo();
-		info.text = L["Race"];
+		info.text = RACE;
 		info.value = "race";
 		info.notCheckable = true;
 		info.hasArrow = true;
