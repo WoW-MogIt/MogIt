@@ -266,6 +266,31 @@ end;
 
 
 --// Toolbar
+local function helpOnEnter(self)
+	self.nt:SetTexture(1,0.82,0,1);
+	GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT");
+	GameTooltip:AddLine(L["How to use"]);
+	GameTooltip:AddLine(" ");
+	GameTooltip:AddLine(L["Model Controls"]);
+	GameTooltip:AddLine(L["Left click and drag horizontally to rotate"],1,1,1);
+	GameTooltip:AddLine(L["Left click and drag vertically to zoom"],1,1,1);
+	GameTooltip:AddLine(L["Right click and drag to move"],1,1,1);
+	GameTooltip:AddLine(L["Click the bottom right corner and drag to resize"],1,1,1);
+	GameTooltip:AddLine(" ");
+	GameTooltip:AddLine(L["Slot Controls"]);
+	GameTooltip:AddLine(L["Shift + Left click to link an item to chat"],1,1,1);
+	GameTooltip:AddLine(L["Ctrl + Left click to try on an item"],1,1,1);
+	GameTooltip:AddLine(L["Right click to show the item menu"],1,1,1);
+	GameTooltip:AddLine(L["Shift + Right click to show a URL for the item"],1,1,1);
+	GameTooltip:AddLine(L["Ctrl + Right click to remove the item from the preview"],1,1,1);
+	GameTooltip:Show();
+end
+
+local function helpOnLeave(self)
+	GameTooltip:Hide();
+	self.nt:SetTexture(0,0,0,0);
+end
+
 local function createMenuBar(parent)
 	local menuBar = mog.CreateMenuBar(parent)
 	
@@ -277,6 +302,11 @@ local function createMenuBar(parent)
 	
 	menuBar.save = menuBar:CreateMenu(L["Save"], saveInitialize);
 	menuBar.save:SetPoint("LEFT", menuBar.load, "RIGHT", 5, 0);
+	
+	menuBar.help = menuBar:CreateMenu(L["Help"]);
+	menuBar.help:SetPoint("LEFT", menuBar.save, "RIGHT", 5, 0);
+	menuBar.help:SetScript("OnEnter",helpOnEnter);
+	menuBar.help:SetScript("OnLeave",helpOnLeave);
 end
 --//
 
