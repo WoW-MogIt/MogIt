@@ -453,6 +453,9 @@ function mog.scroll.update(self,value,offset,onscroll)
 			frame:SetAlpha(1);
 			frame:Enable();
 		else
+			if mog.modelUpdater.model == frame then
+				mog:StopModelUpdater();
+			end
 			frame:SetAlpha(0);
 			frame:Disable();
 		end
