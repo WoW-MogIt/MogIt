@@ -60,6 +60,12 @@ function mog.GetItemSourceShort(itemID)
 end
 
 -- create a new set and add the item to it
+local function previewOnClick(self, previewFrame)
+	mog:AddToPreview(self.value, previewFrame or mog:CreatePreview())
+	CloseDropDownMenus()
+end
+
+-- create a new set and add the item to it
 local function newSetOnClick(self)
 	StaticPopup_Show("MOGIT_WISHLIST_CREATE_SET", nil, nil, self.value)
 	CloseDropDownMenus()
@@ -68,9 +74,33 @@ end
 local itemOptionsMenu = {
 	{
 		text = L["Preview"],
-		func = function(self)
-			mog:AddToPreview(self.value)
-			CloseDropDownMenus()
+		hasArrow = true,
+		menuList = function(level)
+			local info = UIDropDownMenu_CreateInfo()
+			info.text = L["New preview"]
+			info.value = UIDROPDOWNMENU_MENU_VALUE
+			info.func = previewOnClick
+			info.notCheckable = true
+			UIDropDownMenu_AddButton(info, level)
+			
+			local info = UIDropDownMenu_CreateInfo()
+			info.text = L["Active preview"]
+			info.value = UIDROPDOWNMENU_MENU_VALUE
+			info.func = previewOnClick
+			info.disabled = not mog.activePreview
+			info.notCheckable = true
+			info.arg1 = mog.activePreview
+			UIDropDownMenu_AddButton(info, level)
+			
+			for i, preview in ipairs(mog.previews) do
+				local info = UIDropDownMenu_CreateInfo()
+				info.text = format("%s %d", L["Preview"], preview.id)
+				info.value = UIDROPDOWNMENU_MENU_VALUE
+				info.func = previewOnClick
+				info.notCheckable = true
+				info.arg1 = preview
+				UIDropDownMenu_AddButton(info, level)
+			end
 		end,
 	},
 	{
