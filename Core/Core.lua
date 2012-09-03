@@ -124,12 +124,14 @@ end
 
 --// Item Cache
 local GetItemInfo = GetItemInfo;
-mog.cacheQueue = {};
-mog.cacheFuncs = {
+
+local cacheQueue = {};
+local cacheFuncs = {
 	BuildList = mog.BuildList;
 	ModelOnEnter = function()
 		local owner = GameTooltip:GetOwner();
 		if owner and GameTooltip[mog] then
+			print("callback")
 			mog.ModelOnEnter(owner);
 		end
 	end,
@@ -146,25 +148,31 @@ mog.cacheFuncs = {
 		end
 	end,
 };
+mog.cacheFuncs = cacheFuncs;
 
 function mog:GetItemInfo(id,type)
 	if GetItemInfo(id) then
 		return GetItemInfo(id);
-	elseif mog.cacheFuncs[type] then
-		mog.cacheQueue[type] = true;
+	elseif cacheFuncs[type] then
+		print("request item info", type, id)
+		cacheQueue[type] = true;
 	end
 end
 
 function mog.ItemInfoReceived()
-	for k,v in pairs(mog.cacheQueue) do
-		if v and mog.cacheFuncs[k] then
-			mog.cacheFuncs[k]();
-		end
-		mog.cacheQueue[k] = nil;
+	print"item info received"
+	for k in pairs(cacheQueue) do
+		print(nil, k)
+		cacheFuncs[k]();
+		cacheQueue[k] = nil;
 	end
 	mog.frame:SetScript("OnUpdate", nil);
 end
 --//
+
+function mog:HasItem(itemID)
+	return GetItemCount(itemID, true) > 0
+end
 
 
 --// Events

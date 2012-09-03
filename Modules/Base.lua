@@ -101,28 +101,28 @@ function mog.base.Dropdown(module,tier)
 	end
 end
 
-function mog.base.FrameUpdate(module,self,value)
+function mog.base.FrameUpdate(module, self, value)
 	self.data.items = value;
 	self.data.cycle = 1;
 	self.data.item = value[self.data.cycle];
 	for i, item in ipairs(value) do
-		if GetItemCount(item, true) > 0 then
+		if mog:HasItem(item) then
 			self:ShowIndicator("hasItem");
 		end
 		if mog.wishlist:IsItemInWishlist(item) then
 			self:ShowIndicator("wishlist");
 		end
 	end
-	mog.Item_FrameUpdate(self,self.data);
+	mog.Item_FrameUpdate(self, self.data);
 end
 
-function mog.base.OnEnter(module,self,value)
+function mog.base.OnEnter(module, self, value)
 	local data = self.data;
-	mog.Item_OnEnter(self,data.item,data.items,data.cycle);
+	mog.Item_OnEnter(self, data.item, data.items, data.cycle);
 end
 
-function mog.base.OnClick(module,self,btn,value)
-	mog.Item_OnClick(self,btn,self.data);
+function mog.base.OnClick(module, self, btn, value)
+	mog.Item_OnClick(self, btn, self.data);
 end
 
 function mog.base.Unlist(module)
@@ -130,8 +130,8 @@ function mog.base.Unlist(module)
 end
 
 local function itemSort(a, b)
-	local aLevel = mog:GetData("item",a,"level") or 0;
-	local bLevel = mog:GetData("item",b,"level") or 0;
+	local aLevel = mog:GetData("item", a, "level") or 0;
+	local bLevel = mog:GetData("item", b, "level") or 0;
 	if aLevel == bLevel then
 		return a < b;
 	else
@@ -139,15 +139,15 @@ local function itemSort(a, b)
 	end
 end
 
-local function buildList(module,slot,list,items)
-	for _,item in ipairs(slot) do
+local function buildList(module, slot, list, items)
+	for _, item in ipairs(slot) do
 		if mog:CheckFilters(module,item) then
 			local display = mog:GetData("item", item, "display");
 			if not items[display] then
 				items[display] = {};
-				tinsert(list,items[display]);
+				tinsert(list, items[display]);
 			end
-			tinsert(items[display],item);
+			tinsert(items[display], item);
 		end
 	end
 end
@@ -156,14 +156,14 @@ function mog.base.BuildList(module)
 	wipe(list);
 	local items = {};
 	if module.active then
-		buildList(module,module.active.list,list,items);
+		buildList(module, module.active.list, list, items);
 	else
-		for _,data in pairs(module.slots) do
-			buildList(module,data.list,list,items);
+		for _, data in pairs(module.slots) do
+			buildList(module, data.list, list, items);
 		end
 	end
 	for _,tbl in ipairs(list) do
-		sort(tbl,itemSort);
+		sort(tbl, itemSort);
 	end
 	items = nil;
 	return list;
@@ -180,9 +180,9 @@ end
 
 function mog.base.GetFilterArgs(filter,item)
 	if filter == "name" then
-		return mog:GetItemInfo(item,"BuildList");
+		return mog:GetItemInfo(item, "BuildList");
 	elseif filter == "itemLevel" then
-		return select(4,mog:GetItemInfo(item,"BuildList"));
+		return select(4,mog:GetItemInfo(item, "BuildList"));
 	elseif filter == "source" then
 		return mog:GetData("item", item, "source"),mog:GetData("item", item, "sourceinfo");
 	else
@@ -194,14 +194,14 @@ function mog.base.SortLevel(items)
 	-- return mog:GetData("item",items[1],"level");
 	local tbl = {};
 	for k,v in ipairs(items) do
-		table.insert(tbl,mog:GetData("item", v, "level"));
+		table.insert(tbl, mog:GetData("item", v, "level"));
 	end
 	return tbl;
 end
 
 function mog.base.SortColour(items)
-	local display = mog:GetData("item",items[1],"display");
-	return {mog:GetData("display",display,"colour1"),mog:GetData("display",display,"colour2"),mog:GetData("display",display,"colour3")};
+	local display = mog:GetData("item", items[1], "display");
+	return {mog:GetData("display",display,"colour1"), mog:GetData("display",display,"colour2"), mog:GetData("display",display,"colour3")};
 	--return mog:GetData("display",display,"colours");
 end
 --//
@@ -220,8 +220,8 @@ local addons = {
 	"MogIt_Accessories",
 };
 
-for _,addon in ipairs(addons) do
-	local _,title,_,_,loadable = GetAddOnInfo(addon);
+for _, addon in ipairs(addons) do
+	local _, title, _, _, loadable = GetAddOnInfo(addon);
 	if loadable then
 		mog:RegisterModule(addon,tonumber(GetAddOnMetadata(addon,"X-MogItModuleVersion")),{
 			label = title:match("MogIt_(.+)") or title,
@@ -237,9 +237,9 @@ for _,addon in ipairs(addons) do
 			Help = mog.base.Help,
 			GetFilterArgs = mog.base.GetFilterArgs,
 			filters = {
-				"name",
+				-- "name",
 				"level",
-				"itemLevel",
+				-- "itemLevel",
 				"faction",
 				"class",
 				"source",
