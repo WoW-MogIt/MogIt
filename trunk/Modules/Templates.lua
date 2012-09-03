@@ -1,12 +1,16 @@
 local MogIt, mog = ...
 local L = mog.L
 
-local function itemLabel(itemID, textHeight)
-	local name, _, quality = GetItemInfo(itemID) -- need changing to mog:GII
+local function itemIcon(itemID, textHeight)
+	return format("|T%s:%d|t ", GetItemIcon(itemID), textHeight or 0)
+end
+
+local function itemLabel(itemID, callback)
+	local name, _, quality = mog:GetItemInfo(itemID, callback) -- need changing to mog:GII
 	if name then
-		return format("|T%s:%d|t |c%s%s|r", GetItemIcon(itemID), textHeight or 0, select(4, GetItemQualityColor(quality)), name)
+		return format("|c%s%s|r", select(4, GetItemQualityColor(quality)), name)
 	else
-		return format("|T%s:%d|t %s", GetItemIcon(itemID), textHeight or 0, RED_FONT_COLOR_CODE..RETRIEVING_ITEM_INFO..FONT_COLOR_CODE_CLOSE)
+		return RED_FONT_COLOR_CODE..RETRIEVING_ITEM_INFO..FONT_COLOR_CODE_CLOSE
 	end
 end
 
@@ -123,7 +127,7 @@ local function createItemMenu(data, func)
 		v = isArray and v or items[v]
 		if v then
 			local info = UIDropDownMenu_CreateInfo()
-			info.text = itemLabel(v, 16)
+			info.text = itemLabel(v)
 			info.value = v
 			info.func = func
 			info.checked = (i == data.cycle)
@@ -191,9 +195,9 @@ function mog.Item_OnEnter(self, item, items, cycle)
 	--GameTooltip:AddLine(" ")
 	
 	if cycle and #items > 1 then
-		GameTooltip:AddDoubleLine(itemLabel(item), L["Item %d/%d"]:format(cycle, #items), nil, nil, nil, 1, 0, 0)
+		GameTooltip:AddDoubleLine(itemLabel(item, "ModelOnEnter"), L["Item %d/%d"]:format(cycle, #items), nil, nil, nil, 1, 0, 0)
 	else
-		GameTooltip:AddLine(itemLabel(item))
+		GameTooltip:AddLine(itemLabel(item, "ModelOnEnter"))
 	end
 	
 	local sourceType, source, zone, info = mog.GetItemSourceInfo(item)
@@ -261,7 +265,7 @@ function mog.Item_OnEnter(self, item, items, cycle)
 		GameTooltip:AddLine(L["Other items using this appearance:"])
 		for i, v in ipairs(items) do
 			if v ~= item then
-				GameTooltip:AddDoubleLine(itemLabel(v), mog.GetItemSourceShort(v), nil, nil, nil, 1, 1, 1)
+				GameTooltip:AddDoubleLine(itemLabel(v, "ModelOnEnter"), mog.GetItemSourceShort(v), nil, nil, nil, 1, 1, 1)
 				if GetItemCount(v, true) > 0 then
 					GameTooltip:AddTexture("Interface\\RaidFrame\\ReadyCheck-Ready")
 				end
@@ -360,7 +364,7 @@ function mog.Set_OnEnter(self, data)
 	for i, slot in ipairs(mog.slots) do
 		local itemID = data.items[slot] or data.items[i]
 		if itemID then
-			GameTooltip:AddDoubleLine((GetItemCount(itemID, true) > 0 and "|TInterface\\RaidFrame\\ReadyCheck-Ready:0|t " or "")..itemLabel(itemID), mog.GetItemSourceShort(itemID), nil, nil, nil, 1, 1, 1)
+			GameTooltip:AddDoubleLine((GetItemCount(itemID, true) > 0 and "|TInterface\\RaidFrame\\ReadyCheck-Ready:0|t " or "")..itemLabel(itemID, "ModelOnEnter"), mog.GetItemSourceShort(itemID), nil, nil, nil, 1, 1, 1)
 		end
 	end
 	
