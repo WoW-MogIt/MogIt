@@ -64,7 +64,7 @@ end
 
 local function slotOnEnter(self)
 	if self.item then
-		mog.Item_OnEnter(self, self.item);
+		mog.ShowItemTooltip(self, self.item);
 	else
 		GameTooltip:SetOwner(self,"ANCHOR_RIGHT");
 		GameTooltip:SetText(_G[strupper(self.slot)]);
@@ -361,6 +361,7 @@ function mog:CreatePreview()
 		f.slots[slot]:SetScript("OnClick",slotOnClick);
 		f.slots[slot]:SetScript("OnEnter",slotOnEnter);
 		f.slots[slot]:SetScript("OnLeave",slotOnLeave);
+		f.slots[slot].OnEnter = slotOnEnter;
 	end
 	
 	createMenuBar(f);
