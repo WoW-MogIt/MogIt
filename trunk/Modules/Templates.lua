@@ -281,7 +281,7 @@ function mog.ShowItemTooltip(self, item, items, cycle)
 	end
 	
 	-- add wishlist info about this item
-	if mog.active.name ~= "Wishlist" and mog.wishlist:IsItemInWishlist(item) then
+	if (not mog.active or mog.active.name ~= "Wishlist") and mog.wishlist:IsItemInWishlist(item) then
 		GameTooltip:AddLine(" ")
 		GameTooltip:AddLine(L["This item is on your wishlist."], 1, 1, 1)
 		GameTooltip:AddTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcon_1")

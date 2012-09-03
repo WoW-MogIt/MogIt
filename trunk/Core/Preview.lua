@@ -575,9 +575,6 @@ StaticPopupDialogs["MOGIT_PREVIEW_ADDITEM"] = {
 	hasEditBox = 1,
 	maxLetters = 512,
 	editBoxWidth = 260,
-	OnShow = function(self)
-		self.editBox:SetFocus();
-	end,
 	OnAccept = function(self,preview)
 		local text = self.editBox:GetText();
 		text = text and text:match("(%d+).-$");
@@ -596,7 +593,6 @@ StaticPopupDialogs["MOGIT_PREVIEW_ADDITEM"] = {
 	timeout = 0,
 	exclusive = 1,
 	whileDead = 1,
-	hideOnEscape = 1
 };
 
 StaticPopupDialogs["MOGIT_PREVIEW_IMPORT"] = {
@@ -618,7 +614,6 @@ StaticPopupDialogs["MOGIT_PREVIEW_IMPORT"] = {
 			end
 		end
 		self.editBox:SetText(str or "");
-		self.editBox:SetFocus();
 		self.editBox:HighlightText();
 	end,
 	OnAccept = function(self,preview)
@@ -653,7 +648,6 @@ StaticPopupDialogs["MOGIT_PREVIEW_IMPORT"] = {
 	timeout = 0,
 	exclusive = 1,
 	whileDead = 1,
-	hideOnEscape = 1
 };
 --//
 
