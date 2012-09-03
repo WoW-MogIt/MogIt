@@ -128,7 +128,6 @@ mog.cacheQueue = {};
 mog.cacheFuncs = {
 	BuildList = mog.BuildList;
 	ModelOnEnter = function()
-		--> Does this need GameTooltip[mog] ?
 		local owner = GameTooltip:GetOwner();
 		if owner and GameTooltip[mog] then
 			mog.ModelOnEnter(owner);
