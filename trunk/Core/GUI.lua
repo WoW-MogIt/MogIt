@@ -33,7 +33,7 @@ local raceID = {
    ["Draenei"] = 11,
    ["Worgen"] = 22,
    ["Pandaren"] = 24,
-   
+   -- UnitRace returns differently for the following races, so need to include exceptions
    ["NightElf"] = 4,
    ["Scourge"] = 5,
    ["BloodElf"] = 10,
@@ -63,12 +63,14 @@ mog.frame:EnableMouseWheel(true);
 mog.frame:SetMovable(true);
 mog.frame:SetResizable(true);
 mog.frame:SetDontSavePosition(true);
-mog.frame:SetScript("OnMouseDown",mog.frame.StartMoving);
-mog.frame:SetScript("OnMouseUp",function(self)
+mog.frame:SetScript("OnMouseDown", mog.frame.StartMoving);
+local function stopMovingOrSizing(self)
 	self:StopMovingOrSizing();
 	local profile = mog.db.profile;
 	profile.point, profile.x, profile.y = select(3, self:GetPoint());
-end);
+end
+mog.frame:SetScript("OnMouseUp", stopMovingOrSizing);
+mog.frame:SetScript("OnHide", stopMovingOrSizing);
 tinsert(UISpecialFrames,"MogItFrame");
 
 mog.frame.TitleText:SetText("MogIt");
@@ -77,29 +79,24 @@ mog.frame.portrait:SetTexture("Interface\\AddOns\\MogIt\\Images\\MogIt");
 mog.frame.portrait:SetTexCoord(0,106/128,0,105/128);
 MogItFrameBg:SetVertexColor(0.8,0.3,0.8);
 
-mog.frame.resize = CreateFrame("Frame",nil,mog.frame);
+mog.frame.resize = CreateFrame("Button",nil,mog.frame);
 mog.frame.resize:SetSize(16,16);
 mog.frame.resize:SetPoint("BOTTOMRIGHT",mog.frame,"BOTTOMRIGHT",-4,3);
 mog.frame.resize:EnableMouse(true);
-function mog.frame.resize.update(self)
-	mog.db.profile.gridWidth = mog.frame:GetWidth();
-	mog.db.profile.gridHeight = mog.frame:GetHeight();
-	mog:UpdateGUI(true);
-end
-mog.frame.resize:SetScript("OnMouseDown",function(self)
+mog.frame.resize:SetHitRectInsets(0, -4, 0, -3)
+mog.frame.resize:SetScript("OnMouseDown", function(self)
 	mog.frame:SetMinResize(510,350);
-	mog.frame:SetMaxResize(GetScreenWidth(),GetScreenHeight());
+	mog.frame:SetMaxResize(GetScreenWidth(), GetScreenHeight());
 	mog.frame:StartSizing();
-	self:SetScript("OnUpdate",self.update);
 end);
-mog.frame.resize:SetScript("OnMouseUp",function(self)
+local function stopMovingOrSizing()
 	mog.frame:StopMovingOrSizing();
-	self:SetScript("OnUpdate",nil);
-end);
-mog.frame.resize:SetScript("OnHide",mog.frame.resize:GetScript("OnMouseUp"));
-mog.frame.resize.texture = mog.frame.resize:CreateTexture(nil,"OVERLAY");
-mog.frame.resize.texture:SetTexture("Interface\\AddOns\\MogIt\\Images\\Resize");
-mog.frame.resize.texture:SetAllPoints(mog.frame.resize);
+end
+mog.frame.resize:SetScript("OnMouseUp", stopMovingOrSizing);
+mog.frame.resize:SetScript("OnHide", stopMovingOrSizing);
+mog.frame.resize:SetNormalTexture([[Interface\ChatFrame\UI-ChatIM-SizeGrabber-Up]]);
+mog.frame.resize:SetPushedTexture([[Interface\ChatFrame\UI-ChatIM-SizeGrabber-Down]])
+mog.frame.resize:SetHighlightTexture([[Interface\ChatFrame\UI-ChatIM-SizeGrabber-Highlight]])
 
 mog.frame.path = mog.frame:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall");
 mog.frame.path:SetPoint("BOTTOMLEFT",mog.frame,"BOTTOMLEFT",17,10);

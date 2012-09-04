@@ -219,6 +219,11 @@ end
 mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 	if event == "PLAYER_LOGIN" then
 		mog:UpdateGUI();
+		self:SetScript("OnSizeChanged", function(self, width, height)
+			mog.db.profile.gridWidth = width;
+			mog.db.profile.gridHeight = height;
+			mog:UpdateGUI(true);
+		end)
 	elseif event == "GET_ITEM_INFO_RECEIVED" then
 		mog.cacheFrame:SetScript("OnUpdate", mog.ItemInfoReceived);
 	elseif event == "PLAYER_EQUIPMENT_CHANGED" then

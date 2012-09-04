@@ -250,7 +250,7 @@ local function loadInitialize(self, level)
 	elseif level == 2 then
 		local curProfile = mog.wishlist:GetCurrentProfile()
 		for i, profile in ipairs(mog.wishlist:GetProfiles()) do
-			if profile ~= curProfile then
+			if profile ~= curProfile and mog.wishlist:GetSets(profile) then
 				local info = UIDropDownMenu_CreateInfo()
 				info.text = profile
 				info.hasArrow = true
@@ -352,16 +352,17 @@ function mog:CreatePreview()
 	f.topBorderBar:SetPoint("TOPLEFT",f.topLeftCorner,"TOPRIGHT",0,0);
 	f.leftBorderBar:SetPoint("TOPLEFT",f.topLeftCorner,"BOTTOMLEFT",0,0);
 	
-	f.resize = CreateFrame("Frame",nil,f);
+	f.resize = CreateFrame("Button",nil,f);
 	f.resize:SetSize(16,16);
-	f.resize:SetPoint("BOTTOMRIGHT",f,"BOTTOMRIGHT",-4,3);
+	f.resize:SetPoint("BOTTOMRIGHT",-4,3);
 	f.resize:EnableMouse(true);
+	f.resize:SetHitRectInsets(0, -4, 0, -3)
 	f.resize:SetScript("OnMouseDown",resizeOnMouseDown);
 	f.resize:SetScript("OnMouseUp",resizeOnMouseUp);
 	f.resize:SetScript("OnHide",resizeOnMouseUp);
-	f.resize.texture = f.resize:CreateTexture(nil,"OVERLAY");
-	f.resize.texture:SetTexture("Interface\\AddOns\\MogIt\\Images\\Resize");
-	f.resize.texture:SetAllPoints(f.resize);
+	f.resize:SetNormalTexture([[Interface\ChatFrame\UI-ChatIM-SizeGrabber-Up]]);
+	f.resize:SetPushedTexture([[Interface\ChatFrame\UI-ChatIM-SizeGrabber-Down]])
+	f.resize:SetHighlightTexture([[Interface\ChatFrame\UI-ChatIM-SizeGrabber-Highlight]])
 	
 	f.model = mog:CreateModelFrame(f);
 	f.model.type = "preview";
