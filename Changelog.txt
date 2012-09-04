@@ -2,6 +2,9 @@
 - Fixed error when equipping non-transmog items while Equipped grid dress is selected.
 - Fixed helm and cloak showing on models when hidden on your character.
 - Previewing a set should now always open a new preview.
+- Added weapon slot data and filters back in.
+- Preview Load menu no longer includes profiles that has no sets.
+- Resize handles should now be slightly easier to hit.
 
 [b]v3.0.2[/b]
 - Fixed linking sets for characters who are Night Elf, Blood Elf or Undead.
