@@ -179,10 +179,8 @@ mog.base.Help = {
 }
 
 function mog.base.GetFilterArgs(filter,item)
-	if filter == "name" then
-		return mog:GetItemInfo(item, "BuildList");
-	elseif filter == "itemLevel" then
-		return select(4,mog:GetItemInfo(item, "BuildList"));
+	if filter == "name" or filter == "itemLevel" then
+		return item;
 	elseif filter == "source" then
 		return mog:GetData("item", item, "source"),mog:GetData("item", item, "sourceinfo");
 	else

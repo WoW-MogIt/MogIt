@@ -51,15 +51,20 @@ f.max:SetScript("OnTextChanged",function(self,user)
 	end
 end);
 
-function f.Filter(lvl)
-	lvl = lvl or 0;
-	return (minlvl <= 0 or lvl >= minlvl) and (maxlvl <= 0 or lvl <= maxlvl);
+function f.Filter(item)
+	local isMinSpecified = minlvl > 0;
+	local isMaxSpecified = maxlvl > 0;
+	if not (isMinSpecified or isMaxSpecified) then
+		return true
+	end
+	local lvl = select(4, mog:GetItemInfo(item, "BuildList"));
+	return not lvl or ((not isMinSpecified or lvl >= minlvl) and (not isMaxSpecified or lvl <= maxlvl));
 end
 
 function f.Default()
 	minlvl = 0;
-	f.min:SetNumber(minlvl);
 	maxlvl = 0;
+	f.min:SetNumber(minlvl);
 	f.max:SetNumber(maxlvl);
 end
 f.Default();

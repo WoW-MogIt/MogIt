@@ -2,7 +2,7 @@ local MogIt,mog = ...;
 local L = mog.L;
 
 local f = mog:CreateFilter("name");
-local name;
+local searchString;
 
 f:SetHeight(35);
 
@@ -23,23 +23,26 @@ end);--]]
 f.edit:SetScript("OnEnterPressed",EditBox_ClearFocus);
 f.edit:SetScript("OnTextChanged",function(self,user)
 	if user then
-		name = self:GetText() or "";
-		name = name:lower();
+		searchString = self:GetText()-- or "";
+		searchString = searchString:lower();
 		mog:BuildList();
 	end
 end);
 function f.edit.clearFunc(self)
-	name = "";
+	searchString = "";
 	mog:BuildList();
 end
 
-function f.Filter(item)
-	item = item or "";
-	return (name == "") or (item:lower():find(name,nil,true));
+function f.Filter(itemID)
+	if searchString:trim() == "" then
+		return true
+	end
+	local itemName = mog:GetItemInfo(itemID, "BuildList");
+	return not itemName or (itemName:lower():find(searchString, nil, true));
 end
 
 function f.Default()
-	name = "";
-	f.edit:SetText(name);
+	searchString = "";
+	f.edit:SetText(searchString);
 end
 f.Default();
