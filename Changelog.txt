@@ -1,1 +1,12 @@
-MogIt
+[b]v3.0.3[/b]
+- Fixed error when equipping non-transmog items while Equipped grid dress is selected.
+- Fixed helm and cloak showing on models when hidden on your character.
+- Sets should now always open a new preview.
+
+[b]v3.0.2[/b]
+- Fixed linking sets for characters who are Night Elf, Blood Elf or Undead.
+
+[b]v3.0.0[/b]
+* Updated for 5.0.
+See forum for more info.
+http://wow.curseforge.com/addons/mogit/forum/general/42502-mog-it-3-0-release/

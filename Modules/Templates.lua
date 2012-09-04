@@ -397,7 +397,7 @@ function mog.Set_OnClick(self, btn, data, isSaved)
 				mog:ShowURL(data.items, "compare")
 			end
 		elseif IsControlKeyDown() then
-			mog:AddToPreview(data.items)
+			mog:AddToPreview(data.items, mog:CreatePreview())
 		else
 			if mog.IsDropdownShown(mog.Set_Menu) and mog.Set_Menu.data ~= data then
 				HideDropDownMenu(1)

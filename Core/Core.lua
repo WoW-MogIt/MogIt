@@ -222,11 +222,12 @@ mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 	elseif event == "GET_ITEM_INFO_RECEIVED" then
 		mog.cacheFrame:SetScript("OnUpdate", mog.ItemInfoReceived);
 	elseif event == "PLAYER_EQUIPMENT_CHANGED" then
-		if mog.db.profile.gridDress == "equipped" then
-			local slot, hasItem = arg1, ...;
+		local slot, hasItem = arg1, ...;
+		-- don't do anything if the slot is not visible (necklace, ring, trinket)
+		if mog.slotsType[slot] and mog.db.profile.gridDress == "equipped" then
 			for i, frame in ipairs(mog.models) do
 				if hasItem then
-					if (slot ~= GetInventorySlotInfo("HeadSlot") or ShowingHelm()) and (slot ~= GetInventorySlotInfo("BackSlot") or ShowingCloak()) then
+					if (slot ~= INVSLOT_HEAD or ShowingHelm()) and (slot ~= INVSLOT_BACK or ShowingCloak()) then
 						frame.model:TryOn(select(6, GetTransmogrifySlotInfo(slot)));
 					end
 				else

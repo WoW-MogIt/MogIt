@@ -6,8 +6,8 @@ local LBR = LibStub("LibBabble-Race-3.0"):GetUnstrictLookupTable();
 local races = {
    "Human",
    "Dwarf",
-   "Gnome",
    "Night Elf",
+   "Gnome",
    "Draenei",
    "Worgen",
    "Orc",
@@ -198,6 +198,17 @@ end
 
 function mog:BuildModel(self)
 	self.model:SetCustomRace((self.type == "preview" and self.parent.data.displayRace) or mog.displayRace,(self.type == "preview" and self.parent.data.displayGender) or mog.displayGender);
+	-- hack for hidden helm and cloak showing on models
+	local showingHelm, showingCloak = ShowingHelm(), ShowingCloak()
+	local helm, cloak = GetInventoryItemID("player", INVSLOT_HEAD), GetInventoryItemID("player", INVSLOT_BACK)
+	if not showingHelm and helm then
+		self.model:TryOn(helm)
+		self.model:UndressSlot(INVSLOT_HEAD)
+	end
+	if not showingCloak and cloak then
+		self.model:TryOn(cloak)
+		self.model:UndressSlot(INVSLOT_BACK)
+	end
 end
 
 function mog:DressModel(self)

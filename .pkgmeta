@@ -1,6 +1,8 @@
 enable-nolib-creation: no
 
-manual-changelog: Changelog.txt
+manual-changelog:
+    filename: Changelog.txt
+    markup-type: bbcode
 
 externals:
     Libs/LibStub:
