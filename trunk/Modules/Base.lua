@@ -245,7 +245,7 @@ for _, addon in ipairs(addons) do
 				"source",
 				"quality",
 				"bind",
-				(v == "MogIt_OneHanded" and "slot") or nil,
+				(addon == "MogIt_OneHanded" and "slot") or nil,
 			},
 			sorting = {
 				"level",
