@@ -1,4 +1,4 @@
-﻿## Interface: 50001
+## Interface: 50001
 ## Author: Aelobin (The Maelstrom EU) & Lombra (Shattered Hand EU)
 ## Version: 3.0.0
 ## LoadOnDemand: 1
