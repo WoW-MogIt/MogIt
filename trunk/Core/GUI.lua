@@ -194,7 +194,11 @@ function mog:DeleteCatalogueModel(n)
 end
 
 function mog:BuildModel(self)
-	self.model:SetCustomRace((self.type == "preview" and self.parent.data.displayRace) or mog.displayRace,(self.type == "preview" and self.parent.data.displayGender) or mog.displayGender);
+	local info = self.type == "preview" and self.parent.data or mog
+	if info.displayRace == myRace and info.displayGender == myGender then
+		return
+	end
+	self.model:SetCustomRace(info.displayRace, info.displayGender);
 	-- hack for hidden helm and cloak showing on models
 	local showingHelm, showingCloak = ShowingHelm(), ShowingCloak()
 	local helm, cloak = GetInventoryItemID("player", INVSLOT_HEAD), GetInventoryItemID("player", INVSLOT_BACK)

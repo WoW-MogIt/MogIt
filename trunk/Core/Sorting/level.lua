@@ -7,8 +7,10 @@ local function minItem(items)
 	local minLevel
 	for i, v in ipairs(items) do
 		local reqLevel = itemCache[v] or mog:GetData("item", v, "level");
-		itemCache[v] = reqLevel;
-		minLevel = min(reqLevel, minLevel or reqLevel);
+		if reqLevel then
+			itemCache[v] = reqLevel;
+			minLevel = min(reqLevel, minLevel or reqLevel);
+		end
 	end
 	return minLevel;
 end
