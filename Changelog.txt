@@ -5,6 +5,7 @@
 - Added weapon slot data and filters back in.
 - Preview Load menu no longer includes profiles that has no sets.
 - Resize handles should now be slightly easier to hit.
+- Wishlist star should now properly be added to the frame right after adding the item to the wishlist.
 
 [b]v3.0.2[/b]
 - Fixed linking sets for characters who are Night Elf, Blood Elf or Undead.

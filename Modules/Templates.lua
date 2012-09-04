@@ -111,7 +111,7 @@ local itemOptionsMenu = {
 		text = L["Add to wishlist"],
 		func = function(self)
 			mog.wishlist:AddItem(self.value)
-			mog:BuildList(nil, "Wishlist")
+			mog:BuildList()
 			CloseDropDownMenus()
 		end,
 	},
