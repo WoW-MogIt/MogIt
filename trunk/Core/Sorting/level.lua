@@ -12,7 +12,7 @@ local function minItem(items)
 			minLevel = min(reqLevel, minLevel or reqLevel);
 		end
 	end
-	return minLevel;
+	return minLevel or 0;
 end
 
 local function dropdownTier1(self)

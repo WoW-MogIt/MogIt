@@ -22,10 +22,8 @@ function mog.GetItemSourceInfo(itemID)
 	
 	if sourceType == 1 and sourceID then -- Drop
 		source = mog:GetData("npc", sourceID, "name");
-	elseif sourceType == 3 then -- Quest
-		if sourceID then
-			info = IsQuestFlaggedCompleted(sourceID) or false;
-		end
+	elseif sourceType == 3 and sourceID then -- Quest
+		info = IsQuestFlaggedCompleted(sourceID) or false;
 	elseif sourceType == 5 and sourceInfo then -- Crafted
 		source = L.professions[sourceInfo];
 	elseif sourceType == 6 and sourceID then -- Achievement
