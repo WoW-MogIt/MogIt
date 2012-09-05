@@ -274,12 +274,13 @@ mog.modelUpdater:SetScript("OnUpdate",function(self,elapsed)
 			end
 		end
 	else
+		local modelData = self.model.parent.data
 		if self.btn == "LeftButton" then
-			self.model.parent.data.posZ = (self.model.parent.data.posZ or mog.posZ or 0) + dY;
-			self.model.parent.data.face = (self.model.parent.data.face or mog.face or 0) + dX;
+			modelData.posZ = (modelData.posZ or mog.posZ or 0) + dY;
+			modelData.face = (modelData.face or mog.face or 0) + dX;
 		elseif self.btn == "RightButton" then
-			self.model.parent.data.posX = (self.model.parent.data.posX or mog.posX or 0) + dX;
-			self.model.parent.data.posY = (self.model.parent.data.posY or mog.posY or 0) + dY;
+			modelData.posX = (modelData.posX or mog.posX or 0) + dX;
+			modelData.posY = (modelData.posY or mog.posY or 0) + dY;
 		end
 		mog:PositionModel(self.model);
 	end
@@ -667,13 +668,13 @@ local function setDisplayModel(self, arg1)
 	mog[arg1] = self.value;
 	for i, model in ipairs(mog.models) do
 		-- reset positions first since they tend to go nuts when manipulating the model
-		model.model:SetPosition(0, 0, 0)
+		model.model:SetPosition(0, 0, 0);
 		if model:IsEnabled() then
 			mog:BuildModel(model);
 			mog:ModelUpdate(model, model.data.value);
 		end
 		-- and restore to previous position
-		mog:PositionModel(model)
+		mog:PositionModel(model);
 	end
 	CloseDropDownMenus(1);
 end
