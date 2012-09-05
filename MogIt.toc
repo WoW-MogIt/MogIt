@@ -1,7 +1,7 @@
 ﻿## Interface: 50001
 ## Title: MogIt
 ## Author: Aelobin (The Maelstrom EU) & Lombra (Shattered Hand EU)
-## Version: 3.0.3
+## Version: 3.0.4
 ## SavedVariables: MogItDB, MogItWishlist
 ## Notes: Transmogrification Assistant
 ## Notes-frFR: Transmogrification Assistante

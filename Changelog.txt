@@ -1,3 +1,8 @@
+[b]v3.0.4[/b]
+- Fixed error when loading a module where one or more items has no required level specified, using level sorting.
+- Added preview menu option to try on your character's currently equipped gear, taking transmogrification into account.
+- Swapping non-transmog slot items should now properly reflect on models when using Equipped grid dress.
+
 [b]v3.0.3[/b]
 - Fixed error when swapping character gear while Equipped grid dress is selected.
 - Equipped items should no longer get dressed up on set models.
