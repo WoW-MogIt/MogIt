@@ -1,5 +1,5 @@
 [b]v3.0.5[/b]
-- feex morgan
+- Fixed a lot of model issues, hopefully including camera zooming. (models escaping their boundaries remains outside of our control)
 
 [b]v3.0.4[/b]
 - Fixed error when loading a module where one or more items has no required level specified, using level sorting.

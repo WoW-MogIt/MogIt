@@ -198,25 +198,19 @@ function mog:ResetModel(self)
 	local info = self.type == "preview" and self.parent.data or mog
 	-- :Dress resets the custom race, and :SetCustomRace does :Dress, so if we're using a custom race, just :SetCustomRace again instead of :Dress
 	if info.displayRace == myRace and info.displayGender == myGender then
-		-- local hasAlternateForm, inAlternateForm = HasAlternateForm();
-		-- morgan da worgan keeps acting up, treat him with RefreshUnit
-		if HasAlternateForm() then
-			model:RefreshUnit();
-		else
-			model:Dress();
-		end
+		model:Dress();
 	else
 		model:SetCustomRace(info.displayRace, info.displayGender);
 		-- hack for hidden helm and cloak showing on models
-		local showingHelm, showingCloak = ShowingHelm(), ShowingCloak()
-		local helm, cloak = GetInventoryItemID("player", INVSLOT_HEAD), GetInventoryItemID("player", INVSLOT_BACK)
+		local showingHelm, showingCloak = ShowingHelm(), ShowingCloak();
+		local helm, cloak = GetInventoryItemID("player", INVSLOT_HEAD), GetInventoryItemID("player", INVSLOT_BACK);
 		if not showingHelm and helm then
-			model:TryOn(helm)
-			model:UndressSlot(INVSLOT_HEAD)
+			model:TryOn(helm);
+			model:UndressSlot(INVSLOT_HEAD);
 		end
 		if not showingCloak and cloak then
-			model:TryOn(cloak)
-			model:UndressSlot(INVSLOT_BACK)
+			model:TryOn(cloak);
+			model:UndressSlot(INVSLOT_BACK);
 		end
 	end
 	model:RefreshCamera();
@@ -327,9 +321,11 @@ function mog.ModelOnShow(self)
 		self.model:Undress();
 		mog.DressFromPreview(self.model, self.parent);
 	else
-		-- dressing a model will cause it to become 100% opaque, regardless of its parent's opacity, so only do this if the frame is supposed to be shown
-		if self:IsEnabled() then
-			mog:ResetModel(self);
+		mog:ResetModel(self);
+		if not self.data.value then
+			-- hack for models becoming visible OnShow, only do this if the frame is supposed to be hidden
+			self:SetAlpha(1)
+			self:SetAlpha(0)
 		end
 		mog:ModelUpdate(self, self.data.value);
 	end
@@ -417,7 +413,7 @@ mog.scroll.down:SetScript("OnClick",function(self)
 	mog.scroll:update(nil,1);
 end);
 
-function mog.scroll.update(self,value,offset,onscroll)
+function mog.scroll.update(self, value, offset, onscroll)
 	local models = #mog.models;
 	local total = ceil(#mog.list/models);
 	
@@ -425,7 +421,7 @@ function mog.scroll.update(self,value,offset,onscroll)
 		value = onscroll;
 	else
 		if total > 0 then
-			self:SetMinMaxValues(1,total);
+			self:SetMinMaxValues(1, total);
 		end
 		if total > 1 then
 			self:Show();
@@ -460,7 +456,7 @@ function mog.scroll.update(self,value,offset,onscroll)
 		mog.active:OnScroll();
 	end
 	
-	for id,frame in ipairs(mog.models) do
+	for id, frame in ipairs(mog.models) do
 		local index = ((value-1)*models)+id;
 		local value = mog.list[index];
 		wipe(frame.data);
@@ -490,24 +486,24 @@ function mog.scroll.update(self,value,offset,onscroll)
 	end
 	
 	if total > 0 then
-		mog.frame.page:SetText(MERCHANT_PAGE_NUMBER:format(value,total));
+		mog.frame.page:SetText(MERCHANT_PAGE_NUMBER:format(value, total));
 		mog.frame.page:Show();
 	else
 		mog.frame.page:Hide();
 	end
 end
 
-mog.frame:SetScript("OnMouseWheel",function(self,offset)
-	mog.scroll:update(nil,offset > 0 and -1 or 1);
+mog.frame:SetScript("OnMouseWheel", function(self, offset)
+	mog.scroll:update(nil, offset > 0 and -1 or 1);
 end);
 
-function mog:UpdateScroll(value,offset)
-	mog.scroll:update(value,offset);
+function mog:UpdateScroll(value, offset)
+	mog.scroll:update(value, offset);
 end
 
-function mog:ModelUpdate(frame,value)
-	if mog.active and mog.active.FrameUpdate then
-		mog.active:FrameUpdate(frame,value);
+function mog:ModelUpdate(frame, value)
+	if mog.active and mog.active.FrameUpdate and value then
+		mog.active:FrameUpdate(frame, value);
 	end
 end
 --//
