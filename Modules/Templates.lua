@@ -190,7 +190,7 @@ local function createMenu(self, level, menuList)
 end
 
 function mog.Item_FrameUpdate(self, data)
-	mog:DressModel(self)
+	mog:ApplyDress(self)
 	self.model:TryOn(data.item)
 end
 

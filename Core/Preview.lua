@@ -105,8 +105,9 @@ local function setDisplayModel(self, arg1)
 	currentPreview.data[arg1] = self.value;
 	local model = currentPreview.model;
 	model.model:SetPosition(0, 0, 0);
-	mog:BuildModel(model);
-	mog:DressModel(model);
+	mog:ResetModel(model);
+	model.model:Undress();
+	mog.DressFromPreview(model.model, currentPreview);
 	mog:PositionModel(model);
 	CloseDropDownMenus(1);
 end
@@ -331,20 +332,20 @@ function mog:CreatePreview()
 		f:Show();
 		mog:ActivatePreview(f);
 		tremove(mog.previewBin,1);
-		tinsert(mog.previews,f);
+		tinsert(mog.previews, f);
 		return f;
 	end
 	
 	mog.previewNum = mog.previewNum + 1;
-	local f = CreateFrame("Frame","MogItPreview"..mog.previewNum,mog.view,"ButtonFrameTemplate");
+	local f = CreateFrame("Frame", "MogItPreview"..mog.previewNum, mog.view, "ButtonFrameTemplate");
 	f.id = mog.previewNum;
 	f.data = {
 		displayRace = mog.playerRace,
 		displayGender = mog.playerGender,
 	};
 	
-	f:SetPoint("CENTER",mog.view,"CENTER");
-	f:SetSize(335,385);
+	f:SetPoint("CENTER");
+	f:SetSize(335, 385);
 	f:SetToplevel(true);
 	f:SetClampedToScreen(true);
 	f:EnableMouse(true);
@@ -357,64 +358,65 @@ function mog:CreatePreview()
 	_G["MogItPreview"..f.id.."TitleText"]:SetText(L["Preview %d"]:format(f.id));
 	f.portraitFrame:Hide();
 	f.topLeftCorner:Show();
-	f.topBorderBar:SetPoint("TOPLEFT",f.topLeftCorner,"TOPRIGHT",0,0);
-	f.leftBorderBar:SetPoint("TOPLEFT",f.topLeftCorner,"BOTTOMLEFT",0,0);
+	f.topBorderBar:SetPoint("TOPLEFT", f.topLeftCorner, "TOPRIGHT", 0, 0);
+	f.leftBorderBar:SetPoint("TOPLEFT", f.topLeftCorner, "BOTTOMLEFT", 0, 0);
 	
-	f.resize = CreateFrame("Button",nil,f);
-	f.resize:SetSize(16,16);
-	f.resize:SetPoint("BOTTOMRIGHT",-4,3);
+	f.resize = CreateFrame("Button", nil, f);
+	f.resize:SetSize(16, 16);
+	f.resize:SetPoint("BOTTOMRIGHT", -4, 3);
 	f.resize:EnableMouse(true);
 	f.resize:SetHitRectInsets(0, -4, 0, -3)
-	f.resize:SetScript("OnMouseDown",resizeOnMouseDown);
-	f.resize:SetScript("OnMouseUp",resizeOnMouseUp);
-	f.resize:SetScript("OnHide",resizeOnMouseUp);
+	f.resize:SetScript("OnMouseDown", resizeOnMouseDown);
+	f.resize:SetScript("OnMouseUp", resizeOnMouseUp);
+	f.resize:SetScript("OnHide", resizeOnMouseUp);
 	f.resize:SetNormalTexture([[Interface\ChatFrame\UI-ChatIM-SizeGrabber-Up]]);
 	f.resize:SetPushedTexture([[Interface\ChatFrame\UI-ChatIM-SizeGrabber-Down]])
 	f.resize:SetHighlightTexture([[Interface\ChatFrame\UI-ChatIM-SizeGrabber-Highlight]])
+	
+	f.slots = {};
+	for i = 1, 13 do
+		local slotIndex = mog:GetSlot(i);
+		local slot = CreateFrame("Button", "MogItPreview"..f.id..slotIndex, f, "ItemButtonTemplate");
+		slot.slot = slotIndex;
+		if i == 1 then
+			slot:SetPoint("TOPLEFT", f.Inset, "TOPLEFT", 8, -8);
+		elseif i == 8 then
+			slot:SetPoint("TOPRIGHT", f.Inset, "TOPRIGHT", -7, -8);
+		elseif i == 12 then
+			slot:SetPoint("TOP", f.slots[mog:GetSlot(11)], "BOTTOM", 0, -45);
+		else
+			slot:SetPoint("TOP", f.slots[mog:GetSlot(i-1)], "BOTTOM", 0, -4);
+		end
+		slot:RegisterForClicks("AnyUp");
+		slot:SetScript("OnClick", slotOnClick);
+		slot:SetScript("OnEnter", slotOnEnter);
+		slot:SetScript("OnLeave", slotOnLeave);
+		slot.OnEnter = slotOnEnter;
+		f.slots[slotIndex] = slot;
+		slotTexture(f, slotIndex);
+	end
 	
 	f.model = mog:CreateModelFrame(f);
 	f.model.type = "preview";
 	f.model:Show();
 	f.model:EnableMouseWheel(true);
-	f.model:SetScript("OnMouseWheel",modelOnMouseWheel);
-	f.model:SetPoint("TOPLEFT",f.Inset,"TOPLEFT",49,-8);
-	f.model:SetPoint("BOTTOMRIGHT",f.Inset,"BOTTOMRIGHT",-49,8);
+	f.model:SetScript("OnMouseWheel", modelOnMouseWheel);
+	f.model:SetPoint("TOPLEFT", f.Inset, "TOPLEFT", 49, -8);
+	f.model:SetPoint("BOTTOMRIGHT", f.Inset, "BOTTOMRIGHT", -49, 8);
 	
-	f.activate = CreateFrame("Button","MogItPreview"..f.id.."Activate",f,"MagicButtonTemplate");
+	f.activate = CreateFrame("Button", "MogItPreview"..f.id.."Activate", f, "MagicButtonTemplate");
 	f.activate:SetText(L["Activate"]);
-	f.activate:SetPoint("BOTTOMLEFT",f,"BOTTOMLEFT",5,5);
+	f.activate:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", 5, 5);
 	f.activate:SetWidth(100);
-	f.activate:SetScript("OnClick",previewActivate);
+	f.activate:SetScript("OnClick", previewActivate);
 	
-	f:SetScript("OnMouseDown",f.StartMoving);
-	f:SetScript("OnMouseUp",f.StopMovingOrSizing);
-	
-	f.slots = {};
-	for i=1,13 do
-		local slot = mog:GetSlot(i);
-		f.slots[slot] = CreateFrame("Button","MogItPreview"..f.id..slot,f,"ItemButtonTemplate");
-		f.slots[slot].slot = slot;
-		if i == 1 then
-			f.slots[slot]:SetPoint("TOPLEFT",f.Inset,"TOPLEFT",8,-8);
-		elseif i == 8 then
-			f.slots[slot]:SetPoint("TOPRIGHT",f.Inset,"TOPRIGHT",-7,-8);
-		elseif i == 12 then
-			f.slots[slot]:SetPoint("TOP",f.slots[mog:GetSlot(11)],"BOTTOM",0,-45);
-		else
-			f.slots[slot]:SetPoint("TOP",f.slots[mog:GetSlot(i-1)],"BOTTOM",0,-4);
-		end
-		slotTexture(f,slot);
-		f.slots[slot]:RegisterForClicks("AnyUp");
-		f.slots[slot]:SetScript("OnClick",slotOnClick);
-		f.slots[slot]:SetScript("OnEnter",slotOnEnter);
-		f.slots[slot]:SetScript("OnLeave",slotOnLeave);
-		f.slots[slot].OnEnter = slotOnEnter;
-	end
+	f:SetScript("OnMouseDown", f.StartMoving);
+	f:SetScript("OnMouseUp", f.StopMovingOrSizing);
 	
 	createMenuBar(f);
 	mog:ActivatePreview(f);
-		
-	tinsert(mog.previews,f);
+	
+	tinsert(mog.previews, f);
 	return f;
 end
 
@@ -467,7 +469,7 @@ function mog.view.AddItem(item,preview)
 				slot = "INVTYPE_WEAPON";
 			end
 		end
-			
+		
 		if slot == "INVTYPE_WEAPON" then
 			if (not preview.slots.MainHandSlot.item) or preview.data.twohand then
 				slot = "INVTYPE_WEAPONMAINHAND";
@@ -516,6 +518,7 @@ function mog:AddToPreview(item,preview)
 	if not item then return end;
 	preview = preview or mog.activePreview or mog:CreatePreview();
 	
+	ShowUIPanel(mog.view);
 	if type(item) == "number" then
 		mog.view.AddItem(item,preview);
 	elseif type(item) == "string" then
@@ -526,7 +529,6 @@ function mog:AddToPreview(item,preview)
 		end
 	end
 	
-	ShowUIPanel(mog.view);
 	if mog.db.profile.gridDress == "preview" and mog.activePreview == preview then
 		mog.scroll:update();
 	end
