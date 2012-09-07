@@ -193,48 +193,54 @@ function mog:DeleteCatalogueModel(n)
 	tremove(mog.models, n);
 end
 
-function mog:BuildModel(self)
+function mog:ResetModel(self)
+	local model = self.model;
 	local info = self.type == "preview" and self.parent.data or mog
+	-- :Dress resets the custom race, and :SetCustomRace does :Dress, so if we're using a custom race, just :SetCustomRace again instead of :Dress
 	if info.displayRace == myRace and info.displayGender == myGender then
-		return
+		-- local hasAlternateForm, inAlternateForm = HasAlternateForm();
+		-- morgan da worgan keeps acting up, treat him with RefreshUnit
+		if HasAlternateForm() then
+			model:RefreshUnit();
+		else
+			model:Dress();
+		end
+	else
+		model:SetCustomRace(info.displayRace, info.displayGender);
+		-- hack for hidden helm and cloak showing on models
+		local showingHelm, showingCloak = ShowingHelm(), ShowingCloak()
+		local helm, cloak = GetInventoryItemID("player", INVSLOT_HEAD), GetInventoryItemID("player", INVSLOT_BACK)
+		if not showingHelm and helm then
+			model:TryOn(helm)
+			model:UndressSlot(INVSLOT_HEAD)
+		end
+		if not showingCloak and cloak then
+			model:TryOn(cloak)
+			model:UndressSlot(INVSLOT_BACK)
+		end
 	end
-	self.model:SetCustomRace(info.displayRace, info.displayGender);
-	-- hack for hidden helm and cloak showing on models
-	local showingHelm, showingCloak = ShowingHelm(), ShowingCloak()
-	local helm, cloak = GetInventoryItemID("player", INVSLOT_HEAD), GetInventoryItemID("player", INVSLOT_BACK)
-	if not showingHelm and helm then
-		self.model:TryOn(helm)
-		self.model:UndressSlot(INVSLOT_HEAD)
-	end
-	if not showingCloak and cloak then
-		self.model:TryOn(cloak)
-		self.model:UndressSlot(INVSLOT_BACK)
+	model:RefreshCamera();
+end
+
+function mog:ApplyDress(self)
+	if mog.db.profile.gridDress == "equipped" then
+		mog:ResetModel(self);
+	else
+		self.model:Undress();
+		if mog.db.profile.gridDress == "preview" then
+			mog.DressFromPreview(self.model, mog.activePreview);
+		end
 	end
 end
 
-function mog:DressModel(self)
-	if mog.db.profile.gridDress == "equipped" and self.type ~= "preview" then
-		-- :Dress resets the custom race, and :SetCustomRace does :Dress, so if we're using a custom race, just :SetCustomRace again instead of :Dress
-		if mog.displayRace == myRace and mog.displayGender == myGender then
-			self.model:Dress();
-		else
-			mog:BuildModel(self);
-		end
-	else
-		self.model:Undress();
+function mog.DressFromPreview(model, previewFrame)
+	if not previewFrame then
+		return;
 	end
-
-	local slots;
-	if self.type == "preview" then
-		slots = self.parent.slots;
-	elseif (mog.db.profile.gridDress == "preview") and mog.activePreview then
-		slots = mog.activePreview.slots;
-	end
-	if slots then
-		for id,slot in pairs(slots) do
-			if slot.item then
-				self.model:TryOn(slot.item);
-			end
+	
+	for id, slot in pairs(previewFrame.slots) do
+		if slot.item then
+			model:TryOn(slot.item);
 		end
 	end
 end
@@ -316,10 +322,15 @@ function mog.ModelOnShow(self)
 	if self:GetFrameLevel() <= lvl then
 		self:SetFrameLevel(lvl+1);
 	end
-	mog:BuildModel(self);
 	if self.type == "preview" then
-		mog:DressModel(self);
+		mog:ResetModel(self);
+		self.model:Undress();
+		mog.DressFromPreview(self.model, self.parent);
 	else
+		-- dressing a model will cause it to become 100% opaque, regardless of its parent's opacity, so only do this if the frame is supposed to be shown
+		if self:IsEnabled() then
+			mog:ResetModel(self);
+		end
 		mog:ModelUpdate(self, self.data.value);
 	end
 	mog:PositionModel(self);
@@ -669,8 +680,8 @@ local function setDisplayModel(self, arg1)
 	for i, model in ipairs(mog.models) do
 		-- reset positions first since they tend to go nuts when manipulating the model
 		model.model:SetPosition(0, 0, 0);
+		mog:ResetModel(model);
 		if model:IsEnabled() then
-			mog:BuildModel(model);
 			mog:ModelUpdate(model, model.data.value);
 		end
 		-- and restore to previous position

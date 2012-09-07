@@ -90,7 +90,7 @@ function SetItemRef(link,...)
 			if race and gender then
 				preview.data.displayRace = race;
 				preview.data.displayGender = gender;
-				mog:BuildModel(preview.model);
+				mog:ResetModel(preview.model);
 				preview.model.model:Undress();
 			end
 			mog:AddToPreview(set,preview);
