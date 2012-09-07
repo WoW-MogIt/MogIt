@@ -329,6 +329,10 @@ mog.previewNum = 0;
 function mog:CreatePreview()
 	if mog.previewBin[1] then
 		local f = mog.previewBin[1];
+		f.data = {
+			displayRace = mog.playerRace,
+			displayGender = mog.playerGender,
+		};
 		f:Show();
 		mog:ActivatePreview(f);
 		tremove(mog.previewBin,1);
@@ -440,6 +444,9 @@ function mog:DeletePreview(f)
 		if mog.db.profile.gridDress == "preview" then
 			mog.scroll:update();
 		end
+	end
+	if #mog.previews == 0 then
+		HideUIPanel(mog.view);
 	end
 end
 
