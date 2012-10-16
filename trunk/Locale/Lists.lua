@@ -85,6 +85,7 @@ L.classBits = {
 	SHAMAN = 64,
 	WARLOCK = 256,
 	WARRIOR = 1,
+	MONK = 512,
 };
 
 L.bind = {
