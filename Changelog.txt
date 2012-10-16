@@ -1,3 +1,7 @@
+[b]v3.0.6[/b]
+- Added most of the new items from MoP, although some may show an inaccurate level or class requirement.
+- Fixed the error that was occurring for Monks.
+
 [b]v3.0.5[/b]
 - Fixed a lot of model issues, hopefully including camera zooming. (models escaping their boundaries remains outside of our control)
 
