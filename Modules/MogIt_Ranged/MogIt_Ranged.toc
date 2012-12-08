@@ -1,6 +1,6 @@
-## Interface: 50001
+## Interface: 50100
 ## Author: Aelobin (The Maelstrom EU) & Lombra (Shattered Hand EU)
-## Version: 3.0.6
+## Version: 3.0.7
 ## LoadOnDemand: 1
 ## RequiredDeps: MogIt
 ## X-MogItModuleVersion: 1
