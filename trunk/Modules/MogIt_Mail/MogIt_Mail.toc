@@ -1,5 +1,5 @@
 ## Interface: 50100
-## Author: Aelobin (The Maelstrom EU) & Lombra (Shattered Hand EU)
+## Author: Aelobin (The Maelstrom EU) & Lombra (Defias Brotherhood EU)
 ## Version: 3.0.7
 ## LoadOnDemand: 1
 ## RequiredDeps: MogIt
