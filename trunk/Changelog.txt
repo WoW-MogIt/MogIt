@@ -1,3 +1,11 @@
+[b]v3.1.0[/b]
+- Add option to use a single preview frame. (disabled by default) This mimics the behaviour of the pre 3.0 preview frame.
+- Preview frames now remember position and size between sessions.
+- UI elements in the preview frames should now always appear.
+- Improved weapon handling for the preview. Impossible weapon combinations should no longer be possible to "equip", as well it should now be more consistent in which slots weapons go into.
+- Previews will now always be cleared before equipping a set of items.
+- Remove the submenu of the wishlist entry in the modules menu to clarify that it can be clicked directly and managed from there.
+
 [b]v3.0.6[/b]
 - Added most of the new items from MoP, although some may show an inaccurate level or class requirement.
 - Fixed the Monk filter error.

@@ -62,7 +62,7 @@ end
 
 -- create a new set and add the item to it
 local function previewOnClick(self, previewFrame)
-	mog:AddToPreview(self.value, previewFrame or mog:CreatePreview())
+	mog:AddToPreview(self.value, mog:GetPreview(previewFrame))
 	CloseDropDownMenus()
 end
 
@@ -163,7 +163,7 @@ local function createItemMenu(data, func)
 			info.func = func
 			info.checked = (i == data.cycle)
 			info.hasArrow = true
-			info.notCheckable = data.isSaved
+			info.notCheckable = data.isSaved or data.name
 			info.arg1 = data
 			info.arg2 = i
 			info.menuList = itemOptionsMenu
@@ -395,7 +395,7 @@ function mog.Set_OnClick(self, btn, data, isSaved)
 				mog:ShowURL(data.items, "compare")
 			end
 		elseif IsControlKeyDown() then
-			mog:AddToPreview(data.items, mog:CreatePreview())
+			mog:AddToPreview(data.items, mog:GetPreview())
 		else
 			if mog.IsDropdownShown(mog.Set_Menu) and mog.Set_Menu.data ~= data then
 				HideDropDownMenu(1)

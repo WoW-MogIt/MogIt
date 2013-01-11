@@ -85,7 +85,7 @@ function SetItemRef(link,...)
 		if IsModifiedClick("CHATLINK") then
 			ChatEdit_InsertLink("["..link.."]")
 		else
-			local preview = mog:CreatePreview();
+			local preview = mog:GetPreview();
 			local set,race,gender = mog:LinkToSet(link);
 			if race and gender then
 				preview.data.displayRace = race;
