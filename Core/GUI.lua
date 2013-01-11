@@ -815,11 +815,13 @@ local function syncPreviews()
 end
 
 mog.menu.preview = mog.menu:CreateMenu(L["Preview"], function(self, tier)
-	local info = UIDropDownMenu_CreateInfo();
-	info.text = L["New Preview"];
-	info.notCheckable = true;
-	info.func = newPreview;
-	UIDropDownMenu_AddButton(info,tier);
+	if not mog.db.profile.singlePreview then
+		local info = UIDropDownMenu_CreateInfo();
+		info.text = L["New Preview"];
+		info.notCheckable = true;
+		info.func = newPreview;
+		UIDropDownMenu_AddButton(info,tier);
+	end
 	
 	local info = UIDropDownMenu_CreateInfo();
 	info.text = mog.view:IsShown() and L["Hide Previews"] or L["Show Previews"];

@@ -175,6 +175,7 @@ end
 --// Events
 local defaults = {
 	profile = {
+		singlePreview = false,
 		noAnim = false,
 		minimap = {},
 		url = "Battle.net",
@@ -186,6 +187,13 @@ local defaults = {
 		columns = 3,
 		gridDress = "preview",
 		sync = true,
+		previewProps = {
+			["*"] = {
+				w = 335,
+				h = 385,
+				point = "CENTER",
+			}
+		},
 		
 		tooltip = true,
 		tooltipWidth = 300,
@@ -353,7 +361,7 @@ mog.slotsType = {
 	INVTYPE_WEAPON = "MainHandSlot",
 	INVTYPE_WEAPONMAINHAND = "MainHandSlot",
 	INVTYPE_WEAPONOFFHAND = "SecondaryHandSlot",
-	INVTYPE_RANGED = "MainHandSlot",
+	INVTYPE_RANGED = "SecondaryHandSlot",
 	INVTYPE_RANGEDRIGHT = "MainHandSlot",
 	INVTYPE_SHIELD = "SecondaryHandSlot",
 	INVTYPE_HOLDABLE = "SecondaryHandSlot",

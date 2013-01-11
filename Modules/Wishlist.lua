@@ -93,37 +93,10 @@ function wishlist:Dropdown(level)
 		local info = UIDropDownMenu_CreateInfo()
 		info.text = L["Wishlist"]
 		info.value = self
-		info.colorCode = "|cffffff00"
-		info.hasArrow = true
+		info.colorCode = YELLOW_FONT_COLOR_CODE
 		info.notCheckable = true
 		info.func = setModule
 		UIDropDownMenu_AddButton(info, level)
-	elseif level == 2 then
-		for i, set in ipairs(wishlist.db.profile.sets) do
-			local info = UIDropDownMenu_CreateInfo()
-			info.text = set.name
-			-- info.func = function(self)
-				-- wishlist:AddItem(menuList.value, self.value)
-				-- mog:BuildList()
-				-- CloseDropDownMenus()
-			-- end
-			info.hasArrow = true
-			info.notCheckable = true
-			UIDropDownMenu_AddButton(info, level)
-		end
-		
-		local info = UIDropDownMenu_CreateInfo()
-		info.text = L["New set"]
-		info.func = newSetOnClick
-		info.colorCode = GREEN_FONT_COLOR_CODE
-		info.notCheckable = true
-		UIDropDownMenu_AddButton(info, level)
-	elseif level == 3 then
-		for i, v in ipairs(setMenu) do
-			v.value = UIDROPDOWNMENU_MENU_VALUE
-			v.notCheckable = true
-			UIDropDownMenu_AddButton(v, level)
-		end
 	end
 end
 
@@ -132,7 +105,7 @@ function wishlist:FrameUpdate(frame, value, index)
 	if type(value) == "table" then
 		data.name = value.name
 		data.items = value.items
-		mog.Set_FrameUpdate(frame, frame.data)
+		mog.Set_FrameUpdate(frame, data)
 	else
 		data.item = value
 		if mog:HasItem(value) then
@@ -146,7 +119,7 @@ function wishlist:FrameUpdate(frame, value, index)
 				end
 			end
 		end
-		mog.Item_FrameUpdate(frame, frame.data)
+		mog.Item_FrameUpdate(frame, data)
 	end
 end
 

@@ -58,6 +58,13 @@ function mog.createOptions()
 				width = "full",
 				arg = "minimap",
 			},
+			singlePreview = {
+				type = "toggle",
+				order = 1.5,
+				name = L["Use a single preview frame"],
+				width = "full",
+				arg = "singlePreview",
+			},
 			catalogue = {
 				type = "group",
 				order = 2,
