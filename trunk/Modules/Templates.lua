@@ -1,12 +1,20 @@
 local MogIt, mog = ...
 local L = mog.L
 
+local TEXTURE = "Interface\\RaidFrame\\ReadyCheck-Ready"
+
+local function hasItem(itemID, embedded)
+	if mog:HasItem(itemID) then
+		return embedded and format("|T%s:0|t ", TEXTURE) or TEXTURE
+	end
+end
+
 local function itemIcon(itemID, textHeight)
 	return format("|T%s:%d|t ", GetItemIcon(itemID), textHeight or 0)
 end
 
 local function itemLabel(itemID, callback)
-	local name, _, quality = mog:GetItemInfo(itemID, callback) -- need changing to mog:GII
+	local name, _, quality = mog:GetItemInfo(itemID, callback)
 	if name then
 		return format("|c%s%s|r", select(4, GetItemQualityColor(quality)), name)
 	else
@@ -272,11 +280,11 @@ function mog.ShowItemTooltip(self, item, items, cycle)
 	GameTooltip:AddLine(" ")
 	GameTooltip:AddDoubleLine(ID..":", item, nil, nil, nil, 1, 1, 1)
 	
-	-- add wishlist info about this item
-	if mog:HasItem(item) then
+	local texture = hasItem(item)
+	if texture then
 		GameTooltip:AddLine(" ")
 		GameTooltip:AddLine(L["You have this item."], 1, 1, 1)
-		GameTooltip:AddTexture("Interface\\RaidFrame\\ReadyCheck-Ready")
+		GameTooltip:AddTexture(texture)
 	end
 	
 	-- add wishlist info about this item
@@ -295,8 +303,9 @@ function mog.ShowItemTooltip(self, item, items, cycle)
 		for i, v in ipairs(items) do
 			if v ~= item then
 				GameTooltip:AddDoubleLine(itemLabel(v, "ModelOnEnter"), mog.GetItemSourceShort(v), nil, nil, nil, 1, 1, 1)
-				if mog:HasItem(v) then
-					GameTooltip:AddTexture("Interface\\RaidFrame\\ReadyCheck-Ready")
+				local texture = hasItem(v)
+				if texture then
+					GameTooltip:AddTexture(texture)
 				end
 			end
 		end
@@ -371,7 +380,7 @@ function mog.ShowSetTooltip(self, items, name)
 	for i, slot in ipairs(mog.slots) do
 		local itemID = items[slot] or items[i]
 		if itemID then
-			GameTooltip:AddDoubleLine((mog:HasItem(item) and "|TInterface\\RaidFrame\\ReadyCheck-Ready:0|t " or "")..itemLabel(itemID, "ModelOnEnter"), mog.GetItemSourceShort(itemID), nil, nil, nil, 1, 1, 1)
+			GameTooltip:AddDoubleLine((hasItem(itemID, true) or "")..itemLabel(itemID, "ModelOnEnter"), mog.GetItemSourceShort(itemID), nil, nil, nil, 1, 1, 1)
 		end
 	end
 	

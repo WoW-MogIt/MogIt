@@ -27,11 +27,11 @@ function mog.createOptions()
 		else
 			mog.db.profile[info.arg] = value;
 			if info.arg == "tooltipRotate" then
-				if value then
-					mog.tooltip.rotate:Show();
-				else
-					mog.tooltip.rotate:Hide();
-				end
+				mog.tooltip.rotate:SetShown(value);
+			elseif info.arg == "tooltipWidth" then
+				mog.tooltip:SetWidth(value);
+			elseif info.arg == "tooltipHeight" then
+				mog.tooltip:SetHeight(value);
 			elseif info.arg == "rows" or info.arg == "columns" then
 				mog:UpdateGUI();
 			end
@@ -142,19 +142,37 @@ function mog.createOptions()
 						type = "toggle",
 						order = 4,
 						name = L["Auto rotate"],
-						width = "double",
+						width = "full",
 						arg = "tooltipRotate",
+					},
+					width = {
+						type = "range",
+						order = 5,
+						name = L["Width"],
+						step = 1,
+						min = 100,
+						max = 500,
+						arg = "tooltipWidth",
+					},
+					height = {
+						type = "range",
+						order = 6,
+						name = L["Height"],
+						step = 1,
+						min = 100,
+						max = 500,
+						arg = "tooltipHeight",
 					},
 					mog = {
 						type = "toggle",
-						order = 5,
+						order = 7,
 						name = L["Only transmogrification items"],
 						width = "double",
 						arg = "tooltipMog",
 					},
 					modifier = {
 						type = "select",
-						order = 6,
+						order = 8,
 						name = L["Only show if modifier is pressed"],
 						values = function()
 							local tbl = {
