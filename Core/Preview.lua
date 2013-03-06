@@ -383,10 +383,7 @@ function mog:CreatePreview()
 	
 	_G["MogItPreview"..f.id.."CloseButton"]:SetScript("OnClick",previewOnClose);
 	--_G["MogItPreview"..f.id.."Bg"]:SetVertexColor(0.8,0.3,0.8);
-	f.portraitFrame:Hide();
-	f.topLeftCorner:Show();
-	f.topBorderBar:SetPoint("TOPLEFT", f.topLeftCorner, "TOPRIGHT", 0, 0);
-	f.leftBorderBar:SetPoint("TOPLEFT", f.topLeftCorner, "BOTTOMLEFT", 0, 0);
+	ButtonFrameTemplate_HidePortrait(f);
 	
 	f.resize = CreateFrame("Button", nil, f);
 	f.resize:SetSize(16, 16);

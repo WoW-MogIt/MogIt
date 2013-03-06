@@ -40,7 +40,6 @@ externals:
         tag: latest
 
 ignore:
-    - .pkgmeta
     - Changelog.txt
     - LocaleExtractor.lua
     - LocaleList.lua

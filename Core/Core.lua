@@ -215,18 +215,15 @@ function mog.LoadSettings()
 		mog.LDBI:Show("MogIt");
 	end
 	
-	if mog.db.profile.tooltipRotate then
-		mog.tooltip.rotate:Show();
-	else
-		mog.tooltip.rotate:Hide();
-	end
+	mog.tooltip:SetSize(mog.db.profile.tooltipWidth, mog.db.profile.tooltipHeight);
+	mog.tooltip.rotate:SetShown(mog.db.profile.tooltipRotate);
 	
 	mog.scroll:update();
 end
 
 mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 	if event == "PLAYER_LOGIN" then
-		mog:UpdateGUI();
+		mog:LoadSettings()
 		self:SetScript("OnSizeChanged", function(self, width, height)
 			mog.db.profile.gridWidth = width;
 			mog.db.profile.gridHeight = height;
@@ -267,10 +264,6 @@ mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
 			
 			mog.LDBI:Register("MogIt",mog.mmb,mog.db.profile.minimap);
 			
-			mog.tooltip:SetSize(mog.db.profile.tooltipWidth,mog.db.profile.tooltipHeight);
-			if mog.db.profile.tooltipRotate then
-				mog.tooltip.rotate:Show();
-			end
 			
 			for name,module in pairs(mog.moduleList) do
 				if module.MogItLoaded then
