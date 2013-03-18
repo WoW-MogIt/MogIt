@@ -221,68 +221,75 @@ function mog.LoadSettings()
 	mog.scroll:update();
 end
 
-mog.frame:SetScript("OnEvent",function(self,event,arg1,...)
-	if event == "PLAYER_LOGIN" then
-		mog:LoadSettings()
-		self:SetScript("OnSizeChanged", function(self, width, height)
-			mog.db.profile.gridWidth = width;
-			mog.db.profile.gridHeight = height;
-			mog:UpdateGUI(true);
-		end)
-	elseif event == "GET_ITEM_INFO_RECEIVED" then
-		mog.cacheFrame:SetScript("OnUpdate", mog.ItemInfoReceived);
-	elseif event == "PLAYER_EQUIPMENT_CHANGED" then
-		local slot, hasItem = arg1, ...;
-		-- don't do anything if the slot is not visible (necklace, ring, trinket)
-		if mog.db.profile.gridDress == "equipped" then
-			for i, frame in ipairs(mog.models) do
-				local item = frame.data.item
-				if item then
-					if hasItem then
-						if (slot ~= INVSLOT_HEAD or ShowingHelm()) and (slot ~= INVSLOT_BACK or ShowingCloak()) then
-							frame.model:TryOn(mog.mogSlots[slot] and select(6, GetTransmogrifySlotInfo(slot)) or GetInventoryItemID("player", slot));
-						end
-					else
-						frame.model:UndressSlot(slot);
-					end
-					frame.model:TryOn(item);
-				end
+mog.frame:RegisterEvent("ADDON_LOADED");
+mog.frame:RegisterEvent("PLAYER_LOGIN");
+mog.frame:RegisterEvent("GET_ITEM_INFO_RECEIVED");
+mog.frame:RegisterEvent("PLAYER_EQUIPMENT_CHANGED");
+mog.frame:SetScript("OnEvent", function(self, event, ...)
+	return mog[event] and mog[event](mog, ...)
+end);
+
+function mog:ADDON_LOADED(addon)
+	if addon == MogIt then
+		local AceDB = LibStub("AceDB-3.0")
+		mog.db = AceDB:New("MogItDB", defaults, true)
+		mog.db.RegisterCallback(mog, "OnProfileChanged", "LoadSettings")
+		mog.db.RegisterCallback(mog, "OnProfileCopied", "LoadSettings")
+		mog.db.RegisterCallback(mog, "OnProfileReset", "LoadSettings")
+
+		if not mog.db.global.version then
+			mog:Error(L["MogIt has loaded! Type \"/mog\" to open it."]);
+		end
+		mog.db.global.version = GetAddOnMetadata(MogIt,"Version");
+		
+		mog.LDBI:Register("MogIt",mog.mmb,mog.db.profile.minimap);
+		
+		
+		for name,module in pairs(mog.moduleList) do
+			if module.MogItLoaded then
+				module:MogItLoaded()
 			end
 		end
-	elseif event == "ADDON_LOADED" then
-		if arg1 == MogIt then
-			local AceDB = LibStub("AceDB-3.0")
-			mog.db = AceDB:New("MogItDB", defaults, true)
-			mog.db.RegisterCallback(mog, "OnProfileChanged", "LoadSettings")
-			mog.db.RegisterCallback(mog, "OnProfileCopied", "LoadSettings")
-			mog.db.RegisterCallback(mog, "OnProfileReset", "LoadSettings")
+	elseif mog.modules[addon] then
+		mog.modules[addon].loaded = true;
+		if mog.menu.active == mog.menu.modules and mog.IsDropdownShown(mog.menu) then
+			HideDropDownMenu(1);
+			ToggleDropDownMenu(1,mog.modules[addon],mog.menu,mog.menu.modules,0,0);
+		end
+	end
+end
 
-			if not mog.db.global.version then
-				mog:Error(L["MogIt has loaded! Type \"/mog\" to open it."]);
-			end
-			mog.db.global.version = GetAddOnMetadata(MogIt,"Version");
-			
-			mog.LDBI:Register("MogIt",mog.mmb,mog.db.profile.minimap);
-			
-			
-			for name,module in pairs(mog.moduleList) do
-				if module.MogItLoaded then
-					module:MogItLoaded()
+function mog:PLAYER_LOGIN()
+	mog:LoadSettings()
+	self.frame:SetScript("OnSizeChanged", function(self, width, height)
+		mog.db.profile.gridWidth = width;
+		mog.db.profile.gridHeight = height;
+		mog:UpdateGUI(true);
+	end)
+end
+
+function mog:GET_ITEM_INFO_RECEIVED()
+	mog.cacheFrame:SetScript("OnUpdate", mog.ItemInfoReceived);
+end
+
+function mog:PLAYER_EQUIPMENT_CHANGED(slot, hasItem)
+	-- don't do anything if the slot is not visible (necklace, ring, trinket)
+	if mog.db.profile.gridDress == "equipped" then
+		for i, frame in ipairs(mog.models) do
+			local item = frame.data.item
+			if item then
+				if hasItem then
+					if (slot ~= INVSLOT_HEAD or ShowingHelm()) and (slot ~= INVSLOT_BACK or ShowingCloak()) then
+						frame.model:TryOn(mog.mogSlots[slot] and select(6, GetTransmogrifySlotInfo(slot)) or GetInventoryItemID("player", slot));
+					end
+				else
+					frame.model:UndressSlot(slot);
 				end
-			end
-		elseif mog.modules[arg1] then
-			mog.modules[arg1].loaded = true;
-			if mog.menu.active == mog.menu.modules and mog.IsDropdownShown(mog.menu) then
-				HideDropDownMenu(1);
-				ToggleDropDownMenu(1,mog.modules[arg1],mog.menu,mog.menu.modules,0,0);
+				frame.model:TryOn(item);
 			end
 		end
 	end
-end);
-mog.frame:RegisterEvent("PLAYER_LOGIN");
-mog.frame:RegisterEvent("GET_ITEM_INFO_RECEIVED");
-mog.frame:RegisterEvent("ADDON_LOADED");
-mog.frame:RegisterEvent("PLAYER_EQUIPMENT_CHANGED");
+end
 --//
 
 
