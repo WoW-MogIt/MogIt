@@ -1,3 +1,8 @@
+[b]v3.1.1[/b]
+- Adds 5.2 items and fixes a bunch of old item details!
+- Added option to set tooltip model size.
+- Properly show check marks for owned items in set tooltips.
+
 [b]v3.1.0[/b]
 - Add option to use a single preview frame. (disabled by default) This mimics the behaviour of the pre 3.0 preview frame.
 - Preview frames now remember position and size between sessions.
