@@ -195,11 +195,15 @@ end
 
 function mog:ResetModel(self)
 	local model = self.model;
-	local info = self.type == "preview" and self.parent.data or mog
+	model:RefreshCamera();
+	model:SetPosition(0, 0, 0);
+	local info = self.type == "preview" and self.parent.data or mog;
 	-- :Dress resets the custom race, and :SetCustomRace does :Dress, so if we're using a custom race, just :SetCustomRace again instead of :Dress
 	if info.displayRace == myRace and info.displayGender == myGender then
 		model:Dress();
+	mog:PositionModel(self);
 	else
+	model:RefreshCamera();
 		model:SetCustomRace(info.displayRace, info.displayGender);
 		-- hack for hidden helm and cloak showing on models
 		local showingHelm, showingCloak = ShowingHelm(), ShowingCloak();
@@ -212,8 +216,10 @@ function mog:ResetModel(self)
 			model:TryOn(cloak);
 			model:UndressSlot(INVSLOT_BACK);
 		end
+	-- model:RefreshCamera();
+	mog:PositionModel(self);
+	-- model:RefreshCamera();
 	end
-	model:RefreshCamera();
 end
 
 function mog:ApplyDress(self)
@@ -242,8 +248,9 @@ end
 function mog:PositionModel(self)
 	if self.model:IsVisible() then
 		local sync = (mog.db.profile.sync or self.type == "catalogue");
-		self.model:SetPosition((not sync and self.parent.data.posZ) or mog.posZ or 0,(not sync and self.parent.data.posX) or mog.posX or 0,(not sync and self.parent.data.posY) or mog.posY or 0);
-		self.model:SetFacing((not sync and self.parent.data.face) or mog.face or 0);
+		local modelData = sync and mog or self.parent.data
+		self.model:SetPosition(modelData.posZ or 0, modelData.posX or 0, modelData.posY or 0);
+		self.model:SetFacing(modelData.face or 0);
 	end
 end
 --//
@@ -316,12 +323,11 @@ function mog.ModelOnShow(self)
 	if self:GetFrameLevel() <= lvl then
 		self:SetFrameLevel(lvl+1);
 	end
+	mog:ResetModel(self);
 	if self.type == "preview" then
-		mog:ResetModel(self);
 		self.model:Undress();
 		mog.DressFromPreview(self.model, self.parent);
 	else
-		mog:ResetModel(self);
 		if not self.data.value then
 			-- hack for models becoming visible OnShow, only do this if the frame is supposed to be hidden
 			self:SetAlpha(1)
@@ -329,7 +335,6 @@ function mog.ModelOnShow(self)
 		end
 		mog:ModelUpdate(self, self.data.value);
 	end
-	mog:PositionModel(self);
 end
 
 function mog.ModelOnHide(self)
@@ -671,17 +676,18 @@ mog.menu.modules:SetPoint("TOPLEFT", mog.frame, "TOPLEFT", 62, -31);
 
 
 --// Catalogue Menu
-local function setDisplayModel(self, arg1)
-	mog[arg1] = self.value;
+local function setDisplayModel(self, arg1, value)
+	mog[arg1] = value;
 	for i, model in ipairs(mog.models) do
 		-- reset positions first since they tend to go nuts when manipulating the model
-		model.model:SetPosition(0, 0, 0);
+		local modelData = model.parent.data
+		mog.posX = 0;
+		mog.posY = 0;
+		mog.posZ = 0;
 		mog:ResetModel(model);
 		if model:IsEnabled() then
 			mog:ModelUpdate(model, model.data.value);
 		end
-		-- and restore to previous position
-		mog:PositionModel(model);
 	end
 	CloseDropDownMenus(1);
 end
@@ -689,11 +695,11 @@ end
 function mog:CreateRaceMenu(level, func, selectedRace)
 	for i, race in ipairs(races) do -- pairs may yield unexpected order
 		local info = UIDropDownMenu_CreateInfo();
-		info.text = LBR[race] or race; -- fall back to English 'race' until there's pandaren localisation
-		info.value = raceID[race];
+		info.text = LBR[race] or race;
 		info.func = func;
 		info.checked = selectedRace == raceID[race];
 		info.arg1 = "displayRace";
+		info.arg2 = raceID[race];
 		UIDropDownMenu_AddButton(info, level);
 	end
 end
@@ -702,10 +708,10 @@ function mog:CreateGenderMenu(level, func, selectedGender)
 	for i, gender in pairs(gender) do -- pairs may yield unexpected order
 		local info = UIDropDownMenu_CreateInfo();
 		info.text = gender;
-		info.value = i;
 		info.func = func;
 		info.checked = selectedGender == i;
 		info.arg1 = "displayGender";
+		info.arg2 = i;
 		UIDropDownMenu_AddButton(info, level);
 	end
 end

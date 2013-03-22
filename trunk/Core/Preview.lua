@@ -122,14 +122,12 @@ end
 --// Preview Menu
 local currentPreview;
 
-local function setDisplayModel(self, arg1)
-	currentPreview.data[arg1] = self.value;
+local function setDisplayModel(self, arg1, value)
+	currentPreview.data[arg1] = value;
 	local model = currentPreview.model;
-	model.model:SetPosition(0, 0, 0);
 	mog:ResetModel(model);
 	model.model:Undress();
 	mog.DressFromPreview(model.model, currentPreview);
-	mog:PositionModel(model);
 	CloseDropDownMenus(1);
 end
 
@@ -491,6 +489,11 @@ end
 
 local playerClass = select(2, UnitClass("PLAYER"));
 
+local tryOnSlots = {
+	MainHandSlot = "mainhand",
+	SecondaryHandSlot = "offhand",
+}
+
 function mog.view.AddItem(item, preview)
 	if not (item and preview) then return end;
 	
@@ -514,9 +517,6 @@ function mog.view.AddItem(item, preview)
 				-- put one handed weapons in the off hand if; main hand is occupied, off hand is free and a two handed weapon isn't equipped
 				if preview.slots["MainHandSlot"].item and not preview.slots["SecondaryHandSlot"].item and not preview.data.twohand then
 					slot = "SecondaryHandSlot"
-				elseif not preview.data.twohand then
-					-- if it's going in the main hand, clear it first to make sure it doesn't go in the off hand on the model
-					mog.view.DelItem("MainHandSlot", preview);
 				end
 			end
 			
@@ -539,7 +539,7 @@ function mog.view.AddItem(item, preview)
 		preview.slots[slot].item = item;
 		slotTexture(preview, slot, texture);
 		if preview:IsVisible() then
-			preview.model.model:TryOn(item);
+			preview.model.model:TryOn(item, tryOnSlots[slot]);
 		end
 	end
 end
