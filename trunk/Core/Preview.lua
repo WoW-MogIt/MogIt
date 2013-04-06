@@ -477,15 +477,16 @@ function mog:GetPreview(frame)
 	return frame or self:CreatePreview();
 end
 
-mog.view.queue = {};
-mog.cacheFuncs.PreviewAddItem = function()
-	for i,action in ipairs(mog.view.queue) do
-		if GetItemInfo(action[1]) then
-			mog.view.AddItem(action[1],action[2]);
+local doCache = {};
+mog:AddItemCacheCallback("PreviewAddItem", function()
+	for i = #doCache, 1, -1 do
+		local item = doCache[i]
+		if GetItemInfo(item.id) then
+			mog.view.AddItem(item.id, item.frame);
+			tremove(doCache, i)
 		end
 	end
-	wipe(mog.view.queue);
-end
+end)
 
 local playerClass = select(2, UnitClass("PLAYER"));
 
@@ -499,7 +500,7 @@ function mog.view.AddItem(item, preview)
 	
 	local invType, texture = select(9, mog:GetItemInfo(item, "PreviewAddItem"));
 	if not invType then
-		tinsert(mog.view.queue, {item, preview});
+		tinsert(doCache, {id = item, frame = preview});
 		return;
 	end
 	
@@ -514,7 +515,7 @@ function mog.view.AddItem(item, preview)
 			end
 			
 			if invType == "INVTYPE_WEAPON" then
-				-- put one handed weapons in the off hand if; main hand is occupied, off hand is free and a two handed weapon isn't equipped
+				-- put one handed weapons in the off hand if: main hand is occupied, off hand is free and a two handed weapon isn't equipped
 				if preview.slots["MainHandSlot"].item and not preview.slots["SecondaryHandSlot"].item and not preview.data.twohand then
 					slot = "SecondaryHandSlot"
 				end
@@ -601,8 +602,14 @@ function HandleModifiedItemClick(link)
 end;
 
 local function hookInspectUI()
-	for k,v in ipairs(mog.slots) do
+	local function inspect_OnClick(self, button)
+		if InspectFrame.unit and self.hasItem and IsControlKeyDown() and button == "RightButton" then
+			mog:AddToPreview(GetInventoryItemID(InspectFrame.unit, GetInventorySlotInfo(self:GetID())));
+		end
+	end
+	for k, v in ipairs(mog.slots) do
 		_G["Inspect"..v]:RegisterForClicks("AnyUp");
+		_G["Inspect"..v]:HookScript("OnClick", inspect_OnClick);
 	end
 	hookInspectUI = nil;
 end
@@ -621,12 +628,12 @@ else
 end
 
 local old_SetItemRef = SetItemRef;
-function SetItemRef(link,text,btn,...)
+function SetItemRef(link, text, button, ...)
 	local id = tonumber(link:match("^item:(%d+)"));
-	if id and btn == "RightButton" and IsControlKeyDown() then
+	if id and IsControlKeyDown() and button == "RightButton" then
 		mog:AddToPreview(id);
 	else
-		return old_SetItemRef(link,text,btn,...);
+		return old_SetItemRef(link, text, button, ...);
 	end
 end
 --//

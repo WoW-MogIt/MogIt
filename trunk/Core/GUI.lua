@@ -195,15 +195,12 @@ end
 
 function mog:ResetModel(self)
 	local model = self.model;
-	model:RefreshCamera();
 	model:SetPosition(0, 0, 0);
 	local info = self.type == "preview" and self.parent.data or mog;
 	-- :Dress resets the custom race, and :SetCustomRace does :Dress, so if we're using a custom race, just :SetCustomRace again instead of :Dress
 	if info.displayRace == myRace and info.displayGender == myGender then
 		model:Dress();
-	mog:PositionModel(self);
 	else
-	model:RefreshCamera();
 		model:SetCustomRace(info.displayRace, info.displayGender);
 		-- hack for hidden helm and cloak showing on models
 		local showingHelm, showingCloak = ShowingHelm(), ShowingCloak();
@@ -216,10 +213,8 @@ function mog:ResetModel(self)
 			model:TryOn(cloak);
 			model:UndressSlot(INVSLOT_BACK);
 		end
-	-- model:RefreshCamera();
-	mog:PositionModel(self);
-	-- model:RefreshCamera();
 	end
+	mog:PositionModel(self);
 end
 
 function mog:ApplyDress(self)

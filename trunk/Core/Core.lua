@@ -125,9 +125,14 @@ end
 --// Item Cache
 local GetItemInfo = GetItemInfo;
 
-mog.cacheFrame = CreateFrame("Frame");
-local cacheQueue = {};
-local cacheFuncs = {
+local function refreshDropdown(menu)
+	if mog.IsDropdownShown(menu) then
+		HideDropDownMenu(1);
+		ToggleDropDownMenu(nil, nil, menu, "cursor", 0, 0, menu.menuList);
+	end
+end
+
+local itemCacheCallbacks = {
 	BuildList = mog.BuildList;
 	ModelOnEnter = function()
 		local owner = GameTooltip:GetOwner();
@@ -136,34 +141,45 @@ local cacheFuncs = {
 		end
 	end,
 	ItemMenu = function()
-		if mog.IsDropdownShown(mog.Item_Menu) then
-			HideDropDownMenu(1);
-			ToggleDropDownMenu(nil,nil,mog.Item_Menu,"cursor",0,0,mog.Item_Menu.menuList);
-		end
+		refreshDropdown(mog.Item_Menu);
 	end,
 	SetMenu = function()
-		if mog.IsDropdownShown(mog.Set_Menu) then
-			HideDropDownMenu(1);
-			ToggleDropDownMenu(nil,nil,mog.Set_Menu,"cursor",0,0,mog.Set_Menu.menuList);
-		end
+		refreshDropdown(mog.Set_Menu);
 	end,
 };
-mog.cacheFuncs = cacheFuncs;
 
-function mog:GetItemInfo(id,type)
+local cacheFrame = CreateFrame("Frame");
+local pendingCallbacks = {};
+
+for k in pairs(itemCacheCallbacks) do
+	pendingCallbacks[k] = {};
+end
+
+function mog:AddItemCacheCallback(name, func)
+	itemCacheCallbacks[name] = func;
+	pendingCallbacks[name] = {};
+end
+
+function mog:GetItemInfo(id, type)
+	if not type then return GetItemInfo(id) end
 	if GetItemInfo(id) then
+		-- clear pending items when they are cached
+		pendingCallbacks[type][id] = nil;
 		return GetItemInfo(id);
-	elseif cacheFuncs[type] then
-		cacheQueue[type] = true;
+	elseif itemCacheCallbacks[type] then
+		-- add to pending items for this callback if not cached
+		pendingCallbacks[type][id] = true;
 	end
 end
 
 function mog.ItemInfoReceived()
-	for k in pairs(cacheQueue) do
-		cacheFuncs[k]();
+	for k, callback in pairs(pendingCallbacks) do
+		-- execute the callback if any items are pending for it
+		if next(callback) then
+			itemCacheCallbacks[k]();
+		end
 	end
-	wipe(cacheQueue);
-	mog.cacheFrame:SetScript("OnUpdate", nil);
+	cacheFrame:SetScript("OnUpdate", nil);
 end
 --//
 
@@ -269,7 +285,7 @@ function mog:PLAYER_LOGIN()
 end
 
 function mog:GET_ITEM_INFO_RECEIVED()
-	mog.cacheFrame:SetScript("OnUpdate", mog.ItemInfoReceived);
+	cacheFrame:SetScript("OnUpdate", mog.ItemInfoReceived);
 end
 
 function mog:PLAYER_EQUIPMENT_CHANGED(slot, hasItem)
