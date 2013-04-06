@@ -1,16 +1,11 @@
 local MogIt, mog = ...
 local L = mog.L
 
-local TEXTURE = "Interface\\RaidFrame\\ReadyCheck-Ready"
+local TEXTURE = [[Interface\RaidFrame\ReadyCheck-Ready]]
 
-local function hasItem(itemID, embedded)
-	if mog:HasItem(itemID) then
-		return embedded and format("|T%s:0|t ", TEXTURE) or TEXTURE
-	end
-end
-
-local function itemIcon(itemID, textHeight)
-	return format("|T%s:%d|t ", GetItemIcon(itemID), textHeight or 0)
+local function getTexture(hasItem, embedded)
+	local texture = hasItem and TEXTURE or ""
+	return embedded and format("|T%s:0|t ", texture) or texture
 end
 
 local function itemLabel(itemID, callback)
@@ -20,6 +15,14 @@ local function itemLabel(itemID, callback)
 	else
 		return RED_FONT_COLOR_CODE..RETRIEVING_ITEM_INFO..FONT_COLOR_CODE_CLOSE
 	end
+end
+
+local function addTooltipDoubleLine(textLeft, textRight)
+	GameTooltip:AddDoubleLine(textLeft, textRight, nil, nil, nil, 1, 1, 1)
+end
+
+local function addItemTooltipLine(itemID)
+	addTooltipDoubleLine(getTexture(mog:HasItem(itemID), true)..itemLabel(itemID, "ModelOnEnter"), mog.GetItemSourceShort(v))
 end
 
 function mog.GetItemSourceInfo(itemID)
@@ -166,7 +169,7 @@ local function createItemMenu(data, func)
 		v = isArray and v or items[v]
 		if v then
 			local info = UIDropDownMenu_CreateInfo()
-			info.text = itemLabel(v)
+			info.text = itemLabel(v, func and "ItemMenu" or "SetMenu")
 			info.value = v
 			info.func = func
 			info.checked = (i == data.cycle)
@@ -230,39 +233,42 @@ function mog.ShowItemTooltip(self, item, items, cycle)
 	end
 	
 	local itemName, _, _, itemLevel = mog:GetItemInfo(item, "ModelOnEnter")
-	
+	local itemLabel = itemLabel(item, "ModelOnEnter")
 	if cycle and #items > 1 then
-		GameTooltip:AddDoubleLine(itemLabel(item, "ModelOnEnter"), L["Item %d/%d"]:format(cycle, #items), nil, nil, nil, 1, 0, 0)
+		GameTooltip:AddDoubleLine(itemLabel, L["Item %d/%d"]:format(cycle, #items), nil, nil, nil, 1, 0, 0)
 	else
-		GameTooltip:AddLine(itemLabel(item, "ModelOnEnter"))
+		GameTooltip:AddLine(itemLabel)
 	end
 	
 	local sourceType, source, zone, info = mog.GetItemSourceInfo(item)
 	if sourceType then
-		GameTooltip:AddDoubleLine(L["Source"]..":", sourceType, nil, nil, nil, 1, 1, 1)
+		addTooltipDoubleLine(L["Source"]..":", sourceType)
 		if source then
-			GameTooltip:AddDoubleLine((sourceLabels[sourceType] or sourceType)..":", source, nil, nil, nil, 1, 1, 1)
+			addTooltipDoubleLine((sourceLabels[sourceType] or sourceType)..":", source)
 		end
 		if info ~= nil then
-			GameTooltip:AddDoubleLine(STATUS..":", info and COMPLETE or INCOMPLETE, nil, nil, nil, 1, 1, 1)
+			addTooltipDoubleLine(STATUS..":", info and COMPLETE or INCOMPLETE)
 		end
 	end
 	if zone then
-		GameTooltip:AddDoubleLine(ZONE..":", zone, nil, nil, nil, 1, 1, 1)
+		addTooltipDoubleLine(ZONE..":", zone)
 	end
 	
 	GameTooltip:AddLine(" ")
-	if mog:GetData("item", item, "level") then
-		GameTooltip:AddDoubleLine(LEVEL..":", mog:GetData("item", item, "level"), nil, nil, nil, 1, 1, 1)
+	local requiredLevel = mog:GetData("item", item, "level")
+	if requiredLevel then
+		addTooltipDoubleLine(LEVEL..":", requiredLevel)
 	end
-	GameTooltip:AddDoubleLine(STAT_AVERAGE_ITEM_LEVEL..":", itemLevel, nil, nil, nil, 1, 1, 1)
-	if mog:GetData("item", item, "faction") then
-		GameTooltip:AddDoubleLine(FACTION..":", (mog:GetData("item", item, "faction") == 1 and FACTION_ALLIANCE or FACTION_HORDE), nil, nil, nil, 1, 1, 1)
+	addTooltipDoubleLine(STAT_AVERAGE_ITEM_LEVEL..":", itemLevel)
+	local faction = mog:GetData("item", item, "faction")
+	if faction then
+		addTooltipDoubleLine(FACTION..":", (faction == 1 and FACTION_ALLIANCE or FACTION_HORDE))
 	end
-	if mog:GetData("item", item, "class") and mog:GetData("item", item, "class") > 0 then
+	local class = mog:GetData("item", item, "class")
+	if class and class > 0 then
 		local str
 		for k, v in pairs(L.classBits) do
-			if bit.band(mog:GetData("item", item, "class"), v) > 0 then
+			if bit.band(class, v) > 0 then
 				local color = RAID_CLASS_COLORS[k].colorStr
 				if str then
 					str = format("%s, |c%s%s|r", str, color, LOCALIZED_CLASS_NAMES_MALE[k])
@@ -271,25 +277,26 @@ function mog.ShowItemTooltip(self, item, items, cycle)
 				end
 			end
 		end
-		GameTooltip:AddDoubleLine(CLASS..":", str, nil, nil, nil, 1, 1, 1)
+		addTooltipDoubleLine(CLASS..":", str)
 	end
-	if mog:GetData("item", item, "slot") then
-		GameTooltip:AddDoubleLine(L["Slot"]..":", L.slots[mog:GetData("item", item, "slot")], nil, nil, nil, 1, 1, 1)
+	local slot = mog:GetData("item", item, "slot")
+	if slot then
+		addTooltipDoubleLine(L["Slot"]..":", L.slots[slot])
 	end
 	
 	GameTooltip:AddLine(" ")
-	GameTooltip:AddDoubleLine(ID..":", item, nil, nil, nil, 1, 1, 1)
+	addTooltipDoubleLine(ID..":", item)
 	
-	local texture = hasItem(item)
-	if texture then
+	if mog:HasItem(item) then
 		GameTooltip:AddLine(" ")
 		GameTooltip:AddLine(L["You have this item."], 1, 1, 1)
-		GameTooltip:AddTexture(texture)
+		GameTooltip:AddTexture(TEXTURE)
 	end
 	
-	-- add wishlist info about this item
 	if (not mog.active or mog.active.name ~= "Wishlist") and mog.wishlist:IsItemInWishlist(item) then
-		GameTooltip:AddLine(" ")
+		if not mog:HasItem(item) then
+			GameTooltip:AddLine(" ")
+		end
 		GameTooltip:AddLine(L["This item is on your wishlist."], 1, 1, 1)
 		GameTooltip:AddTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcon_1")
 	end
@@ -302,16 +309,22 @@ function mog.ShowItemTooltip(self, item, items, cycle)
 		GameTooltip:AddLine(L["Other items using this appearance:"])
 		for i, v in ipairs(items) do
 			if v ~= item then
-				GameTooltip:AddDoubleLine(itemLabel(v, "ModelOnEnter"), mog.GetItemSourceShort(v), nil, nil, nil, 1, 1, 1)
-				local texture = hasItem(v)
-				if texture then
-					GameTooltip:AddTexture(texture)
-				end
+				addItemTooltipLine(v)
 			end
 		end
 	end
 	
 	GameTooltip:Show()
+end
+
+local function showMenu(menu, data, isSaved)
+	if mog.IsDropdownShown(menu) and menu.data ~= data then
+		HideDropDownMenu(1)
+	end
+	-- needs to be either true or false
+	data.isSaved = isSaved ~= nil
+	menu.data = data
+	ToggleDropDownMenu(nil, data.item, menu, "cursor", 0, 0)
 end
 
 function mog.Item_OnClick(self, btn, data, isSaved)
@@ -330,13 +343,7 @@ function mog.Item_OnClick(self, btn, data, isSaved)
 		elseif IsShiftKeyDown() then
 			mog:ShowURL(item)
 		else
-			if mog.IsDropdownShown(mog.Item_Menu) and mog.Item_Menu.data ~= data then
-				HideDropDownMenu(1)
-			end
-			-- needs to be either true or false
-			data.isSaved = isSaved ~= nil
-			mog.Item_Menu.data = data
-			ToggleDropDownMenu(nil, data.item, mog.Item_Menu, "cursor", 0, 0)
+			showMenu(mog.Item_Menu, data, isSaved)
 		end
 	end
 end
@@ -375,15 +382,15 @@ end
 
 function mog.ShowSetTooltip(self, items, name)
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+	GameTooltip[mog] = true
 	
 	GameTooltip:AddLine(name)
 	for i, slot in ipairs(mog.slots) do
 		local itemID = items[slot] or items[i]
 		if itemID then
-			GameTooltip:AddDoubleLine((hasItem(itemID, true) or "")..itemLabel(itemID, "ModelOnEnter"), mog.GetItemSourceShort(itemID), nil, nil, nil, 1, 1, 1)
+			addItemTooltipLine(itemID)
 		end
 	end
-	
 	GameTooltip:Show()
 end
 
@@ -392,6 +399,17 @@ function mog.Set_OnClick(self, btn, data, isSaved)
 		if IsShiftKeyDown() then
 			ChatEdit_InsertLink(mog:SetToLink(data.items))
 		elseif IsControlKeyDown() then
+			if not DressUpFrame:IsShown() or DressUpFrame.mode ~= "player" then
+				DressUpFrame.mode = "player"
+				DressUpFrame.ResetButton:Show()
+
+				local race, fileName = UnitRace("player")
+				SetDressUpBackground(DressUpFrame, fileName)
+
+				ShowUIPanel(DressUpFrame)
+				DressUpModel:SetUnit("player")
+			end
+			DressUpModel:Undress()
 			for k, v in pairs(data.items) do
 				DressUpItemLink(v)
 			end
@@ -406,12 +424,7 @@ function mog.Set_OnClick(self, btn, data, isSaved)
 		elseif IsControlKeyDown() then
 			mog:AddToPreview(data.items, mog:GetPreview())
 		else
-			if mog.IsDropdownShown(mog.Set_Menu) and mog.Set_Menu.data ~= data then
-				HideDropDownMenu(1)
-			end
-			mog.Set_Menu.data = data
-			data.isSaved = isSaved ~= nil
-			ToggleDropDownMenu(nil, nil, mog.Set_Menu, "cursor", 0, 0)
+			showMenu(mog.Set_Menu, data, isSaved)
 		end
 	end
 end
