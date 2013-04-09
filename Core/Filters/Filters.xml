@@ -13,5 +13,6 @@
 <Script file="slot.lua"/>
 <Script file="quality.lua"/>
 <Script file="bind.lua"/>
+<Script file="hasItem.lua"/>
 
 </Ui>
