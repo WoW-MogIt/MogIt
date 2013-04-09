@@ -5,38 +5,50 @@ local f = mog:CreateFilter("faction");
 local alliance;
 local horde;
 
+local factions = {
+	[1] = "Alliance",
+	[2] = "Horde",
+}
+
+local settings = {
+	Alliance = false,
+	Horde = false,
+}
+
 f:SetHeight(69);
 
-f.faction = f:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall");
-f.faction:SetPoint("TOPLEFT",f,"TOPLEFT",0,0);
-f.faction:SetPoint("RIGHT",f,"RIGHT",0,0);
+f.faction = f:CreateFontString(nil,nil,"GameFontHighlightSmall");
+f.faction:SetPoint("TOPLEFT");
+f.faction:SetPoint("RIGHT");
 f.faction:SetText(L["Faction"]..":");
 f.faction:SetJustifyH("LEFT");
 
-f.alliance = CreateFrame("CheckButton","MogItFiltersFactionAlliance",f,"UICheckButtonTemplate");
-MogItFiltersFactionAllianceText:SetText(FACTION_ALLIANCE);
-f.alliance:SetPoint("TOPLEFT",f.faction,"BOTTOMLEFT",0,0);
-f.alliance:SetScript("OnClick",function(self)
-	alliance = self:GetChecked();
+local function onClick(self)
+	settings[self.value] = self:GetChecked() == 1;
 	mog:BuildList();
-end);
+end
 
-f.horde = CreateFrame("CheckButton","MogItFiltersFactionHorde",f,"UICheckButtonTemplate");
-MogItFiltersFactionHordeText:SetText(FACTION_HORDE);
-f.horde:SetPoint("TOPLEFT",f.alliance,"BOTTOMLEFT",0,0);
-f.horde:SetScript("OnClick",function(self)
-	horde = self:GetChecked();
-	mog:BuildList();
-end);
+f.Alliance = CreateFrame("CheckButton",nil,f,"UICheckButtonTemplate");
+f.Alliance.text:SetText(FACTION_ALLIANCE);
+f.Alliance:SetPoint("TOPLEFT",f.faction,"BOTTOMLEFT");
+f.Alliance:SetScript("OnClick",onClick);
+f.Alliance.value = "Alliance";
+
+f.Horde = CreateFrame("CheckButton",nil,f,"UICheckButtonTemplate");
+f.Horde.text:SetText(FACTION_HORDE);
+f.Horde:SetPoint("TOPLEFT",f.Alliance,"BOTTOMLEFT");
+f.Horde:SetScript("OnClick",onClick);
+f.Horde.value = "Horde";
 
 function f.Filter(faction)
-	return (not faction) or (faction == 1 and alliance) or (faction == 2 and horde);
+	return (not faction) or (settings[factions[faction]]);
 end
 
 function f.Default()
-	alliance = UnitFactionGroup("PLAYER") == "Alliance";
-	f.alliance:SetChecked(alliance);
-	horde = UnitFactionGroup("PLAYER") == "Horde";
-	f.horde:SetChecked(horde);
+	for i, faction in ipairs(factions) do
+		local value = UnitFactionGroup("PLAYER") == faction;
+		settings[faction] = value;
+		f[faction]:SetChecked(value);
+	end
 end
 f.Default();

@@ -9,17 +9,10 @@ local class = L.classBits[select(2,UnitClass("PLAYER"))];
 
 
 --// Tooltip
-mog.tooltip = CreateFrame("Frame","MogItTooltip",UIParent);
+mog.tooltip = CreateFrame("Frame","MogItTooltip",UIParent,"TooltipBorderedFrameTemplate");
 mog.tooltip:Hide();
 mog.tooltip:SetClampedToScreen(true);
 mog.tooltip:SetFrameStrata("TOOLTIP");
-mog.tooltip:SetBackdrop({
-	bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", 
-	edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-	tile = true, tileSize = 16, edgeSize = 16, 
-	insets = { left = 5, right = 5, top = 5, bottom = 5 }
-});
-mog.tooltip:SetBackdropColor(0,0,0);
 
 mog.tooltip:SetScript("OnShow",function(self)
 	if mog.db.profile.tooltipMouse and not InCombatLockdown() then
@@ -127,7 +120,7 @@ end
 mog.tooltip.check = CreateFrame("Frame");
 mog.tooltip.check:Hide();
 mog.tooltip.check:SetScript("OnUpdate",function(self)
-	if mog.tooltip.owner and not (mog.tooltip.owner:IsShown() and mog.tooltip.owner:GetItem()) then
+	if (mog.tooltip.owner and not (mog.tooltip.owner:IsShown() and mog.tooltip.owner:GetItem())) or not mog.tooltip.owner then
 		mog.tooltip:Hide();
 		mog.tooltip.item = nil;
 	end

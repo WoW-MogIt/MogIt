@@ -29,10 +29,7 @@ mog.filt:EnableMouse(true);
 --MogItFiltersCloseButton:SetPushedTexture("Interface\\BUTTONS\\UI-Panel-HideButton-Down");
 MogItFiltersBg:SetVertexColor(0.8,0.3,0.8);
 MogItFiltersTitleText:SetText(FILTERS);
-mog.filt.portraitFrame:Hide();
-mog.filt.topLeftCorner:Show();
-mog.filt.topBorderBar:SetPoint("TOPLEFT",mog.filt.topLeftCorner,"TOPRIGHT",0,0);
-mog.filt.leftBorderBar:SetPoint("TOPLEFT",mog.filt.topLeftCorner,"BOTTOMLEFT",0,0);
+ButtonFrameTemplate_HidePortrait(mog.filt);
 
 mog.filt.results = mog.filt:CreateFontString(nil,"ARTWORK","GameFontNormal");
 mog.filt.results:SetPoint("TOPLEFT",mog.filt,"TOPLEFT",10,-35);
