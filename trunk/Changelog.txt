@@ -1,3 +1,13 @@
+[b]v3.1.2[/b]
+- Added filter for showing only items that the character possesses.
+- Fixed potential tooltip model issue with ElvUI.
+- Weapons should now always go into the correct slot on the preview model.
+- Fixed a few catalogue model positioning issues when scrolling.
+- Uncached items should now properly get added when loading sets into previews, and tooltips should update automatically. (no more Retreiving item information)
+- It is once again possible to preview inspected units' transmogged items rather than their real items.
+- Default UI dressing room will now get undressed before trying on sets.
+- Slightly indent item names in tooltips to line them up with items preceded by a tick.
+
 [b]v3.1.1[/b]
 - Adds 5.2 items and fixes a bunch of old item details!
 - Added option to set tooltip model size.
