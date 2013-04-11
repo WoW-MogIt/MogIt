@@ -22,7 +22,7 @@ local function addTooltipDoubleLine(textLeft, textRight)
 end
 
 local function addItemTooltipLine(itemID)
-	addTooltipDoubleLine(getTexture(mog:HasItem(itemID), true)..itemLabel(itemID, "ModelOnEnter"), mog.GetItemSourceShort(v))
+	addTooltipDoubleLine(getTexture(mog:HasItem(itemID), true)..itemLabel(itemID, "ModelOnEnter"), mog.GetItemSourceShort(itemID))
 end
 
 function mog.GetItemSourceInfo(itemID)
