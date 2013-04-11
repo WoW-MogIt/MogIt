@@ -3,6 +3,7 @@
 ## Author: Aelobin (The Maelstrom EU) & Lombra (Defias Brotherhood EU)
 ## Version: @project-version@
 ## SavedVariables: MogItDB, MogItWishlist
+## OptionalDeps: DataStore_Container
 ## Notes: Transmogrification Assistant
 ## Notes-frFR: Transmogrification Assistante
 ## Notes-deDE: Transmogrifikation Assistentin

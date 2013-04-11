@@ -1,3 +1,7 @@
+[b]v3.1.3[/b]
+- Add support for DataStore to check for owned items in void storage.
+- Fix tooltip source info for set and alternate items.
+
 [b]v3.1.2[/b]
 - Added filter for showing only items that the character possesses.
 - Fixed potential tooltip model issue with ElvUI.

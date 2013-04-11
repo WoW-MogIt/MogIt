@@ -2,6 +2,7 @@ local MogIt,mog = ...;
 _G["MogIt"] = mog;
 local L = mog.L;
 
+local character = DataStore_Containers and DataStore:GetCharacter()
 
 mog.frame = CreateFrame("Frame","MogItFrame",UIParent,"ButtonFrameTemplate");
 mog.list = {};
@@ -184,7 +185,7 @@ end
 --//
 
 function mog:HasItem(itemID)
-	return GetItemCount(itemID, true) > 0
+	return GetItemCount(itemID, true) > 0 or (character and select(2, DataStore:GetContainerItemCount(character, itemID)) > 0)
 end
 
 
