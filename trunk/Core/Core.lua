@@ -15,6 +15,12 @@ function mog.IsDropdownShown(dd)
 	return DropDownList1 and DropDownList1:IsShown() and UIDropDownMenu_GetCurrentDropDown() == dd;
 end
 
+function mog:ToggleDropdown(value, dropdownFrame, anchor, xOffset, yOffset, menuList, button)
+	dropdownFrame.displayMode = "MENU"
+	ToggleDropDownMenu(nil, value, dropdownFrame, anchor, xOffset, yOffset, menuList, button);
+	dropdownFrame.displayMode = nil
+end
+
 
 --// Slash Commands
 function mog:ToggleFrame()
@@ -295,9 +301,10 @@ function mog:PLAYER_EQUIPMENT_CHANGED(slot, hasItem)
 		for i, frame in ipairs(mog.models) do
 			local item = frame.data.item
 			if item then
+				local slotName = mog.mogSlots[slot];
 				if hasItem then
 					if (slot ~= INVSLOT_HEAD or ShowingHelm()) and (slot ~= INVSLOT_BACK or ShowingCloak()) then
-						frame.model:TryOn(mog.mogSlots[slot] and select(6, GetTransmogrifySlotInfo(slot)) or GetInventoryItemID("player", slot));
+						frame.model:TryOn(mog.mogSlots[slot] and select(6, GetTransmogrifySlotInfo(slot)) or GetInventoryItemID("player", slot), slotName);
 					end
 				else
 					frame.model:UndressSlot(slot);
@@ -388,17 +395,17 @@ mog.slotsType = {
 
 -- all slot IDs that can be transmogrified
 mog.mogSlots = {
-	[INVSLOT_HEAD] = true,
-	[INVSLOT_SHOULDER] = true,
-	[INVSLOT_CHEST] = true,
-	[INVSLOT_WAIST] = true,
-	[INVSLOT_LEGS] = true,
-	[INVSLOT_FEET] = true,
-	[INVSLOT_WRIST] = true,
-	[INVSLOT_HAND] = true,
-	[INVSLOT_BACK] = true,
-	[INVSLOT_MAINHAND] = true,
-	[INVSLOT_OFFHAND] = true,
+	[INVSLOT_HEAD] = "HeadSlot",
+	[INVSLOT_SHOULDER] = "ShoulderSlot",
+	[INVSLOT_BACK] = "BackSlot",
+	[INVSLOT_CHEST] = "ChestSlot",
+	[INVSLOT_WRIST] = "WristSlot",
+	[INVSLOT_HAND] = "HandsSlot",
+	[INVSLOT_WAIST] = "WaistSlot",
+	[INVSLOT_LEGS] = "LegsSlot",
+	[INVSLOT_FEET] = "FeetSlot",
+	[INVSLOT_MAINHAND] = "MainHandSlot",
+	[INVSLOT_OFFHAND] = "SecondaryHandSlot",
 }
 
 function mog:GetSlot(id)

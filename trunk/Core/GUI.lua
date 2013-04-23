@@ -52,6 +52,8 @@ mog.playerGender = myGender;
 mog.displayRace = myRace
 mog.displayGender = myGender
 
+local ModelFramePrototype = CreateFrame("Button")
+local ModelFrame_MT = {__index = ModelFramePrototype}
 
 --// mog.frame
 mog.frame:SetPoint("CENTER");
@@ -129,7 +131,7 @@ function mog:CreateModelFrame(parent)
 		return f;
 	end
 	
-	local f = CreateFrame("Button",nil,parent);
+	local f = setmetatable(CreateFrame("Button",nil,parent), ModelFrame_MT);
 	f:Hide();
 	
 	f.parent = parent;
@@ -193,7 +195,32 @@ function mog:DeleteCatalogueModel(n)
 	tremove(mog.models, n);
 end
 
-function mog:ResetModel(self)
+local tryOnSlots = {
+	MainHandSlot = "mainhand",
+	SecondaryHandSlot = "offhand",
+}
+
+function ModelFramePrototype:TryOn(item, slot)
+	self.model:TryOn(item, tryOnSlots[slot]);
+end
+
+function ModelFramePrototype:Undress()
+	self.model:UndressSlot(INVSLOT_LEGS) -- hack for kilt textures getting stuck
+	self.model:Undress()
+end
+
+function ModelFramePrototype:ApplyDress()
+	if mog.db.profile.gridDress == "equipped" then
+		self:ResetModel();
+	else
+		self:Undress();
+		if mog.db.profile.gridDress == "preview" then
+			mog.DressFromPreview(self, mog.activePreview);
+		end
+	end
+end
+
+function ModelFramePrototype:ResetModel()
 	local model = self.model;
 	model:SetPosition(0, 0, 0);
 	local info = self.type == "preview" and self.parent.data or mog;
@@ -217,14 +244,12 @@ function mog:ResetModel(self)
 	mog:PositionModel(self);
 end
 
-function mog:ApplyDress(self)
-	if mog.db.profile.gridDress == "equipped" then
-		mog:ResetModel(self);
-	else
-		self.model:Undress();
-		if mog.db.profile.gridDress == "preview" then
-			mog.DressFromPreview(self.model, mog.activePreview);
-		end
+function mog:PositionModel(self)
+	if self.model:IsVisible() then
+		local sync = (mog.db.profile.sync or self.type == "catalogue");
+		local modelData = sync and mog or self.parent.data
+		self.model:SetPosition(modelData.posZ or 0, modelData.posX or 0, modelData.posY or 0);
+		self.model:SetFacing(modelData.face or 0);
 	end
 end
 
@@ -235,17 +260,8 @@ function mog.DressFromPreview(model, previewFrame)
 	
 	for id, slot in pairs(previewFrame.slots) do
 		if slot.item then
-			model:TryOn(slot.item);
+			model:TryOn(slot.item, slot.slot);
 		end
-	end
-end
-
-function mog:PositionModel(self)
-	if self.model:IsVisible() then
-		local sync = (mog.db.profile.sync or self.type == "catalogue");
-		local modelData = sync and mog or self.parent.data
-		self.model:SetPosition(modelData.posZ or 0, modelData.posX or 0, modelData.posY or 0);
-		self.model:SetFacing(modelData.face or 0);
 	end
 end
 --//
@@ -318,10 +334,10 @@ function mog.ModelOnShow(self)
 	if self:GetFrameLevel() <= lvl then
 		self:SetFrameLevel(lvl+1);
 	end
-	mog:ResetModel(self);
+	self:ResetModel();
 	if self.type == "preview" then
-		self.model:Undress();
-		mog.DressFromPreview(self.model, self.parent);
+		self:Undress();
+		mog.DressFromPreview(self, self.parent);
 	else
 		if not self.data.value then
 			-- hack for models becoming visible OnShow, only do this if the frame is supposed to be hidden
@@ -463,6 +479,7 @@ function mog.scroll.update(self, value, offset, onscroll)
 		if value then
 			frame.data.value = value;
 			frame.data.frame = frame;
+			frame.data.index = index;
 			for k, v in pairs(frame.indicators) do
 				v:Hide();
 			end
@@ -679,7 +696,7 @@ local function setDisplayModel(self, arg1, value)
 		mog.posX = 0;
 		mog.posY = 0;
 		mog.posZ = 0;
-		mog:ResetModel(model);
+		model:ResetModel();
 		if model:IsEnabled() then
 			mog:ModelUpdate(model, model.data.value);
 		end
