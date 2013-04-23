@@ -157,6 +157,10 @@ local itemOptionsMenu = {
 	},
 }
 
+function mog:AddItemOption(info)
+	tinsert(itemOptionsMenu, info)
+end
+
 local function createItemMenu(data, func)
 	local items = data.items
 	-- not listing the items if it's only 1 and it's not a set
@@ -200,9 +204,15 @@ local function createMenu(self, level, menuList)
 	end
 end
 
+local slots = {
+	[1] = "MainHandSlot",
+	-- [2] = "mainhand",
+	-- [3] = "offhand",
+}
+
 function mog.Item_FrameUpdate(self, data)
-	mog:ApplyDress(self)
-	self.model:TryOn(data.item)
+	self:ApplyDress()
+	self:TryOn(data.item, slots[mog:GetData("item", data.item, "slot")])
 end
 
 local sourceLabels = {
@@ -374,9 +384,9 @@ end
 function mog.Set_FrameUpdate(self, data)
 	self:ShowIndicator("label")
 	self:SetText(data.name)
-	self.model:Undress()
+	self:Undress()
 	for k, v in pairs(data.items) do
-		self.model:TryOn(v)
+		self:TryOn(v, k)
 	end
 end
 
@@ -458,7 +468,11 @@ do
 			end,
 		},
 	}
-
+	
+	function mog:AddSetOption(info)
+		tinsert(setMenu, info)
+	end
+	
 	mog.Set_Menu = CreateFrame("Frame")
 	mog.Set_Menu.displayMode = "MENU"
 	mog.Set_Menu.initialize = function(self, level, menuList)
@@ -472,6 +486,7 @@ do
 					info.value = data.name
 					info.notCheckable = true
 					info.arg1 = data.items
+					info.arg2 = data.index
 					UIDropDownMenu_AddButton(info, level)
 				end
 			end

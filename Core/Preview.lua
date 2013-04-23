@@ -125,9 +125,9 @@ local currentPreview;
 local function setDisplayModel(self, arg1, value)
 	currentPreview.data[arg1] = value;
 	local model = currentPreview.model;
-	mog:ResetModel(model);
-	model.model:Undress();
-	mog.DressFromPreview(model.model, currentPreview);
+	model:ResetModel();
+	model:Undress();
+	mog.DressFromPreview(model, currentPreview);
 	CloseDropDownMenus(1);
 end
 
@@ -490,12 +490,7 @@ end)
 
 local playerClass = select(2, UnitClass("PLAYER"));
 
-local tryOnSlots = {
-	MainHandSlot = "mainhand",
-	SecondaryHandSlot = "offhand",
-}
-
-function mog.view.AddItem(item, preview)
+function mog.view.AddItem(item, preview, forceSlot)
 	if not (item and preview) then return end;
 	
 	local invType, texture = select(9, mog:GetItemInfo(item, "PreviewAddItem"));
@@ -505,6 +500,9 @@ function mog.view.AddItem(item, preview)
 	end
 	
 	local slot = mog:GetSlot(invType)
+	if type(forceSlot) == "string" then
+		slot = forceSlot
+	end
 	if slot then
 		if slot == "MainHandSlot" or slot == "SecondaryHandSlot" then
 			if invType == "INVTYPE_2HWEAPON" then
@@ -536,11 +534,10 @@ function mog.view.AddItem(item, preview)
 			end
 		end
 		
-		--> Undress/TryOn weapon slots if weapon changed?
 		preview.slots[slot].item = item;
 		slotTexture(preview, slot, texture);
 		if preview:IsVisible() then
-			preview.model.model:TryOn(item, tryOnSlots[slot]);
+			preview.model:TryOn(item, slot);
 		end
 	end
 end
@@ -566,7 +563,7 @@ function mog:AddToPreview(item,preview)
 	elseif type(item) == "table" then
 		mog.view:Undress(preview);
 		for k,v in pairs(item) do
-			mog.view.AddItem(v,preview);
+			mog.view.AddItem(v,preview,k);
 		end
 	end
 	
