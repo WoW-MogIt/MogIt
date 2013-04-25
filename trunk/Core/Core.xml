@@ -9,6 +9,7 @@
 <Script file="URL.lua"/>
 <Script file="Tooltip.lua"/>
 <Script file="Options.lua"/>
+<Script file="Templates.lua"/>
 
 <Include file="Filters\Filters.xml"/>
 <Include file="Sorting\Sorting.xml"/>

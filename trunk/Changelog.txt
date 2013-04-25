@@ -1,3 +1,6 @@
+[b]v3.1.4[/b]
+- Fixed kilt texture bug also in preview frames.
+
 [b]v3.1.3[/b]
 - Added support for DataStore_Containers to check for owned items in void storage. (see [url=http://wow.curseforge.com/addons/mogit/forum/general/51917-data-store-support/]forum[/url] for more info)
 - Fixed tooltip source info for set and same-appearance items.

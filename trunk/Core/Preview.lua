@@ -575,6 +575,7 @@ function mog:AddToPreview(item,preview)
 end
 
 function mog.view:Undress(preview)
+	preview.model.model:UndressSlot(INVSLOT_LEGS); -- hack for kilt textures getting stuck
 	for k, v in pairs(preview.slots) do
 		mog.view.DelItem(k, preview);
 	end
