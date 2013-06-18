@@ -205,7 +205,6 @@ function ModelFramePrototype:TryOn(item, slot)
 end
 
 function ModelFramePrototype:Undress()
-	self.model:UndressSlot(INVSLOT_LEGS) -- hack for kilt textures getting stuck
 	self.model:Undress()
 end
 

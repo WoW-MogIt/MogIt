@@ -575,7 +575,6 @@ function mog:AddToPreview(item,preview)
 end
 
 function mog.view:Undress(preview)
-	preview.model.model:UndressSlot(INVSLOT_LEGS); -- hack for kilt textures getting stuck
 	for k, v in pairs(preview.slots) do
 		mog.view.DelItem(k, preview);
 	end
@@ -584,20 +583,30 @@ end
 
 
 --// Hooks
-local old_HandleModifiedItemClick = HandleModifiedItemClick
-
-function HandleModifiedItemClick(link)
-	if not link then
-		return;
-	end
+if not ModifiedItemClickHandlers then
+	ModifiedItemClickHandlers = {};
 	
+	local origHandleModifiedItemClick = HandleModifiedItemClick;
+	
+	function HandleModifiedItemClick(link)
+		if not link then
+			return false;
+		end
+		for i, v in ipairs(ModifiedItemClickHandlers) do
+			if v(link) then
+				return true;
+			end
+		end
+		return origHandleModifiedItemClick(link);
+	end
+end
+
+tinsert(ModifiedItemClickHandlers, function(link)
 	if IsControlKeyDown() and GetMouseButtonClicked() == "RightButton" then
 		mog:AddToPreview(link);
 		return true;
 	end
-	
-	return old_HandleModifiedItemClick(link);
-end;
+end);
 
 local function hookInspectUI()
 	local function inspect_OnClick(self, button)
