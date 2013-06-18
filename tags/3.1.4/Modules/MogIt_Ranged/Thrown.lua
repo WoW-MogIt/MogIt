@@ -1,0 +1,1 @@
+local i=MogIt.base.AddSlot("Thrown",...)
