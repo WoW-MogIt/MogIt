@@ -1,9 +1,3 @@
-General:
-[!] Check for errors
-
-Preview:
-[?] mog.view.AddItem Undress weapons and re-equip
-
 GUI:
 [?] SetAnimation instead of SetSequence
 [?] Disable modules (or the bracket text) in the module dropdown if version isnt compatible?
