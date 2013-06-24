@@ -191,7 +191,7 @@ end
 --//
 
 function mog:HasItem(itemID)
-	return GetItemCount(itemID, true) > 0 or (character and select(2, DataStore:GetContainerItemCount(character, itemID)) > 0)
+	return GetItemCount(itemID, true) > 0 or (character and select(3, DataStore:GetContainerItemCount(character, itemID)) > 0)
 end
 
 
