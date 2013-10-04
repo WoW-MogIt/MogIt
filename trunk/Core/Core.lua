@@ -121,7 +121,7 @@ end
 
 function mog:BuildList(top,module)
 	if (module and mog.active and mog.active.name ~= module) then return end;
-	mog.list = mog.active and mog.active:BuildList() or {};
+	mog.list = mog.active and mog.active.BuildList and mog.active:BuildList() or {};
 	mog:SortList(nil,true);
 	mog.scroll:update(top and 1);
 	mog.filt.models:SetText(#mog.list);
