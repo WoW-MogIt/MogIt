@@ -1,0 +1,14 @@
+GUI:
+[?] SetAnimation instead of SetSequence
+[?] Disable modules (or the bracket text) in the module dropdown if version isnt compatible?
+
+Modules:
+[A] Update extra modules
+
+Raise preview frame
+No hidden cloak/helm
+Dressing room bug?
+Owned filter?
+Weapon catalog equip slot
+Preview - uncached equipped items
+Override Titan's Grip
