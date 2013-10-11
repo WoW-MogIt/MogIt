@@ -1,5 +1,6 @@
 [b]v3.1.6[/b]
 - Added 5.4 items.
+- Added 'Flexible' item tags.
 - Fix scrolling in the main window when dragging the scroll thumb.
 - DataStore should now always load before MogIt if enabled.
 
