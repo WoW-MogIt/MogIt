@@ -216,7 +216,7 @@ local addons = {
 for _, addon in ipairs(addons) do
 	local _, title, _, _, loadable = GetAddOnInfo(addon);
 	if loadable then
-		mog:RegisterModule(addon, tonumber(GetAddOnMetadata(addon, "X-MogItModuleVersion")), {
+		local module = mog:RegisterModule(addon, tonumber(GetAddOnMetadata(addon, "X-MogItModuleVersion")), {
 			label = title:match("MogIt_(.+)") or title,
 			base = true,
 			slots = {},
@@ -239,7 +239,6 @@ for _, addon in ipairs(addons) do
 				"quality",
 				"bind",
 				(addon == "MogIt_OneHanded" and "slot") or nil,
-				"hasItem",
 			},
 			sorting = {
 				"level",
@@ -251,6 +250,8 @@ for _, addon in ipairs(addons) do
 				colour = mog.base.SortColour,
 			},
 		});
+		-- dirty fix for now - if the "slot" filter is not present the array is broken unless we do this
+		tinsert(module.filters, "hasItem");
 	end
 end
 --//

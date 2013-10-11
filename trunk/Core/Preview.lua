@@ -180,7 +180,9 @@ local previewMenu = {
 				mog.view.DelItem(k, currentPreview);
 				local slotID = GetInventorySlotInfo(k);
 				local item = mog.mogSlots[slotID] and select(6, GetTransmogrifySlotInfo(slotID)) or GetInventoryItemID("player", slotID)
-				mog.view.AddItem(item, currentPreview);
+				if (k ~= "HeadSlot" or ShowingHelm()) and (k ~= "BackSlot" or ShowingCloak()) then
+					mog.view.AddItem(item, currentPreview);
+				end
 			end
 			if mog.activePreview == currentPreview and mog.db.profile.gridDress == "preview" then
 				mog.scroll:update();
@@ -515,7 +517,7 @@ function mog.view.AddItem(item, preview, forceSlot)
 			if invType == "INVTYPE_WEAPON" then
 				-- put one handed weapons in the off hand if: main hand is occupied, off hand is free and a two handed weapon isn't equipped
 				if preview.slots["MainHandSlot"].item and not preview.slots["SecondaryHandSlot"].item and not preview.data.twohand then
-					slot = "SecondaryHandSlot"
+					slot = "SecondaryHandSlot";
 				end
 			end
 			
