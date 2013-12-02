@@ -99,7 +99,7 @@ local itemOptionsMenu = {
 			
 			for i, preview in ipairs(mog.previews) do
 				local info = UIDropDownMenu_CreateInfo()
-				info.text = format("%s %d", L["Preview"], preview.id)
+				info.text = format("%s %d", L["Preview"], preview:GetID())
 				info.value = UIDROPDOWNMENU_MENU_VALUE
 				info.func = previewOnClick
 				info.notCheckable = true

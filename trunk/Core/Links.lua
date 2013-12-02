@@ -79,8 +79,8 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_BN_INLINE_TOAST_BROADCAST",filter);
 ChatFrame_AddMessageEventFilter("CHAT_MSG_BN_INLINE_TOAST_BROADCAST_INFORM",filter);
 ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL",filter);
 
-local old_SetItemRef = SetItemRef;
-function SetItemRef(link, ...)
+local SetHyperlink = ItemRefTooltip.SetHyperlink;
+function ItemRefTooltip:SetHyperlink(link)
 	if link:find("^MogIt") then
 		if IsModifiedClick("CHATLINK") then
 			ChatEdit_InsertLink("["..link.."]")
@@ -96,6 +96,6 @@ function SetItemRef(link, ...)
 			mog:AddToPreview(set,preview);
 		end
 	else
-		return old_SetItemRef(link, ...);
+		SetHyperlink(self, link);
 	end
 end
