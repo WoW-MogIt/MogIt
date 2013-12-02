@@ -304,12 +304,12 @@ function mog:PLAYER_EQUIPMENT_CHANGED(slot, hasItem)
 				local slotName = mog.mogSlots[slot];
 				if hasItem then
 					if (slot ~= INVSLOT_HEAD or ShowingHelm()) and (slot ~= INVSLOT_BACK or ShowingCloak()) then
-						frame.model:TryOn(mog.mogSlots[slot] and select(6, GetTransmogrifySlotInfo(slot)) or GetInventoryItemID("player", slot), slotName);
+						frame:TryOn(mog.mogSlots[slot] and select(6, GetTransmogrifySlotInfo(slot)) or GetInventoryItemID("player", slot), slotName);
 					end
 				else
-					frame.model:UndressSlot(slot);
+					frame:UndressSlot(slot);
 				end
-				frame.model:TryOn(item);
+				frame:TryOn(item);
 			end
 		end
 	end

@@ -15,11 +15,11 @@ tinsert(UISpecialFrames,"MogItPreview");
 
 function mog:ActivatePreview(preview)
 	mog.activePreview = preview;
-	_G["MogItPreview"..preview.id.."Bg"]:SetVertexColor(0.8,0.3,0.8);
+	preview.Bg:SetVertexColor(0.8,0.3,0.8);
 	preview.activate:Disable();
 	for k,v in ipairs(mog.previews) do
 		if v ~= preview then
-			_G["MogItPreview"..v.id.."Bg"]:SetVertexColor(1,1,1);
+			v.Bg:SetVertexColor(1,1,1);
 			v.activate:Enable();
 		end
 	end
@@ -76,7 +76,7 @@ local function modelOnMouseWheel(self,v)
 end
 
 local function slotTexture(f,slot,texture)
-	SetItemButtonTexture(f.slots[slot],texture or select(2,GetInventorySlotInfo(slot)));
+	f.slots[slot].icon:SetTexture(texture or select(2,GetInventorySlotInfo(slot)));
 end
 
 local function slotOnEnter(self)
@@ -359,7 +359,7 @@ function mog:CreatePreview()
 		local leastIndex = #mog.previews + 1;
 		-- find the lowest unused frame ID
 		for i, v in ipairs(self.previewBin) do
-			leastIndex = min(v.id, leastIndex);
+			leastIndex = min(v:GetID(), leastIndex);
 		end
 		initPreview(f, leastIndex);
 		f:Show();
@@ -371,18 +371,19 @@ function mog:CreatePreview()
 	
 	mog.previewNum = mog.previewNum + 1;
 	local f = CreateFrame("Frame", "MogItPreview"..mog.previewNum, mog.view, "ButtonFrameTemplate");
-	f.id = mog.previewNum;
-	initPreview(f, f.id);
+	local id = mog.previewNum;
+	initPreview(f, id);
 	
 	f:SetToplevel(true);
 	f:SetClampedToScreen(true);
 	f:EnableMouse(true);
 	f:SetMovable(true);
 	f:SetResizable(true);
-	f:Raise();
+	-- f:Raise();
 	
-	_G["MogItPreview"..f.id.."CloseButton"]:SetScript("OnClick",previewOnClose);
-	--_G["MogItPreview"..f.id.."Bg"]:SetVertexColor(0.8,0.3,0.8);
+	_G["MogItPreview"..id.."CloseButton"]:SetScript("OnClick",previewOnClose);
+	--_G["MogItPreview"..id.."Bg"]:SetVertexColor(0.8,0.3,0.8);
+	f.Bg = _G["MogItPreview"..id.."Bg"];
 	ButtonFrameTemplate_HidePortrait(f);
 	
 	f.resize = CreateFrame("Button", nil, f);
@@ -400,7 +401,7 @@ function mog:CreatePreview()
 	f.slots = {};
 	for i = 1, 13 do
 		local slotIndex = mog:GetSlot(i);
-		local slot = CreateFrame("Button", "MogItPreview"..f.id..slotIndex, f, "ItemButtonTemplate");
+		local slot = CreateFrame("Button", nil, f, "ItemButtonTemplate");
 		slot.slot = slotIndex;
 		if i == 1 then
 			slot:SetPoint("TOPLEFT", f.Inset, "TOPLEFT", 8, -8);
@@ -428,7 +429,7 @@ function mog:CreatePreview()
 	f.model:SetPoint("TOPLEFT", f.Inset, "TOPLEFT", 49, -8);
 	f.model:SetPoint("BOTTOMRIGHT", f.Inset, "BOTTOMRIGHT", -49, 8);
 	
-	f.activate = CreateFrame("Button", "MogItPreview"..f.id.."Activate", f, "MagicButtonTemplate");
+	f.activate = CreateFrame("Button", "MogItPreview"..id.."Activate", f, "MagicButtonTemplate");
 	f.activate:SetText(L["Activate"]);
 	f.activate:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", 5, 5);
 	f.activate:SetWidth(100);
@@ -549,7 +550,7 @@ function mog.view.DelItem(slot,preview)
 	preview.slots[slot].item = nil;
 	slotTexture(preview,slot);
 	if preview:IsVisible() then
-		preview.model.model:UndressSlot(GetInventorySlotInfo(slot));
+		preview.model:UndressSlot(GetInventorySlotInfo(slot));
 	end
 end
 
@@ -735,12 +736,3 @@ StaticPopupDialogs["MOGIT_PREVIEW_CLOSE"] = {
 	whileDead = true,
 	timeout = 0,
 }
---//
-
-
---[[
-One-Handed Weapon Logic
-- First goes into main hand, then alternates
-- Equipping 2h weapon causes to next to go into main hand
-- Equipping a right handed ranged weapon (gun, crossbow, thrown) will cause the next two one hand weapons to go into main hand (above rule still applies)
-]]

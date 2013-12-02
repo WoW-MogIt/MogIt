@@ -9,5 +9,4 @@ Raise preview frame
 Dressing room bug?
 Weapon catalog equip slot
 Preview - uncached equipped items
-Override Titan's Grip
 Wishlist catalog info

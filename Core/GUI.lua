@@ -208,6 +208,10 @@ function ModelFramePrototype:Undress()
 	self.model:Undress()
 end
 
+function ModelFramePrototype:UndressSlot(slot)
+	self.model:UndressSlot(slot)
+end
+
 function ModelFramePrototype:ApplyDress()
 	if mog.db.profile.gridDress == "equipped" then
 		self:ResetModel();
