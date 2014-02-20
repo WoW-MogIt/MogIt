@@ -370,8 +370,8 @@ function mog:CreatePreview()
 	end
 	
 	mog.previewNum = mog.previewNum + 1;
-	local f = CreateFrame("Frame", "MogItPreview"..mog.previewNum, mog.view, "ButtonFrameTemplate");
 	local id = mog.previewNum;
+	local f = CreateFrame("Frame", "MogItPreview"..id, mog.view, "ButtonFrameTemplate");
 	initPreview(f, id);
 	
 	f:SetToplevel(true);
@@ -379,11 +379,11 @@ function mog:CreatePreview()
 	f:EnableMouse(true);
 	f:SetMovable(true);
 	f:SetResizable(true);
-	-- f:Raise();
+	f:Raise();
 	
-	_G["MogItPreview"..id.."CloseButton"]:SetScript("OnClick",previewOnClose);
-	--_G["MogItPreview"..id.."Bg"]:SetVertexColor(0.8,0.3,0.8);
+	f.onCloseCallback = previewOnClose;
 	f.Bg = _G["MogItPreview"..id.."Bg"];
+	--f.Bg:SetVertexColor(0.8,0.3,0.8);
 	ButtonFrameTemplate_HidePortrait(f);
 	
 	f.resize = CreateFrame("Button", nil, f);

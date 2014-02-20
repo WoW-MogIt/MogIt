@@ -144,7 +144,7 @@ local itemCacheCallbacks = {
 	ModelOnEnter = function()
 		local owner = GameTooltip:GetOwner();
 		if owner and GameTooltip[mog] then
-			mog.ModelOnEnter(owner);
+			owner:OnEnter();
 		end
 	end,
 	ItemMenu = function()
