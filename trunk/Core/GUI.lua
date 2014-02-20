@@ -83,8 +83,7 @@ MogItFrameBg:SetVertexColor(0.8,0.3,0.8);
 
 mog.frame.resize = CreateFrame("Button",nil,mog.frame);
 mog.frame.resize:SetSize(16,16);
-mog.frame.resize:SetPoint("BOTTOMRIGHT",mog.frame,"BOTTOMRIGHT",-4,3);
-mog.frame.resize:EnableMouse(true);
+mog.frame.resize:SetPoint("BOTTOMRIGHT",-4,3);
 mog.frame.resize:SetHitRectInsets(0, -4, 0, -3)
 mog.frame.resize:SetScript("OnMouseDown", function(self)
 	mog.frame:SetMinResize(510,350);
@@ -109,11 +108,6 @@ mog.frame.page:SetPoint("BOTTOMRIGHT",mog.frame,"BOTTOMRIGHT",-17,10);
 
 
 --// Model Frames
-local mixins = {
-	"ShowIndicator",
-	"SetText",
-}
-
 mog.models = {};
 mog.modelBin = {};
 mog.posX = 0;
@@ -148,13 +142,13 @@ function mog:CreateModelFrame(parent)
 	f.bg:SetAllPoints(f);
 	f.bg:SetTexture(0.3,0.3,0.3,0.2);
 	
-	f:SetScript("OnUpdate",mog.ModelOnUpdate);
-	f:SetScript("OnShow",mog.ModelOnShow);
-	f:SetScript("OnHide",mog.ModelOnHide);
 	f:RegisterForClicks("AnyUp");
 	f:RegisterForDrag("LeftButton","RightButton");
-	f:SetScript("OnDragStart",mog.ModelOnDragStart);
-	f:SetScript("OnDragStop",mog.ModelOnDragStop);
+	f:SetScript("OnShow",f.OnShow);
+	f:SetScript("OnHide",f.OnHide);
+	f:SetScript("OnUpdate",f.OnUpdate);
+	f:SetScript("OnDragStart",f.OnDragStart);
+	f:SetScript("OnDragStop",f.OnDragStop);
 	
 	return f;
 end
@@ -179,13 +173,9 @@ end
 function mog:CreateCatalogueModel()
 	local f = mog:CreateModelFrame(mog.frame);
 	f.type = "catalogue";
-	f:SetScript("OnClick", mog.ModelOnClick);
-	f:SetScript("OnEnter", mog.ModelOnEnter);
-	f:SetScript("OnLeave", mog.ModelOnLeave);
-	f.OnEnter = mog.ModelOnEnter;
-	for i, v in ipairs(mixins) do
-		f[v] = mog[v];
-	end
+	f:SetScript("OnClick", f.OnClick);
+	f:SetScript("OnEnter", f.OnEnter);
+	f:SetScript("OnLeave", f.OnLeave);
 	tinsert(mog.models, f);
 	return f;
 end
@@ -193,6 +183,83 @@ end
 function mog:DeleteCatalogueModel(n)
 	mog:DeleteModelFrame(mog.models[n]);
 	tremove(mog.models, n);
+end
+
+
+function ModelFramePrototype:OnClick(button, ...)
+	if mog.active and mog.active.OnClick then
+		mog.active:OnClick(self, button, self.data.value, ...);
+	end
+end
+
+function ModelFramePrototype:OnEnter()
+	if mog.active and mog.active.OnEnter then
+		mog.active:OnEnter(self, self.data.value);
+	end
+end
+
+function ModelFramePrototype:OnLeave(...)
+	if mog.active and mog.active.OnLeave then
+		mog.active:OnLeave(self, self.data.value, ...);
+	else
+		GameTooltip:Hide();
+	end
+end
+
+function ModelFramePrototype:OnShow()
+	local lvl = self:GetParent():GetFrameLevel();
+	if self:GetFrameLevel() <= lvl then
+		self:SetFrameLevel(lvl+1);
+	end
+	self:ResetModel();
+	if self.type == "preview" then
+		self:Undress();
+		mog.DressFromPreview(self, self.parent);
+	else
+		if not self.data.value then
+			-- hack for models becoming visible OnShow, only do this if the frame is supposed to be hidden
+			self:SetAlpha(1)
+			self:SetAlpha(0)
+		end
+		mog:ModelUpdate(self, self.data.value);
+	end
+end
+
+function ModelFramePrototype:OnHide()
+	if mog.modelUpdater.model == self then
+		mog:StopModelUpdater();
+	end
+	self.model:SetPosition(0,0,0);
+end
+
+function ModelFramePrototype:OnUpdate()
+	--56, 108, 237, 238, 239, 243, 249, 250, 251, 252, 253, 254, 255
+	if mog.db.profile.noAnim then
+		self.model:SetSequence(254);
+	end
+end
+
+function ModelFramePrototype:OnDragStart(button)
+	mog:StartModelUpdater(self, button);
+end
+
+function ModelFramePrototype:OnDragStop(button)
+	mog:StopModelUpdater();
+end
+
+function ModelFramePrototype:ShowIndicator(name)
+	if not mog.indicators[name] then return end;
+	if not self.indicators[name] then
+		self.indicators[name] = mog.indicators[name](self.model);
+	end
+	self.indicators[name]:Show();
+end
+
+function ModelFramePrototype:SetText(text)
+	if not self.indicators.label then
+		self.indicators.label = mog.indicators.label(self.model);
+	end
+	self.indicators.label:SetText(text);
 end
 
 local tryOnSlots = {
@@ -324,91 +391,12 @@ end
 --//
 
 
---// Model Functions
-function mog.ModelOnUpdate(self)
-	--56, 108, 237, 238, 239, 243, 249, 250, 251, 252, 253, 254, 255
-	if mog.db.profile.noAnim then
-		self.model:SetSequence(254);
-	end
-end
-
-function mog.ModelOnShow(self)
-	local lvl = self:GetParent():GetFrameLevel();
-	if self:GetFrameLevel() <= lvl then
-		self:SetFrameLevel(lvl+1);
-	end
-	self:ResetModel();
-	if self.type == "preview" then
-		self:Undress();
-		mog.DressFromPreview(self, self.parent);
-	else
-		if not self.data.value then
-			-- hack for models becoming visible OnShow, only do this if the frame is supposed to be hidden
-			self:SetAlpha(1)
-			self:SetAlpha(0)
-		end
-		mog:ModelUpdate(self, self.data.value);
-	end
-end
-
-function mog.ModelOnHide(self)
-	if mog.modelUpdater.model == self then
-		mog:StopModelUpdater();
-	end
-	self.model:SetPosition(0,0,0);
-end
-
-function mog.ModelOnClick(self, btn, ...)
-	if mog.active and mog.active.OnClick then
-		mog.active:OnClick(self, btn, self.data.value, ...);
-	end
-end
-
-function mog.ModelOnDragStart(self, btn)
-	mog:StartModelUpdater(self, btn);
-end
-
-function mog.ModelOnDragStop(self, btn)
-	mog:StopModelUpdater();
-end
-
-function mog.ModelOnEnter(self)
-	if mog.active and mog.active.OnEnter then
-		mog.active:OnEnter(self, self.data.value);
-	end
-end
-
-function mog.ModelOnLeave(self, ...)
-	if mog.active and mog.active.OnLeave then
-		mog.active:OnLeave(self, self.data.value, ...);
-	else
-		GameTooltip:Hide();
-	end
-end
---//
-
-
 --// Indicators
 mog.indicators = {};
 
 function mog:CreateIndicator(name,func)
 	if mog.indicators[name] then return end;
 	mog.indicators[name] = func;
-end
-
-function mog:ShowIndicator(name)
-	if not mog.indicators[name] then return end;
-	if not self.indicators[name] then
-		self.indicators[name] = mog.indicators[name](self.model);
-	end
-	self.indicators[name]:Show();
-end
-
-function mog:SetText(text)
-	if not self.indicators.label then
-		self.indicators.label = mog.indicators.label(self.model);
-	end
-	self.indicators.label:SetText(text);
 end
 --//
 
@@ -695,6 +683,7 @@ mog.menu.modules:SetPoint("TOPLEFT", mog.frame, "TOPLEFT", 62, -31);
 
 
 --// Catalogue Menu
+
 local function setDisplayModel(self, arg1, value)
 	mog[arg1] = value;
 	for i, model in ipairs(mog.models) do
@@ -776,6 +765,7 @@ mog.menu.catalogue = mog.menu:CreateMenu(L["Catalogue"], function(self, tier)
 		UIDropDownMenu_AddButton(info,tier);
 		
 		local info = UIDropDownMenu_CreateInfo();
+		
 		info.text = RACE;
 		info.value = "race";
 		info.notCheckable = true;
@@ -807,6 +797,7 @@ mog.menu.catalogue = mog.menu:CreateMenu(L["Catalogue"], function(self, tier)
 		elseif self.tier[3] and self.tier[3].Dropdown then
 			self.tier[3].Dropdown(mog.active,tier);
 		end
+		
 	elseif self.tier[2] == "race" then
 		mog:CreateRaceMenu(tier, setDisplayModel, mog.displayRace)
 	elseif self.tier[2] == "gender" then
