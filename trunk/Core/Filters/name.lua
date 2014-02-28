@@ -37,8 +37,8 @@ function f.Filter(itemID)
 	if searchString:trim() == "" then
 		return true
 	end
-	local itemName = mog:GetItemInfo(itemID, "BuildList");
-	return not itemName or (itemName:lower():find(searchString, nil, true));
+	local item = mog:GetItemInfo(itemID, "BuildList");
+	return not item or (item.name:lower():find(searchString, nil, true));
 end
 
 function f.Default()

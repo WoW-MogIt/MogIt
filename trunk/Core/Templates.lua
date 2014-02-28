@@ -9,9 +9,9 @@ local function getTexture(hasItem, embedded)
 end
 
 local function itemLabel(itemID, callback)
-	local name, _, quality = mog:GetItemInfo(itemID, callback)
-	if name then
-		return format("|c%s%s|r", select(4, GetItemQualityColor(quality)), name)
+	local item = mog:GetItemInfo(itemID, callback)
+	if item then
+		return format("|c%s%s|r", select(4, GetItemQualityColor(item.quality)), item.name)
 	else
 		return RED_FONT_COLOR_CODE..RETRIEVING_ITEM_INFO..FONT_COLOR_CODE_CLOSE
 	end
@@ -212,7 +212,7 @@ local slots = {
 
 function mog.Item_FrameUpdate(self, data)
 	self:ApplyDress()
-	self:TryOn(data.item, slots[mog:GetData("item", data.item, "slot")])
+	self:TryOn(format("item:%d:%d", data.item, mog.weaponEnchant), slots[mog:GetData("item", data.item, "slot")])
 end
 
 local sourceLabels = {
@@ -242,7 +242,8 @@ function mog.ShowItemTooltip(self, item, items, cycle)
 		return
 	end
 	
-	local itemName, _, _, itemLevel = mog:GetItemInfo(item, "ModelOnEnter")
+	local itemInfo = mog:GetItemInfo(item, "ModelOnEnter")
+	local itemLevel = itemInfo and itemInfo.itemlevel
 	local itemLabel = itemLabel(item, "ModelOnEnter")
 	if cycle and #items > 1 then
 		GameTooltip:AddDoubleLine(itemLabel, L["Item %d/%d"]:format(cycle, #items), nil, nil, nil, 1, 0, 0)
@@ -334,7 +335,7 @@ local function showMenu(menu, data, isSaved)
 	-- needs to be either true or false
 	data.isSaved = isSaved ~= nil
 	menu.data = data
-	ToggleDropDownMenu(nil, data.item, menu, "cursor", 0, 0)
+	menu:Toggle(data.item, nil, "cursor")
 end
 
 function mog.Item_OnClick(self, btn, data, isSaved)
@@ -364,8 +365,7 @@ do
 		data.item = data.items[index]
 	end
 	
-	mog.Item_Menu = CreateFrame("Frame")
-	mog.Item_Menu.displayMode = "MENU"
+	mog.Item_Menu = mog:CreateDropdown("Menu")
 	mog.Item_Menu.initialize = function(self, level, menuList)
 		local data = self.data
 		
@@ -473,8 +473,7 @@ do
 		tinsert(setMenu, info)
 	end
 	
-	mog.Set_Menu = CreateFrame("Frame")
-	mog.Set_Menu.displayMode = "MENU"
+	mog.Set_Menu = mog:CreateDropdown("Menu")
 	mog.Set_Menu.initialize = function(self, level, menuList)
 		local data = self.data
 		

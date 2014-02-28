@@ -57,8 +57,8 @@ function f.Filter(item)
 	if not (isMinSpecified or isMaxSpecified) then
 		return true
 	end
-	local lvl = select(4, mog:GetItemInfo(item, "BuildList"));
-	return not lvl or ((not isMinSpecified or lvl >= minlvl) and (not isMaxSpecified or lvl <= maxlvl));
+	local item = mog:GetItemInfo(item, "BuildList");
+	return not item or ((not isMinSpecified or item.itemLevel >= minlvl) and (not isMaxSpecified or item.itemLevel <= maxlvl));
 end
 
 function f.Default()

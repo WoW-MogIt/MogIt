@@ -14,5 +14,6 @@
 <Script file="quality.lua"/>
 <Script file="bind.lua"/>
 <Script file="hasItem.lua"/>
+<Script file="chestType.lua"/>
 
 </Ui>

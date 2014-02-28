@@ -179,7 +179,7 @@ mog.base.Help = {
 }
 
 function mog.base.GetFilterArgs(filter,item)
-	if filter == "name" or filter == "itemLevel" or filter == "hasItem" then
+	if filter == "name" or filter == "itemLevel" or filter == "hasItem" or filter == "chestType" then
 		return item;
 	elseif filter == "source" then
 		return mog:GetData("item", item, "source"),mog:GetData("item", item, "sourceinfo");
@@ -238,6 +238,7 @@ for _, addon in ipairs(addons) do
 				"source",
 				"quality",
 				"bind",
+				"chestType",
 				(addon == "MogIt_OneHanded" and "slot") or nil,
 			},
 			sorting = {
