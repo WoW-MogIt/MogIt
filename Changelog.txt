@@ -1,13 +1,16 @@
 [b]v3.2.0[/b]
 - Added an entry to the 'Preview' menus to select a weapon enchant to display on the models.
-- Added a chest type filter to filter robes and tunics. This relies on game data which may be unexpected for some items.
+- Added a chest type filter to filter robes and tunics.
 - Added an option to redirect all dressup clicks (default Ctrl-left click) to the MogIt preview frame.
 - Added an option to have the preview frame behave as a UI panel. (immovable and will get pushed around by other frames) Requires single preview option enabled.
 - Added an option for locking the preview frame size to default UI panel size. Requires above option enabled.
 - Toggling the Single preview option should now have an immediate effect.
+- The 'Equip current gear' option in the preview frame now honors helm and cloak visibility settings.
+- 'Owned items' filter should now properly appear for all modules.
 - Dropdown menus are now scrollable (with mouse wheel or scroll buttons on the menu) if they exceed the height of the screen.
 - Reworked chat link hook to allow the Target option to once again appear in player link popup menus.
 - Fixed BG queuing taint that would occur if you opened any dropdown menu before opening the PvP UI.
+- Fixed some issues with overlapping and inconsistent preview frame IDs.
 - Implented LibItemInfo for faster filtering using certain filters.
 
 [b]v3.1.6[/b]
