@@ -83,38 +83,40 @@ local function newSetOnClick(self)
 	CloseDropDownMenus()
 end
 
+local previewItem = {
+	text = L["Preview"],
+	-- hasArrow = true,
+	menuList = function(level)
+		local info = UIDropDownMenu_CreateInfo()
+		info.text = L["Active preview"]
+		info.value = UIDROPDOWNMENU_MENU_VALUE
+		info.func = previewOnClick
+		info.disabled = not mog.activePreview
+		info.notCheckable = true
+		info.arg1 = mog.activePreview
+		UIDropDownMenu_AddButton(info, level)
+		
+		for i, preview in ipairs(mog.previews) do
+			local info = UIDropDownMenu_CreateInfo()
+			info.text = format("%s %d", L["Preview"], preview:GetID())
+			info.value = UIDROPDOWNMENU_MENU_VALUE
+			info.func = previewOnClick
+			info.notCheckable = true
+			info.arg1 = preview
+			UIDropDownMenu_AddButton(info, level)
+		end
+		
+		local info = UIDropDownMenu_CreateInfo()
+		info.text = L["New preview"]
+		info.value = UIDROPDOWNMENU_MENU_VALUE
+		info.func = previewOnClick
+		info.notCheckable = true
+		UIDropDownMenu_AddButton(info, level)
+	end,
+}
+
 local itemOptionsMenu = {
-	{
-		text = L["Preview"],
-		hasArrow = true,
-		menuList = function(level)
-			local info = UIDropDownMenu_CreateInfo()
-			info.text = L["Active preview"]
-			info.value = UIDROPDOWNMENU_MENU_VALUE
-			info.func = previewOnClick
-			info.disabled = not mog.activePreview
-			info.notCheckable = true
-			info.arg1 = mog.activePreview
-			UIDropDownMenu_AddButton(info, level)
-			
-			for i, preview in ipairs(mog.previews) do
-				local info = UIDropDownMenu_CreateInfo()
-				info.text = format("%s %d", L["Preview"], preview:GetID())
-				info.value = UIDROPDOWNMENU_MENU_VALUE
-				info.func = previewOnClick
-				info.notCheckable = true
-				info.arg1 = preview
-				UIDropDownMenu_AddButton(info, level)
-			end
-			
-			local info = UIDropDownMenu_CreateInfo()
-			info.text = L["New preview"]
-			info.value = UIDROPDOWNMENU_MENU_VALUE
-			info.func = previewOnClick
-			info.notCheckable = true
-			UIDropDownMenu_AddButton(info, level)
-		end,
-	},
+	previewItem,
 	{
 		set = true,
 		text = L["Add to wishlist"],
@@ -156,6 +158,16 @@ local itemOptionsMenu = {
 		end,
 	},
 }
+
+function mog:SetPreviewMenu(isSinglePreview)
+	if isSinglePreview then
+		previewItem.func = previewOnClick
+		previewItem.hasArrow = nil
+	else
+		previewItem.func = nil
+		previewItem.hasArrow = true
+	end
+end
 
 function mog:AddItemOption(info)
 	tinsert(itemOptionsMenu, info)

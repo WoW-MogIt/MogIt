@@ -9,6 +9,7 @@
 - 'Owned items' filter should now properly appear for all modules.
 - Dropdown menus are now scrollable (with mouse wheel or scroll buttons on the menu) if they exceed the height of the screen.
 - Reworked chat link hook to allow the Target option to once again appear in player link popup menus.
+- Item menu 'Preview' entry no longer has a submenu if single preview option is enabled.
 - Fixed BG queuing taint that would occur if you opened any dropdown menu before opening the PvP UI.
 - Fixed some issues with overlapping and inconsistent preview frame IDs.
 - Implented LibItemInfo for faster filtering using certain filters.
