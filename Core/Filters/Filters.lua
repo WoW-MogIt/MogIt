@@ -108,23 +108,24 @@ function mog:FilterUpdate()
 	local height = 20;
 	local last;
 	for k,v in ipairs(mog.active.filters) do
-		if mog.filters[v] then
-			mog.filters[v]:ClearAllPoints();
+		local filter = mog.filters[v];
+		if filter and (not filter.slot or (mog.active.active and filter.slot == mog.active.active.label)) then
+			filter:ClearAllPoints();
 			if last then
-				mog.filters[v]:SetPoint("TOPLEFT",last,"BOTTOMLEFT",0,-14);
+				filter:SetPoint("TOPLEFT",last,"BOTTOMLEFT",0,-14);
 			else
-				mog.filters[v]:SetPoint("TOPLEFT",mog.filt.frame,"TOPLEFT",12,-10);
+				filter:SetPoint("TOPLEFT",mog.filt.frame,"TOPLEFT",12,-10);
 			end
-			mog.filters[v]:SetPoint("RIGHT",mog.filt.frame,"RIGHT",-19,0);
-			if not mog.filters[v].bg then
-				mog.filters[v].bg = mog.filters[v]:CreateTexture(nil,"BACKGROUND");
-				mog.filters[v].bg:SetPoint("TOPLEFT",mog.filters[v],"TOPLEFT",-5,5);
-				mog.filters[v].bg:SetPoint("BOTTOMRIGHT",mog.filters[v],"BOTTOMRIGHT",5,-5);
-				mog.filters[v].bg:SetTexture(0.3,0.3,0.3,0.2);
+			filter:SetPoint("RIGHT",mog.filt.frame,"RIGHT",-19,0);
+			if not filter.bg then
+				filter.bg = mog.filters[v]:CreateTexture(nil,"BACKGROUND");
+				filter.bg:SetPoint("TOPLEFT",mog.filters[v],"TOPLEFT",-5,5);
+				filter.bg:SetPoint("BOTTOMRIGHT",mog.filters[v],"BOTTOMRIGHT",5,-5);
+				filter.bg:SetTexture(0.3,0.3,0.3,0.2);
 			end
-			height = height + mog.filters[v]:GetHeight() + (last and 14 or 0);
-			last = mog.filters[v];
-			mog.filters[v]:Show();
+			height = height + filter:GetHeight() + (last and 14 or 0);
+			last = filter;
+			filter:Show();
 		end
 	end
 	mog.filt.frame:SetHeight(height);

@@ -28,6 +28,12 @@ function mog.createOptions()
 			mog.db.profile[info.arg] = value;
 			if info.arg == "tooltipRotate" then
 				mog.tooltip.rotate:SetShown(value);
+			elseif info.arg == "singlePreview" then
+				mog:SetSinglePreview(value);
+			elseif info.arg == "previewUIPanel" then
+				mog:SetPreviewUIPanel(value);
+			elseif info.arg == "previewFixedSize" then
+				mog:SetPreviewFixedSize(value);
 			elseif info.arg == "tooltipWidth" then
 				mog.tooltip:SetWidth(value);
 			elseif info.arg == "tooltipHeight" then
@@ -58,12 +64,42 @@ function mog.createOptions()
 				width = "full",
 				arg = "minimap",
 			},
+			dressupPreview = {
+				type = "toggle",
+				order = 1.4,
+				name = L["Use preview frame to dress up"],
+				width = "full",
+				arg = "dressupPreview",
+			},
 			singlePreview = {
 				type = "toggle",
 				order = 1.5,
 				name = L["Use a single preview frame"],
 				width = "full",
 				arg = "singlePreview",
+				confirm = function()
+					return L["This will close all your currently open previews."];
+				end,
+			},
+			previewUIPanel = {
+				type = "toggle",
+				order = 1.75,
+				name = L["Preview frame UI panel behaviour"],
+				width = "full",
+				arg = "previewUIPanel",
+				disabled = function()
+					return not mog.db.profile.singlePreview;
+				end,
+			},
+			previewFixedSize = {
+				type = "toggle",
+				order = 1.8,
+				name = L["Preview frame fixed size"],
+				width = "full",
+				arg = "previewFixedSize",
+				disabled = function()
+					return not (mog.db.profile.singlePreview and mog.db.profile.previewUIPanel);
+				end,
 			},
 			catalogue = {
 				type = "group",

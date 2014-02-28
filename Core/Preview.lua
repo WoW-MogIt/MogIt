@@ -3,10 +3,18 @@ local L = mog.L;
 
 
 mog.view = CreateFrame("Frame","MogItPreview",UIParent);
-mog.view:SetAllPoints(UIParent);
+mog.view:SetAllPoints();
 mog.view:SetScript("OnShow",function(self)
 	if #mog.previews == 0 then
 		mog:CreatePreview();
+	end
+	if mog.db.profile.singlePreview then
+		ShowUIPanel(mog.previews[1]);
+	end
+end);
+mog.view:SetScript("OnHide",function(self)
+	if mog.db.profile.singlePreview then
+		HideUIPanel(mog.previews[1]);
 	end
 end);
 tinsert(UISpecialFrames,"MogItPreview");
@@ -51,12 +59,14 @@ local function resizeOnMouseDown(self)
 end
 
 local function resizeOnMouseUp(self)
+	if mog.db.profile.singlePreview and mog.db.profile.previewUIPanel and mog.db.profile.previewFixedSize then return end
 	local f = self:GetParent();
 	f:StopMovingOrSizing();
 	local frameProps = mog.db.profile.previewProps[f:GetID()];
 	frameProps.w, frameProps.h = f:GetSize();
 	-- anchors may change from resizing
 	frameProps.point, frameProps.x, frameProps.y = select(3, f:GetPoint());
+	UpdateUIPanelPositions(f)
 end
 
 local function modelOnMouseWheel(self,v)
@@ -131,6 +141,20 @@ local function setDisplayModel(self, arg1, value)
 	CloseDropDownMenus(1);
 end
 
+local function setWeaponEnchant(self, preview, enchant)
+	preview.data.weaponEnchant = enchant;
+	self.owner:Rebuild(2);
+	mog.scroll:update();
+	local mainHandItem = preview.slots["MainHandSlot"].item;
+	local offHandItem = preview.slots["SecondaryHandSlot"].item;
+	if mainHandItem then
+		preview.model:TryOn(format("item:%d:%d", mainHandItem, preview.data.weaponEnchant), "MainHandSlot");
+	end
+	if offHandItem then
+		preview.model:TryOn(format("item:%d:%d", offHandItem, preview.data.weaponEnchant), "SecondaryHandSlot");
+	end
+end
+
 local previewMenu = {
 	{
 		text = RACE,
@@ -141,6 +165,12 @@ local previewMenu = {
 	{
 		text = L["Gender"],
 		value = "gender",
+		notCheckable = true,
+		hasArrow = true,
+	},
+	{
+		text = L["Weapon enchant"],
+		value = "weaponEnchant",
 		notCheckable = true,
 		hasArrow = true,
 	},
@@ -212,6 +242,26 @@ local function previewInitialize(self, level)
 		mog:CreateRaceMenu(level, setDisplayModel, self.parent.data.displayRace)
 	elseif self.tier[2] == "gender" then
 		mog:CreateGenderMenu(level, setDisplayModel, self.parent.data.displayGender)
+	elseif self.tier[2] == "weaponEnchant" then
+		local info = UIDropDownMenu_CreateInfo();
+		info.text = NONE;
+		info.func = setWeaponEnchant;
+		info.arg1 = nil;
+		info.checked = mog.weaponEnchant == nil;
+		info.keepShownOnClick = true;
+		UIDropDownMenu_AddButton(info, level);
+		
+		for i, enchant in ipairs(mog.enchants) do
+			local info = UIDropDownMenu_CreateInfo();
+			info.text = enchant.name;
+			info.func = setWeaponEnchant;
+			info.arg1 = self.parent;
+			info.arg2 = enchant.id;
+			info.checked = self.parent.data.weaponEnchant == enchant.id;
+			info.keepShownOnClick = true;
+			info.owner = self;
+			UIDropDownMenu_AddButton(info, level);
+		end
 	end
 end
 --//
@@ -449,7 +499,7 @@ function mog:CreatePreview()
 end
 
 function mog:DeletePreview(f)
-	f:Hide();
+	HideUIPanel(f);
 	f:ClearAllPoints();
 	f:SetPoint("CENTER",mog.view,"CENTER");
 	mog.view:Undress(f);
@@ -480,6 +530,62 @@ function mog:GetPreview(frame)
 	return frame or self:CreatePreview();
 end
 
+function mog:SetSinglePreview(isSinglePreview)
+	for i = #mog.previews, 1, -1 do
+		mog:DeletePreview(mog.previews[i]);
+	end
+	if isSinglePreview then
+		-- hack to make sure CreatePreview gets the frame named MogItPreview1
+		if #mog.previewBin > 1 and mog.previewBin[1] ~= MogItPreview1 then
+			for i = 2, #mog.previewBin do
+				if mog.previewBin[i] == MogItPreview1 then
+					tremove(mog.previewBin, i)
+					tinsert(mog.previewBin, 1, MogItPreview1)
+					break
+				end
+			end
+		end
+		mog:CreatePreview();
+	end
+	if MogItPreview1 then
+		mog:SetPreviewUIPanel(mog.db.profile.previewUIPanel);
+	end
+end
+
+function mog:SetPreviewUIPanel(isUIPanel)
+	if isUIPanel and mog.db.profile.singlePreview then
+		MogItPreview1:SetScript("OnMouseDown", nil);
+		MogItPreview1:SetScript("OnMouseUp", nil);
+		MogItPreview1:SetScript("OnHide", HideParentPanel);
+		UIPanelWindows["MogItPreview1"] = {
+			area = "left",
+			pushable = 1,
+			whileDead = true,
+		}
+		HideUIPanel(MogItPreview1);
+	else
+		HideUIPanel(MogItPreview1);
+		MogItPreview1:SetScript("OnMouseDown", MogItPreview1.StartMoving);
+		MogItPreview1:SetScript("OnMouseUp", stopMovingOrSizing);
+		MogItPreview1:SetScript("OnHide", nil);
+		UIPanelWindows["MogItPreview1"] = nil
+		MogItPreview1:SetAttribute("UIPanelLayout-defined", nil);
+	end
+	mog:SetPreviewFixedSize(mog.db.profile.previewFixedSize);
+end
+
+function mog:SetPreviewFixedSize(isFixedSize)
+	local isUIPanel = mog.db.profile.previewUIPanel;
+	if isFixedSize and isUIPanel then
+		MogItPreview1:SetSize(PANEL_DEFAULT_WIDTH, PANEL_DEFAULT_HEIGHT);
+	else
+		local props = mog.db.profile.previewProps[1];
+		MogItPreview1:SetSize(props.w, props.h);
+	end
+	MogItPreview1.resize:SetShown(not (isUIPanel and isFixedSize));
+	UpdateUIPanelPositions(MogItPreview1);
+end
+
 local doCache = {};
 mog:AddItemCacheCallback("PreviewAddItem", function()
 	for i = #doCache, 1, -1 do
@@ -496,11 +602,12 @@ local playerClass = select(2, UnitClass("PLAYER"));
 function mog.view.AddItem(item, preview, forceSlot)
 	if not (item and preview) then return end;
 	
-	local invType, texture = select(9, mog:GetItemInfo(item, "PreviewAddItem"));
-	if not invType then
+	local itemInfo = mog:GetItemInfo(item, "PreviewAddItem");
+	if not itemInfo then
 		tinsert(doCache, {id = item, frame = preview});
 		return;
 	end
+	local invType = itemInfo.slot;
 	
 	local slot = mog:GetSlot(invType)
 	if type(forceSlot) == "string" then
@@ -538,9 +645,9 @@ function mog.view.AddItem(item, preview, forceSlot)
 		end
 		
 		preview.slots[slot].item = item;
-		slotTexture(preview, slot, texture);
+		slotTexture(preview, slot, GetItemIcon(item));
 		if preview:IsVisible() then
-			preview.model:TryOn(item, slot);
+			preview.model:TryOn(format("item:%d:%d", item, preview.data.weaponEnchant), slot);
 		end
 	end
 end
@@ -605,11 +712,43 @@ if not ModifiedItemClickHandlers then
 end
 
 tinsert(ModifiedItemClickHandlers, function(link)
-	if IsControlKeyDown() and GetMouseButtonClicked() == "RightButton" then
+	local button = GetMouseButtonClicked()
+	if button then
+		if link and IsDressableItem(link) then
+			if IsModifiedClick("DRESSUP") then
+				return DressUpItemLink(link);
+			elseif IsControlKeyDown() and button == "RightButton" then
+				mog:AddToPreview(link);
+				return true;
+			end
+		end
+	elseif IsModifiedClick("DRESSUP") then
+		return link and IsDressableItem(link);
+	end
+end);
+
+hooksecurefunc("SetItemRef", function(link, text, button, chatFrame)
+	local id = tonumber(link:match("^item:(%d+)"));
+	if link:match("item:%d+") and IsModifiedClick("DRESSUP") then
+		if button == "RightButton" then
+			mog:AddToPreview(link);
+		else
+			DressUpItemLink(link);
+		end
+	end
+end)
+
+local origDressUpItemLink = DressUpItemLink;
+function DressUpItemLink(link)
+	if not (link and IsDressableItem(link)) then
+		return false;
+	end
+	if mog.db.profile.dressupPreview then
 		mog:AddToPreview(link);
 		return true;
 	end
-end);
+	return origDressUpItemLink(link);
+end
 
 local function hookInspectUI()
 	local function inspect_OnClick(self, button)
@@ -635,16 +774,6 @@ else
 		end
 	end);
 	mog.view:RegisterEvent("ADDON_LOADED");
-end
-
-local old_SetItemRef = SetItemRef;
-function SetItemRef(link, text, button, ...)
-	local id = tonumber(link:match("^item:(%d+)"));
-	if id and IsControlKeyDown() and button == "RightButton" then
-		mog:AddToPreview(id);
-	else
-		return old_SetItemRef(link, text, button, ...);
-	end
 end
 --//
 

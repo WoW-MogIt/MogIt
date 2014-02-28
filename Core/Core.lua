@@ -2,6 +2,10 @@ local MogIt,mog = ...;
 _G["MogIt"] = mog;
 local L = mog.L;
 
+local ItemInfo = LibStub("LibItemInfo-1.0")
+
+LibStub("Libra"):EmbedWidgets(mog)
+
 local character = DataStore_Containers and DataStore:GetCharacter()
 
 mog.frame = CreateFrame("Frame","MogItFrame",UIParent,"ButtonFrameTemplate");
@@ -15,28 +19,13 @@ function mog.IsDropdownShown(dd)
 	return DropDownList1 and DropDownList1:IsShown() and UIDropDownMenu_GetCurrentDropDown() == dd;
 end
 
-function mog:ToggleDropdown(value, dropdownFrame, anchor, xOffset, yOffset, menuList, button)
-	dropdownFrame.displayMode = "MENU"
-	ToggleDropDownMenu(nil, value, dropdownFrame, anchor, xOffset, yOffset, menuList, button);
-	dropdownFrame.displayMode = nil
-end
-
-
 --// Slash Commands
 function mog:ToggleFrame()
-	if mog.frame:IsShown() then
-		HideUIPanel(mog.frame);
-	else
-		ShowUIPanel(mog.frame);
-	end
+	ToggleFrame(mog.frame);
 end
 
 function mog:TogglePreview()
-	if mog.view:IsShown() then
-		HideUIPanel(mog.view);
-	else
-		ShowUIPanel(mog.view);
-	end
+	ToggleFrame(mog.view);
 end
 --//
 
@@ -103,8 +92,7 @@ function mog:RegisterModule(name,version,data)
 	mog.modules[name] = data;
 	table.insert(mog.moduleList,data);
 	if mog.menu.active == mog.menu.modules and mog.IsDropdownShown(mog.menu) then
-		HideDropDownMenu(1);
-		ToggleDropDownMenu(1,data,mog.menu);
+		mog.menu:Rebuild(1);
 	end
 	return data;
 end
@@ -130,15 +118,6 @@ end
 
 
 --// Item Cache
-local GetItemInfo = GetItemInfo;
-
-local function refreshDropdown(menu)
-	if mog.IsDropdownShown(menu) then
-		HideDropDownMenu(1);
-		ToggleDropDownMenu(nil, nil, menu, "cursor", 0, 0, menu.menuList);
-	end
-end
-
 local itemCacheCallbacks = {
 	BuildList = mog.BuildList;
 	ModelOnEnter = function()
@@ -148,14 +127,13 @@ local itemCacheCallbacks = {
 		end
 	end,
 	ItemMenu = function()
-		refreshDropdown(mog.Item_Menu);
+		mog.Item_Menu:Rebuild(1);
 	end,
 	SetMenu = function()
-		refreshDropdown(mog.Set_Menu);
+		mog.Set_Menu:Rebuild(1);
 	end,
 };
 
-local cacheFrame = CreateFrame("Frame");
 local pendingCallbacks = {};
 
 for k in pairs(itemCacheCallbacks) do
@@ -168,11 +146,11 @@ function mog:AddItemCacheCallback(name, func)
 end
 
 function mog:GetItemInfo(id, type)
-	if not type then return GetItemInfo(id) end
-	if GetItemInfo(id) then
+	if not type then return ItemInfo[id] end
+	if ItemInfo[id] then
 		-- clear pending items when they are cached
 		pendingCallbacks[type][id] = nil;
-		return GetItemInfo(id);
+		return ItemInfo[id];
 	elseif itemCacheCallbacks[type] then
 		-- add to pending items for this callback if not cached
 		pendingCallbacks[type][id] = true;
@@ -186,8 +164,9 @@ function mog.ItemInfoReceived()
 			itemCacheCallbacks[k]();
 		end
 	end
-	cacheFrame:SetScript("OnUpdate", nil);
 end
+
+ItemInfo.RegisterCallback(mog, "OnItemInfoReceivedBatch", "ItemInfoReceived");
 --//
 
 function mog:HasItem(itemID)
@@ -198,7 +177,10 @@ end
 --// Events
 local defaults = {
 	profile = {
+		dressupPreview = false,
 		singlePreview = false,
+		previewUIPanel = false,
+		previewFixedSize = false,
 		noAnim = false,
 		minimap = {},
 		url = "Battle.net",
@@ -242,6 +224,8 @@ function mog.LoadSettings()
 	mog.tooltip.rotate:SetShown(mog.db.profile.tooltipRotate);
 	
 	mog.scroll:update();
+	
+	mog:SetSinglePreview(mog.db.profile.singlePreview);
 end
 
 mog.frame:RegisterEvent("ADDON_LOADED");
@@ -276,8 +260,7 @@ function mog:ADDON_LOADED(addon)
 	elseif mog.modules[addon] then
 		mog.modules[addon].loaded = true;
 		if mog.menu.active == mog.menu.modules and mog.IsDropdownShown(mog.menu) then
-			HideDropDownMenu(1);
-			ToggleDropDownMenu(1,mog.modules[addon],mog.menu,mog.menu.modules,0,0);
+			mog.menu:Rebuild(1)
 		end
 	end
 end
@@ -289,10 +272,6 @@ function mog:PLAYER_LOGIN()
 		mog.db.profile.gridHeight = height;
 		mog:UpdateGUI(true);
 	end)
-end
-
-function mog:GET_ITEM_INFO_RECEIVED()
-	cacheFrame:SetScript("OnUpdate", mog.ItemInfoReceived);
 end
 
 function mog:PLAYER_EQUIPMENT_CHANGED(slot, hasItem)

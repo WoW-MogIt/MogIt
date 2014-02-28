@@ -10,6 +10,7 @@
 <Script file="Tooltip.lua"/>
 <Script file="Options.lua"/>
 <Script file="Templates.lua"/>
+<Script file="Enchants.lua"/>
 
 <Include file="Filters\Filters.xml"/>
 <Include file="Sorting\Sorting.xml"/>
