@@ -539,9 +539,9 @@ function mog:SetSinglePreview(isSinglePreview)
 		if #mog.previewBin > 1 and mog.previewBin[1] ~= MogItPreview1 then
 			for i = 2, #mog.previewBin do
 				if mog.previewBin[i] == MogItPreview1 then
-					tremove(mog.previewBin, i)
-					tinsert(mog.previewBin, 1, MogItPreview1)
-					break
+					tremove(mog.previewBin, i);
+					tinsert(mog.previewBin, 1, MogItPreview1);
+					break;
 				end
 			end
 		end
@@ -550,6 +550,7 @@ function mog:SetSinglePreview(isSinglePreview)
 	if MogItPreview1 then
 		mog:SetPreviewUIPanel(mog.db.profile.previewUIPanel);
 	end
+	mog:SetPreviewMenu(isSinglePreview);
 end
 
 function mog:SetPreviewUIPanel(isUIPanel)
@@ -568,7 +569,7 @@ function mog:SetPreviewUIPanel(isUIPanel)
 		MogItPreview1:SetScript("OnMouseDown", MogItPreview1.StartMoving);
 		MogItPreview1:SetScript("OnMouseUp", stopMovingOrSizing);
 		MogItPreview1:SetScript("OnHide", nil);
-		UIPanelWindows["MogItPreview1"] = nil
+		UIPanelWindows["MogItPreview1"] = nil;
 		MogItPreview1:SetAttribute("UIPanelLayout-defined", nil);
 	end
 	mog:SetPreviewFixedSize(mog.db.profile.previewFixedSize);
@@ -775,6 +776,7 @@ else
 	end);
 	mog.view:RegisterEvent("ADDON_LOADED");
 end
+
 --//
 
 
