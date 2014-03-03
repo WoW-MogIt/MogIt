@@ -38,7 +38,7 @@ end
 
 mog:CreateSort("colour",{
 	label = L["Approximate Colour"],
-	Dropdown = function(module,tier)
+	Dropdown = function(dropdown,module,tier)
 		local info = UIDropDownMenu_CreateInfo();
 		info.text =	L["Approximate Colour"];
 		info.value = "colour";
@@ -49,7 +49,7 @@ mog:CreateSort("colour",{
 		info.g = cG/255;
 		info.b = cB/255;
 		info.swatchFunc = swatchFunc;
-		UIDropDownMenu_AddButton(info,tier);
+		dropdown:AddButton(info,tier);
 	end,
 	Sort = function(args)
 		wipe(colourCache);

@@ -134,7 +134,8 @@ end
 function mog:CheckFilters(module,value)
 	if module.filters and module.GetFilterArgs then
 		for _,filter in ipairs(module.filters) do
-			if not mog:GetFilter(filter).Filter(module.GetFilterArgs(filter,value)) then
+			local filterObject = mog:GetFilter(filter);
+			if (not filterObject.slot or (module.active and filterObject.slot == module.active.label)) and not filterObject.Filter(module.GetFilterArgs(filter,value)) then
 				return;
 			end
 		end

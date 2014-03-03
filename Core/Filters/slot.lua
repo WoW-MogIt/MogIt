@@ -8,17 +8,17 @@ local all;
 
 f:SetHeight(41);
 
-f.slot = f:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall");
-f.slot:SetPoint("TOPLEFT",f,"TOPLEFT",0,0);
-f.slot:SetPoint("RIGHT",f,"RIGHT",0,0);
-f.slot:SetText(TRADESKILL_FILTER_SLOTS..":");
-f.slot:SetJustifyH("LEFT");
+local slotLabel = f:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall");
+slotLabel:SetPoint("TOPLEFT",f,"TOPLEFT",0,0);
+slotLabel:SetPoint("RIGHT",f,"RIGHT",0,0);
+slotLabel:SetText(TRADESKILL_FILTER_SLOTS..":");
+slotLabel:SetJustifyH("LEFT");
 
-f.dd = CreateFrame("Frame","MogItFiltersSlotDropdown",f,"UIDropDownMenuTemplate");
-f.dd:SetPoint("TOPLEFT",f.slot,"BOTTOMLEFT",-16,-2);
-UIDropDownMenu_SetWidth(f.dd,125);
-UIDropDownMenu_SetButtonWidth(f.dd,140);
-UIDropDownMenu_JustifyText(f.dd,"LEFT");
+f.dd = mog:CreateDropdown("Frame",f);
+f.dd:SetPoint("TOPLEFT",slotLabel,"BOTTOMLEFT",-16,-2);
+f.dd:SetWidth(125);
+f.dd:SetButtonWidth(140);
+f.dd:JustifyText("LEFT");
 
 function f.dd.SelectAll(self)
 	num = 0;

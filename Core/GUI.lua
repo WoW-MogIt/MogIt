@@ -687,6 +687,7 @@ mog.menu.modules:SetPoint("TOPLEFT", mog.frame, "TOPLEFT", 62, -31);
 local function setWeaponEnchant(self, enchant)
 	mog.weaponEnchant = enchant;
 	mog.menu:Rebuild(2);
+	mog.menu:Rebuild(3);
 	mog.scroll:update();
 end
 
@@ -706,7 +707,7 @@ local function setDisplayModel(self, arg1, value)
 	CloseDropDownMenus(1);
 end
 
-function mog:CreateRaceMenu(level, func, selectedRace)
+function mog:CreateRaceMenu(dropdown, level, func, selectedRace)
 	for i, race in ipairs(races) do -- pairs may yield unexpected order
 		local info = UIDropDownMenu_CreateInfo();
 		info.text = LBR[race] or race;
@@ -714,11 +715,11 @@ function mog:CreateRaceMenu(level, func, selectedRace)
 		info.checked = selectedRace == raceID[race];
 		info.arg1 = "displayRace";
 		info.arg2 = raceID[race];
-		UIDropDownMenu_AddButton(info, level);
+		dropdown:AddButton(info, level);
 	end
 end
 
-function mog:CreateGenderMenu(level, func, selectedGender)
+function mog:CreateGenderMenu(dropdown, level, func, selectedGender)
 	for i, gender in pairs(gender) do -- pairs may yield unexpected order
 		local info = UIDropDownMenu_CreateInfo();
 		info.text = gender;
@@ -726,7 +727,7 @@ function mog:CreateGenderMenu(level, func, selectedGender)
 		info.checked = selectedGender == i;
 		info.arg1 = "displayGender";
 		info.arg2 = i;
-		UIDropDownMenu_AddButton(info, level);
+		dropdown:AddButton(info, level);
 	end
 end
 
@@ -802,7 +803,7 @@ mog.menu.catalogue = mog.menu:CreateMenu(L["Catalogue"], function(self, tier)
 			if mog.active and mog.active.sorting then
 				for k,v in ipairs(mog.active.sorting) do
 					if mog.sorting[v] and mog.sorting[v].Dropdown then
-						mog.sorting[v].Dropdown(mog.active,tier);
+						mog.sorting[v].Dropdown(self,mog.active,tier);
 					end
 				end
 			end
@@ -810,26 +811,37 @@ mog.menu.catalogue = mog.menu:CreateMenu(L["Catalogue"], function(self, tier)
 			self.tier[3].Dropdown(mog.active,tier);
 		end
 	elseif self.tier[2] == "race" then
-		mog:CreateRaceMenu(tier, setDisplayModel, mog.displayRace)
+		mog:CreateRaceMenu(self, tier, setDisplayModel, mog.displayRace)
 	elseif self.tier[2] == "gender" then
-		mog:CreateGenderMenu(tier, setDisplayModel, mog.displayGender)
+		mog:CreateGenderMenu(self, tier, setDisplayModel, mog.displayGender)
 	elseif self.tier[2] == "weaponEnchant" then
-		local info = UIDropDownMenu_CreateInfo();
-		info.text = NONE;
-		info.func = setWeaponEnchant;
-		info.arg1 = nil;
-		info.checked = mog.weaponEnchant == nil;
-		info.keepShownOnClick = true;
-		UIDropDownMenu_AddButton(info,tier);
-		
-		for i, enchant in ipairs(mog.enchants) do
+		if tier == 2 then
 			local info = UIDropDownMenu_CreateInfo();
-			info.text = enchant.name;
+			info.text = NONE;
 			info.func = setWeaponEnchant;
-			info.arg1 = enchant.id;
-			info.checked = mog.weaponEnchant == enchant.id;
-			info.keepShownOnClick = true;
-			UIDropDownMenu_AddButton(info,tier);
+			info.arg1 = nil;
+			info.checked = mog.weaponEnchant == nil;
+			self:AddButton(info, tier);
+			
+			for i, enchantCategory in ipairs(mog.enchants) do
+				local info = UIDropDownMenu_CreateInfo();
+				info.text = enchantCategory.name;
+				info.value = enchantCategory;
+				info.notCheckable = true;
+				info.hasArrow = true;
+				info.keepShownOnClick = true;
+				self:AddButton(info, tier);
+			end
+		elseif tier == 3 then
+			for i, enchant in ipairs(self.tier[3]) do
+				local info = UIDropDownMenu_CreateInfo();
+				info.text = enchant.name;
+				info.func = setWeaponEnchant;
+				info.arg1 = self.parent;
+				info.arg2 = enchant.id;
+				info.checked = mog.weaponEnchant == enchant.id;
+				self:AddButton(info, tier);
+			end
 		end
 	elseif self.tier[2] == "gridDress" then
 		if tier == 2 then
@@ -840,7 +852,7 @@ mog.menu.catalogue = mog.menu:CreateMenu(L["Catalogue"], function(self, tier)
 				info.func = setGridDress;
 				info.checked = mog.db.profile.gridDress == k;
 				info.keepShownOnClick = true;
-				UIDropDownMenu_AddButton(info,tier);
+				self:AddButton(info,tier);
 			end
 		end
 	end

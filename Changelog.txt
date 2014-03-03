@@ -1,4 +1,6 @@
 [b]v3.2.0[/b]
+- Updated database with PvP items and some other missing items (challenge sets included) and data.
+- Removed thrown weapons module.
 - Added an entry to the 'Preview' menus to select a weapon enchant to display on the models.
 - Added a chest type filter to filter robes and tunics.
 - Added an option to redirect all dressup clicks (default Ctrl-left click) to the MogIt preview frame.

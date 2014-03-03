@@ -11,13 +11,13 @@ end
 
 mog:CreateSort("display",{
 	label = L["Display ID"],
-	Dropdown = function(module,tier)
+	Dropdown = function(dropdown,module,tier)
 		local info = UIDropDownMenu_CreateInfo();
 		info.text = L["Display ID"];
 		info.value = "display";
 		info.func = dropdownTier1;
 		info.checked = mog.sorting.active == "display";
-		UIDropDownMenu_AddButton(info,tier);
+		dropdown:AddButton(info,tier);
 	end,
 	Sort = function(args)
 		table.sort(mog.list, displayIDSort);

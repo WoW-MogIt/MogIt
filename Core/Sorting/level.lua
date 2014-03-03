@@ -30,14 +30,14 @@ end
 
 mog:CreateSort("level", {
 	label = LEVEL,
-	Dropdown = function(module,tier)
+	Dropdown = function(dropdown,module,tier)
 		local info;
 		info = UIDropDownMenu_CreateInfo();
 		info.text = LEVEL;
 		info.value = "level";
 		info.func = dropdownTier1;
 		info.checked = mog.sorting.active == "level";
-		UIDropDownMenu_AddButton(info, tier);
+		dropdown:AddButton(info, tier);
 	end,
 	Sort = function()
 		table.sort(mog.list, levelSort);

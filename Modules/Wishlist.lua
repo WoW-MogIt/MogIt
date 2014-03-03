@@ -373,7 +373,6 @@ do
 			self.editBox:HighlightText()
 		end,
 		whileDead = true,
-		timeout = 0,
 	}
 end
 
@@ -405,7 +404,6 @@ do
 			self.editBox:HighlightText()
 		end,
 		whileDead = true,
-		timeout = 0,
 	}
 end
 
@@ -417,7 +415,6 @@ StaticPopupDialogs["MOGIT_WISHLIST_DELETE_SET"] = {
 		wishlist:DeleteSet(data, true)
 	end,
 	whileDead = true,
-	timeout = 0,
 }
 
 StaticPopupDialogs["MOGIT_WISHLIST_OVERWRITE_SET"] = {
@@ -433,5 +430,4 @@ StaticPopupDialogs["MOGIT_WISHLIST_OVERWRITE_SET"] = {
 		mog:BuildList(nil, "Wishlist")
 	end,
 	whileDead = true,
-	timeout = 0,
 }
