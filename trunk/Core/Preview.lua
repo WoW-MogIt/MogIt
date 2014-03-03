@@ -1,6 +1,8 @@
 local MogIt,mog = ...;
 local L = mog.L;
 
+local LBI = LibStub("LibBabble-Inventory-3.0"):GetUnstrictLookupTable();
+
 
 mog.view = CreateFrame("Frame","MogItPreview",UIParent);
 mog.view:SetAllPoints();
@@ -650,7 +652,7 @@ function mog.view.AddItem(item, preview, forceSlot)
 				end
 			end
 			
-			if invType == "INVTYPE_2HWEAPON" or invType == "INVTYPE_RANGED" or invType == "INVTYPE_RANGEDRIGHT" then
+			if invType == "INVTYPE_2HWEAPON" or invType == "INVTYPE_RANGED" or (invType == "INVTYPE_RANGEDRIGHT" and itemInfo.type ~= LBI["Wands"]) then
 				-- if any two handed weapon is being equipped, first clear up both hands
 				mog.view.DelItem("MainHandSlot", preview);
 				mog.view.DelItem("SecondaryHandSlot", preview);
@@ -668,7 +670,10 @@ function mog.view.AddItem(item, preview, forceSlot)
 		preview.slots[slot].item = item;
 		slotTexture(preview, slot, GetItemIcon(item));
 		if preview:IsVisible() then
-			preview.model:TryOn(format("item:%d:%d", item, preview.data.weaponEnchant), slot);
+			if (slot == "MainHandSlot" or slot == "SecondaryHandSlot") and preview.data.weaponEnchant then
+				item = format("item:%d:%d", item, preview.data.weaponEnchant)
+			end
+			preview.model:TryOn(item, slot);
 		end
 	end
 end
@@ -796,7 +801,6 @@ else
 	end);
 	mog.view:RegisterEvent("ADDON_LOADED");
 end
-
 --//
 
 

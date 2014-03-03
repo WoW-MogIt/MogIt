@@ -2,6 +2,7 @@
 - Updated database with PvP items and some other missing items (challenge sets included) and data.
 - Removed thrown weapons module.
 - Added an entry to the 'Preview' menus to select a weapon enchant to display on the models.
+- Allow equipping a wand and off hand item at the same time in the preview. They can't both actually display on the model until Blizzard fixes that, though.
 - Added a chest type filter to filter robes and tunics.
 - Added an option to redirect all dressup clicks (default Ctrl-left click) to the MogIt preview frame.
 - Added an option to have the preview frame behave as a UI panel. (immovable and will get pushed around by other frames) Requires single preview option enabled.
