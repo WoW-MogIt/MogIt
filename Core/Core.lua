@@ -2,11 +2,11 @@ local MogIt,mog = ...;
 _G["MogIt"] = mog;
 local L = mog.L;
 
-local ItemInfo = LibStub("LibItemInfo-1.0")
+local ItemInfo = LibStub("LibItemInfo-1.0");
 
-LibStub("Libra"):EmbedWidgets(mog)
+LibStub("Libra"):EmbedWidgets(mog);
 
-local character = DataStore_Containers and DataStore:GetCharacter()
+local character = DataStore_Containers and DataStore:GetCharacter();
 
 mog.frame = CreateFrame("Frame","MogItFrame",UIParent,"ButtonFrameTemplate");
 mog.list = {};
@@ -352,14 +352,16 @@ mog.slots = {
 mog.slotsType = {
 	INVTYPE_HEAD = "HeadSlot",
 	INVTYPE_SHOULDER = "ShoulderSlot",
-	INVTYPE_BODY = "ShirtSlot",
 	INVTYPE_CLOAK = "BackSlot",
 	INVTYPE_CHEST = "ChestSlot",
 	INVTYPE_ROBE = "ChestSlot",
+	INVTYPE_BODY = "ShirtSlot",
+	INVTYPE_TABARD = "TabardSlot",
+	INVTYPE_WRIST = "WristSlot",
+	INVTYPE_HAND = "HandsSlot",
 	INVTYPE_WAIST = "WaistSlot",
 	INVTYPE_LEGS = "LegsSlot",
 	INVTYPE_FEET = "FeetSlot",
-	INVTYPE_WRIST = "WristSlot",
 	INVTYPE_2HWEAPON = "MainHandSlot",
 	INVTYPE_WEAPON = "MainHandSlot",
 	INVTYPE_WEAPONMAINHAND = "MainHandSlot",
@@ -368,8 +370,6 @@ mog.slotsType = {
 	INVTYPE_RANGEDRIGHT = "MainHandSlot",
 	INVTYPE_SHIELD = "SecondaryHandSlot",
 	INVTYPE_HOLDABLE = "SecondaryHandSlot",
-	INVTYPE_HAND = "HandsSlot",
-	INVTYPE_TABARD = "TabardSlot",
 };
 
 -- all slot IDs that can be transmogrified
