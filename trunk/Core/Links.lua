@@ -27,7 +27,7 @@ local function fromBase(str)
 	return num;
 end
 
-function mog:SetToLink(set,race,gender)
+function mog:SetToLink(set,race,gender,enchant)
 	local link = "[MogIt:";
 	for k,v in pairs(set) do
 		link = link..("%0"..maxlen.."s"):format(toBase(v));
@@ -35,6 +35,8 @@ function mog:SetToLink(set,race,gender)
 	link = link..":";
 	link = link..(race and toBase(race) or toBase(mog.playerRace));
 	link = link..(gender or mog.playerGender);
+	link = link..":";
+	link = link..(enchant and toBase(enchant) or 0);
 	link = link.."]";
 	return link;
 end
@@ -42,7 +44,7 @@ end
 function mog:LinkToSet(link)
 	local set = {};
 	--local items = link:match("MogIt:([^%]:]+)");
-	local items,race,gender = link:match("MogIt:(%w*):?(%w?)(%w?)");
+	local items,race,gender,enchant = link:match("MogIt:(%w*):?(%w?)(%w?):?(%w*)");
 	if items then
 		for i=1,#items/maxlen do
 			table.insert(set,fromBase(items:sub((i-1)*maxlen+1,i*maxlen)));
@@ -50,7 +52,8 @@ function mog:LinkToSet(link)
 	end
 	race = race and fromBase(race);
 	gender = tonumber(gender);
-	return set,race,gender;
+	enchant = enchant and fromBase(enchant);
+	return set,race,gender,enchant;
 end
 
 local function filter(self,event,msg,...)
@@ -86,10 +89,11 @@ function ItemRefTooltip:SetHyperlink(link)
 			ChatEdit_InsertLink("["..link.."]")
 		else
 			local preview = mog:GetPreview();
-			local set,race,gender = mog:LinkToSet(link);
+			local set,race,gender,enchant = mog:LinkToSet(link);
 			if race and gender then
 				preview.data.displayRace = race;
 				preview.data.displayGender = gender;
+				preview.data.weaponEnchant = enchant;
 				preview.model:ResetModel();
 				preview.model:Undress();
 			end

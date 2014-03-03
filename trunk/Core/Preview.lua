@@ -65,8 +65,10 @@ local function resizeOnMouseUp(self)
 	local frameProps = mog.db.profile.previewProps[f:GetID()];
 	frameProps.w, frameProps.h = f:GetSize();
 	-- anchors may change from resizing
-	frameProps.point, frameProps.x, frameProps.y = select(3, f:GetPoint());
-	UpdateUIPanelPositions(f)
+	if not (mog.db.profile.singlePreview and mog.db.profile.previewUIPanel) then
+		frameProps.point, frameProps.x, frameProps.y = select(3, f:GetPoint());
+		UpdateUIPanelPositions(f)
+	end
 end
 
 local function modelOnMouseWheel(self,v)
@@ -144,6 +146,9 @@ end
 local function setWeaponEnchant(self, preview, enchant)
 	preview.data.weaponEnchant = enchant;
 	self.owner:Rebuild(2);
+	if enchant then
+		self.owner:Rebuild(3);
+	end
 	mog.scroll:update();
 	local mainHandItem = preview.slots["MainHandSlot"].item;
 	local offHandItem = preview.slots["SecondaryHandSlot"].item;
@@ -191,7 +196,7 @@ local previewMenu = {
 					table.insert(tbl, v.item);
 				end
 			end
-			ChatEdit_InsertLink(mog:SetToLink(tbl, currentPreview.data.displayRace, currentPreview.data.displayGender));
+			ChatEdit_InsertLink(mog:SetToLink(tbl, currentPreview.data.displayRace, currentPreview.data.displayGender, currentPreview.data.weaponEnchant));
 			--ChatFrame_OpenChat(link);
 		end,
 	},
@@ -239,28 +244,39 @@ local function previewInitialize(self, level)
 			UIDropDownMenu_AddButton(info, level);
 		end
 	elseif self.tier[2] == "race" then
-		mog:CreateRaceMenu(level, setDisplayModel, self.parent.data.displayRace)
+		mog:CreateRaceMenu(self, level, setDisplayModel, self.parent.data.displayRace)
 	elseif self.tier[2] == "gender" then
-		mog:CreateGenderMenu(level, setDisplayModel, self.parent.data.displayGender)
+		mog:CreateGenderMenu(self, level, setDisplayModel, self.parent.data.displayGender)
 	elseif self.tier[2] == "weaponEnchant" then
-		local info = UIDropDownMenu_CreateInfo();
-		info.text = NONE;
-		info.func = setWeaponEnchant;
-		info.arg1 = nil;
-		info.checked = mog.weaponEnchant == nil;
-		info.keepShownOnClick = true;
-		UIDropDownMenu_AddButton(info, level);
-		
-		for i, enchant in ipairs(mog.enchants) do
+		if level == 2 then
 			local info = UIDropDownMenu_CreateInfo();
-			info.text = enchant.name;
+			info.text = NONE;
 			info.func = setWeaponEnchant;
 			info.arg1 = self.parent;
-			info.arg2 = enchant.id;
-			info.checked = self.parent.data.weaponEnchant == enchant.id;
+			info.arg2 = nil;
+			info.checked = self.parent.data.weaponEnchant == nil;
 			info.keepShownOnClick = true;
-			info.owner = self;
-			UIDropDownMenu_AddButton(info, level);
+			self:AddButton(info, level);
+			
+			for i, enchantCategory in ipairs(mog.enchants) do
+				local info = UIDropDownMenu_CreateInfo();
+				info.text = enchantCategory.name;
+				info.value = enchantCategory;
+				info.notCheckable = true;
+				info.hasArrow = true;
+				info.keepShownOnClick = true;
+				self:AddButton(info, level);
+			end
+		elseif level == 3 then
+			for i, enchant in ipairs(self.tier[3]) do
+				local info = UIDropDownMenu_CreateInfo();
+				info.text = enchant.name;
+				info.func = setWeaponEnchant;
+				info.arg1 = self.parent;
+				info.arg2 = enchant.id;
+				info.checked = self.parent.data.weaponEnchant == enchant.id;
+				self:AddButton(info, level);
+			end
 		end
 	end
 end
@@ -565,12 +581,16 @@ function mog:SetPreviewUIPanel(isUIPanel)
 		}
 		HideUIPanel(MogItPreview1);
 	else
+		local props = mog.db.profile.previewProps[1];
+		local point, x, y = props.point, props.x, props.y;
 		HideUIPanel(MogItPreview1);
 		MogItPreview1:SetScript("OnMouseDown", MogItPreview1.StartMoving);
 		MogItPreview1:SetScript("OnMouseUp", stopMovingOrSizing);
 		MogItPreview1:SetScript("OnHide", nil);
 		UIPanelWindows["MogItPreview1"] = nil;
 		MogItPreview1:SetAttribute("UIPanelLayout-defined", nil);
+		MogItPreview1:ClearAllPoints();
+		MogItPreview1:SetPoint(point, x, y);
 	end
 	mog:SetPreviewFixedSize(mog.db.profile.previewFixedSize);
 end

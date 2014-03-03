@@ -173,7 +173,7 @@ function mog:AddItemOption(info)
 	tinsert(itemOptionsMenu, info)
 end
 
-local function createItemMenu(data, func)
+local function createItemMenu(dropdown, data, func)
 	local items = data.items
 	-- not listing the items if it's only 1 and it's not a set
 	if not items or (data.item and #items == 1) then
@@ -194,7 +194,7 @@ local function createItemMenu(data, func)
 			info.arg1 = data
 			info.arg2 = i
 			info.menuList = itemOptionsMenu
-			UIDropDownMenu_AddButton(info)
+			dropdown:AddButton(info)
 		end
 	end
 	return true
@@ -382,7 +382,7 @@ do
 		local data = self.data
 		
 		if not menuList then
-			if not createItemMenu(data, itemOnClick) then
+			if not createItemMenu(self, data, itemOnClick) then
 				-- this is a single item, so skip directly to the item options menu
 				createMenu(self, level, itemOptionsMenu)
 			end
@@ -421,19 +421,23 @@ function mog.Set_OnClick(self, btn, data, isSaved)
 		if IsShiftKeyDown() then
 			ChatEdit_InsertLink(mog:SetToLink(data.items))
 		elseif IsControlKeyDown() then
-			if not DressUpFrame:IsShown() or DressUpFrame.mode ~= "player" then
-				DressUpFrame.mode = "player"
-				DressUpFrame.ResetButton:Show()
+			if mog.db.profile.dressupPreview then
+				mog:AddToPreview(data.items, mog:GetPreview())
+			else
+				if not DressUpFrame:IsShown() or DressUpFrame.mode ~= "player" then
+					DressUpFrame.mode = "player"
+					DressUpFrame.ResetButton:Show()
 
-				local race, fileName = UnitRace("player")
-				SetDressUpBackground(DressUpFrame, fileName)
+					local race, fileName = UnitRace("player")
+					SetDressUpBackground(DressUpFrame, fileName)
 
-				ShowUIPanel(DressUpFrame)
-				DressUpModel:SetUnit("player")
-			end
-			DressUpModel:Undress()
-			for k, v in pairs(data.items) do
-				DressUpItemLink(v)
+					ShowUIPanel(DressUpFrame)
+					DressUpModel:SetUnit("player")
+				end
+				DressUpModel:Undress()
+				for k, v in pairs(data.items) do
+					DressUpItemLink(v)
+				end
 			end
 		end
 	elseif btn == "RightButton" then
@@ -490,7 +494,7 @@ do
 		local data = self.data
 		
 		if not menuList then
-			createItemMenu(data)
+			createItemMenu(self, data)
 			
 			for i, info in ipairs(setMenu) do
 				if info.wishlist == nil or info.wishlist == data.isSaved then
