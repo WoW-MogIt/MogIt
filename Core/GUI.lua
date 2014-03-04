@@ -585,7 +585,7 @@ local function menuOnClick(self, btn)
 	end
 	self.menuBar.active = self;
 	if self.func then
-		self.menuBar:ToggleMenu(nil, nil, self);
+		self.menuBar:ToggleMenu(nil, self);
 	end
 end
 
@@ -594,7 +594,7 @@ local function menuOnEnter(self)
 		HideDropDownMenu(1);
 		if self.func then
 			self.menuBar.active = self;
-			self.menuBar:ToggleMenu(nil, nil, self);
+			self.menuBar:ToggleMenu(nil, self);
 		end
 	end
 	self.nt:SetTexture(1,0.82,0,1);

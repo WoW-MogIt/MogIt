@@ -347,7 +347,7 @@ local function showMenu(menu, data, isSaved)
 	-- needs to be either true or false
 	data.isSaved = isSaved ~= nil
 	menu.data = data
-	menu:Toggle(data.item, nil, "cursor")
+	menu:Toggle(data.item, "cursor")
 end
 
 function mog.Item_OnClick(self, btn, data, isSaved)
