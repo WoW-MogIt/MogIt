@@ -630,7 +630,7 @@ function mog.view.AddItem(item, preview, forceSlot)
 		tinsert(doCache, {id = item, frame = preview});
 		return;
 	end
-	local invType = itemInfo.slot;
+	local invType = itemInfo.invType;
 	
 	local slot = mog:GetSlot(invType)
 	if type(forceSlot) == "string" then
@@ -652,7 +652,7 @@ function mog.view.AddItem(item, preview, forceSlot)
 				end
 			end
 			
-			if invType == "INVTYPE_2HWEAPON" or invType == "INVTYPE_RANGED" or (invType == "INVTYPE_RANGEDRIGHT" and itemInfo.type ~= LBI["Wands"]) then
+			if invType == "INVTYPE_2HWEAPON" or invType == "INVTYPE_RANGED" or (invType == "INVTYPE_RANGEDRIGHT" and itemInfo.subType ~= LBI["Wands"]) then
 				-- if any two handed weapon is being equipped, first clear up both hands
 				mog.view.DelItem("MainHandSlot", preview);
 				mog.view.DelItem("SecondaryHandSlot", preview);

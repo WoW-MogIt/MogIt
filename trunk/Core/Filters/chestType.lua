@@ -52,7 +52,7 @@ function f.Filter(item)
 		return true;
 	end
 	local item = mog:GetItemInfo(item, "BuildList");
-	return not item or selected == item.slot;
+	return not item or selected == item.invType;
 end
 
 function f.Default()
