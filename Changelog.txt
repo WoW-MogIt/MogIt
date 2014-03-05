@@ -1,3 +1,6 @@
+[b]v3.2.1[/b]
+- Fixed selecting weapon enchants.
+
 [b]v3.2.0[/b]
 - Updated database with PvP items and some other missing items (challenge sets included) and data.
 - Removed thrown weapons module.
