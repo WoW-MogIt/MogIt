@@ -52,7 +52,7 @@ function mog:LinkToSet(link)
 	end
 	race = race and fromBase(race);
 	gender = tonumber(gender);
-	enchant = enchant and fromBase(enchant);
+	enchant = enchant ~= "" and fromBase(enchant) or nil;
 	return set,race,gender,enchant;
 end
 
