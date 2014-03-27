@@ -8,12 +8,18 @@ local function getTexture(hasItem, embedded)
 	return embedded and format("|T%s:0|t ", texture) or texture
 end
 
-local function itemLabel(itemID, callback)
+function mog:GetItemLabel(itemID, callback, includeIcon, iconSize)
 	local item = mog:GetItemInfo(itemID, callback)
+	local name
 	if item then
-		return format("|c%s%s|r", select(4, GetItemQualityColor(item.quality)), item.name)
+		name = format("|c%s%s|r", select(4, GetItemQualityColor(item.quality)), item.name)
 	else
-		return RED_FONT_COLOR_CODE..RETRIEVING_ITEM_INFO..FONT_COLOR_CODE_CLOSE
+		name = RED_FONT_COLOR_CODE..RETRIEVING_ITEM_INFO..FONT_COLOR_CODE_CLOSE
+	end
+	if includeIcon then
+		return format("|T%s:%d|t %s", GetItemIcon(itemID), iconSize, name)
+	else
+		return name
 	end
 end
 
@@ -22,7 +28,7 @@ local function addTooltipDoubleLine(textLeft, textRight)
 end
 
 local function addItemTooltipLine(itemID)
-	addTooltipDoubleLine(getTexture(mog:HasItem(itemID), true)..itemLabel(itemID, "ModelOnEnter"), mog.GetItemSourceShort(itemID))
+	addTooltipDoubleLine(getTexture(mog:HasItem(itemID), true)..mog:GetItemLabel(itemID, "ModelOnEnter"), mog.GetItemSourceShort(itemID))
 end
 
 function mog.GetItemSourceInfo(itemID)
@@ -185,7 +191,7 @@ local function createItemMenu(dropdown, data, func)
 		v = isArray and v or items[v]
 		if v then
 			local info = UIDropDownMenu_CreateInfo()
-			info.text = itemLabel(v, func and "ItemMenu" or "SetMenu")
+			info.text = mog:GetItemLabel(v, func and "ItemMenu" or "SetMenu")
 			info.value = v
 			info.func = func
 			info.checked = (i == data.cycle)
@@ -256,7 +262,7 @@ function mog.ShowItemTooltip(self, item, items, cycle)
 	
 	local itemInfo = mog:GetItemInfo(item, "ModelOnEnter")
 	local itemLevel = itemInfo and itemInfo.itemlevel
-	local itemLabel = itemLabel(item, "ModelOnEnter")
+	local itemLabel = mog:GetItemLabel(item, "ModelOnEnter")
 	if cycle and #items > 1 then
 		GameTooltip:AddDoubleLine(itemLabel, L["Item %d/%d"]:format(cycle, #items), nil, nil, nil, 1, 0, 0)
 	else
