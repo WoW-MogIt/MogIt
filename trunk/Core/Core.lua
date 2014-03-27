@@ -64,7 +64,7 @@ mog.mmb = LibStub("LibDataBroker-1.1"):NewDataObject("MogIt",{
 
 
 --// Module API
-mog.moduleVersion = 1;
+mog.moduleVersion = 2;
 mog.modules = {};
 mog.moduleList = {};
 

@@ -3,7 +3,7 @@
 ## Version: @project-version@
 ## LoadOnDemand: 1
 ## RequiredDeps: MogIt
-## X-MogItModuleVersion: 1
+## X-MogItModuleVersion: 2
 
 ## Title: MogIt_Ranged
 ## Title-frFR: MogIt_À distance
@@ -35,4 +35,5 @@ Colours.lua
 Bow.lua
 Crossbow.lua
 Gun.lua
+Thrown.lua
 Wand.lua

@@ -3,7 +3,7 @@
 ## Version: @project-version@
 ## LoadOnDemand: 1
 ## RequiredDeps: MogIt
-## X-MogItModuleVersion: 1
+## X-MogItModuleVersion: 2
 
 ## Title: MogIt_Mail
 ## Title-frFR: MogIt_Mailles
