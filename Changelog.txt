@@ -1,3 +1,6 @@
+[b]v3.2.2[/b]
+- Added cloth chests from 5.4 that went missing.
+
 [b]v3.2.1[/b]
 - Fixed selecting weapon enchants.
 
