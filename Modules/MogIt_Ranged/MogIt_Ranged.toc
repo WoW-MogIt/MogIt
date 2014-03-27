@@ -35,5 +35,4 @@ Colours.lua
 Bow.lua
 Crossbow.lua
 Gun.lua
-Thrown.lua
 Wand.lua
