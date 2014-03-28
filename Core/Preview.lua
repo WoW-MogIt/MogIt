@@ -737,6 +737,7 @@ if not ModifiedItemClickHandlers then
 	end
 end
 
+-- hack to allow post hooking SetItemRef for previewing
 tinsert(ModifiedItemClickHandlers, function(link)
 	local button = GetMouseButtonClicked()
 	if button then
@@ -749,6 +750,8 @@ tinsert(ModifiedItemClickHandlers, function(link)
 			end
 		end
 	elseif IsModifiedClick("DRESSUP") then
+		-- if no mouse button was detected, this happened through a chat link
+		-- if it's a dressup modified click and a dressable item, intercept the call here and let SetItemRef hook handle it
 		return link and IsDressableItem(link);
 	end
 end);
@@ -777,14 +780,17 @@ function DressUpItemLink(link)
 end
 
 local function hookInspectUI()
-	local function inspect_OnClick(self, button)
+	local function onClick(self, button)
 		if InspectFrame.unit and self.hasItem and IsControlKeyDown() and button == "RightButton" then
-			mog:AddToPreview(GetInventoryItemID(InspectFrame.unit, GetInventorySlotInfo(self:GetID())));
+			-- GetInventoryItemID actually returns the transmogged-into item for inspect units
+			mog:AddToPreview(GetInventoryItemID(InspectFrame.unit, self:GetID()));
+		else
+			HandleModifiedItemClick(GetInventoryItemLink(InspectFrame.unit, self:GetID()));
 		end
 	end
 	for k, v in ipairs(mog.slots) do
 		_G["Inspect"..v]:RegisterForClicks("AnyUp");
-		_G["Inspect"..v]:HookScript("OnClick", inspect_OnClick);
+		_G["Inspect"..v]:SetScript("OnClick", onClick);
 	end
 	hookInspectUI = nil;
 end
