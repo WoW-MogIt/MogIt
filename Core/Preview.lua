@@ -142,7 +142,7 @@ local function setDisplayModel(self, arg1, value)
 	model:ResetModel();
 	model:Undress();
 	mog.DressFromPreview(model, currentPreview);
-	CloseDropDownMenus(1);
+	CloseDropDownMenus();
 end
 
 local function setWeaponEnchant(self, preview, enchant)
@@ -277,6 +277,7 @@ local function previewInitialize(self, level)
 				info.arg1 = self.parent;
 				info.arg2 = enchant.id;
 				info.checked = self.parent.data.weaponEnchant == enchant.id;
+				info.keepShownOnClick = true;
 				self:AddButton(info, level);
 			end
 		end

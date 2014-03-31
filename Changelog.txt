@@ -1,3 +1,10 @@
+[b]v3.2.3[/b]
+- Fixed previewing items of inspected players. Will once again preview the transmogged-into item.
+- Fixed catalogue weapon enchanting.
+- The Add to wishlist option should now appear in all item menus.
+- Bump module API version to 2. MogIt.GetItemInfo now returns a table according to [url]http://www.wowace.com/addons/libra/[/url].
+- Added function MogIt:GetItemLabel(itemID, callback, includeIcon, iconSize).
+
 [b]v3.2.2[/b]
 - Added cloth chests from 5.4 that went missing.
 

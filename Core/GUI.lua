@@ -821,6 +821,7 @@ mog.menu.catalogue = mog.menu:CreateMenu(L["Catalogue"], function(self, tier)
 			info.func = setWeaponEnchant;
 			info.arg1 = nil;
 			info.checked = mog.weaponEnchant == nil;
+			info.keepShownOnClick = true;
 			self:AddButton(info, tier);
 			
 			for i, enchantCategory in ipairs(mog.enchants) do
@@ -837,9 +838,9 @@ mog.menu.catalogue = mog.menu:CreateMenu(L["Catalogue"], function(self, tier)
 				local info = UIDropDownMenu_CreateInfo();
 				info.text = enchant.name;
 				info.func = setWeaponEnchant;
-				info.arg1 = self.parent;
-				info.arg2 = enchant.id;
+				info.arg1 = enchant.id;
 				info.checked = mog.weaponEnchant == enchant.id;
+				info.keepShownOnClick = true;
 				self:AddButton(info, tier);
 			end
 		end
