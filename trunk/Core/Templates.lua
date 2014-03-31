@@ -124,7 +124,6 @@ local previewItem = {
 local itemOptionsMenu = {
 	previewItem,
 	{
-		set = true,
 		text = L["Add to wishlist"],
 		func = function(self)
 			mog.wishlist:AddItem(self.value)
