@@ -260,7 +260,7 @@ function mog.ShowItemTooltip(self, item, items, cycle)
 	end
 	
 	local itemInfo = mog:GetItemInfo(item, "ModelOnEnter")
-	local itemLevel = itemInfo and itemInfo.itemlevel
+	local itemLevel = itemInfo and itemInfo.itemLevel
 	local itemLabel = mog:GetItemLabel(item, "ModelOnEnter")
 	if cycle and #items > 1 then
 		GameTooltip:AddDoubleLine(itemLabel, L["Item %d/%d"]:format(cycle, #items), nil, nil, nil, 1, 0, 0)
@@ -283,6 +283,10 @@ function mog.ShowItemTooltip(self, item, items, cycle)
 	end
 	
 	GameTooltip:AddLine(" ")
+	local bindType = mog:GetData("item", item, "bind")
+	if bindType then
+		addTooltipDoubleLine(L["Bind"]..":", L.bind[bindType])
+	end
 	local requiredLevel = mog:GetData("item", item, "level")
 	if requiredLevel then
 		addTooltipDoubleLine(LEVEL..":", requiredLevel)
