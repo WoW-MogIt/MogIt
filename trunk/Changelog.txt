@@ -1,3 +1,8 @@
+[b]v3.3.1[/b]
+- Added option to use a different model for the tooltip preview.
+- Added option to sort wishlist sets alphabetically. (found in options, not sorting menu, and is remembered between sessions)
+- Removed explicit AtlasLoot tooltip support. Enable GameTooltip in AtlasLoot options instead.
+
 [b]v3.3.0[/b]
 - Fixed previewing items of inspected players. Will once again preview the transmogged-into item.
 - Fixed catalogue weapon enchanting.

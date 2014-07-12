@@ -215,7 +215,7 @@ local function createMenu(self, level, menuList)
 				info.value = UIDROPDOWNMENU_MENU_VALUE
 				info.notCheckable = true
 				info.arg1 = data
-				UIDropDownMenu_AddButton(info, level)
+				self:AddButton(info, level)
 			end
 		end
 	end
@@ -350,7 +350,7 @@ function mog.ShowItemTooltip(self, item, items, cycle)
 end
 
 local function showMenu(menu, data, isSaved)
-	if mog.IsDropdownShown(menu) and menu.data ~= data then
+	if menu:IsShown() and menu.data ~= data then
 		HideDropDownMenu(1)
 	end
 	-- needs to be either true or false
@@ -469,11 +469,11 @@ do
 		{
 			wishlist = false,
 			text = L["Add set to wishlist"],
-			func = function(self, items)
-				local create = mog.wishlist:CreateSet(self.value)
+			func = function(self, set, items)
+				local create = mog.wishlist:CreateSet(set)
 				if create then
 					for i, itemID in pairs(items) do
-						mog.wishlist:AddItem(itemID, self.value)
+						mog.wishlist:AddItem(itemID, set)
 					end
 				end
 			end,
@@ -481,15 +481,15 @@ do
 		{
 			wishlist = true,
 			text = L["Rename set"],
-			func = function(self)
-				mog.wishlist:RenameSet(self.value)
+			func = function(self, set)
+				mog.wishlist:RenameSet(set)
 			end,
 		},
 		{
 			wishlist = true,
 			text = L["Delete set"],
-			func = function(self)
-				mog.wishlist:DeleteSet(self.value)
+			func = function(self, set)
+				mog.wishlist:DeleteSet(set)
 			end,
 		},
 	}
@@ -509,9 +509,9 @@ do
 				if info.wishlist == nil or info.wishlist == data.isSaved then
 					info.value = data.name
 					info.notCheckable = true
-					info.arg1 = data.items
-					info.arg2 = data.index
-					UIDropDownMenu_AddButton(info, level)
+					info.arg1 = data.name
+					info.arg2 = data.items
+					self:AddButton(info, level)
 				end
 			end
 			return
