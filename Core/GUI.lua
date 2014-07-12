@@ -33,11 +33,12 @@ local raceID = {
    ["Draenei"] = 11,
    ["Worgen"] = 22,
    ["Pandaren"] = 24,
-   -- UnitRace returns differently for the following races, so need to include exceptions
-   ["NightElf"] = 4,
-   ["Scourge"] = 5,
-   ["BloodElf"] = 10,
 }
+
+-- UnitRace returns differently for the following races, so need to include exceptions
+raceID["NightElf"] = raceID["Night Elf"]
+raceID["Scourge"] = raceID["Undead"]
+raceID["BloodElf"] = raceID["Blood Elf"]
 
 local gender = {
 	[0] = MALE,
@@ -311,15 +312,16 @@ function ModelFramePrototype:ResetModel()
 			model:UndressSlot(INVSLOT_BACK);
 		end
 	end
-	mog:PositionModel(self);
+	self:PositionModel();
 end
 
-function mog:PositionModel(self)
-	if self.model:IsVisible() then
+function ModelFramePrototype:PositionModel()
+	local model = self.model
+	if model:IsVisible() then
 		local sync = (mog.db.profile.sync or self.type == "catalogue");
 		local modelData = sync and mog or self.parent.data
-		self.model:SetPosition(modelData.posZ or 0, modelData.posX or 0, modelData.posY or 0);
-		self.model:SetFacing(modelData.face or 0);
+		model:SetPosition(modelData.posZ or 0, modelData.posX or 0, modelData.posY or 0);
+		model:SetFacing(modelData.face or 0);
 	end
 end
 
@@ -354,11 +356,11 @@ mog.modelUpdater:SetScript("OnUpdate",function(self,elapsed)
 			mog.posY = mog.posY + dY;
 		end
 		for id,model in ipairs(mog.models) do
-			mog:PositionModel(model);
+			model:PositionModel();
 		end
 		if mog.db.profile.sync then
-			for id,preview in ipairs(mog.previews) do
-				mog:PositionModel(preview.model);
+			for id, preview in ipairs(mog.previews) do
+				preview.model:PositionModel();
 			end
 		end
 	else
@@ -370,7 +372,7 @@ mog.modelUpdater:SetScript("OnUpdate",function(self,elapsed)
 			modelData.posX = (modelData.posX or mog.posX or 0) + dX;
 			modelData.posY = (modelData.posY or mog.posY or 0) + dY;
 		end
-		mog:PositionModel(self.model);
+		self.model:PositionModel();
 	end
 	
 	self.pX,self.pY = cX,cY;
@@ -459,7 +461,7 @@ function mog.scroll.update(self, value, offset, onscroll)
 		self.down:Enable();
 	end
 	
-	if mog.IsDropdownShown(mog.Item_Menu) or mog.IsDropdownShown(mog.Set_Menu) then
+	if mog.Item_Menu:IsShown() or mog.Set_Menu:IsShown() then
 		HideDropDownMenu(1);
 	end
 	
@@ -590,7 +592,7 @@ local function menuOnClick(self, btn)
 end
 
 local function menuOnEnter(self)
-	if self.menuBar.active ~= self and mog.IsDropdownShown(self.menuBar) then
+	if self.menuBar.active ~= self and self.menuBar:IsShown() then
 		HideDropDownMenu(1);
 		if self.func then
 			self.menuBar.active = self;
@@ -687,7 +689,6 @@ mog.menu.modules:SetPoint("TOPLEFT", mog.frame, "TOPLEFT", 62, -31);
 local function setWeaponEnchant(self, enchant)
 	mog.weaponEnchant = enchant;
 	mog.menu:Rebuild(2);
-	mog.menu:Rebuild(3);
 	mog.scroll:update();
 end
 
@@ -708,7 +709,7 @@ local function setDisplayModel(self, arg1, value)
 end
 
 function mog:CreateRaceMenu(dropdown, level, func, selectedRace)
-	for i, race in ipairs(races) do -- pairs may yield unexpected order
+	for i, race in ipairs(races) do
 		local info = UIDropDownMenu_CreateInfo();
 		info.text = LBR[race] or race;
 		info.func = func;
@@ -720,9 +721,9 @@ function mog:CreateRaceMenu(dropdown, level, func, selectedRace)
 end
 
 function mog:CreateGenderMenu(dropdown, level, func, selectedGender)
-	for i, gender in pairs(gender) do -- pairs may yield unexpected order
+	for i = 0, 1 do
 		local info = UIDropDownMenu_CreateInfo();
-		info.text = gender;
+		info.text = gender[i];
 		info.func = func;
 		info.checked = selectedGender == i;
 		info.arg1 = "displayGender";
@@ -744,7 +745,7 @@ local function setGridDress(self)
 	end
 	mog.scroll:update();
 	for i, model in ipairs(mog.models) do
-		mog:PositionModel(model)
+		model:PositionModel()
 	end
 	CloseDropDownMenus(1);
 end

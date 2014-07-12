@@ -29,7 +29,7 @@ end);
 
 mog.tooltip:SetScript("OnEvent", function(self, event, arg1)
 	if event == "PLAYER_LOGIN" then
-		mog.tooltip.model:SetUnit("PLAYER");
+		mog.tooltip.model:SetUnit("player");
 	elseif event == "PLAYER_REGEN_DISABLED" then
 		ClearOverrideBindings(mog.tooltip);
 	elseif event == "PLAYER_REGEN_ENABLED" then
@@ -37,16 +37,11 @@ mog.tooltip:SetScript("OnEvent", function(self, event, arg1)
 			SetOverrideBinding(mog.tooltip,true,"MOUSEWHEELUP","MogIt_TooltipScrollUp");
 			SetOverrideBinding(mog.tooltip,true,"MOUSEWHEELDOWN","MogIt_TooltipScrollDown");
 		end
-	elseif event == "ADDON_LOADED" then
-		if arg1 == "AtlasLoot" then
-			mog.tooltip.hookAtlasLoot();
-		end
 	end
 end);
 mog.tooltip:RegisterEvent("PLAYER_LOGIN");
 mog.tooltip:RegisterEvent("PLAYER_REGEN_DISABLED");
 mog.tooltip:RegisterEvent("PLAYER_REGEN_ENABLED");
-mog.tooltip:RegisterEvent("ADDON_LOADED");
 --//
 
 
@@ -54,6 +49,29 @@ mog.tooltip:RegisterEvent("ADDON_LOADED");
 mog.tooltip.model = CreateFrame("DressUpModel",nil,mog.tooltip);
 mog.tooltip.model:SetPoint("TOPLEFT",mog.tooltip,"TOPLEFT",5,-5);
 mog.tooltip.model:SetPoint("BOTTOMRIGHT",mog.tooltip,"BOTTOMRIGHT",-5,5);
+mog.tooltip.model:SetScript("OnShow",function(self)
+	if mog.db.profile.tooltipCustomModel then
+		self:SetCustomRace(mog.db.profile.tooltipRace, mog.db.profile.tooltipGender);
+		-- hack for hidden helm and cloak showing on models
+		local showingHelm, showingCloak = ShowingHelm(), ShowingCloak();
+		local helm, cloak = GetInventoryItemID("player", INVSLOT_HEAD), GetInventoryItemID("player", INVSLOT_BACK);
+		if not showingHelm and helm then
+			self:TryOn(helm);
+			self:UndressSlot(INVSLOT_HEAD);
+		end
+		if not showingCloak and cloak then
+			self:TryOn(cloak);
+			self:UndressSlot(INVSLOT_BACK);
+		end
+		self:RefreshCamera();
+	else
+		self:Dress();
+	end
+	if not mog.db.profile.tooltipDress then
+		self:Undress();
+	end
+end);
+
 
 function mog.tooltip.ShowItem(self)
 	local _,itemLink = self:GetItem();
@@ -63,10 +81,11 @@ function mog.tooltip.ShowItem(self)
 	local itemID = tonumber(itemLink:match("item:(%d+)"));
 	
 	local db = mog.db.profile
-	if db.tooltip and (not mog.tooltip.mod[db.tooltipMod] or mog.tooltip.mod[db.tooltipMod]()) then
+	local tooltip = mog.tooltip
+	if db.tooltip and (not tooltip.mod[db.tooltipMod] or tooltip.mod[db.tooltipMod]()) then
 		if not self[mog] then
-			if mog.tooltip.item ~= itemLink then
-				mog.tooltip.item = itemLink;
+			if tooltip.item ~= itemLink then
+				tooltip.item = itemLink;
 				local token = mog.tokens[itemID];
 				if token then
 					for item, classBit in pairs(token) do
@@ -77,28 +96,23 @@ function mog.tooltip.ShowItem(self)
 					end
 				end
 				local slot = select(9,GetItemInfo(itemLink));
-				if (not db.tooltipMog or select(3, GetItemTransmogrifyInfo(itemLink))) and mog.tooltip.slots[slot] and IsDressableItem(itemLink) then
-					mog.tooltip.model:SetFacing(mog.tooltip.slots[slot]-(db.tooltipRotate and 0.5 or 0));
-					mog.tooltip:Show();
-					mog.tooltip.owner = self;
+				if (not db.tooltipMog or select(3, GetItemTransmogrifyInfo(itemLink))) and tooltip.slots[slot] and IsDressableItem(itemLink) then
+					tooltip.model:SetFacing(tooltip.slots[slot]-(db.tooltipRotate and 0.5 or 0));
+					tooltip:Show();
+					tooltip.owner = self;
 					--if mog.global.tooltipAnchor then
-						mog.tooltip.repos:Show();
+						tooltip.repos:Show();
 					--else
-					--	mog.tooltip:ClearAllPoints();
-					--	mog.tooltip:SetPoint("BOTTOMRIGHT","UIParent","BOTTOMRIGHT",-CONTAINER_OFFSET_X - 13,CONTAINER_OFFSET_Y);
+					--	tooltip:ClearAllPoints();
+					--	tooltip:SetPoint("BOTTOMRIGHT","UIParent","BOTTOMRIGHT",-CONTAINER_OFFSET_X - 13,CONTAINER_OFFSET_Y);
 					--end
-					if db.tooltipDress then
-						mog.tooltip.model:Dress();
-					else
-						mog.tooltip.model:Undress();
-					end
-					mog.tooltip.model:TryOn(itemLink);
+					tooltip.model:TryOn(itemLink);
 				else
-					mog.tooltip:Hide();
+					tooltip:Hide();
 				end
 			end
 		else
-			-- mog.tooltip:Hide();
+			-- tooltip:Hide();
 		end
 	end
 	
@@ -195,15 +209,4 @@ mog.tooltip.mod = {
 	Ctrl = IsControlKeyDown,
 	Alt = IsAltKeyDown,
 };
---//
-
-
---// AtlasLoot
-function mog.tooltip.hookAtlasLoot()
-	if AtlasLootTooltipTEMP then
-		AtlasLootTooltipTEMP:HookScript("OnTooltipSetItem",mog.tooltip.ShowItem);
-		AtlasLootTooltipTEMP:HookScript("OnHide",mog.tooltip.HideItem);
-	end
-end
-mog.tooltip.hookAtlasLoot();
 --//

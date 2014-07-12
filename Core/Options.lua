@@ -1,8 +1,10 @@
 ﻿local MogIt,mog = ...;
 local L = mog.L;
 
+local LBR = LibStub("LibBabble-Race-3.0"):GetUnstrictLookupTable();
+
 function mog.createOptions()
-	local about = LibStub("LibAddonInfo-1.0"):CreateFrame(MogIt,nil,"Interface\\AddOns\\Mogit\\Images");
+	local about = LibStub("LibAddonInfo-1.0"):CreateFrame(MogIt,nil,"Interface\\AddOns\\MogIt\\Images");
 
 	local config = LibStub("AceConfig-3.0");
 	local dialog = LibStub("AceConfigDialog-3.0");
@@ -28,6 +30,8 @@ function mog.createOptions()
 			mog.db.profile[info.arg] = value;
 			if info.arg == "tooltipRotate" then
 				mog.tooltip.rotate:SetShown(value);
+			elseif info.arg == "sortWishlist" then
+				mog:BuildList(nil, "Wishlist");
 			elseif info.arg == "singlePreview" then
 				mog:SetSinglePreview(value);
 			elseif info.arg == "previewUIPanel" then
@@ -63,6 +67,13 @@ function mog.createOptions()
 				name = L["Hide minimap button"],
 				width = "full",
 				arg = "minimap",
+			},
+			sortWishlist = {
+				type = "toggle",
+				order = 1.3,
+				name = L["Sort wishlist sets alphabetically"],
+				width = "full",
+				arg = "sortWishlist",
 			},
 			dressupPreview = {
 				type = "toggle",
@@ -147,86 +158,134 @@ function mog.createOptions()
 					},
 				},
 			},
-			tooltip = {
-				type = "group",
-				order = 3,
-				name = L["Tooltip"],
-				inline = true,
-				args = {
-					tooltip = {
-						type = "toggle",
-						order = 1,
-						name = L["Enable tooltip model"],
-						width = "double",
-						arg = "tooltip",
-					},
-					dress = {
-						type = "toggle",
-						order = 2,
-						name = L["Dress model"],
-						width = "double",
-						arg = "tooltipDress",
-					},
-					mouse = {
-						type = "toggle",
-						order = 3,
-						name = L["Rotate with mouse wheel"],
-						width = "double",
-						arg = "tooltipMouse",
-					},
-					rotate = {
-						type = "toggle",
-						order = 4,
-						name = L["Auto rotate"],
-						width = "full",
-						arg = "tooltipRotate",
-					},
-					width = {
-						type = "range",
-						order = 5,
-						name = L["Width"],
-						step = 1,
-						min = 100,
-						max = 500,
-						arg = "tooltipWidth",
-					},
-					height = {
-						type = "range",
-						order = 6,
-						name = L["Height"],
-						step = 1,
-						min = 100,
-						max = 500,
-						arg = "tooltipHeight",
-					},
-					mog = {
-						type = "toggle",
-						order = 7,
-						name = L["Only transmogrification items"],
-						width = "double",
-						arg = "tooltipMog",
-					},
-					modifier = {
-						type = "select",
-						order = 8,
-						name = L["Only show if modifier is pressed"],
-						values = function()
-							local tbl = {
-								None = "None",
-							};
-							for k,v in pairs(mog.tooltip.mod) do
-								tbl[k] = k;
-							end
-							return tbl;
-						end,
-						arg = "tooltipMod",
-					},
-				},
-			},
 		},
 	};
 	config:RegisterOptionsTable("MogIt_General",options.args.general);
 	dialog:AddToBlizOptions("MogIt_General",options.args.general.name,MogIt);
+	
+	options.args.tooltip = {
+		type = "group",
+		order = 1,
+		name = L["Tooltip"],
+		get = get,
+		set = set,
+		args = {
+			tooltip = {
+				type = "toggle",
+				order = 1,
+				name = L["Enable tooltip model"],
+				width = "double",
+				arg = "tooltip",
+			},
+			dress = {
+				type = "toggle",
+				order = 2,
+				name = L["Dress model"],
+				width = "double",
+				arg = "tooltipDress",
+			},
+			mouse = {
+				type = "toggle",
+				order = 3,
+				name = L["Rotate with mouse wheel"],
+				width = "double",
+				arg = "tooltipMouse",
+			},
+			rotate = {
+				type = "toggle",
+				order = 4,
+				name = L["Auto rotate"],
+				width = "full",
+				arg = "tooltipRotate",
+			},
+			width = {
+				type = "range",
+				order = 5,
+				name = L["Width"],
+				step = 1,
+				min = 100,
+				max = 500,
+				arg = "tooltipWidth",
+			},
+			height = {
+				type = "range",
+				order = 6,
+				name = L["Height"],
+				step = 1,
+				min = 100,
+				max = 500,
+				arg = "tooltipHeight",
+			},
+			mog = {
+				type = "toggle",
+				order = 7,
+				name = L["Only transmogrification items"],
+				width = "double",
+				arg = "tooltipMog",
+			},
+			modifier = {
+				type = "select",
+				order = 8,
+				name = L["Only show if modifier is pressed"],
+				values = function()
+					local tbl = {
+						None = "None",
+					};
+					for k,v in pairs(mog.tooltip.mod) do
+						tbl[k] = k;
+					end
+					return tbl;
+				end,
+				arg = "tooltipMod",
+			},
+			customModel = {
+				type = "toggle",
+				order = 9,
+				name = L["Use custom model"],
+				width = "full",
+				arg = "tooltipCustomModel",
+			},
+			race = {
+				type = "select",
+				order = 10,
+				name = L["Model race"],
+				values = {
+					[1] = LBR["Human"],
+					[3] = LBR["Dwarf"],
+					[4] = LBR["Night Elf"],
+					[7] = LBR["Gnome"],
+					[11] = LBR["Draenei"],
+					[22] = LBR["Worgen"],
+					[2] = LBR["Orc"],
+					[5] = LBR["Undead"],
+					[6] = LBR["Tauren"],
+					[8] = LBR["Troll"],
+					[10] = LBR["Blood Elf"],
+					[9] = LBR["Goblin"],
+					[24] = LBR["Pandaren"],
+				},
+				arg = "tooltipRace",
+				disabled = function()
+					return not mog.db.profile.tooltipCustomModel;
+				end,
+			},
+			gender = {
+				type = "select",
+				order = 11,
+				name = L["Model gender"],
+				values = {
+					[0] = MALE,
+					[1] = FEMALE,
+				},
+				arg = "tooltipGender",
+				disabled = function()
+					return not mog.db.profile.tooltipCustomModel;
+				end,
+			},
+		},
+	};
+	config:RegisterOptionsTable("MogIt_Tooltip",options.args.tooltip);
+	dialog:AddToBlizOptions("MogIt_Tooltip",options.args.tooltip.name,MogIt);
 	
 	--[[options.args.modules = {
 		type = "group",

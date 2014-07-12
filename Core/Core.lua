@@ -15,10 +15,6 @@ function mog:Error(msg)
 	DEFAULT_CHAT_FRAME:AddMessage("MogIt: "..msg,0.9,0.5,0.9);
 end
 
-function mog.IsDropdownShown(dd)
-	return DropDownList1 and DropDownList1:IsShown() and UIDropDownMenu_GetCurrentDropDown() == dd;
-end
-
 --// Slash Commands
 function mog:ToggleFrame()
 	ToggleFrame(mog.frame);
@@ -91,7 +87,7 @@ function mog:RegisterModule(name,version,data)
 	data.name = name;
 	mog.modules[name] = data;
 	table.insert(mog.moduleList,data);
-	if mog.menu.active == mog.menu.modules and mog.IsDropdownShown(mog.menu) then
+	if mog.menu.active == mog.menu.modules then
 		mog.menu:Rebuild(1);
 	end
 	return data;
@@ -177,6 +173,7 @@ end
 --// Events
 local defaults = {
 	profile = {
+		sortWishlist = false,
 		dressupPreview = false,
 		singlePreview = false,
 		previewUIPanel = false,
@@ -208,6 +205,9 @@ local defaults = {
 		tooltipRotate = true,
 		tooltipMog = true,
 		tooltipMod = "None",
+		tooltipCustomModel = false,
+		tooltipRace = 1,
+		tooltipGender = 0,
 	}
 }
 
@@ -259,7 +259,7 @@ function mog:ADDON_LOADED(addon)
 		end
 	elseif mog.modules[addon] then
 		mog.modules[addon].loaded = true;
-		if mog.menu.active == mog.menu.modules and mog.IsDropdownShown(mog.menu) then
+		if mog.menu.active == mog.menu.modules then
 			mog.menu:Rebuild(1)
 		end
 	end

@@ -78,14 +78,14 @@ local function modelOnMouseWheel(self,v)
 	if mog.db.profile.sync then
 		mog.posZ = mog.posZ + delta;
 		for id,model in ipairs(mog.models) do
-			mog:PositionModel(model);
+			model:PositionModel();
 		end
 		for id,preview in ipairs(mog.previews) do
-			mog:PositionModel(preview.model);
+			preview.model:PositionModel();
 		end
 	else
 		self.parent.data.posZ = (self.parent.data.posZ or mog.posZ or 0) + delta;
-		mog:PositionModel(self);
+		self:PositionModel();
 	end
 end
 
@@ -148,9 +148,6 @@ end
 local function setWeaponEnchant(self, preview, enchant)
 	preview.data.weaponEnchant = enchant;
 	self.owner:Rebuild(2);
-	if enchant then
-		self.owner:Rebuild(3);
-	end
 	mog.scroll:update();
 	local mainHandItem = preview.slots["MainHandSlot"].item;
 	local offHandItem = preview.slots["SecondaryHandSlot"].item;

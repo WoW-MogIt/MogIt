@@ -139,6 +139,10 @@ function wishlist:OnClick(frame, button, value)
 	end
 end
 
+local function sortAlpha(a, b)
+	return a.name < b.name
+end
+
 local list = {}
 
 function wishlist:BuildList()
@@ -146,6 +150,9 @@ function wishlist:BuildList()
 	local db = self.db.profile
 	for i, v in ipairs(db.sets) do
 		list[#list + 1] = v
+	end
+	if mog.db.profile.sortWishlist then
+		sort(list, sortAlpha)
 	end
 	for i, v in ipairs(db.items) do
 		list[#list + 1] = v
