@@ -301,13 +301,13 @@ function mog.createOptions()
 	dialog:AddToBlizOptions("MogIt_Modules",options.args.modules.name,MogIt);--]]
 
 	options.args.options = db:GetOptionsTable(mog.db);
-	options.args.options.name = L["Options Profile"];
+	options.args.options.name = L["Options profile"];
 	options.args.options.order = 5;
 	config:RegisterOptionsTable("MogIt_Options",options.args.options);
 	dialog:AddToBlizOptions("MogIt_Options",options.args.options.name,MogIt);
 	
 	options.args.wishlist = db:GetOptionsTable(mog.wishlist.db);
-	options.args.wishlist.name = L["Wishlist Profile"];
+	options.args.wishlist.name = L["Wishlist profile"];
 	options.args.wishlist.order = 6;
 	config:RegisterOptionsTable("MogIt_Wishlist",options.args.wishlist);
 	dialog:AddToBlizOptions("MogIt_Wishlist",options.args.wishlist.name,MogIt);
