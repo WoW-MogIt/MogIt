@@ -286,13 +286,13 @@ end
 --// Save Menu
 local newSet = {items = {}}
 
-local function onClick(self)
-	newSet.name = self.value
+local function onClick(self, set)
+	newSet.name = set
 	wipe(newSet.items)
 	for slot, v in pairs(currentPreview.slots) do
 		newSet.items[slot] = v.item
 	end
-	StaticPopup_Show("MOGIT_WISHLIST_OVERWRITE_SET", self.value, nil, newSet)
+	StaticPopup_Show("MOGIT_WISHLIST_OVERWRITE_SET", set, nil, newSet)
 end
 
 local function newSetOnClick(self)
@@ -314,14 +314,14 @@ local function saveInitialize(self, level)
 	info.func = newSetOnClick
 	info.colorCode = GREEN_FONT_COLOR_CODE
 	info.notCheckable = true
-	UIDropDownMenu_AddButton(info, level)
+	self:AddButton(info, level)
 end
 --//
 
 
 --// Load Menu
-local function onClick(self, profile)
-	mog:AddToPreview(mog.wishlist:GetSetItems(self.value, profile), currentPreview)
+local function onClick(self, set, profile)
+	mog:AddToPreview(mog.wishlist:GetSetItems(set, profile), currentPreview)
 	CloseDropDownMenus()
 end
 
@@ -335,7 +335,7 @@ local function loadInitialize(self, level)
 		info.text = L["Other profiles"]
 		info.hasArrow = true
 		info.notCheckable = true
-		UIDropDownMenu_AddButton(info, level)
+		self:AddButton(info, level)
 	elseif level == 2 then
 		local curProfile = mog.wishlist:GetCurrentProfile()
 		for i, profile in ipairs(mog.wishlist:GetProfiles()) do
@@ -344,7 +344,7 @@ local function loadInitialize(self, level)
 				info.text = profile
 				info.hasArrow = true
 				info.notCheckable = true
-				UIDropDownMenu_AddButton(info, level)
+				self:AddButton(info, level)
 			end
 		end
 	elseif level == 3 then
@@ -456,7 +456,7 @@ function mog:CreatePreview()
 	f.resize:SetSize(16, 16);
 	f.resize:SetPoint("BOTTOMRIGHT", -4, 3);
 	f.resize:EnableMouse(true);
-	f.resize:SetHitRectInsets(0, -4, 0, -3)
+	f.resize:SetHitRectInsets(0, -4, 0, -3);
 	f.resize:SetScript("OnMouseDown", resizeOnMouseDown);
 	f.resize:SetScript("OnMouseUp", resizeOnMouseUp);
 	f.resize:SetScript("OnHide", resizeOnMouseUp);

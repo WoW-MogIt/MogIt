@@ -316,30 +316,38 @@ function wishlist:GetSetItems(setName, profile)
 end
 
 local setFuncs = {
-	addItem = function(self, item)
-		if wishlist:AddItem(item, self.value) then
+	addItem = function(self, set, item)
+		if wishlist:AddItem(item, set, select(9, GetItemInfo(item)) == "INVTYPE_WEAPON" and IsShiftKeyDown() and "SecondaryHandSlot" or nil) then
 			mog:BuildList(nil, "Wishlist")
 		end
 		CloseDropDownMenus()
 	end,
 }
 
-function wishlist:AddSetMenuItems(level, func, arg1, profile)
+function wishlist:AddSetMenuItems(level, func, arg2, profile)
 	local sets = self:GetSets(profile)
 	if not sets then
 		return
 	end
 	
+	local onehand
 	if type(func) ~= "function" then
 		func = setFuncs[func]
+		if select(9, GetItemInfo(arg2)) == "INVTYPE_WEAPON" then
+			onehand = true
+		end
 	end
 	for i, set in ipairs(sets) do
 		local info = UIDropDownMenu_CreateInfo()
 		info.text = set.name
-		-- info.value = value
 		info.func = func
 		info.notCheckable = true
-		info.arg1 = arg1
+		info.arg1 = set.name
+		info.arg2 = arg2
+		if onehand then
+			info.tooltipTitle = "|cffffd200"..L["Shift-click to add to off hand"].."|r"
+			info.tooltipOnButton = true
+		end
 		UIDropDownMenu_AddButton(info, level)
 	end
 end
