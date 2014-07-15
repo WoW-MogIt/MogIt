@@ -465,8 +465,7 @@ function mog:CreatePreview()
 	f.resize:SetHighlightTexture([[Interface\ChatFrame\UI-ChatIM-SizeGrabber-Highlight]])
 	
 	f.slots = {};
-	for i = 1, 13 do
-		local slotIndex = mog:GetSlot(i);
+	for i, slotIndex in ipairs(mog.slots) do
 		local slot = CreateFrame("Button", nil, f, "ItemButtonTemplate");
 		slot.slot = slotIndex;
 		if i == 1 then
@@ -474,7 +473,7 @@ function mog:CreatePreview()
 		elseif i == 8 then
 			slot:SetPoint("TOPRIGHT", f.Inset, "TOPRIGHT", -7, -8);
 		elseif i == 12 then
-			slot:SetPoint("TOP", f.slots[mog:GetSlot(11)], "BOTTOM", 0, -45);
+			slot:SetPoint("TOP", f.slots[mog:GetSlot(i-1)], "BOTTOM", 0, -45);
 		else
 			slot:SetPoint("TOP", f.slots[mog:GetSlot(i-1)], "BOTTOM", 0, -4);
 		end
@@ -671,16 +670,23 @@ function mog.view.AddItem(item, preview, forceSlot)
 			if (slot == "MainHandSlot" or slot == "SecondaryHandSlot") and preview.data.weaponEnchant then
 				item = format("item:%d:%d", item, preview.data.weaponEnchant)
 			end
+			if invType == "INVTYPE_RANGED" then
+				slot = "SecondaryHandSlot"
+			end
 			preview.model:TryOn(item, slot);
 		end
 	end
 end
 
 function mog.view.DelItem(slot,preview)
-	if not (preview and slot) then return end;
+	if not (preview and slot) or not preview.slots[slot].item then return end;
+	local invType = mog:GetItemInfo(preview.slots[slot].item).invType;
 	preview.slots[slot].item = nil;
 	slotTexture(preview,slot);
 	if preview:IsVisible() then
+		if invType == "INVTYPE_RANGED" then
+			slot = "SecondaryHandSlot"
+		end
 		preview.model:UndressSlot(GetInventorySlotInfo(slot));
 	end
 end
