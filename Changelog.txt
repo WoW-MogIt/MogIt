@@ -1,4 +1,7 @@
 [b]v3.3.1[/b]
+- Put bows in main hand slot in sets and preview to fix various issues. Existing sets will be patched.
+
+[b]v3.3.1[/b]
 - Added option to use a different model for the tooltip preview.
 - Added option to sort wishlist sets alphabetically. (found in options, not sorting menu, and is remembered between sessions)
 - One handed weapons may now be added to the off hand of a set by pressing shift when adding it.

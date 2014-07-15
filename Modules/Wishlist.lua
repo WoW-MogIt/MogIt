@@ -5,6 +5,19 @@ local wishlist = mog:RegisterModule("Wishlist", mog.moduleVersion)
 mog.wishlist = wishlist
 wishlist.base = true
 
+local function convertBowSlots()
+	for i, set in ipairs(wishlist.db.profile.sets) do
+		local offhand = set.items["SecondaryHandSlot"]
+		local item = offhand and mog:GetItemInfo(offhand, "convertBowSlots")
+		if item and item.invType == "INVTYPE_RANGED" then
+			set.items["MainHandSlot"] = offhand
+			set.items["SecondaryHandSlot"] = nil
+		end
+	end
+end
+
+mog:AddItemCacheCallback("convertBowSlots", convertBowSlots)
+
 local function onProfileUpdated(self, event)
 	mog:BuildList(true, "Wishlist")
 end
@@ -20,42 +33,13 @@ function wishlist:MogItLoaded()
 	local db = LibStub("AceDB-3.0"):New("MogItWishlist", defaults)
 	self.db = db
 	
-	local function upgradeDB(dbTable)
-		db.profile.items = dbTable.wishlist.items
-		db.profile.sets = dbTable.wishlist.sets
-		for i, itemID in ipairs(db.profile.items) do
-			db.profile.items[i] = tonumber(itemID)
-		end
-		for i, set in ipairs(db.profile.sets) do
-			set.items = {}
-			for slotID, items in pairs(set) do
-				if type(slotID) == "number" then
-					local itemID = tonumber(items[1])
-					set.items[mog.slots[slotID]] = itemID
-					set[slotID] = nil
-				end
-			end
-		end
-	end
-	
-	-- convert old database
-	if MogIt_Global then -- v1.2b
-		local prevProfile = db:GetCurrentProfile()
-		db:SetProfile("Default")
-		upgradeDB(MogIt_Global)
-		db:SetProfile(prevProfile)
-		MogIt_Global = nil
-		print("MogIt: Database upgraded. Previous account wide wishlist was moved to 'Default' profile.")
-	end
-	if MogIt_Character then -- v1.2b
-		upgradeDB(MogIt_Character)
-		MogIt_Character = nil
-	end
-	
 	-- add alternate items table to sets
 	for i, set in ipairs(db.profile.sets) do
 		set.alternateItems = set.alternateItems or {}
 	end
+	
+	-- convert all bows into main hand instead of off hand
+	convertBowSlots()
 	
 	db.RegisterCallback(self, "OnProfileChanged", onProfileUpdated)
 	db.RegisterCallback(self, "OnProfileCopied", onProfileUpdated)
