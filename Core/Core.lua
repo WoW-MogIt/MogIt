@@ -141,15 +141,15 @@ function mog:AddItemCacheCallback(name, func)
 	pendingCallbacks[name] = {};
 end
 
-function mog:GetItemInfo(id, type)
-	if not type then return ItemInfo[id] end
+function mog:GetItemInfo(id, callback)
+	if not callback then return ItemInfo[id] end
 	if ItemInfo[id] then
 		-- clear pending items when they are cached
-		pendingCallbacks[type][id] = nil;
+		pendingCallbacks[callback][id] = nil;
 		return ItemInfo[id];
-	elseif itemCacheCallbacks[type] then
+	elseif itemCacheCallbacks[callback] then
 		-- add to pending items for this callback if not cached
-		pendingCallbacks[type][id] = true;
+		pendingCallbacks[callback][id] = true;
 	end
 end
 

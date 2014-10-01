@@ -17,7 +17,7 @@ f.min = CreateFrame("EditBox","MogItFiltersLevelMin",f,"InputBoxTemplate");
 f.min:SetSize(25,16);
 f.min:SetPoint("TOPLEFT",f.label,"BOTTOMLEFT",8,-5);
 f.min:SetNumeric(true);
-f.min:SetMaxLetters(2);
+f.min:SetMaxLetters(3);
 f.min:SetAutoFocus(false);
 f.min:SetScript("OnEnterPressed",EditBox_ClearFocus);
 f.min:SetScript("OnTabPressed",function(self)
@@ -38,7 +38,7 @@ f.max = CreateFrame("EditBox","MogItFiltersLevelMax",f,"InputBoxTemplate");
 f.max:SetSize(25,16);
 f.max:SetPoint("LEFT",f.min,"RIGHT",12,0);
 f.max:SetNumeric(true);
-f.max:SetMaxLetters(2);
+f.max:SetMaxLetters(3);
 f.max:SetAutoFocus(false);
 f.max:SetScript("OnEnterPressed",EditBox_ClearFocus);
 f.max:SetScript("OnTabPressed",function(self)
@@ -46,7 +46,7 @@ f.max:SetScript("OnTabPressed",function(self)
 end);
 f.max:SetScript("OnTextChanged",function(self,user)
 	if user then
-		maxlvl = self:GetNumber() or PLAYER_MAX_LEVEL;
+		maxlvl = self:GetNumber() or MAX_PLAYER_LEVEL;
 		mog:BuildList();
 	end
 end);
