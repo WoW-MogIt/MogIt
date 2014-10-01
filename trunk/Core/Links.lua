@@ -61,26 +61,32 @@ local function filter(self,event,msg,...)
 	return false, msg, ...;
 end
 
-ChatFrame_AddMessageEventFilter("CHAT_MSG_SAY",filter);
-ChatFrame_AddMessageEventFilter("CHAT_MSG_YELL",filter);
-ChatFrame_AddMessageEventFilter("CHAT_MSG_EMOTE",filter);
-ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD",filter);
-ChatFrame_AddMessageEventFilter("CHAT_MSG_OFFICER",filter);
-ChatFrame_AddMessageEventFilter("CHAT_MSG_PARTY",filter);
-ChatFrame_AddMessageEventFilter("CHAT_MSG_PARTY_LEADER",filter);
-ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID",filter);
-ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID_LEADER",filter);
-ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID_WARNING",filter);
-ChatFrame_AddMessageEventFilter("CHAT_MSG_BATTLEGROUND",filter);
-ChatFrame_AddMessageEventFilter("CHAT_MSG_BATTLEGROUND_LEADER",filter);
-ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER",filter);
-ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM",filter);
-ChatFrame_AddMessageEventFilter("CHAT_MSG_BN_WHISPER",filter);
-ChatFrame_AddMessageEventFilter("CHAT_MSG_BN_WHISPER_INFORM",filter);
-ChatFrame_AddMessageEventFilter("CHAT_MSG_BN_CONVERSATION",filter);
-ChatFrame_AddMessageEventFilter("CHAT_MSG_BN_INLINE_TOAST_BROADCAST",filter);
-ChatFrame_AddMessageEventFilter("CHAT_MSG_BN_INLINE_TOAST_BROADCAST_INFORM",filter);
-ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL",filter);
+local events = {
+	"CHAT_MSG_SAY",
+	"CHAT_MSG_YELL",
+	"CHAT_MSG_EMOTE",
+	"CHAT_MSG_GUILD",
+	"CHAT_MSG_OFFICER",
+	"CHAT_MSG_PARTY",
+	"CHAT_MSG_PARTY_LEADER",
+	"CHAT_MSG_RAID",
+	"CHAT_MSG_RAID_LEADER",
+	"CHAT_MSG_RAID_WARNING",
+	"CHAT_MSG_BATTLEGROUND",
+	"CHAT_MSG_BATTLEGROUND_LEADER",
+	"CHAT_MSG_WHISPER",
+	"CHAT_MSG_WHISPER_INFORM",
+	"CHAT_MSG_BN_WHISPER",
+	"CHAT_MSG_BN_WHISPER_INFORM",
+	"CHAT_MSG_BN_CONVERSATION",
+	"CHAT_MSG_BN_INLINE_TOAST_BROADCAST",
+	"CHAT_MSG_BN_INLINE_TOAST_BROADCAST_INFORM",
+	"CHAT_MSG_CHANNEL",
+};
+
+for i, event in ipairs(events) do
+	ChatFrame_AddMessageEventFilter(event,filter);
+end
 
 local SetHyperlink = ItemRefTooltip.SetHyperlink;
 function ItemRefTooltip:SetHyperlink(link)

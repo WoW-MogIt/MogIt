@@ -102,10 +102,6 @@ local function slotOnEnter(self)
 	end
 end
 
-local function slotOnLeave(self)
-	GameTooltip:Hide();
-end
-
 local function slotOnClick(self,btn)
 	if btn == "RightButton" and IsControlKeyDown() then
 		local preview = self:GetParent();
@@ -113,7 +109,7 @@ local function slotOnClick(self,btn)
 		if mog.db.profile.gridDress == "preview" and mog.activePreview == preview then
 			mog.scroll:update();
 		end
-		slotOnEnter(self);
+		self:OnEnter();
 	else
 		mog.Item_OnClick(self,btn,self);
 	end
@@ -253,7 +249,7 @@ local function previewInitialize(self, level)
 			info.func = setWeaponEnchant;
 			info.arg1 = self.parent;
 			info.arg2 = nil;
-			info.checked = self.parent.data.weaponEnchant == nil;
+			info.checked = (self.parent.data.weaponEnchant == nil);
 			info.keepShownOnClick = true;
 			self:AddButton(info, level);
 			
@@ -273,7 +269,7 @@ local function previewInitialize(self, level)
 				info.func = setWeaponEnchant;
 				info.arg1 = self.parent;
 				info.arg2 = enchant.id;
-				info.checked = self.parent.data.weaponEnchant == enchant.id;
+				info.checked = (self.parent.data.weaponEnchant == enchant.id);
 				info.keepShownOnClick = true;
 				self:AddButton(info, level);
 			end
@@ -307,21 +303,21 @@ end
 local function saveInitialize(self, level)
 	currentPreview = self.parent;
 	
-	mog.wishlist:AddSetMenuItems(level, onClick)
-	
 	local info = UIDropDownMenu_CreateInfo()
-	info.text = L["New set"]
+	info.text = L["New set..."]
 	info.func = newSetOnClick
 	info.colorCode = GREEN_FONT_COLOR_CODE
 	info.notCheckable = true
 	self:AddButton(info, level)
+	
+	mog.wishlist:AddSetMenuItems(level, onClick)
 end
 --//
 
 
 --// Load Menu
 local function onClick(self, set, profile)
-	mog:AddToPreview(mog.wishlist:GetSetItems(set, profile), currentPreview)
+	mog:AddToPreview(mog.wishlist:GetSetItems(set, profile), currentPreview, set)
 	CloseDropDownMenus()
 end
 
@@ -480,7 +476,7 @@ function mog:CreatePreview()
 		slot:RegisterForClicks("AnyUp");
 		slot:SetScript("OnClick", slotOnClick);
 		slot:SetScript("OnEnter", slotOnEnter);
-		slot:SetScript("OnLeave", slotOnLeave);
+		slot:SetScript("OnLeave", GameTooltip_Hide);
 		slot.OnEnter = slotOnEnter;
 		f.slots[slotIndex] = slot;
 		slotTexture(f, slotIndex);
@@ -609,29 +605,34 @@ end
 local doCache = {};
 mog:AddItemCacheCallback("PreviewAddItem", function()
 	for i = #doCache, 1, -1 do
-		local item = doCache[i]
-		if GetItemInfo(item.id) then
-			mog.view.AddItem(item.id, item.frame);
-			tremove(doCache, i)
+		local item = doCache[i];
+		if mog:GetItemInfo(item.id) then
+			mog.view.AddItem(item.id, item.frame, item.slot, item.set);
+			tremove(doCache, i);
 		end
 	end
 end)
 
 local playerClass = select(2, UnitClass("PLAYER"));
 
-function mog.view.AddItem(item, preview, forceSlot)
+function mog.view.AddItem(item, preview, forceSlot, setItem)
 	if not (item and preview) then return end;
 	
 	local itemInfo = mog:GetItemInfo(item, "PreviewAddItem");
 	if not itemInfo then
-		tinsert(doCache, {id = item, frame = preview});
+		tinsert(doCache, {
+			id = item,
+			frame = preview,
+			slot = forceSlot,
+			set = setItem,
+		});
 		return;
 	end
 	local invType = itemInfo.invType;
 	
-	local slot = mog:GetSlot(invType)
+	local slot = mog:GetSlot(invType);
 	if type(forceSlot) == "string" then
-		slot = forceSlot
+		slot = forceSlot;
 	end
 	if slot then
 		if slot == "MainHandSlot" or slot == "SecondaryHandSlot" then
@@ -668,17 +669,20 @@ function mog.view.AddItem(item, preview, forceSlot)
 		slotTexture(preview, slot, GetItemIcon(item));
 		if preview:IsVisible() then
 			if (slot == "MainHandSlot" or slot == "SecondaryHandSlot") and preview.data.weaponEnchant then
-				item = format("item:%d:%d", item, preview.data.weaponEnchant)
+				item = format("item:%d:%d", item, preview.data.weaponEnchant);
 			end
 			if invType == "INVTYPE_RANGED" then
-				slot = "SecondaryHandSlot"
+				slot = "SecondaryHandSlot";
 			end
 			preview.model:TryOn(item, slot);
+			if preview.data.title then
+				preview.TitleText:SetText("*"..preview.data.title);
+			end
 		end
 	end
 end
 
-function mog.view.DelItem(slot,preview)
+function mog.view.DelItem(slot, preview)
 	if not (preview and slot) or not preview.slots[slot].item then return end;
 	local invType = mog:GetItemInfo(preview.slots[slot].item).invType;
 	preview.slots[slot].item = nil;
@@ -691,19 +695,23 @@ function mog.view.DelItem(slot,preview)
 	end
 end
 
-function mog:AddToPreview(item,preview)
+function mog:AddToPreview(item, preview, title)
 	if not item then return end;
 	preview = mog:GetPreview(preview or mog.activePreview);
 	
 	ShowUIPanel(mog.view);
 	if type(item) == "number" then
-		mog.view.AddItem(item,preview);
+		mog.view.AddItem(item, preview);
 	elseif type(item) == "string" then
 		mog.view.AddItem(tonumber(item:match("item:(%d+)")),preview);
 	elseif type(item) == "table" then
 		mog.view:Undress(preview);
 		for k,v in pairs(item) do
-			mog.view.AddItem(v,preview,k);
+			mog.view.AddItem(v, preview, k, true);
+		end
+		if title then
+			preview.TitleText:SetText(title);
+			preview.data.title = title;
 		end
 	end
 	

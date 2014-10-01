@@ -135,15 +135,15 @@ local itemOptionsMenu = {
 		text = L["Add to set"],
 		hasArrow = true,
 		menuList = function(level)
-			mog.wishlist:AddSetMenuItems(level, "addItem", UIDROPDOWNMENU_MENU_VALUE)
-			
 			local info = UIDropDownMenu_CreateInfo()
-			info.text = L["New set"]
+			info.text = L["New set..."]
 			info.value = UIDROPDOWNMENU_MENU_VALUE
 			info.func = newSetOnClick
 			info.colorCode = GREEN_FONT_COLOR_CODE
 			info.notCheckable = true
 			UIDropDownMenu_AddButton(info, level)
+			
+			mog.wishlist:AddSetMenuItems(level, "addItem", UIDROPDOWNMENU_MENU_VALUE)
 		end,
 	},
 	{
@@ -407,7 +407,7 @@ function mog.Set_FrameUpdate(self, data)
 	self:SetText(data.name)
 	self:Undress()
 	for k, v in pairs(data.items) do
-		self:TryOn(v, k)
+		self:TryOn(v, k == "SecondaryHandSlot" and k)
 	end
 end
 
@@ -431,7 +431,7 @@ function mog.Set_OnClick(self, btn, data, isSaved)
 			ChatEdit_InsertLink(mog:SetToLink(data.items))
 		elseif IsControlKeyDown() then
 			if mog.db.profile.dressupPreview then
-				mog:AddToPreview(data.items, mog:GetPreview())
+				mog:AddToPreview(data.items, mog:GetPreview(), data.name)
 			else
 				if not DressUpFrame:IsShown() or DressUpFrame.mode ~= "player" then
 					DressUpFrame.mode = "player"
@@ -457,7 +457,7 @@ function mog.Set_OnClick(self, btn, data, isSaved)
 				mog:ShowURL(data.items, "compare")
 			end
 		elseif IsControlKeyDown() then
-			mog:AddToPreview(data.items, mog:GetPreview())
+			mog:AddToPreview(data.items, mog:GetPreview(), data.name)
 		else
 			showMenu(mog.Set_Menu, data, isSaved)
 		end
