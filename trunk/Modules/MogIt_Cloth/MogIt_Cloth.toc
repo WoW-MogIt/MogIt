@@ -5,17 +5,17 @@
 ## RequiredDeps: MogIt
 ## X-MogItModuleVersion: 3
 
-## Title: MogtIt: Cloth
-## Title-frFR: MogtIt: Tissu
-## Title-deDE: MogtIt: Stoff
-## Title-esES: MogtIt: Tela
-## Title-esMX: MogtIt: Tela
-## Title-ruRU: MogtIt: Ткань
-## Title-koKR: MogtIt: 천
-## Title-zhCN: MogtIt: 布甲
-## Title-zhTW: MogtIt: 布料
-## Title-ptBR: MogtIt: Tecido
-## Title-itIT: MogtIt: Cloth
+## Title: MogIt: Cloth
+## Title-frFR: MogIt: Tissu
+## Title-deDE: MogIt: Stoff
+## Title-esES: MogIt: Tela
+## Title-esMX: MogIt: Tela
+## Title-ruRU: MogIt: Ткань
+## Title-koKR: MogIt: 천
+## Title-zhCN: MogIt: 布甲
+## Title-zhTW: MogIt: 布料
+## Title-ptBR: MogIt: Tecido
+## Title-itIT: MogIt: Cloth
 
 ## Notes: MogIt Data
 ## Notes-frFR: MogIt Données

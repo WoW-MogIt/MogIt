@@ -5,17 +5,17 @@
 ## RequiredDeps: MogIt
 ## X-MogItModuleVersion: 3
 
-## Title: MogtIt: Mail
-## Title-frFR: MogtIt: Mailles
-## Title-deDE: MogtIt: Kette
-## Title-esES: MogtIt: Mallas
-## Title-esMX: MogtIt: Mallas
-## Title-ruRU: MogtIt: Кольчуга
-## Title-koKR: MogtIt: 사슬
-## Title-zhCN: MogtIt: 锁甲
-## Title-zhTW: MogtIt: 鎖甲
-## Title-ptBR: MogtIt: Malha
-## Title-itIT: MogtIt: Mail
+## Title: MogIt: Mail
+## Title-frFR: MogIt: Mailles
+## Title-deDE: MogIt: Kette
+## Title-esES: MogIt: Mallas
+## Title-esMX: MogIt: Mallas
+## Title-ruRU: MogIt: Кольчуга
+## Title-koKR: MogIt: 사슬
+## Title-zhCN: MogIt: 锁甲
+## Title-zhTW: MogIt: 鎖甲
+## Title-ptBR: MogIt: Malha
+## Title-itIT: MogIt: Mail
 
 ## Notes: MogIt Data
 ## Notes-frFR: MogIt Données

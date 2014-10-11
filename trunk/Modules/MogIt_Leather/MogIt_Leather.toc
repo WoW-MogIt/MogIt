@@ -5,17 +5,17 @@
 ## RequiredDeps: MogIt
 ## X-MogItModuleVersion: 3
 
-## Title: MogtIt: Leather
-## Title-frFR: MogtIt: Cuir
-## Title-deDE: MogtIt: Leder
-## Title-esES: MogtIt: Cuero
-## Title-esMX: MogtIt: Cuero
-## Title-ruRU: MogtIt: Кожа
-## Title-koKR: MogtIt: 가죽
-## Title-zhCN: MogtIt: 皮甲
-## Title-zhTW: MogtIt: 皮革
-## Title-ptBR: MogtIt: Couro
-## Title-itIT: MogtIt: Leather
+## Title: MogIt: Leather
+## Title-frFR: MogIt: Cuir
+## Title-deDE: MogIt: Leder
+## Title-esES: MogIt: Cuero
+## Title-esMX: MogIt: Cuero
+## Title-ruRU: MogIt: Кожа
+## Title-koKR: MogIt: 가죽
+## Title-zhCN: MogIt: 皮甲
+## Title-zhTW: MogIt: 皮革
+## Title-ptBR: MogIt: Couro
+## Title-itIT: MogIt: Leather
 
 ## Notes: MogIt Data
 ## Notes-frFR: MogIt Données

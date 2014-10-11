@@ -5,17 +5,17 @@
 ## RequiredDeps: MogIt
 ## X-MogItModuleVersion: 3
 
-## Title: MogtIt: Two-Hand
-## Title-frFR: MogtIt: Deux mains
-## Title-deDE: MogtIt: Zweihändig
-## Title-esES: MogtIt: Dos Manos
-## Title-esMX: MogtIt: Dos Manos
-## Title-ruRU: MogtIt: Двуручное
-## Title-koKR: MogtIt: 양손
-## Title-zhCN: MogtIt: 双手
-## Title-zhTW: MogtIt: 雙手
-## Title-ptBR: MogtIt: Duas Mãos
-## Title-itIT: MogtIt: Two-Hand
+## Title: MogIt: Two-Hand
+## Title-frFR: MogIt: Deux mains
+## Title-deDE: MogIt: Zweihändig
+## Title-esES: MogIt: Dos Manos
+## Title-esMX: MogIt: Dos Manos
+## Title-ruRU: MogIt: Двуручное
+## Title-koKR: MogIt: 양손
+## Title-zhCN: MogIt: 双手
+## Title-zhTW: MogIt: 雙手
+## Title-ptBR: MogIt: Duas Mãos
+## Title-itIT: MogIt: Two-Hand
 
 ## Notes: MogIt Data
 ## Notes-frFR: MogIt Données

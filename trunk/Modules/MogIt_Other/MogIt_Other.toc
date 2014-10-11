@@ -5,17 +5,17 @@
 ## RequiredDeps: MogIt
 ## X-MogItModuleVersion: 3
 
-## Title: MogtIt: Other
-## Title-frFR: MogtIt: Autre
-## Title-deDE: MogtIt: Sonstige
-## Title-esES: MogtIt: Otro
-## Title-esMX: MogtIt: Otro
-## Title-ruRU: MogtIt: Другое
-## Title-koKR: MogtIt: 기타
-## Title-zhCN: MogtIt: 其它
-## Title-zhTW: MogtIt: 其他
-## Title-ptBR: MogtIt: Outro
-## Title-itIT: MogtIt: Other
+## Title: MogIt: Other
+## Title-frFR: MogIt: Autre
+## Title-deDE: MogIt: Sonstige
+## Title-esES: MogIt: Otro
+## Title-esMX: MogIt: Otro
+## Title-ruRU: MogIt: Другое
+## Title-koKR: MogIt: 기타
+## Title-zhCN: MogIt: 其它
+## Title-zhTW: MogIt: 其他
+## Title-ptBR: MogIt: Outro
+## Title-itIT: MogIt: Other
 
 ## Notes: MogIt Data
 ## Notes-frFR: MogIt Données
