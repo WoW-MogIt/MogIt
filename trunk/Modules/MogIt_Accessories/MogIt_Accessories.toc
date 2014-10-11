@@ -1,21 +1,21 @@
-## Interface: 50400
+## Interface: 60000
 ## Author: Aelobin (The Maelstrom EU) & Lombra (Defias Brotherhood EU)
 ## Version: @project-version@
 ## LoadOnDemand: 1
 ## RequiredDeps: MogIt
-## X-MogItModuleVersion: 2
+## X-MogItModuleVersion: 3
 
-## Title: MogIt_Accessories
-## Title-frFR: MogIt_Accessoires
-## Title-deDE: MogIt_Zubehör
-## Title-esES: MogIt_Accesorios
-## Title-esMX: MogIt_Accesorios
-## Title-ruRU: MogIt_принадлежности
-## Title-koKR: MogIt_부속물
-## Title-zhCN: MogIt_饰品
-## Title-zhTW: MogIt_飾品
-## Title-ptBR: MogIt_Acessórios
-## Title-itIT: MogIt_Accessories
+## Title: MogtIt: Accessories
+## Title-frFR: MogtIt: Accessoires
+## Title-deDE: MogtIt: Zubehör
+## Title-esES: MogtIt: Accesorios
+## Title-esMX: MogtIt: Accesorios
+## Title-ruRU: MogtIt: принадлежности
+## Title-koKR: MogtIt: 부속물
+## Title-zhCN: MogtIt: 饰品
+## Title-zhTW: MogtIt: 飾品
+## Title-ptBR: MogtIt: Acessórios
+## Title-itIT: MogtIt: Accessories
 
 ## Notes: MogIt Data
 ## Notes-frFR: MogIt Données
