@@ -5,17 +5,17 @@
 ## RequiredDeps: MogIt
 ## X-MogItModuleVersion: 3
 
-## Title: MogtIt: One-Hand
-## Title-frFR: MogtIt: A une main
-## Title-deDE: MogtIt: Einhändig
-## Title-esES: MogtIt: Una Mano
-## Title-esMX: MogtIt: Una Mano
-## Title-ruRU: MogtIt: Одноручное
-## Title-koKR: MogtIt: 한손
-## Title-zhCN: MogtIt: 单手
-## Title-zhTW: MogtIt: 單手
-## Title-ptBR: MogtIt: Uma Mão
-## Title-itIT: MogtIt: One-Hand
+## Title: MogIt: One-Hand
+## Title-frFR: MogIt: A une main
+## Title-deDE: MogIt: Einhändig
+## Title-esES: MogIt: Una Mano
+## Title-esMX: MogIt: Una Mano
+## Title-ruRU: MogIt: Одноручное
+## Title-koKR: MogIt: 한손
+## Title-zhCN: MogIt: 单手
+## Title-zhTW: MogIt: 單手
+## Title-ptBR: MogIt: Uma Mão
+## Title-itIT: MogIt: One-Hand
 
 ## Notes: MogIt Data
 ## Notes-frFR: MogIt Données

@@ -5,17 +5,17 @@
 ## RequiredDeps: MogIt
 ## X-MogItModuleVersion: 3
 
-## Title: MogtIt: Ranged
-## Title-frFR: MogtIt: À distance
-## Title-deDE: MogtIt: Distanz
-## Title-esES: MogtIt: Rango
-## Title-esMX: MogtIt: Rango
-## Title-ruRU: MogtIt: Для оружия дальнего боя
-## Title-koKR: MogtIt: 원거리 장비
-## Title-zhCN: MogtIt: 远程
-## Title-zhTW: MogtIt: 遠程
-## Title-ptBR: MogtIt: Longo alcance
-## Title-itIT: MogtIt: Ranged
+## Title: MogIt: Ranged
+## Title-frFR: MogIt: À distance
+## Title-deDE: MogIt: Distanz
+## Title-esES: MogIt: Rango
+## Title-esMX: MogIt: Rango
+## Title-ruRU: MogIt: Для оружия дальнего боя
+## Title-koKR: MogIt: 원거리 장비
+## Title-zhCN: MogIt: 远程
+## Title-zhTW: MogIt: 遠程
+## Title-ptBR: MogIt: Longo alcance
+## Title-itIT: MogIt: Ranged
 
 ## Notes: MogIt Data
 ## Notes-frFR: MogIt Données

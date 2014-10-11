@@ -5,17 +5,17 @@
 ## RequiredDeps: MogIt
 ## X-MogItModuleVersion: 3
 
-## Title: MogtIt: Plate
-## Title-frFR: MogtIt: Plaques
-## Title-deDE: MogtIt: Platte
-## Title-esES: MogtIt: Placas
-## Title-esMX: MogtIt: Placas
-## Title-ruRU: MogtIt: Латы
-## Title-koKR: MogtIt: 판금
-## Title-zhCN: MogtIt: 板甲
-## Title-zhTW: MogtIt: 鎧甲
-## Title-ptBR: MogtIt: Placas
-## Title-itIT: MogtIt: Plate
+## Title: MogIt: Plate
+## Title-frFR: MogIt: Plaques
+## Title-deDE: MogIt: Platte
+## Title-esES: MogIt: Placas
+## Title-esMX: MogIt: Placas
+## Title-ruRU: MogIt: Латы
+## Title-koKR: MogIt: 판금
+## Title-zhCN: MogIt: 板甲
+## Title-zhTW: MogIt: 鎧甲
+## Title-ptBR: MogIt: Placas
+## Title-itIT: MogIt: Plate
 
 ## Notes: MogIt Data
 ## Notes-frFR: MogIt Données
