@@ -1,21 +1,21 @@
-## Interface: 50400
+## Interface: 60000
 ## Author: Aelobin (The Maelstrom EU) & Lombra (Defias Brotherhood EU)
 ## Version: @project-version@
 ## LoadOnDemand: 1
 ## RequiredDeps: MogIt
-## X-MogItModuleVersion: 2
+## X-MogItModuleVersion: 3
 
-## Title: MogIt_Ranged
-## Title-frFR: MogIt_À distance
-## Title-deDE: MogIt_Distanz
-## Title-esES: MogIt_Rango
-## Title-esMX: MogIt_Rango
-## Title-ruRU: MogIt_Для оружия дальнего боя
-## Title-koKR: MogIt_원거리 장비
-## Title-zhCN: MogIt_远程
-## Title-zhTW: MogIt_遠程
-## Title-ptBR: MogIt_Longo alcance
-## Title-itIT: MogIt_Ranged
+## Title: MogtIt: Ranged
+## Title-frFR: MogtIt: À distance
+## Title-deDE: MogtIt: Distanz
+## Title-esES: MogtIt: Rango
+## Title-esMX: MogtIt: Rango
+## Title-ruRU: MogtIt: Для оружия дальнего боя
+## Title-koKR: MogtIt: 원거리 장비
+## Title-zhCN: MogtIt: 远程
+## Title-zhTW: MogtIt: 遠程
+## Title-ptBR: MogtIt: Longo alcance
+## Title-itIT: MogtIt: Ranged
 
 ## Notes: MogIt Data
 ## Notes-frFR: MogIt Données
@@ -35,4 +35,5 @@ Colours.lua
 Bow.lua
 Crossbow.lua
 Gun.lua
+Thrown.lua
 Wand.lua

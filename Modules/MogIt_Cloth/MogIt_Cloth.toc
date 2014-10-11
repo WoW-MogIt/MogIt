@@ -1,21 +1,21 @@
-## Interface: 50400
+## Interface: 60000
 ## Author: Aelobin (The Maelstrom EU) & Lombra (Defias Brotherhood EU)
 ## Version: @project-version@
 ## LoadOnDemand: 1
 ## RequiredDeps: MogIt
-## X-MogItModuleVersion: 2
+## X-MogItModuleVersion: 3
 
-## Title: MogIt_Cloth
-## Title-frFR: MogIt_Tissu
-## Title-deDE: MogIt_Stoff
-## Title-esES: MogIt_Tela
-## Title-esMX: MogIt_Tela
-## Title-ruRU: MogIt_Ткань
-## Title-koKR: MogIt_천
-## Title-zhCN: MogIt_布甲
-## Title-zhTW: MogIt_布料
-## Title-ptBR: MogIt_Tecido
-## Title-itIT: MogIt_Cloth
+## Title: MogtIt: Cloth
+## Title-frFR: MogtIt: Tissu
+## Title-deDE: MogtIt: Stoff
+## Title-esES: MogtIt: Tela
+## Title-esMX: MogtIt: Tela
+## Title-ruRU: MogtIt: Ткань
+## Title-koKR: MogtIt: 천
+## Title-zhCN: MogtIt: 布甲
+## Title-zhTW: MogtIt: 布料
+## Title-ptBR: MogtIt: Tecido
+## Title-itIT: MogtIt: Cloth
 
 ## Notes: MogIt Data
 ## Notes-frFR: MogIt Données

@@ -1,3 +1,19 @@
+== 6.0 ==
+- Change import format (in both modules and :AddData, using strings)
+- Fix enchant in TryOn
+- Fix chat links ("item1,bonus1:item2,bonus2:item3:item4")
+- Fix URL.lua
+- Wishlist conversion for numerical IDs
+- Update Enchants.lua and Tokens.lua
+- Check sorting/filters still work
+- Localization
+- License txt file
+- Update extra modules
+
+
+
+== Old ==
+
 GUI:
 [?] SetAnimation instead of SetSequence
 [?] Disable modules (or the bracket text) in the module dropdown if version isnt compatible?
