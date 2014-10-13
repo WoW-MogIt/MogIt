@@ -352,15 +352,16 @@ function mog:ItemToString(item)
 	end
 end
 
+mog.itemStringPattern = "item:(%d+):?[^:]*:?[^:]*:?[^:]*:?[^:]*:?[^:]*:?[^:]*:?[^:]*:?[^:]*:?[^:]*:?[^:]*:?[^:]*:?([^:]*)";
 function mog:ItemToID(item)
-	local id;
 	if type(item) == "string" then
-		id = item:match("item:(%d+)") or item:match("^(%d+)");
+		local id,bonus = item:match(mog.itemStringPattern) or item:match("^(%d+),?(%d*)");
 		id = tonumber(id);
+		bonus = tonumber(bonus);
+		return id,bonus;
 	elseif type(item) == "number" then
-		id = item;
+		return item;
 	end 
-	return id;
 end
 --//
 
