@@ -229,8 +229,7 @@ local slots = {
 
 function mog.Item_FrameUpdate(self, data)
 	self:ApplyDress()
-	--self:TryOn(format("item:%d:%d", data.item, mog.weaponEnchant), slots[mog:GetData("item", data.item, "slot")])
-	self:TryOn(data.item, slots[mog:GetData("item", data.item, "slot")])
+	self:TryOn(format("item:%d:%d", data.item, mog.weaponEnchant), slots[mog:GetData("item", data.item, "slot")])
 end
 
 local sourceLabels = {
@@ -254,9 +253,9 @@ function mog.ShowItemTooltip(self, item, items, cycle)
 	
 	if IsShiftKeyDown() then
 		if type(item) == "number" then
-			GameTooltip:SetItemByID(item);
+			GameTooltip:SetItemByID(item)
 		else
-			GameTooltip:SetHyperlink(item);
+			GameTooltip:SetHyperlink(item)
 		end
 		for _, frame in pairs(GameTooltip.shoppingTooltips) do
 			frame:Hide()

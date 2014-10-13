@@ -675,7 +675,7 @@ function mog.view.AddItem(item, preview, forceSlot, setItem)
 				slot = "SecondaryHandSlot";
 			end
 			preview.model:TryOn(item, slot);
-			if preview.data.title then
+			if preview.data.title and not setItem then
 				preview.TitleText:SetText("*"..preview.data.title);
 			end
 		end

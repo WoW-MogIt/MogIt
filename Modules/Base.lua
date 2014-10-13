@@ -254,8 +254,10 @@ for _, addon in ipairs(addons) do
 				colour = mog.base.SortColour,
 			},
 		});
-		-- dirty fix for now - if the "slot" filter is not present the array is broken unless we do this
-		tinsert(module.filters, "hasItem");
+		if module then
+			-- dirty fix for now - if the "slot" filter is not present the array is broken unless we do this
+			tinsert(module.filters, "hasItem");
+		end
 	end
 end
 --//
