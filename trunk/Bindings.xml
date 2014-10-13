@@ -1,8 +1,8 @@
 <Bindings>
-	<Binding name="MogIt" header="MogIt">
+	<Binding category="ADDONS" name="MogIt" header="MogIt">
 		MogIt:ToggleFrame()
 	</Binding>
-	<Binding name="MogItPreview">
+	<Binding category="ADDONS" name="MogItPreview">
 		MogIt:TogglePreview()
 	</Binding>
 	<Binding name="MogIt_TooltipScrollUp" hidden="true">

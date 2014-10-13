@@ -338,9 +338,9 @@ end
 mog.itemStringShort = "item:%d";
 mog.itemStringLong = "item:%d:%d:0:0:0:0:0:0:0:0:%d:%d:%d";
 function mog:ItemToString(item)
-	local id,bonus;
+	local id, bonus;
 	if type(item) == "string" then
-		id,bonus = item:match("^(%d+),?(%d*)");
+		id, bonus = item:match("^(%d+),?(%d*)");
 		id = tonumber(id);
 		bonus = tonumber(bonus);
 	elseif type(item) == "number" then
@@ -348,7 +348,7 @@ function mog:ItemToString(item)
 	end
 	if id then
 		-- itemID, enchantID, instanceDifficulty, numBonusIDs, bonusID1
-		return (bonus and mog.itemStringLong or mog.itemStringShort):format(id,0,0,bonus and bonus ~= 0 and 1,bonus or 0);
+		return format(bonus and mog.itemStringLong or mog.itemStringShort, id, 0, 0, bonus and bonus ~= 0 and 1, bonus or 0);
 	end
 end
 
