@@ -302,9 +302,9 @@ mog.data = {};
 function mog:AddData(data,id,key,value)
 	if not (data and id and key) then return end;
 	
-	if data == "item" then
-		id = mog:ItemToString(id);
-	end
+	--if data == "item" then
+	--	id = mog:ItemToString(id);
+	--end
 	
 	if not mog.data[data] then
 		mog.data[data] = {};
@@ -353,8 +353,14 @@ function mog:ItemToString(item)
 end
 
 function mog:ItemToID(item)
-	local id = item:match("item:(%d+)") or item:match("^(%d+)");
-	return tonumber(id);
+	local id;
+	if type(item) == "string" then
+		id = item:match("item:(%d+)") or item:match("^(%d+)");
+		id = tonumber(id);
+	elseif type(item) == "number" then
+		id = item;
+	end 
+	return id;
 end
 --//
 

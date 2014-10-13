@@ -23,6 +23,7 @@ function mog.base.AddSlot(slot,addon)
 	local list = module.slots[slot].list;
 	
 	return function(id,display,quality,lvl,faction,class,bind,slot,source,sourceid,zone,sourceinfo)
+		id = mog:ItemToString(id);
 		tinsert(list,id);
 		mog:AddData("item", id, "display", display);
 		mog:AddData("item", id, "quality", quality);
@@ -143,11 +144,13 @@ local function buildList(module, slot, list, items)
 	for _, item in ipairs(slot) do
 		if mog:CheckFilters(module,item) then
 			local display = mog:GetData("item", item, "display");
-			if not items[display] then
-				items[display] = {};
-				tinsert(list, items[display]);
+			if display then
+				if not items[display] then
+					items[display] = {};
+					tinsert(list, items[display]);
+				end
+				tinsert(items[display], item);
 			end
-			tinsert(items[display], item);
 		end
 	end
 end

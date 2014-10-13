@@ -229,7 +229,8 @@ local slots = {
 
 function mog.Item_FrameUpdate(self, data)
 	self:ApplyDress()
-	self:TryOn(format("item:%d:%d", data.item, mog.weaponEnchant), slots[mog:GetData("item", data.item, "slot")])
+	--self:TryOn(format("item:%d:%d", data.item, mog.weaponEnchant), slots[mog:GetData("item", data.item, "slot")])
+	self:TryOn(data.item, slots[mog:GetData("item", data.item, "slot")])
 end
 
 local sourceLabels = {
@@ -252,7 +253,11 @@ function mog.ShowItemTooltip(self, item, items, cycle)
 	GameTooltip[mog] = true
 	
 	if IsShiftKeyDown() then
-		GameTooltip:SetItemByID(item)
+		if type(item) == "number" then
+			GameTooltip:SetItemByID(item);
+		else
+			GameTooltip:SetHyperlink(item);
+		end
 		for _, frame in pairs(GameTooltip.shoppingTooltips) do
 			frame:Hide()
 		end
@@ -317,7 +322,7 @@ function mog.ShowItemTooltip(self, item, items, cycle)
 	end
 	
 	GameTooltip:AddLine(" ")
-	addTooltipDoubleLine(ID..":", item)
+	addTooltipDoubleLine(ID..":", mog:ItemToID(item))
 	
 	if mog:HasItem(item) then
 		GameTooltip:AddLine(" ")
@@ -373,7 +378,7 @@ function mog.Item_OnClick(self, btn, data, isSaved)
 		if IsControlKeyDown() then
 			mog:AddToPreview(item)
 		elseif IsShiftKeyDown() then
-			mog:ShowURL(item)
+			mog:ShowURL(mog:ItemToID(item))
 		else
 			showMenu(mog.Item_Menu, data, isSaved)
 		end
@@ -419,7 +424,7 @@ function mog.ShowSetTooltip(self, items, name)
 	for i, slot in ipairs(mog.slots) do
 		local itemID = items[slot] or items[i]
 		if itemID then
-			addItemTooltipLine(itemID)
+			addItemTooltipLine(mog:ItemToID(itemID))
 		end
 	end
 	GameTooltip:Show()
