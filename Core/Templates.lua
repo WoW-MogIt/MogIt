@@ -27,8 +27,8 @@ local function addTooltipDoubleLine(textLeft, textRight)
 	GameTooltip:AddDoubleLine(textLeft, textRight, nil, nil, nil, 1, 1, 1)
 end
 
-local function addItemTooltipLine(itemID)
-	addTooltipDoubleLine(getTexture(mog:HasItem(itemID), true)..mog:GetItemLabel(itemID, "ModelOnEnter"), mog.GetItemSourceShort(itemID))
+local function addItemTooltipLine(itemID, slot)
+	addTooltipDoubleLine(getTexture(mog:HasItem(itemID), true)..(type(slot) == "string" and _G[strupper(slot)]..": " or "")..mog:GetItemLabel(itemID, "ModelOnEnter"), mog.GetItemSourceShort(itemID))
 end
 
 function mog.GetItemSourceInfo(itemID)
@@ -229,7 +229,7 @@ local slots = {
 
 function mog.Item_FrameUpdate(self, data)
 	self:ApplyDress()
-	self:TryOn(format("item:%d:%d", data.item, mog.weaponEnchant), slots[mog:GetData("item", data.item, "slot")])
+	self:TryOn(format(gsub(data.item, "item:(%d+):0", "item:%1:%%d"), mog.weaponEnchant), slots[mog:GetData("item", data.item, "slot")])
 end
 
 local sourceLabels = {

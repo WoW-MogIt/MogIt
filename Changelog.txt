@@ -1,9 +1,9 @@
 [b]v3.4.0[/b]
+- Updated for 6.0 with Warlords of Draenor items, new difficulty filters.
 - Loading a set into a preview will now set the window title to the set name. A prepended * indicates that changes have been made.
 - Wishlist sets will now be sorted also in menus.
 - Moved 'New set' option to top of menu.
 - Weapons should now go in the appropriate hand for set models.
-- Increased max letters of level filter boxes to 3.
 
 [b]v3.3.2[/b]
 - Put bows in main hand slot in sets and preview to fix various issues. Existing sets will be patched.

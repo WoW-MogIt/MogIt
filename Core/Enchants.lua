@@ -1,5 +1,7 @@
 local _, MogIt = ...
 
+local L = MogIt.L
+
 MogIt.enchants = {
 	{
 		{

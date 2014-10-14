@@ -20,7 +20,6 @@ GUI:
 Modules:
 [A] Update extra modules
 
-Raise preview frame
 Dressing room bug?
 Weapon catalog equip slot
 Preview - uncached equipped items
