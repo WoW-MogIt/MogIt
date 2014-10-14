@@ -1,0 +1,12 @@
+GUI:
+[?] SetAnimation instead of SetSequence
+[?] Disable modules (or the bracket text) in the module dropdown if version isnt compatible?
+
+Modules:
+[A] Update extra modules
+
+Raise preview frame
+Dressing room bug?
+Weapon catalog equip slot
+Preview - uncached equipped items
+Wishlist catalog info
