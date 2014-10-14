@@ -335,8 +335,8 @@ function mog:GetData(data,id,key)
 	return mog.data[data] and mog.data[data][key] and mog.data[data][key][id];
 end
 
-mog.itemStringShort = "item:%d";
-mog.itemStringLong = "item:%d:%d:0:0:0:0:0:0:0:0:%d:%d:%d";
+mog.itemStringShort = "item:%d:0";
+mog.itemStringLong = "item:%d:0:0:0:0:0:0:0:0:0:%d:%d:%d";
 function mog:ItemToString(item)
 	local id, bonus;
 	if type(item) == "string" then
@@ -348,7 +348,7 @@ function mog:ItemToString(item)
 	end
 	if id then
 		-- itemID, enchantID, instanceDifficulty, numBonusIDs, bonusID1
-		return format(bonus and mog.itemStringLong or mog.itemStringShort, id, 0, 0, bonus and bonus ~= 0 and 1, bonus or 0);
+		return format(bonus and mog.itemStringLong or mog.itemStringShort, id, 0, bonus and bonus ~= 0 and 1, bonus or 0);
 	end
 end
 
