@@ -21,7 +21,7 @@ for i=1,GetNumAddOns() do
 		local version = tonumber(GetAddOnMetadata(name,"X-MogItModuleVersion"));
 		if version then
 			mog:RegisterModule(name,version,{
-				label = title:match("^MogIt_(.+)") or title,
+				label = title:match("^MogIt[%s%-_:]+(.+)") or title,
 				Dropdown = temp,
 			});
 		end

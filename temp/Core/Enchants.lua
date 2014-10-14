@@ -1,5 +1,7 @@
 local _, MogIt = ...
 
+local L = MogIt.L
+
 MogIt.enchants = {
 	{
 		{
@@ -126,7 +128,7 @@ MogIt.enchants = {
 			id = 2443,
 			name = "Winter's Might",
 		},
-		name = "Classic",
+		name = L["Classic"],
 	},
 	{
 		{
@@ -337,7 +339,7 @@ MogIt.enchants = {
 			id = 4098,
 			name = "Windwalk",
 		},
-		name = "Expansions",
+		name = L["Expansions"],
 	},
 	{
 		{
@@ -380,6 +382,6 @@ MogIt.enchants = {
 			id = 3847,
 			name = "Rune of the Stoneskin Gargoyle",
 		},
-		name = "Runeforging",
+		name = L["Runeforging"],
 	},
 }

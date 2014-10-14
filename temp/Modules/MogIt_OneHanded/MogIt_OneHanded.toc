@@ -1,21 +1,21 @@
-## Interface: 50400
+﻿## Interface: 60000
 ## Author: Aelobin (The Maelstrom EU) & Lombra (Defias Brotherhood EU)
 ## Version: @project-version@
 ## LoadOnDemand: 1
 ## RequiredDeps: MogIt
 ## X-MogItModuleVersion: 2
 
-## Title: MogIt_One-Hand
-## Title-frFR: MogIt_A une main
-## Title-deDE: MogIt_Einhändig
-## Title-esES: MogIt_Una Mano
-## Title-esMX: MogIt_Una Mano
-## Title-ruRU: MogIt_Одноручное
-## Title-koKR: MogIt_한손
-## Title-zhCN: MogIt_单手
-## Title-zhTW: MogIt_單手
-## Title-ptBR: MogIt_Uma Mão
-## Title-itIT: MogIt_One-Hand
+## Title: MogIt: One-Hand
+## Title-frFR: MogIt: A une main
+## Title-deDE: MogIt: Einhändig
+## Title-esES: MogIt: Una Mano
+## Title-esMX: MogIt: Una Mano
+## Title-ruRU: MogIt: Одноручное
+## Title-koKR: MogIt: 한손
+## Title-zhCN: MogIt: 单手
+## Title-zhTW: MogIt: 單手
+## Title-ptBR: MogIt: Uma Mão
+## Title-itIT: MogIt: One-Hand
 
 ## Notes: MogIt Data
 ## Notes-frFR: MogIt Données

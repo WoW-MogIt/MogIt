@@ -217,7 +217,7 @@ for _, addon in ipairs(addons) do
 	local _, title, _, _, loadable = GetAddOnInfo(addon);
 	if loadable then
 		local module = mog:RegisterModule(addon, tonumber(GetAddOnMetadata(addon, "X-MogItModuleVersion")), {
-			label = title:match("MogIt_(.+)") or title,
+			label = title:match("MogIt[%s%-_:]+(.+)") or title,
 			base = true,
 			slots = {},
 			slotList = {},
@@ -251,8 +251,10 @@ for _, addon in ipairs(addons) do
 				colour = mog.base.SortColour,
 			},
 		});
-		-- dirty fix for now - if the "slot" filter is not present the array is broken unless we do this
-		tinsert(module.filters, "hasItem");
+		if module then
+			-- dirty fix for now - if the "slot" filter is not present the array is broken unless we do this
+			tinsert(module.filters, "hasItem");
+		end
 	end
 end
 --//

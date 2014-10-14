@@ -24,7 +24,7 @@ f.faction:SetText(L["Faction"]..":");
 f.faction:SetJustifyH("LEFT");
 
 local function onClick(self)
-	settings[self.value] = self:GetChecked() == 1;
+	settings[self.value] = self:GetChecked();
 	mog:BuildList();
 end
 

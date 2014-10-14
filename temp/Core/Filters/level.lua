@@ -14,7 +14,7 @@ f.label:SetText(LEVEL_RANGE..":");
 f.label:SetJustifyH("LEFT");
 
 f.min = CreateFrame("EditBox","MogItFiltersLevelMin",f,"InputBoxTemplate");
-f.min:SetSize(25,16);
+f.min:SetSize(32,16);
 f.min:SetPoint("TOPLEFT",f.label,"BOTTOMLEFT",8,-5);
 f.min:SetNumeric(true);
 f.min:SetMaxLetters(3);
@@ -35,7 +35,7 @@ f.dash:SetPoint("LEFT",f.min,"RIGHT",0,1);
 f.dash:SetText("-");
 
 f.max = CreateFrame("EditBox","MogItFiltersLevelMax",f,"InputBoxTemplate");
-f.max:SetSize(25,16);
+f.max:SetSize(32,16);
 f.max:SetPoint("LEFT",f.min,"RIGHT",12,0);
 f.max:SetNumeric(true);
 f.max:SetMaxLetters(3);

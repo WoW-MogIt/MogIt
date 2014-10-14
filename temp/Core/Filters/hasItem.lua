@@ -16,7 +16,7 @@ f.hasItem = CreateFrame("CheckButton",nil,f,"UICheckButtonTemplate");
 f.hasItem.text:SetText(L["Only items you own"]);
 f.hasItem:SetPoint("TOPLEFT",f.label,"BOTTOMLEFT");
 f.hasItem:SetScript("OnClick",function(self)
-	enabled = self:GetChecked() == 1;
+	enabled = self:GetChecked();
 	mog:BuildList();
 end);
 

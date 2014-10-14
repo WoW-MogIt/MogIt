@@ -1,21 +1,21 @@
-## Interface: 50400
+﻿## Interface: 60000
 ## Author: Aelobin (The Maelstrom EU) & Lombra (Defias Brotherhood EU)
 ## Version: @project-version@
 ## LoadOnDemand: 1
 ## RequiredDeps: MogIt
 ## X-MogItModuleVersion: 2
 
-## Title: MogIt_Mail
-## Title-frFR: MogIt_Mailles
-## Title-deDE: MogIt_Kette
-## Title-esES: MogIt_Mallas
-## Title-esMX: MogIt_Mallas
-## Title-ruRU: MogIt_Кольчуга
-## Title-koKR: MogIt_사슬
-## Title-zhCN: MogIt_锁甲
-## Title-zhTW: MogIt_鎖甲
-## Title-ptBR: MogIt_Malha
-## Title-itIT: MogIt_Mail
+## Title: MogIt: Mail
+## Title-frFR: MogIt: Mailles
+## Title-deDE: MogIt: Kette
+## Title-esES: MogIt: Mallas
+## Title-esMX: MogIt: Mallas
+## Title-ruRU: MogIt: Кольчуга
+## Title-koKR: MogIt: 사슬
+## Title-zhCN: MogIt: 锁甲
+## Title-zhTW: MogIt: 鎖甲
+## Title-ptBR: MogIt: Malha
+## Title-itIT: MogIt: Mail
 
 ## Notes: MogIt Data
 ## Notes-frFR: MogIt Données

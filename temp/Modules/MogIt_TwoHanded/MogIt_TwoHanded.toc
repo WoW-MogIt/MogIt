@@ -1,21 +1,21 @@
-## Interface: 50400
+﻿## Interface: 60000
 ## Author: Aelobin (The Maelstrom EU) & Lombra (Defias Brotherhood EU)
 ## Version: @project-version@
 ## LoadOnDemand: 1
 ## RequiredDeps: MogIt
 ## X-MogItModuleVersion: 2
 
-## Title: MogIt_Two-Hand
-## Title-frFR: MogIt_Deux mains
-## Title-deDE: MogIt_Zweihändig
-## Title-esES: MogIt_Dos Manos
-## Title-esMX: MogIt_Dos Manos
-## Title-ruRU: MogIt_Двуручное
-## Title-koKR: MogIt_양손
-## Title-zhCN: MogIt_双手
-## Title-zhTW: MogIt_雙手
-## Title-ptBR: MogIt_Duas Mãos
-## Title-itIT: MogIt_Two-Hand
+## Title: MogIt: Two-Hand
+## Title-frFR: MogIt: Deux mains
+## Title-deDE: MogIt: Zweihändig
+## Title-esES: MogIt: Dos Manos
+## Title-esMX: MogIt: Dos Manos
+## Title-ruRU: MogIt: Двуручное
+## Title-koKR: MogIt: 양손
+## Title-zhCN: MogIt: 双手
+## Title-zhTW: MogIt: 雙手
+## Title-ptBR: MogIt: Duas Mãos
+## Title-itIT: MogIt: Two-Hand
 
 ## Notes: MogIt Data
 ## Notes-frFR: MogIt Données
