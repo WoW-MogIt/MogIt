@@ -355,13 +355,14 @@ end
 mog.itemStringPattern = "item:(%d+):?[^:]*:?[^:]*:?[^:]*:?[^:]*:?[^:]*:?[^:]*:?[^:]*:?[^:]*:?[^:]*:?[^:]*:?[^:]*:?([^:]*)";
 function mog:ItemToID(item)
 	if type(item) == "string" then
-		local id,bonus = item:match(mog.itemStringPattern) or item:match("^(%d+),?(%d*)");
-		id = tonumber(id);
-		bonus = tonumber(bonus);
-		return id,bonus;
+		local id,bonus = item:match(mog.itemStringPattern);
+		if not id then
+			id,bonus = item:match("^(%d+),?(%d*)");
+		end
+		return tonumber(id), tonumber(bonus);
 	elseif type(item) == "number" then
 		return item;
-	end 
+	end
 end
 --//
 
