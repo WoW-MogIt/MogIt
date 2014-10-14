@@ -268,34 +268,6 @@ MogIt.enchants = {
 			name = "Major Striking",
 		},
 		{
-			id = 5336,
-			name = "Mark of Blackrock",
-		},
-		{
-			id = 5384,
-			name = "Mark of Bleeding Hollow",
-		},
-		{
-			id = 5335,
-			name = "Mark of Shadowmoon",
-		},
-		{
-			id = 5334,
-			name = "Mark of the Frostwolf",
-		},
-		{
-			id = 5331,
-			name = "Mark of the Shattered Hand",
-		},
-		{
-			id = 5330,
-			name = "Mark of the Thunderlord",
-		},
-		{
-			id = 5337,
-			name = "Mark of Warsong",
-		},
-		{
 			id = 3827,
 			name = "Massacre",
 		},
@@ -412,9 +384,4 @@ MogIt.enchants = {
 		},
 		name = L["Runeforging"],
 	},
-	--[=[
-	{
-		name = L["Illusions"],
-	},
-	--]=]
-};
+}

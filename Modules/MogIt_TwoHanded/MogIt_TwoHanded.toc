@@ -1,9 +1,9 @@
-## Interface: 60000
+﻿## Interface: 60000
 ## Author: Aelobin (The Maelstrom EU) & Lombra (Defias Brotherhood EU)
 ## Version: @project-version@
 ## LoadOnDemand: 1
 ## RequiredDeps: MogIt
-## X-MogItModuleVersion: 3
+## X-MogItModuleVersion: 2
 
 ## Title: MogIt: Two-Hand
 ## Title-frFR: MogIt: Deux mains

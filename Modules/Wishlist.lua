@@ -1,12 +1,12 @@
 local _, MogIt = ...
 local L = MogIt.L
 
-local Wishlist = MogIt:RegisterModule("Wishlist", MogIt.moduleVersion)
-MogIt.wishlist = Wishlist
-Wishlist.base = true
+local wishlist = MogIt:RegisterModule("Wishlist", MogIt.moduleVersion)
+MogIt.wishlist = wishlist
+wishlist.base = true
 
 local function convertBowSlots()
-	for i, set in ipairs(Wishlist.db.profile.sets) do
+	for i, set in ipairs(wishlist.db.profile.sets) do
 		local offhand = set.items["SecondaryHandSlot"]
 		local item = offhand and MogIt:GetItemInfo(offhand, "convertBowSlots")
 		if item and item.invType == "INVTYPE_RANGED" then
@@ -29,7 +29,7 @@ local defaults = {
 	}
 }
 
-function Wishlist:MogItLoaded()
+function wishlist:MogItLoaded()
 	local db = LibStub("AceDB-3.0"):New("MogItWishlist", defaults)
 	self.db = db
 	
@@ -41,35 +41,13 @@ function Wishlist:MogItLoaded()
 	-- convert all bows into main hand instead of off hand
 	convertBowSlots()
 	
-	do	-- convert to 6.0 string format
-		for k, profile in pairs(self.db.profiles) do
-			if profile.items then
-				for k, item in pairs(profile.items) do
-					if type(item) == "string" then break end
-					-- profile.items[k] = MogIt:ItemToID(item)
-					profile.items[k] = tostring(item)
-				end
-			end
-			
-			if profile.sets then
-				for i, set in ipairs(profile.sets) do
-					for k, item in pairs(set.items) do
-						if type(item) == "string" then break end
-						-- set.items[k] = MogIt:ItemToID(item)
-						set.items[k] = tostring(item)
-					end
-				end
-			end
-		end
-	end
-	
 	db.RegisterCallback(self, "OnProfileChanged", onProfileUpdated)
 	db.RegisterCallback(self, "OnProfileCopied", onProfileUpdated)
 	db.RegisterCallback(self, "OnProfileReset", onProfileUpdated)
 end
 
 local function setModule(self)
-	MogIt:SetModule(Wishlist, L["Wishlist"])
+	MogIt:SetModule(wishlist, L["Wishlist"])
 end
 
 local function newSetOnClick(self)
@@ -81,20 +59,20 @@ local setMenu = {
 	{
 		text = L["Rename set"],
 		func = function(self)
-			Wishlist:RenameSet(self.value)
+			wishlist:RenameSet(self.value)
 			CloseDropDownMenus()
 		end,
 	},
 	{
 		text = L["Delete set"],
 		func = function(self)
-			Wishlist:DeleteSet(self.value)
+			wishlist:DeleteSet(self.value)
 			CloseDropDownMenus()
 		end,
 	},
 }
 
-function Wishlist:Dropdown(level)
+function wishlist:Dropdown(level)
 	if level == 1 then
 		local info = UIDropDownMenu_CreateInfo()
 		info.text = L["Wishlist"]
@@ -106,7 +84,7 @@ function Wishlist:Dropdown(level)
 	end
 end
 
-function Wishlist:FrameUpdate(frame, value, index)
+function wishlist:FrameUpdate(frame, value, index)
 	local data = frame.data
 	if type(value) == "table" then
 		data.name = value.name
@@ -129,7 +107,7 @@ function Wishlist:FrameUpdate(frame, value, index)
 	end
 end
 
-function Wishlist:OnEnter(frame, value)
+function wishlist:OnEnter(frame, value)
 	if type(value) == "table" then
 		MogIt.ShowSetTooltip(frame, value.items, value.name)
 	else
@@ -137,7 +115,7 @@ function Wishlist:OnEnter(frame, value)
 	end
 end
 
-function Wishlist:OnClick(frame, button, value)
+function wishlist:OnClick(frame, button, value)
 	if type(value) == "table" then
 		MogIt.Set_OnClick(frame, button, frame.data, true)
 	else
@@ -147,7 +125,7 @@ end
 
 local list = {}
 
-function Wishlist:BuildList()
+function wishlist:BuildList()
 	wipe(list)
 	local db = self.db.profile
 	for i, v in ipairs(self:GetSets()) do
@@ -159,7 +137,7 @@ function Wishlist:BuildList()
 	return list
 end
 
-Wishlist.Help = {
+wishlist.Help = {
 	L["Right click for additional options"],
 	L["Shift-left click to link"],
 	L["Shift-right click for item URL"],
@@ -170,17 +148,17 @@ Wishlist.Help = {
 local t = {}
 
 -- returns a sorted array of existing wishlist profiles
-function Wishlist:GetProfiles()
+function wishlist:GetProfiles()
 	self.db:GetProfiles(t)
 	sort(t)
 	return t
 end
 
-function Wishlist:GetCurrentProfile()
+function wishlist:GetCurrentProfile()
 	return self.db:GetCurrentProfile()
 end
 
-function Wishlist:AddItem(itemID, setName, slot, isAlternate)
+function wishlist:AddItem(itemID, setName, slot, isAlternate)
 	-- don't add single items that are already on the wishlist
 	if not setName and self:IsItemInWishlist(itemID, true) then
 		return false
@@ -205,7 +183,7 @@ end
 -- deletes an item from the database
 -- if setName not provided, will look for a single item
 -- if isAlternate is not true, will look among the primary items
-function Wishlist:DeleteItem(itemID, setName, isAlternate)
+function wishlist:DeleteItem(itemID, setName, isAlternate)
 	if setName then
 		local set = assert(self:GetSet(setName), format("Set '%s' does not exist.", setName))
 		if isAlternate then
@@ -240,7 +218,7 @@ function Wishlist:DeleteItem(itemID, setName, isAlternate)
 	end
 end
 
-function Wishlist:CreateSet(name)
+function wishlist:CreateSet(name)
 	if self:GetSet(name) then
 		return false
 	end
@@ -252,13 +230,13 @@ function Wishlist:CreateSet(name)
 	return true
 end
 
-function Wishlist:RenameSet(set)
+function wishlist:RenameSet(set)
 	StaticPopup_Show("MOGIT_WISHLIST_RENAME_SET", nil, nil, self:GetSet(set))
 end
 
-function Wishlist:DeleteSet(setName, noConfirm)
+function wishlist:DeleteSet(setName, noConfirm)
 	if noConfirm then
-		local sets = self:GetSets()
+		local sets = wishlist:GetSets()
 		for i, set in ipairs(sets) do
 			if set.name == setName then
 				tremove(sets, i)
@@ -279,7 +257,7 @@ local function tableFind(tbl, value, token)
 	end
 end
 
-function Wishlist:IsItemInWishlist(itemID, noSet)
+function wishlist:IsItemInWishlist(itemID, noSet)
 	local token = MogIt.tokens[itemID]
 	if tableFind(self.db.profile.items, itemID, token) then return true end
 	if not noSet then
@@ -299,7 +277,7 @@ end
 
 local sortedSets = {}
 
-function Wishlist:GetSets(profile, noSort)
+function wishlist:GetSets(profile, noSort)
 	local sets
 	if profile then
 		assert(self.db.profiles[profile], format("Profile '%s' does not exist.", profile))
@@ -318,7 +296,7 @@ function Wishlist:GetSets(profile, noSort)
 	return sets
 end
 
-function Wishlist:GetSet(name, profile)
+function wishlist:GetSet(name, profile)
 	for i, set in ipairs(self:GetSets(profile, true)) do
 		if set.name == name then
 			return set
@@ -326,20 +304,20 @@ function Wishlist:GetSet(name, profile)
 	end
 end
 
-function Wishlist:GetSetItems(setName, profile)
+function wishlist:GetSetItems(setName, profile)
 	return self:GetSet(setName, profile).items
 end
 
 local setFuncs = {
 	addItem = function(self, set, item)
-		if Wishlist:AddItem(item, set, select(9, GetItemInfo(item)) == "INVTYPE_WEAPON" and IsShiftKeyDown() and "SecondaryHandSlot" or nil) then
+		if wishlist:AddItem(item, set, select(9, GetItemInfo(item)) == "INVTYPE_WEAPON" and IsShiftKeyDown() and "SecondaryHandSlot" or nil) then
 			MogIt:BuildList(nil, "Wishlist")
 		end
 		CloseDropDownMenus()
 	end,
 }
 
-function Wishlist:AddSetMenuItems(level, func, arg2, profile)
+function wishlist:AddSetMenuItems(level, func, arg2, profile)
 	local sets = self:GetSets(profile)
 	if not sets then
 		return
@@ -370,7 +348,7 @@ end
 do
 	local function onAccept(self, data)
 		local text = self.editBox:GetText()
-		local create = Wishlist:CreateSet(text)
+		local create = wishlist:CreateSet(text)
 		if not create then
 			print("MogIt: A set with this name already exists.")
 			return
@@ -378,10 +356,10 @@ do
 		if data then
 			if type(data) == "table" then
 				for slot, v in pairs(data.items) do
-					Wishlist:AddItem(v, text, slot)
+					wishlist:AddItem(v, text, slot)
 				end
 			else
-				Wishlist:AddItem(data, text)
+				wishlist:AddItem(data, text)
 			end
 		end
 		MogIt:BuildList(nil, "Wishlist")
@@ -399,7 +377,7 @@ do
 			parent:Hide()
 		end,
 		OnShow = function(self)
-			self.editBox:SetText("Set "..(#Wishlist:GetSets() + 1))
+			self.editBox:SetText("Set "..(#wishlist:GetSets() + 1))
 			self.editBox:HighlightText()
 		end,
 		whileDead = true,
@@ -409,7 +387,7 @@ end
 do
 	local function onAccept(self, data)
 		local text = self.editBox:GetText()
-		local set = Wishlist:GetSet(text)
+		local set = wishlist:GetSet(text)
 		if set then
 			print("MogIt: A set with this name already exists.")
 			return
@@ -442,7 +420,7 @@ StaticPopupDialogs["MOGIT_WISHLIST_DELETE_SET"] = {
 	button1 = YES,
 	button2 = NO,
 	OnAccept = function(self, data)
-		Wishlist:DeleteSet(data, true)
+		wishlist:DeleteSet(data, true)
 	end,
 	whileDead = true,
 }
@@ -453,9 +431,9 @@ StaticPopupDialogs["MOGIT_WISHLIST_OVERWRITE_SET"] = {
 	button2 = NO,
 	OnAccept = function(self, data)
 		-- first clear all items since every slot might not be used
-		wipe(Wishlist:GetSet(data.name).items)
+		wipe(wishlist:GetSet(data.name).items)
 		for slot, v in pairs(data.items) do
-			Wishlist:AddItem(v, data.name, slot)
+			wishlist:AddItem(v, data.name, slot)
 		end
 		MogIt:BuildList(nil, "Wishlist")
 	end,
