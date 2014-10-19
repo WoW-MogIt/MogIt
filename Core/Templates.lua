@@ -27,8 +27,8 @@ local function addTooltipDoubleLine(textLeft, textRight)
 	GameTooltip:AddDoubleLine(textLeft, textRight, nil, nil, nil, 1, 1, 1)
 end
 
-local function addItemTooltipLine(itemID, slot)
-	addTooltipDoubleLine(getTexture(mog:HasItem(itemID), true)..(type(slot) == "string" and _G[strupper(slot)]..": " or "")..mog:GetItemLabel(itemID, "ModelOnEnter"), mog.GetItemSourceShort(itemID))
+local function addItemTooltipLine(itemID)
+	addTooltipDoubleLine(getTexture(mog:HasItem(itemID), true)..mog:GetItemLabel(itemID, "ModelOnEnter"), mog.GetItemSourceShort(itemID))
 end
 
 function mog.GetItemSourceInfo(itemID)
@@ -229,7 +229,7 @@ local slots = {
 
 function mog.Item_FrameUpdate(self, data)
 	self:ApplyDress()
-	self:TryOn(format(gsub(data.item, "item:(%d+):0", "item:%1:%%d"), mog.weaponEnchant), slots[mog:GetData("item", data.item, "slot")])
+	self:TryOn(format("item:%d:%d", data.item, mog.weaponEnchant), slots[mog:GetData("item", data.item, "slot")])
 end
 
 local sourceLabels = {
@@ -252,11 +252,7 @@ function mog.ShowItemTooltip(self, item, items, cycle)
 	GameTooltip[mog] = true
 	
 	if IsShiftKeyDown() then
-		if type(item) == "number" then
-			GameTooltip:SetItemByID(item)
-		else
-			GameTooltip:SetHyperlink(item)
-		end
+		GameTooltip:SetItemByID(item)
 		for _, frame in pairs(GameTooltip.shoppingTooltips) do
 			frame:Hide()
 		end
@@ -321,7 +317,7 @@ function mog.ShowItemTooltip(self, item, items, cycle)
 	end
 	
 	GameTooltip:AddLine(" ")
-	addTooltipDoubleLine(ID..":", mog:ItemToID(item))
+	addTooltipDoubleLine(ID..":", item)
 	
 	if mog:HasItem(item) then
 		GameTooltip:AddLine(" ")
@@ -377,7 +373,7 @@ function mog.Item_OnClick(self, btn, data, isSaved)
 		if IsControlKeyDown() then
 			mog:AddToPreview(item)
 		elseif IsShiftKeyDown() then
-			mog:ShowURL(mog:ItemToID(item))
+			mog:ShowURL(item)
 		else
 			showMenu(mog.Item_Menu, data, isSaved)
 		end
@@ -423,7 +419,7 @@ function mog.ShowSetTooltip(self, items, name)
 	for i, slot in ipairs(mog.slots) do
 		local itemID = items[slot] or items[i]
 		if itemID then
-			addItemTooltipLine(mog:ItemToID(itemID))
+			addItemTooltipLine(itemID)
 		end
 	end
 	GameTooltip:Show()
