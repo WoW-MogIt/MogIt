@@ -73,6 +73,11 @@ mog.tooltip.model:SetScript("OnShow",function(self)
 end);
 
 
+local function GetItemTransmogrifyInfo()
+	return true, true, true
+end
+
+
 function mog.tooltip.ShowItem(self)
 	local _,itemLink = self:GetItem();
 	if not itemLink then

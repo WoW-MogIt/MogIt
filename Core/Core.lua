@@ -60,7 +60,7 @@ mog.mmb = LibStub("LibDataBroker-1.1"):NewDataObject("MogIt",{
 
 
 --// Module API
-mog.moduleVersion = 3;
+mog.moduleVersion = 2;
 mog.modules = {};
 mog.moduleList = {};
 
@@ -300,12 +300,7 @@ end
 mog.data = {};
 
 function mog:AddData(data,id,key,value)
-	if not (data and id and key) then return end;
-	
-	--if data == "item" then
-	--	id = mog:ItemToString(id);
-	--end
-	
+	if not data and id and key then return end;
 	if not mog.data[data] then
 		mog.data[data] = {};
 	end
@@ -333,36 +328,6 @@ end
 
 function mog:GetData(data,id,key)
 	return mog.data[data] and mog.data[data][key] and mog.data[data][key][id];
-end
-
-mog.itemStringShort = "item:%d:0";
-mog.itemStringLong = "item:%d:0:0:0:0:0:0:0:0:0:%d:%d:%d";
-function mog:ItemToString(item)
-	local id, bonus;
-	if type(item) == "string" then
-		id, bonus = item:match("^(%d+),?(%d*)");
-		id = tonumber(id);
-		bonus = tonumber(bonus);
-	elseif type(item) == "number" then
-		id = item;
-	end
-	if id then
-		-- itemID, enchantID, instanceDifficulty, numBonusIDs, bonusID1
-		return format(bonus and mog.itemStringLong or mog.itemStringShort, id, 0, bonus and bonus ~= 0 and 1, bonus or 0);
-	end
-end
-
-mog.itemStringPattern = "item:(%d+):?[^:]*:?[^:]*:?[^:]*:?[^:]*:?[^:]*:?[^:]*:?[^:]*:?[^:]*:?[^:]*:?[^:]*:?[^:]*:?([^:]*)";
-function mog:ItemToID(item)
-	if type(item) == "string" then
-		local id,bonus = item:match(mog.itemStringPattern);
-		if not id then
-			id,bonus = item:match("^(%d+),?(%d*)");
-		end
-		return tonumber(id), tonumber(bonus);
-	elseif type(item) == "number" then
-		return item;
-	end
 end
 --//
 

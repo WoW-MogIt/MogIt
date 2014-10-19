@@ -46,7 +46,7 @@ L["Chat Link"] = true
 L["Import / Export"] = true
 L["Equip current gear"] = true
 L["Clear"] = true
-L["New set"] = true
+L["New set..."] = true
 L["Other profiles"] = true
 L["Basic Controls"] = true
 L["Click the bottom right corner and drag to resize"] = true
@@ -78,6 +78,7 @@ L["This item is on your wishlist."] = true
 
 	--[[ Core\Options.lua ]]--
 L["Hide minimap button"] = true
+L["Sort wishlist sets alphabetically"] = true
 L["Use preview frame to dress up"] = true
 L["Use a single preview frame"] = true
 L["This will close all your currently open previews."] = true
@@ -96,9 +97,12 @@ L["Width"] = true
 L["Height"] = true
 L["Only transmogrification items"] = true
 L["Only show if modifier is pressed"] = true
+L["Use custom model"] = true
+L["Model race"] = true
+L["Model gender"] = true
 L["Wishlist"] = true
-L["Options Profile"] = true
-L["Wishlist Profile"] = true
+L["Options profile"] = true
+L["Wishlist profile"] = true
 
 	--[[ Core\Templates.lua ]]--
 L["Active preview"] = true
@@ -108,6 +112,7 @@ L["Add to set"] = true
 L["Delete"] = true
 L["Item %d/%d"] = true
 L["Source"] = true
+L["Bind"] = true
 L["Slot"] = true
 L["You have this item."] = true
 L["Load module to see other items using this appearance."] = true
@@ -117,6 +122,9 @@ L["Rename set"] = true
 L["Delete set"] = true
 
 	--[[ Core\Enchants.lua ]]--
+L["Classic"] = true
+L["Expansions"] = true
+L["Runeforging"] = true
 
 	--[[ Core\Filters\Filters.xml ]]--
 
@@ -146,7 +154,6 @@ L["Select None"] = true
 	--[[ Core\Filters\quality.lua ]]--
 
 	--[[ Core\Filters\bind.lua ]]--
-L["Bind"] = true
 
 	--[[ Core\Filters\hasItem.lua ]]--
 L["Owned items"] = true
@@ -180,6 +187,7 @@ L["Shift-left click to link"] = true
 L["Shift-right click for item URL"] = true
 L["Ctrl-left click to try on in dressing room"] = true
 L["Ctrl-right click to preview with MogIt"] = true
+L["Shift-click to add to off hand"] = true
 L["Enter set name"] = true
 L["Enter new set name"] = true
 L["Delete set '%s'?"] = true
