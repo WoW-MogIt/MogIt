@@ -1,0 +1,26 @@
+== 6.0 ==
+- Module imports are grouping non-identical items together - check what's causing that - probably display ID in extractor
+- Check module data is correct - missing items (due to "not obtainable") and difficulties (think warforged is wrong)
+- Fix/check Links.lua and Preview.lua ("item1,bonus1:item2,bonus2:item3:item4")
+- Re-add enchant feature to TryOn (can change mog.ItemStringShort for simplicity if you want)
+- Possibly add support for bonus ID for items in URL.lua
+- Wishlist conversion (numerical -> string, or support numerical everywhere in addon? might already work!)
+- Figure out if/how we will support bonusID in Tokens.lua
+- License txt file / Localization (just needs running + uploading when we're finished)
+- Update extra modules
+- Add support for illusions and localised enchant names in Enchants.lua (for the future)
+
+
+== Old ==
+
+GUI:
+[?] SetAnimation instead of SetSequence
+[?] Disable modules (or the bracket text) in the module dropdown if version isnt compatible?
+
+Modules:
+[A] Update extra modules
+
+Dressing room bug?
+Weapon catalog equip slot
+Preview - uncached equipped items
+Wishlist catalog info

@@ -1,0 +1,120 @@
+[b]v3.4.0[/b]
+- Updated for 6.0 with Warlords of Draenor items, new difficulty filters.
+- Loading a set into a preview will now set the window title to the set name. A prepended * indicates that changes have been made.
+- Wishlist sets will now be sorted also in menus.
+- Moved 'New set' option to top of menu.
+- Weapons should now go in the appropriate hand for set models.
+
+[b]v3.3.2[/b]
+- Put bows in main hand slot in sets and preview to fix various issues. Existing sets will be patched.
+
+[b]v3.3.1[/b]
+- Added option to use a different model for the tooltip preview.
+- Added option to sort wishlist sets alphabetically. (found in options, not sorting menu, and is remembered between sessions)
+- One handed weapons may now be added to the off hand of a set by pressing shift when adding it.
+- Removed explicit AtlasLoot tooltip support. Enable GameTooltip in AtlasLoot options instead.
+
+[b]v3.3.0[/b]
+- Fixed previewing items of inspected players. Will once again preview the transmogged-into item.
+- Fixed catalogue weapon enchanting.
+- The Add to wishlist option should now appear in all item menus.
+- Added bind type to item tooltips.
+- Fixed item level info in tooltips.
+- Bump module API version to 2. MogIt.GetItemInfo now returns a table according to [url]http://www.wowace.com/addons/libiteminfo-1-0/[/url].
+- Added function MogIt:GetItemLabel(itemID, callback, includeIcon, iconSize).
+
+[b]v3.2.2[/b]
+- Added cloth chests from 5.4 that went missing.
+
+[b]v3.2.1[/b]
+- Fixed selecting weapon enchants.
+
+[b]v3.2.0[/b]
+- Updated database with PvP items and some other missing items (challenge sets included) and data.
+- Removed thrown weapons module.
+- Added an entry to the 'Preview' menus to select a weapon enchant to display on the models.
+- Allow equipping a wand and off hand item at the same time in the preview. They can't both actually display on the model until Blizzard fixes that, though.
+- Added a chest type filter to filter robes and tunics.
+- Added an option to redirect all dressup clicks (default Ctrl-left click) to the MogIt preview frame.
+- Added an option to have the preview frame behave as a UI panel. (immovable and will get pushed around by other frames) Requires single preview option enabled.
+- Added an option for locking the preview frame size to default UI panel size. Requires above option enabled.
+- Toggling the Single preview option should now have an immediate effect.
+- The 'Equip current gear' option in the preview frame now honors helm and cloak visibility settings.
+- 'Owned items' filter should now properly appear for all modules.
+- Dropdown menus are now scrollable (with mouse wheel or scroll buttons on the menu) if they exceed the height of the screen.
+- Reworked chat link hook to allow the Target option to once again appear in player link popup menus.
+- Item menu 'Preview' entry no longer has a submenu if single preview option is enabled.
+- Fixed BG queuing taint that would occur if you opened any dropdown menu before opening the PvP UI.
+- Fixed some issues with overlapping and inconsistent preview frame IDs.
+- Implented LibItemInfo for faster filtering using certain filters.
+
+[b]v3.1.6[/b]
+- Added 5.4 items.
+- Added 'Flexible' item tags.
+- Fix scrolling in the main window when dragging the scroll thumb.
+- DataStore should now always load before MogIt if enabled.
+
+[b]v3.1.5[/b]
+- Fixed DataStore support.
+
+[b]v3.1.4[/b]
+- Added 5.3 items.
+
+[b]v3.1.3[/b]
+- Added support for DataStore_Containers to check for owned items in void storage. (see [url=http://wow.curseforge.com/addons/mogit/forum/general/51917-data-store-support/]forum[/url] for more info)
+- Fixed tooltip source info for set and same-appearance items.
+- Added workaround for a bug where kilt textures would get stuck on the model under certain circumstances.
+- Further improvements to how weapons get equipped. Should now work as expected when loading sets, and weapons should no longer appear doubly in the catalogue.
+
+[b]v3.1.2[/b]
+- Added filter for showing only items that the character possesses.
+- Fixed potential tooltip model issue with ElvUI.
+- Weapons should now always go into the correct slot on the preview model.
+- Fixed a few catalogue model positioning issues when scrolling.
+- Uncached items should now properly get added when loading sets into previews, and tooltips should update automatically. (no more Retreiving item information)
+- It is once again possible to preview inspected units' transmogged items rather than their real items.
+- Default UI dressing room will now get undressed before trying on sets.
+- Slightly indent item names in tooltips to line them up with items preceded by a tick.
+
+[b]v3.1.1[/b]
+- Adds 5.2 items and fixes a bunch of old item details!
+- Added option to set tooltip model size.
+- Properly show check marks for owned items in set tooltips.
+
+[b]v3.1.0[/b]
+- Add option to use a single preview frame. (disabled by default) This mimics the behaviour of the pre 3.0 preview frame.
+- Preview frames now remember position and size between sessions.
+- UI elements in the preview frames should now always appear.
+- Improved weapon handling for the preview. Impossible weapon combinations should no longer be possible to "equip", as well it should now be more consistent in which slots weapons go into.
+- Previews will now always be cleared before equipping a set of items.
+- Remove the submenu of the wishlist entry in the modules menu to clarify that it can be clicked directly and managed from there.
+
+[b]v3.0.6[/b]
+- Added most of the new items from MoP, although some may show an inaccurate level or class requirement.
+- Fixed the Monk filter error.
+
+[b]v3.0.5[/b]
+- Fixed a lot of model issues, hopefully including camera zooming. (models escaping their boundaries remains outside of our control)
+
+[b]v3.0.4[/b]
+- Fixed error when loading a module where one or more items has no required level specified, using level sorting.
+- Added preview menu option to try on your character's currently equipped gear, taking transmogrification into account.
+- Swapping non-transmog slot items should now properly reflect on models when using Equipped grid dress.
+
+[b]v3.0.3[/b]
+- Fixed error when swapping character gear while Equipped grid dress is selected.
+- Equipped items should no longer get dressed up on set models.
+- Fixed helm and cloak showing on models when hidden on your character.
+- Previewing a set should now always open a new preview.
+- Added weapon slot data and filters back in.
+- Preview Load menu no longer includes profiles that has no sets.
+- Resize handles should now be slightly easier to hit.
+- Wishlist star should now properly be added to the frame right after adding the item to the wishlist.
+
+[b]v3.0.2[/b]
+- Fixed linking sets for characters who are Night Elf, Blood Elf or Undead.
+
+[b]v3.0.0[/b]
+* Updated for 5.0.
+See forum for more info.
+http://wow.curseforge.com/addons/mogit/forum/general/42502-mog-it-3-0-release/
