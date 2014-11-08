@@ -332,7 +332,7 @@ function mog.DressFromPreview(model, previewFrame)
 	
 	for id, slot in pairs(previewFrame.slots) do
 		if slot.item then
-			model:TryOn(format("item:%d:%d", slot.item, previewFrame.data.weaponEnchant), slot.slot);
+			model:TryOn(format("item:%s:%d", slot.item:match("item:(%d+)"), previewFrame.data.weaponEnchant), slot.slot);
 		end
 	end
 end

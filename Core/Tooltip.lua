@@ -73,6 +73,11 @@ mog.tooltip.model:SetScript("OnShow",function(self)
 end);
 
 
+local function GetItemTransmogrifyInfo()
+	return true, true, true
+end
+
+
 function mog.tooltip.ShowItem(self)
 	local _,itemLink = self:GetItem();
 	if not itemLink then
@@ -118,9 +123,9 @@ function mog.tooltip.ShowItem(self)
 	
 	-- add wishlist info about this item
 	if not self[mog] and mog.wishlist:IsItemInWishlist(itemID) then
-		self:AddLine(" ");
-		self:AddLine(L["This item is on your wishlist."], 1, 1, 0);
-		self:AddTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcon_1");
+			self:AddLine(" ");
+			self:AddLine(L["This item is on your wishlist."], 1, 1, 0);
+			self:AddTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcon_1");
 	end
 end
 

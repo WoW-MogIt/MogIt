@@ -618,6 +618,10 @@ local playerClass = select(2, UnitClass("PLAYER"));
 function mog.view.AddItem(item, preview, forceSlot, setItem)
 	if not (item and preview) then return end;
 	
+	if type(item) == "number" then
+		item = mog:ItemToString(item);
+	end
+	
 	local itemInfo = mog:GetItemInfo(item, "PreviewAddItem");
 	if not itemInfo then
 		tinsert(doCache, {
@@ -637,7 +641,7 @@ function mog.view.AddItem(item, preview, forceSlot, setItem)
 	if slot then
 		if slot == "MainHandSlot" or slot == "SecondaryHandSlot" then
 			if invType == "INVTYPE_2HWEAPON" then
-				if playerClass == "WARRIOR" and IsSpellKnown(46917) then
+				if playerClass == "WARRIOR" and IsSpellKnown(23588) then
 					-- Titan's Grip exists in the spellbook, so we can treat this weapon as one handed
 					invType = "INVTYPE_WEAPON";
 				end
@@ -703,7 +707,7 @@ function mog:AddToPreview(item, preview, title)
 	if type(item) == "number" then
 		mog.view.AddItem(item, preview);
 	elseif type(item) == "string" then
-		mog.view.AddItem(tonumber(item:match("item:(%d+)")),preview);
+		mog.view.AddItem(tonumber(item:match("item:(%d+)")), preview);
 	elseif type(item) == "table" then
 		mog.view:Undress(preview);
 		for k,v in pairs(item) do
@@ -766,6 +770,11 @@ tinsert(ModifiedItemClickHandlers, function(link)
 		-- if it's a dressup modified click and a dressable item, intercept the call here and let SetItemRef hook handle it
 		return link and IsDressableItem(link);
 	end
+	local _, staticPopup = StaticPopup_Visible("MOGIT_PREVIEW_ADDITEM");
+	if IsModifiedClick("CHATLINK") and staticPopup then
+		staticPopup.editBox:SetText(link);
+		return true
+	end
 end);
 
 hooksecurefunc("SetItemRef", function(link, text, button, chatFrame)
@@ -823,17 +832,19 @@ end
 
 
 --// Popups
-local function onAccept(self,preview)
+local function onAccept(self, preview)
 	local text = self.editBox:GetText();
-	text = text and text:match("(%d+).-$");
-	mog:AddToPreview(tonumber(text),preview);
+	-- TODO: need support for bonus ID here
+	-- "http://www.wowhead.com/item=(%d+)&bonus=(%d+)"
+	text = text and (text:match("item:(%d+)") or text:match("(%d+).-$"));
+	mog:AddToPreview(tonumber(text), preview);
 end
 
 StaticPopupDialogs["MOGIT_PREVIEW_ADDITEM"] = {
 	text = L["Type the item ID or url in the text box below"],
 	button1 = ADD,
 	button2 = CANCEL,
-	hasEditBox = 1,
+	hasEditBox = true,
 	maxLetters = 512,
 	editBoxWidth = 260,
 	OnAccept = onAccept,
@@ -842,24 +853,21 @@ StaticPopupDialogs["MOGIT_PREVIEW_ADDITEM"] = {
 		onAccept(parent, data);
 		parent:Hide();
 	end,
-	EditBoxOnEscapePressed = function(self)
-		self:GetParent():Hide();
-	end,
-	timeout = 0,
-	exclusive = 1,
-	whileDead = 1,
+	EditBoxOnEscapePressed = HideParentPanel;
+	exclusive = true,
+	whileDead = true,
 };
 
-local function onAccept(self,preview)
+local function onAccept(self, preview)
 	local items = self.editBox:GetText();
 	items = items and items:match("compare%?items=([^;#]+)");
 	if items then
 		local tbl = {};
 		for item in items:gmatch("([^:]+)") do
 			item = item:match("^(%d+)");
-			table.insert(tbl,tonumber(item));
+			table.insert(tbl, tonumber(item));
 		end
-		mog:AddToPreview(tbl,preview);
+		mog:AddToPreview(tbl, preview);
 	end
 end
 
@@ -867,12 +875,12 @@ StaticPopupDialogs["MOGIT_PREVIEW_IMPORT"] = {
 	text = L["Copy and paste a Wowhead Compare URL into the text box below to import"],
 	button1 = L["Import"],
 	button2 = CANCEL,
-	hasEditBox = 1,
+	hasEditBox = true,
 	maxLetters = 512,
 	editBoxWidth = 260,
-	OnShow = function(self,preview)
+	OnShow = function(self, preview)
 		local str;
-		for k,v in pairs(preview.slots) do
+		for k, v in pairs(preview.slots) do
 			if v.item then
 				if str then
 					str = str..":"..v.item;
@@ -890,12 +898,9 @@ StaticPopupDialogs["MOGIT_PREVIEW_IMPORT"] = {
 		onAccept(parent, data);
 		parent:Hide();
 	end,
-	EditBoxOnEscapePressed = function(self)
-		self:GetParent():Hide();
-	end,
-	timeout = 0,
-	exclusive = 1,
-	whileDead = 1,
+	EditBoxOnEscapePressed = HideParentPanel,
+	exclusive = true,
+	whileDead = true,
 };
 
 StaticPopupDialogs["MOGIT_PREVIEW_CLOSE"] = {
@@ -907,5 +912,4 @@ StaticPopupDialogs["MOGIT_PREVIEW_CLOSE"] = {
 	end,
 	hideOnEscape = true,
 	whileDead = true,
-	timeout = 0,
 }

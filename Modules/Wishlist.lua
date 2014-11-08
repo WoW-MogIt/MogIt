@@ -42,25 +42,21 @@ function Wishlist:MogItLoaded()
 	convertBowSlots()
 	
 	do	-- convert to 6.0 string format
-		for k, profile in pairs(self.db.profiles) do
-			if profile.items then
-				for k, item in pairs(profile.items) do
-					if type(item) == "string" then break end
-					-- profile.items[k] = MogIt:ItemToID(item)
-					profile.items[k] = tostring(item)
-				end
-			end
+		-- for k, profile in pairs(self.db.profiles) do
+			-- if profile.items then
+				-- for k, item in pairs(profile.items) do
+					-- profile.items[k] = tostring(item)
+				-- end
+			-- end
 			
-			if profile.sets then
-				for i, set in ipairs(profile.sets) do
-					for k, item in pairs(set.items) do
-						if type(item) == "string" then break end
-						-- set.items[k] = MogIt:ItemToID(item)
-						set.items[k] = tostring(item)
-					end
-				end
-			end
-		end
+			-- if profile.sets then
+				-- for i, set in ipairs(profile.sets) do
+					-- for k, item in pairs(set.items) do
+						-- set.items[k] = tostring(item)
+					-- end
+				-- end
+			-- end
+		-- end
 	end
 	
 	db.RegisterCallback(self, "OnProfileChanged", onProfileUpdated)
@@ -154,7 +150,7 @@ function Wishlist:BuildList()
 		list[#list + 1] = v
 	end
 	for i, v in ipairs(db.items) do
-		list[#list + 1] = v
+		list[#list + 1] = MogIt:ItemToString(v)
 	end
 	return list
 end
@@ -272,6 +268,7 @@ function Wishlist:DeleteSet(setName, noConfirm)
 end
 
 local function tableFind(tbl, value, token)
+	if not tbl then return end
 	for i, v in pairs(tbl) do
 		if v == value or (token and token[v]) then
 			return true
@@ -279,14 +276,26 @@ local function tableFind(tbl, value, token)
 	end
 end
 
-function Wishlist:IsItemInWishlist(itemID, noSet)
-	local token = MogIt.tokens[itemID]
-	if tableFind(self.db.profile.items, itemID, token) then return true end
+function Wishlist:IsItemInWishlist(itemID, noSet, profile)
+	local token = MogIt.tokens[MogIt:ItemToID(itemID)]
+	-- itemID = tostring(itemID)
+	local items
+	if profile then
+		local profile = self.db.profiles[profile]
+		if not profile then return end
+		items = profile.items
+	else
+		items = self.db.profile.items
+	end
+	if tableFind(items, itemID, token) then return true end
 	if not noSet then
-		for i, set in ipairs(self:GetSets()) do
-			if tableFind(set.items, itemID, token) then return true end
-			for slot, items in pairs(set.alternateItems) do
-				if tableFind(items, itemID, token) then return true end
+		local sets = self:GetSets(profile, true)
+		if sets then
+			for i, set in ipairs(sets) do
+				if tableFind(set.items, itemID, token) then return true end
+				for slot, items in pairs(set.alternateItems) do
+					if tableFind(items, itemID, token) then return true end
+				end
 			end
 		end
 	end

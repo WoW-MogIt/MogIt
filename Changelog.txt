@@ -1,5 +1,11 @@
 [b]v3.4.0[/b]
 - Updated for 6.0 with Warlords of Draenor items, new difficulty filters.
+
+[b]v3.3.4[/b]
+- Pull updated libraries.
+- Temporarily disable "Only transmog items" tooltip option as it broke tooltip model.
+
+[b]v3.3.3[/b]
 - Loading a set into a preview will now set the window title to the set name. A prepended * indicates that changes have been made.
 - Wishlist sets will now be sorted also in menus.
 - Moved 'New set' option to top of menu.
