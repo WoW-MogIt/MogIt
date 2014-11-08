@@ -265,8 +265,41 @@ function mog:ADDON_LOADED(addon)
 	end
 end
 
+local function sortCharacters(a, b)
+	local characterA, realmA = a:match("(.+) %- (.+)");
+	local characterB, realmB = b:match("(.+) %- (.+)");
+	if realmA ~= realmB then
+		-- your own realm gets sorted before others
+		if realmA == myRealm then
+			return true;
+		end
+		if realmB == myRealm then
+			return false;
+		end
+		return realmA < realmB;
+	else
+		return characterA < characterB;
+	end
+end
+
 function mog:PLAYER_LOGIN()
-	mog:LoadSettings()
+	local connectedRealms = {};
+	local _, realm = UnitFullName("player");
+	for i, v in ipairs(GetAutoCompleteRealms() or {}) do
+		connectedRealms[v] = true;
+	end
+	self.realmCharacters = {};
+	local myName = UnitName("player");
+	local myRealm = GetRealmName();
+	for characterKey in pairs(mog.wishlist.db.sv.profileKeys) do
+		local character, realm = characterKey:match("(.+) %- (.+)");
+		if connectedRealms[realm:gsub("[ -]", "")] and (character ~= myName or realm ~= myRealm) then
+			table.insert(self.realmCharacters, characterKey);
+		end
+	end
+	sort(self.realmCharacters, sortCharacters);
+	
+	mog:LoadSettings();
 	self.frame:SetScript("OnSizeChanged", function(self, width, height)
 		mog.db.profile.gridWidth = width;
 		mog.db.profile.gridHeight = height;

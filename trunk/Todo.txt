@@ -10,6 +10,8 @@
 - Update extra modules
 - Add support for illusions and localised enchant names in Enchants.lua (for the future)
 
+- Fix removing wishlist sets when sorting enabled.
+
 
 == Old ==
 
