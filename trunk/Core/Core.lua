@@ -370,28 +370,22 @@ end
 
 mog.itemStringShort = "item:%d:0";
 mog.itemStringLong = "item:%d:0:0:0:0:0:0:0:0:0:%d:%d:%d";
-function mog:ItemToString(item)
-	local id, bonus;
-	if type(item) == "string" then
-		id, bonus = item:match("^(%d+),?(%d*)");
-		id = tonumber(id);
-		bonus = tonumber(bonus);
-	elseif type(item) == "number" then
-		id = item;
-	end
-	if id then
-		-- itemID, enchantID, instanceDifficulty, numBonusIDs, bonusID1
-		return format(bonus and mog.itemStringLong or mog.itemStringShort, id, 0, bonus and bonus ~= 0 and 1, bonus or 0);
+
+function mog:ToStringItem(id, bonus)
+	-- itemID, enchantID, instanceDifficulty, numBonusIDs, bonusID1
+	if bonus then
+		return format(mog.itemStringLong, id, 0, bonus and 1, bonus);
+	else
+		return format(mog.itemStringShort, id);
 	end
 end
 
-mog.itemStringPattern = "item:(%d+):?[^:]*:?[^:]*:?[^:]*:?[^:]*:?[^:]*:?[^:]*:?[^:]*:?[^:]*:?[^:]*:?[^:]*:?[^:]*:?([^:]*)";
-function mog:ItemToID(item)
+mog.itemStringPattern = "item:(%d+):%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:(%d+)";
+
+function mog:ToNumberItem(item)
 	if type(item) == "string" then
-		local id,bonus = item:match(mog.itemStringPattern);
-		if not id then
-			id,bonus = item:match("^(%d+),?(%d*)");
-		end
+		local id, bonus = item:match(mog.itemStringPattern);
+		id = id or item:match("item:(%d+)");
 		return tonumber(id), tonumber(bonus);
 	elseif type(item) == "number" then
 		return item;

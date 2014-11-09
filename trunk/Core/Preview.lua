@@ -148,10 +148,10 @@ local function setWeaponEnchant(self, preview, enchant)
 	local mainHandItem = preview.slots["MainHandSlot"].item;
 	local offHandItem = preview.slots["SecondaryHandSlot"].item;
 	if mainHandItem then
-		preview.model:TryOn(format("item:%d:%d", mainHandItem, preview.data.weaponEnchant), "MainHandSlot");
+		preview.model:TryOn(format("item:%s:%d", mainHandItem:match("item:(%d+)"), preview.data.weaponEnchant), "MainHandSlot");
 	end
 	if offHandItem then
-		preview.model:TryOn(format("item:%d:%d", offHandItem, preview.data.weaponEnchant), "SecondaryHandSlot");
+		preview.model:TryOn(format("item:%s:%d", offHandItem:match("item:(%d+)"), preview.data.weaponEnchant), "SecondaryHandSlot");
 	end
 end
 
@@ -284,6 +284,7 @@ local newSet = {items = {}}
 
 local function onClick(self, set)
 	newSet.name = set
+	newSet.previewFrame = currentPreview
 	wipe(newSet.items)
 	for slot, v in pairs(currentPreview.slots) do
 		newSet.items[slot] = v.item
@@ -294,6 +295,7 @@ end
 local function newSetOnClick(self)
 	wipe(newSet.items)
 	newSet.name = "Set "..(#mog.wishlist:GetSets() + 1)
+	newSet.previewFrame = currentPreview
 	for slot, v in pairs(currentPreview.slots) do
 		newSet.items[slot] = v.item
 	end
@@ -619,7 +621,7 @@ function mog.view.AddItem(item, preview, forceSlot, setItem)
 	if not (item and preview) then return end;
 	
 	if type(item) == "number" then
-		item = mog:ItemToString(item);
+		item = mog:ToStringItem(item);
 	end
 	
 	local itemInfo = mog:GetItemInfo(item, "PreviewAddItem");
@@ -673,7 +675,7 @@ function mog.view.AddItem(item, preview, forceSlot, setItem)
 		slotTexture(preview, slot, GetItemIcon(item));
 		if preview:IsVisible() then
 			if (slot == "MainHandSlot" or slot == "SecondaryHandSlot") and preview.data.weaponEnchant then
-				item = format("item:%d:%d", item, preview.data.weaponEnchant);
+				item = format("item:%s:%d", item:match("item:(%d+)"), preview.data.weaponEnchant);
 			end
 			if invType == "INVTYPE_RANGED" then
 				slot = "SecondaryHandSlot";
@@ -691,6 +693,9 @@ function mog.view.DelItem(slot, preview)
 	local invType = mog:GetItemInfo(preview.slots[slot].item).invType;
 	preview.slots[slot].item = nil;
 	slotTexture(preview,slot);
+	if preview.data.title then
+		preview.TitleText:SetText("*"..preview.data.title);
+	end
 	if preview:IsVisible() then
 		if invType == "INVTYPE_RANGED" then
 			slot = "SecondaryHandSlot"
