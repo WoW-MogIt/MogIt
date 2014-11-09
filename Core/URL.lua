@@ -65,7 +65,7 @@ mog:AddURL("Wowhead",{
 	compare = function(tbl)
 		local str;
 		for k,v in pairs(tbl) do
-			v = mog:ItemToID(v);
+			v = mog:ToNumberItem(v);
 			if str then
 				str = str..":"..v;
 			else
@@ -117,7 +117,7 @@ mog:AddURL("Buffed.de",{
 	compare = function(tbl)
 		local str;
 		for k,v in pairs(tbl) do
-			v = mog:ItemToID(v);
+			v = mog:ToNumberItem(v);
 			if str then
 				str = str..v..";";
 			else

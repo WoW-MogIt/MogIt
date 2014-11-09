@@ -23,7 +23,7 @@ function mog.base.AddSlot(slot,addon)
 	local list = module.slots[slot].list;
 	
 	return function(id,display,quality,lvl,faction,class,bind,slot,source,sourceid,zone,sourceinfo)
-		id = mog:ItemToString(id);
+		id = mog:ToStringItem(id, bonusID);
 		tinsert(list,id);
 		mog:AddData("item", id, "display", display);
 		mog:AddData("item", id, "quality", quality);

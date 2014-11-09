@@ -321,7 +321,7 @@ function mog.ShowItemTooltip(self, item, items, cycle)
 	end
 	
 	GameTooltip:AddLine(" ")
-	addTooltipDoubleLine(ID..":", mog:ItemToID(item))
+	addTooltipDoubleLine(ID..":", mog:ToNumberItem(item))
 	
 	if mog:HasItem(item) then
 		GameTooltip:AddLine(" ")
@@ -377,7 +377,7 @@ function mog.Item_OnClick(self, btn, data, isSaved)
 		if IsControlKeyDown() then
 			mog:AddToPreview(item)
 		elseif IsShiftKeyDown() then
-			mog:ShowURL(mog:ItemToID(item))
+			mog:ShowURL(mog:ToNumberItem(item))
 		else
 			showMenu(mog.Item_Menu, data, isSaved)
 		end
@@ -423,7 +423,7 @@ function mog.ShowSetTooltip(self, items, name)
 	for i, slot in ipairs(mog.slots) do
 		local itemID = items[slot] or items[i]
 		if itemID then
-			addItemTooltipLine(mog:ItemToID(itemID))
+			addItemTooltipLine(mog:ToNumberItem(itemID))
 		end
 	end
 	GameTooltip:Show()
