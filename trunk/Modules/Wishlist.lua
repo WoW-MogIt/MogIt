@@ -281,7 +281,9 @@ end
 
 function Wishlist:IsItemInWishlist(itemID, noSet, profile)
 	local token = MogIt.tokens[MogIt:ToNumberItem(itemID)]
-	-- itemID = tostring(itemID)
+	if type(itemID) == "string" then
+		itemID = tonumber(itemID:match("item:(%d+)"))
+	end
 	local items
 	if profile then
 		local profile = self.db.profiles[profile]
@@ -394,6 +396,7 @@ do
 				end
 				if data.previewFrame then
 					data.previewFrame.TitleText:SetText(text)
+					data.previewFrame.data.title = text
 				end
 			else
 				Wishlist:AddItem(data, text)
@@ -467,13 +470,15 @@ StaticPopupDialogs["MOGIT_WISHLIST_OVERWRITE_SET"] = {
 	button1 = YES,
 	button2 = NO,
 	OnAccept = function(self, data)
+		local setName = data.name
 		-- first clear all items since every slot might not be used
-		wipe(Wishlist:GetSet(data.name).items)
+		wipe(Wishlist:GetSet(setName).items)
 		for slot, v in pairs(data.items) do
-			Wishlist:AddItem(v, data.name, slot)
+			Wishlist:AddItem(v, setName, slot)
 		end
 		if data.previewFrame then
-			data.previewFrame.TitleText:SetText(data.name)
+			data.previewFrame.TitleText:SetText(setName)
+			data.previewFrame.data.title = setName
 		end
 		MogIt:BuildList(nil, "Wishlist")
 	end,
