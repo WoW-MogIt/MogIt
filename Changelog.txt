@@ -1,8 +1,8 @@
 [b]v3.4.0[/b]
 - Updated for 6.0 with Warlords of Draenor items, new difficulty filters.
 - Fixed Titan's Grip support.
-- Enable linking items into preview add item dialog.
-- Preview title will now update when the set is saved.
+- You can now link ingame items into the preview Add item dialog.
+- Preview title will now update when saved to a set.
 - Preview will now appear modified when items are removed.
 - Deleting wishlist sets when alphabetical wishlist sorting is enabled should now work.
 
