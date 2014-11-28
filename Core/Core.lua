@@ -166,6 +166,7 @@ ItemInfo.RegisterCallback(mog, "OnItemInfoReceivedBatch", "ItemInfoReceived");
 --//
 
 function mog:HasItem(itemID)
+	itemID = self:ToNumberItem(itemID)
 	return GetItemCount(itemID, true) > 0 or (character and select(3, DataStore:GetContainerItemCount(character, itemID)) > 0)
 end
 
