@@ -809,7 +809,7 @@ local function hookInspectUI()
 	local function onClick(self, button)
 		if InspectFrame.unit and self.hasItem and IsControlKeyDown() and button == "RightButton" then
 			-- GetInventoryItemID actually returns the transmogged-into item for inspect units
-			mog:AddToPreview(GetInventoryItemID(InspectFrame.unit, self:GetID()));
+			mog:AddToPreview((GetInventoryItemID(InspectFrame.unit, self:GetID())));
 		else
 			HandleModifiedItemClick(GetInventoryItemLink(InspectFrame.unit, self:GetID()));
 		end

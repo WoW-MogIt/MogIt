@@ -10,6 +10,8 @@
 - Add support for illusions and localised enchant names in Enchants.lua (for the future)
 
 
+http://wow.curseforge.com/addons/mogit/forum/bugs/66566-white-items/#p1
+
 == Old ==
 
 GUI:
