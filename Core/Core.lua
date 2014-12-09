@@ -333,7 +333,7 @@ end
 --// Data API
 mog.data = {};
 
-function mog:AddData(data,id,key,value)
+function mog:AddData(data, id, key, value)
 	if not (data and id and key) then return end;
 	
 	--if data == "item" then
@@ -350,7 +350,7 @@ function mog:AddData(data,id,key,value)
 	return value;
 end
 
-function mog:DeleteData(data,id,key)
+function mog:DeleteData(data, id, key)
 	if not mog.data[data] then return end;
 	if id and key then
 		mog.data[data][key][id] = nil;
@@ -365,17 +365,17 @@ function mog:DeleteData(data,id,key)
 	end
 end
 
-function mog:GetData(data,id,key)
+function mog:GetData(data, id, key)
 	return mog.data[data] and mog.data[data][key] and mog.data[data][key][id];
 end
 
 mog.itemStringShort = "item:%d:0";
-mog.itemStringLong = "item:%d:0:0:0:0:0:0:0:0:0:%d:%d:%d";
+mog.itemStringLong = "item:%d:0:0:0:0:0:0:0:0:0:0:%d:%d";
 
 function mog:ToStringItem(id, bonus)
 	-- itemID, enchantID, instanceDifficulty, numBonusIDs, bonusID1
 	if bonus then
-		return format(mog.itemStringLong, id, 0, bonus and 1, bonus);
+		return format(mog.itemStringLong, id, bonus and 1, bonus);
 	else
 		return format(mog.itemStringShort, id);
 	end
@@ -391,6 +391,10 @@ function mog:ToNumberItem(item)
 	elseif type(item) == "number" then
 		return item;
 	end
+end
+
+function mog:NormaliseItemString(item)
+	return self:ToStringItem(self:ToNumberItem(item));
 end
 --//
 

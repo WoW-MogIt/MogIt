@@ -17,21 +17,10 @@ f.edit:SetHeight(16);
 f.edit:SetPoint("TOPLEFT",f.label,"BOTTOMLEFT",8,-5);
 f.edit:SetPoint("RIGHT",f.label,"RIGHT",-2,0);
 f.edit:SetAutoFocus(false);
---[[f.edit:SetScript("OnFocusGained",function(self)
-	
-end);--]]
-f.edit:SetScript("OnEnterPressed",EditBox_ClearFocus);
-f.edit:SetScript("OnTextChanged",function(self,user)
-	if user then
-		searchString = self:GetText()-- or "";
-		searchString = searchString:lower();
-		mog:BuildList();
-	end
-end);
-function f.edit.clearFunc(self)
-	searchString = "";
+f.edit:HookScript("OnTextChanged",function(self,user)
+	searchString = self:GetText():lower();
 	mog:BuildList();
-end
+end);
 
 function f.Filter(itemID)
 	if searchString:trim() == "" then
