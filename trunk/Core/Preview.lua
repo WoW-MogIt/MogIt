@@ -620,9 +620,11 @@ local playerClass = select(2, UnitClass("PLAYER"));
 function mog.view.AddItem(item, preview, forceSlot, setItem)
 	if not (item and preview) then return end;
 	
-	if type(item) == "number" then
-		item = mog:ToStringItem(item);
+	local itemID, bonusID = item
+	if type(item) == "string" then
+		itemID, bonusID = mog:ToNumberItem(item);
 	end
+	item = mog:ToStringItem(itemID, bonusID);
 	
 	local itemInfo = mog:GetItemInfo(item, "PreviewAddItem");
 	if not itemInfo then
@@ -675,7 +677,7 @@ function mog.view.AddItem(item, preview, forceSlot, setItem)
 		slotTexture(preview, slot, GetItemIcon(item));
 		if preview:IsVisible() then
 			if (slot == "MainHandSlot" or slot == "SecondaryHandSlot") and preview.data.weaponEnchant then
-				item = format("item:%s:%d", item:match("item:(%d+)"), preview.data.weaponEnchant);
+				item = format(gsub(item, "item:(%d+):0", "item:%1:%%d"), preview.data.weaponEnchant);
 			end
 			if invType == "INVTYPE_RANGED" then
 				slot = "SecondaryHandSlot";
@@ -709,11 +711,7 @@ function mog:AddToPreview(item, preview, title)
 	preview = mog:GetPreview(preview or mog.activePreview);
 	
 	ShowUIPanel(mog.view);
-	if type(item) == "number" then
-		mog.view.AddItem(item, preview);
-	elseif type(item) == "string" then
-		mog.view.AddItem(tonumber(item:match("item:(%d+)")), preview);
-	elseif type(item) == "table" then
+	if type(item) == "table" then
 		mog.view:Undress(preview);
 		for k,v in pairs(item) do
 			mog.view.AddItem(v, preview, k, true);
@@ -722,6 +720,8 @@ function mog:AddToPreview(item, preview, title)
 			preview.TitleText:SetText(title);
 			preview.data.title = title;
 		end
+	else
+		mog.view.AddItem(item, preview);
 	end
 	
 	if mog.db.profile.gridDress == "preview" and mog.activePreview == preview then
@@ -865,10 +865,10 @@ StaticPopupDialogs["MOGIT_PREVIEW_ADDITEM"] = {
 
 local function onAccept(self, preview)
 	local items = self.editBox:GetText();
-	items = items and items:match("compare%?items=([^;#]+)");
+	items = items and items:match("compare%?items=([^#]+)");
 	if items then
 		local tbl = {};
-		for item in items:gmatch("([^:]+)") do
+		for item in items:gmatch("([^;]+)") do
 			item = item:match("^(%d+)");
 			table.insert(tbl, tonumber(item));
 		end

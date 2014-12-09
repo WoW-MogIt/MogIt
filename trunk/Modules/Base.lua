@@ -23,7 +23,8 @@ function mog.base.AddSlot(slot,addon)
 	local list = module.slots[slot].list;
 	
 	return function(id,display,quality,lvl,faction,class,bind,slot,source,sourceid,zone,sourceinfo)
-		id = mog:ToStringItem(id, bonusID);
+		local itemID, bonusID = strsplit(",", id)
+		id = mog:ToStringItem(tonumber(itemID), tonumber(bonusID));
 		tinsert(list,id);
 		mog:AddData("item", id, "display", display);
 		mog:AddData("item", id, "quality", quality);
@@ -216,9 +217,11 @@ local addons = {
 	"MogIt_Accessories",
 };
 
+local myName = UnitName("player");
+
 for _, addon in ipairs(addons) do
-	local _, title, _, loadable = GetAddOnInfo(addon);
-	if loadable then
+	local _, title = GetAddOnInfo(addon);
+	if GetAddOnEnableState(myName, addon) > 0 then
 		local module = mog:RegisterModule(addon, tonumber(GetAddOnMetadata(addon, "X-MogItModuleVersion")), {
 			label = title:match("MogIt[%s%-_:]+(.+)") or title,
 			base = true,

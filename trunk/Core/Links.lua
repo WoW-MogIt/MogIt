@@ -1,4 +1,4 @@
-local MogIt,mog = ...;
+local MogIt, mog = ...;
 local L = mog.L;
 
 local charset = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -12,7 +12,7 @@ local function toBase(num)
 	else
 		str = "";
 		while num > 0 do
-			str = charset:sub((num%base)+1,(num%base)+1)..str;
+			str = charset:sub((num%base)+1, (num%base)+1)..str;
 			num = math.floor(num/base);
 		end
 	end
@@ -21,43 +21,50 @@ end
 
 local function fromBase(str)
 	local num = 0;
-	for i=1,#str do
-		num = num + ((charset:find(str:sub(i,i))-1) * base^(#str-i));
+	for i=1, #str do
+		num = num + ((charset:find(str:sub(i, i))-1) * base^(#str-i));
 	end
 	return num;
 end
 
-function mog:SetToLink(set,race,gender,enchant)
-	local link = "[MogIt:";
+function mog:SetToLink(set, race, gender, enchant)
+	local items = {};
 	for k,v in pairs(set) do
-		link = link..("%0"..maxlen.."s"):format(toBase(v));
+		local itemID, bonusID = mog:ToNumberItem(v);
+		if bonusID then
+			tinsert(items, format("%s.%s", toBase(itemID), toBase(bonusID)));
+		else
+			tinsert(items, toBase(itemID));
+		end
 	end
-	link = link..":";
-	link = link..(race and toBase(race) or toBase(mog.playerRace));
-	link = link..(gender or mog.playerGender);
-	link = link..":";
-	link = link..(enchant and toBase(enchant) or 0);
-	link = link.."]";
-	return link;
+	return format("[MogIt:%s:%s%s:%s]", table.concat(items, ";"), toBase(race or mog.playerRace), (gender or mog.playerGender), toBase(enchant or 0));
 end
 
 function mog:LinkToSet(link)
 	local set = {};
-	--local items = link:match("MogIt:([^%]:]+)");
-	local items,race,gender,enchant = link:match("MogIt:(%w*):?(%w?)(%w?):?(%w*)");
+	-- local items, race, gender, enchant = strsplit(":", link:match("MogIt:(.+)"));
+	local items, race, gender, enchant = link:match("MogIt:([^:]*):?(%w?)(%w?):?(%w*)");
 	if items then
-		for i=1,#items/maxlen do
-			table.insert(set,fromBase(items:sub((i-1)*maxlen+1,i*maxlen)));
+		if items:find("[.;]") then
+			for item in gmatch(items, "[^;]+") do
+				local itemID, bonusID = strsplit(".", item);
+				table.insert(set, mog:ToStringItem(tonumber(fromBase(itemID)), bonusID and tonumber(fromBase(bonusID))));
+			end
+		else
+			for i = 1, #items/maxlen do
+				local itemID = items:sub((i-1)*maxlen+1, i*maxlen);
+				table.insert(set, mog:ToStringItem(tonumber(fromBase(itemID))));
+			end
 		end
 	end
 	race = race and fromBase(race);
 	gender = tonumber(gender);
 	enchant = enchant ~= "" and fromBase(enchant) or nil;
-	return set,race,gender,enchant;
+	return set, race, gender, enchant;
 end
 
-local function filter(self,event,msg,...)
-	msg = msg:gsub("%[(MogIt[^%]]+)%]","|cFFCC99FF|H%1|h[MogIt]|h|r");
+local function filter(self, event, msg, ...)
+	msg = msg:gsub("%[(MogIt[^%]]+)%]","|cffcc99ff|H%1|h[MogIt]|h|r");
 	return false, msg, ...;
 end
 
@@ -85,7 +92,7 @@ local events = {
 };
 
 for i, event in ipairs(events) do
-	ChatFrame_AddMessageEventFilter(event,filter);
+	ChatFrame_AddMessageEventFilter(event, filter);
 end
 
 local SetHyperlink = ItemRefTooltip.SetHyperlink;
@@ -95,7 +102,7 @@ function ItemRefTooltip:SetHyperlink(link)
 			ChatEdit_InsertLink("["..link.."]")
 		else
 			local preview = mog:GetPreview();
-			local set,race,gender,enchant = mog:LinkToSet(link);
+			local set, race, gender, enchant = mog:LinkToSet(link);
 			if race and gender then
 				preview.data.displayRace = race;
 				preview.data.displayGender = gender;
@@ -103,7 +110,7 @@ function ItemRefTooltip:SetHyperlink(link)
 				preview.model:ResetModel();
 				preview.model:Undress();
 			end
-			mog:AddToPreview(set,preview);
+			mog:AddToPreview(set, preview);
 		end
 	else
 		SetHyperlink(self, link);

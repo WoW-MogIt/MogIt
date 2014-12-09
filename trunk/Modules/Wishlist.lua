@@ -42,21 +42,25 @@ function Wishlist:MogItLoaded()
 	convertBowSlots()
 	
 	do	-- convert to 6.0 string format
-		-- for k, profile in pairs(self.db.profiles) do
-			-- if profile.items then
-				-- for k, item in pairs(profile.items) do
-					-- profile.items[k] = tostring(item)
-				-- end
-			-- end
+		for k, profile in pairs(self.db.profiles) do
+			if profile.items then
+				for k, item in pairs(profile.items) do
+					if type(item) == "number" then
+						profile.items[k] = MogIt:ToStringItem(item)
+					end
+				end
+			end
 			
-			-- if profile.sets then
-				-- for i, set in ipairs(profile.sets) do
-					-- for k, item in pairs(set.items) do
-						-- set.items[k] = tostring(item)
-					-- end
-				-- end
-			-- end
-		-- end
+			if profile.sets then
+				for i, set in ipairs(profile.sets) do
+					for k, item in pairs(set.items) do
+						if type(item) == "number" then
+							set.items[k] = MogIt:ToStringItem(item)
+						end
+					end
+				end
+			end
+		end
 	end
 	
 	db.RegisterCallback(self, "OnProfileChanged", onProfileUpdated)
@@ -150,7 +154,7 @@ function Wishlist:BuildList()
 		list[#list + 1] = v
 	end
 	for i, v in ipairs(db.items) do
-		list[#list + 1] = MogIt:ToStringItem(v)
+		list[#list + 1] = v
 	end
 	return list
 end
@@ -177,8 +181,8 @@ function Wishlist:GetCurrentProfile()
 end
 
 function Wishlist:AddItem(itemID, setName, slot, isAlternate)
-	if type(itemID) == "string" then
-		itemID = tonumber(itemID:match("item:(%d+)"))
+	if type(itemID) == "number" then
+		itemID = MogIt:ToStringItem(itemID)
 	end
 	-- don't add single items that are already on the wishlist
 	if not setName and self:IsItemInWishlist(itemID, true) then
@@ -282,7 +286,9 @@ end
 function Wishlist:IsItemInWishlist(itemID, noSet, profile)
 	local token = MogIt.tokens[MogIt:ToNumberItem(itemID)]
 	if type(itemID) == "string" then
-		itemID = tonumber(itemID:match("item:(%d+)"))
+		itemID = MogIt:NormaliseItemString(itemID)
+	else
+		itemID = MogIt:ToStringItem(itemID)
 	end
 	local items
 	if profile then
