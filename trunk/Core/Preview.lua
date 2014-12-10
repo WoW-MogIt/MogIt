@@ -615,7 +615,7 @@ mog:AddItemCacheCallback("PreviewAddItem", function()
 	end
 end)
 
-local playerClass = select(2, UnitClass("PLAYER"));
+local playerClass = select(2, UnitClass("player"));
 
 function mog.view.AddItem(item, preview, forceSlot, setItem)
 	if not (item and preview) then return end;

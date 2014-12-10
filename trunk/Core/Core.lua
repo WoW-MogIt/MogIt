@@ -381,11 +381,41 @@ function mog:ToStringItem(id, bonus)
 	end
 end
 
-mog.itemStringPattern = "item:(%d+):%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:(%d+)";
+local bonusDiffs = {
+	-- MoP
+	[451] = true, -- Raid Finder
+	[449] = true, -- Heroic (Raid)
+	[450] = true, -- Mythic (Raid)
+	-- WoD
+	[518] = true, -- 5N
+	[519] = true, -- 5N
+	[520] = true, -- 5N
+	[521] = true, -- 5N
+	[522] = true, -- 5N
+	[524] = true, -- 5H
+	[566] = true, -- Heroic (Raid)
+	[567] = true, -- Mythic (Raid)
+};
+
+mog.itemStringPattern = "item:(%d+):%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:(%d+):([%d:]+)";
 
 function mog:ToNumberItem(item)
 	if type(item) == "string" then
-		local id, bonus = item:match(mog.itemStringPattern);
+		local id, numBonusIDs, bonus = item:match(mog.itemStringPattern);
+		if numBonusIDs then
+			numBonusIDs = tonumber(numBonusIDs);
+			if numBonusIDs == 1 and not bonusDiffs[tonumber(bonus)] then
+				bonus = nil;
+			elseif numBonusIDs > 1 then
+				for bonusID in gmatch(bonus, "%d+") do
+					bonusID = tonumber(bonusID);
+					if bonusDiffs[bonusID] then
+						bonus = bonusID;
+						break;
+					end
+				end
+			end
+		end
 		id = id or item:match("item:(%d+)");
 		return tonumber(id), tonumber(bonus);
 	elseif type(item) == "number" then
