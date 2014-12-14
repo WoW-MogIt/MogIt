@@ -175,6 +175,7 @@ end
 local defaults = {
 	profile = {
 		sortWishlist = false,
+		tooltipItemID = false,
 		dressupPreview = false,
 		singlePreview = false,
 		previewUIPanel = false,

@@ -3,11 +3,6 @@ local L = mog.L
 
 local TEXTURE = [[Interface\RaidFrame\ReadyCheck-Ready]]
 
-local function getTexture(hasItem, embedded)
-	local texture = hasItem and TEXTURE or ""
-	return embedded and format("|T%s:0|t ", texture) or texture
-end
-
 function mog:GetItemLabel(itemID, callback, includeIcon, iconSize)
 	local item = mog:GetItemInfo(itemID, callback)
 	local name
@@ -23,12 +18,9 @@ function mog:GetItemLabel(itemID, callback, includeIcon, iconSize)
 	end
 end
 
-local function addTooltipDoubleLine(textLeft, textRight)
-	GameTooltip:AddDoubleLine(textLeft, textRight, nil, nil, nil, 1, 1, 1)
-end
-
-local function addItemTooltipLine(itemID, slot)
-	addTooltipDoubleLine(getTexture(mog:HasItem(itemID), true)..(type(slot) == "string" and _G[strupper(slot)]..": " or "")..mog:GetItemLabel(itemID, "ModelOnEnter"), mog.GetItemSourceShort(itemID))
+local function addItemTooltipLine(itemID, slot, selected)
+	local texture = format("|T%s:0|t ", (selected and [[Interface\ChatFrame\ChatFrameExpandArrow]]) or (mog:HasItem(itemID) and TEXTURE) or "")
+	GameTooltip:AddDoubleLine(texture..(type(slot) == "string" and _G[strupper(slot)]..": " or "")..mog:GetItemLabel(itemID, "ModelOnEnter"), mog.GetItemSourceShort(itemID), nil, nil, nil, 1, 1, 1)
 end
 
 function mog.GetItemSourceInfo(itemID)
@@ -247,7 +239,7 @@ GameTooltip:HookScript("OnTooltipCleared", function(self)
 	self[mog] = nil
 end)
 
-function mog.ShowItemTooltip(self, item, items, cycle)
+function mog.ShowItemTooltip(self, item, items)
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 	GameTooltip[mog] = true
 	
@@ -265,40 +257,35 @@ function mog.ShowItemTooltip(self, item, items, cycle)
 	
 	local itemInfo = mog:GetItemInfo(item, "ModelOnEnter")
 	local itemLevel = itemInfo and itemInfo.itemLevel
-	local itemLabel = mog:GetItemLabel(item, "ModelOnEnter")
-	if cycle and #items > 1 then
-		GameTooltip:AddDoubleLine(itemLabel, L["Item %d/%d"]:format(cycle, #items), nil, nil, nil, 1, 0, 0)
-	else
-		GameTooltip:AddLine(itemLabel)
-	end
+	GameTooltip:AddLine(mog:GetItemLabel(item, "ModelOnEnter"))
 	
 	local sourceType, source, zone, info = mog.GetItemSourceInfo(item)
 	if sourceType then
-		addTooltipDoubleLine(L["Source"]..":", sourceType)
+		GameTooltip:AddLine(L["Source"]..": |cffffffff"..sourceType)
 		if source then
-			addTooltipDoubleLine((sourceLabels[sourceType] or sourceType)..":", source)
+			GameTooltip:AddLine((sourceLabels[sourceType] or sourceType)..": |cffffffff"..source)
 		end
 		if info ~= nil then
-			addTooltipDoubleLine(STATUS..":", info and COMPLETE or INCOMPLETE)
+			GameTooltip:AddLine(STATUS..": |cffffffff"..(info and COMPLETE or INCOMPLETE))
 		end
 	end
 	if zone then
-		addTooltipDoubleLine(ZONE..":", zone)
+		GameTooltip:AddLine(ZONE..": |cffffffff"..zone)
 	end
 	
 	GameTooltip:AddLine(" ")
 	local bindType = mog:GetData("item", item, "bind")
 	if bindType then
-		addTooltipDoubleLine(L["Bind"]..":", L.bind[bindType])
+		GameTooltip:AddLine(L.bind[bindType], 1.0, 1.0, 1.0)
 	end
 	local requiredLevel = mog:GetData("item", item, "level")
 	if requiredLevel then
-		addTooltipDoubleLine(LEVEL..":", requiredLevel)
+		GameTooltip:AddLine("Required Level: |cffffffff"..requiredLevel)
 	end
-	addTooltipDoubleLine(STAT_AVERAGE_ITEM_LEVEL..":", itemLevel)
+	GameTooltip:AddLine(STAT_AVERAGE_ITEM_LEVEL..": |cffffffff"..(itemLevel or "??"))
 	local faction = mog:GetData("item", item, "faction")
 	if faction then
-		addTooltipDoubleLine(FACTION..":", (faction == 1 and FACTION_ALLIANCE or FACTION_HORDE))
+		GameTooltip:AddLine(FACTION..": |cffffffff"..(faction == 1 and FACTION_ALLIANCE or FACTION_HORDE))
 	end
 	local class = mog:GetData("item", item, "class")
 	if class and class > 0 then
@@ -313,15 +300,17 @@ function mog.ShowItemTooltip(self, item, items, cycle)
 				end
 			end
 		end
-		addTooltipDoubleLine(CLASS..":", str)
+		GameTooltip:AddLine(CLASS..": "..str)
 	end
 	local slot = mog:GetData("item", item, "slot")
 	if slot then
-		addTooltipDoubleLine(L["Slot"]..":", L.slots[slot])
+		GameTooltip:AddLine(L["Slot"]..": |cffffffff"..L.slots[slot])
 	end
 	
-	GameTooltip:AddLine(" ")
-	addTooltipDoubleLine(ID..":", mog:ToNumberItem(item))
+	if mog.db.profile.tooltipItemID then
+		GameTooltip:AddLine(" ")
+		GameTooltip:AddLine(L["Item ID"]..": |cffffffff"..mog:ToNumberItem(item))
+	end
 	
 	if mog:HasItem(item) then
 		GameTooltip:AddLine(" ")
@@ -342,11 +331,9 @@ function mog.ShowItemTooltip(self, item, items, cycle)
 		--GameTooltip:AddLine(L["Load module to see other items using this appearance."], nil, nil, nil, true)
 	elseif #items > 1 then
 		GameTooltip:AddLine(" ")
-		GameTooltip:AddLine(L["Other items using this appearance:"])
+		GameTooltip:AddLine(L["Items using this appearance:"])
 		for i, v in ipairs(items) do
-			if v ~= item then
-				addItemTooltipLine(v)
-			end
+			addItemTooltipLine(v, nil, v == item)
 		end
 	end
 	

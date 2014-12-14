@@ -7,6 +7,8 @@
 - Preview will now appear modified when items are removed.
 - Deleting wishlist sets when alphabetical wishlist sorting is enabled should now work.
 - Fixed name filter text box behaviour.
+- Various changes to item tooltips.
+- Added an option to include item ID in single item tooltips. Defaults to disabled.
 
 [b]v3.3.4[/b]
 - Pull updated libraries.
