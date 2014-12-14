@@ -70,51 +70,66 @@ function mog.createOptions()
 			},
 			sortWishlist = {
 				type = "toggle",
-				order = 1.3,
+				order = 2,
 				name = L["Sort wishlist sets alphabetically"],
 				width = "full",
 				arg = "sortWishlist",
 			},
-			dressupPreview = {
+			tooltipItemID = {
 				type = "toggle",
-				order = 1.4,
-				name = L["Use preview frame to dress up"],
+				order = 3,
+				name = L["Show item ID in tooltips"],
 				width = "full",
-				arg = "dressupPreview",
+				arg = "tooltipItemID",
 			},
-			singlePreview = {
-				type = "toggle",
-				order = 1.5,
-				name = L["Use a single preview frame"],
-				width = "full",
-				arg = "singlePreview",
-				confirm = function()
-					return L["This will close all your currently open previews."];
-				end,
-			},
-			previewUIPanel = {
-				type = "toggle",
-				order = 1.75,
-				name = L["Preview frame UI panel behaviour"],
-				width = "full",
-				arg = "previewUIPanel",
-				disabled = function()
-					return not mog.db.profile.singlePreview;
-				end,
-			},
-			previewFixedSize = {
-				type = "toggle",
-				order = 1.8,
-				name = L["Preview frame fixed size"],
-				width = "full",
-				arg = "previewFixedSize",
-				disabled = function()
-					return not (mog.db.profile.singlePreview and mog.db.profile.previewUIPanel);
-				end,
+			preview = {
+				type = "group",
+				order = 4,
+				name = L["Preview"],
+				inline = true,
+				args = {
+					dressupPreview = {
+						type = "toggle",
+						order = 1,
+						name = L["Use preview frame to dress up"],
+						width = "full",
+						arg = "dressupPreview",
+					},
+					singlePreview = {
+						type = "toggle",
+						order = 2,
+						name = L["Use a single preview frame"],
+						width = "full",
+						arg = "singlePreview",
+						confirm = function()
+							return L["This will close all your currently open previews."];
+						end,
+					},
+					previewUIPanel = {
+						type = "toggle",
+						order = 3,
+						name = L["Preview frame UI panel behaviour"],
+						width = "full",
+						arg = "previewUIPanel",
+						disabled = function()
+							return not mog.db.profile.singlePreview;
+						end,
+					},
+					previewFixedSize = {
+						type = "toggle",
+						order = 4,
+						name = L["Preview frame fixed size"],
+						width = "full",
+						arg = "previewFixedSize",
+						disabled = function()
+							return not (mog.db.profile.singlePreview and mog.db.profile.previewUIPanel);
+						end,
+					},
+				},
 			},
 			catalogue = {
 				type = "group",
-				order = 2,
+				order = 5,
 				name = L["Catalogue"],
 				inline = true,
 				args = {

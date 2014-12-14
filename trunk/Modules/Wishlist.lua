@@ -180,27 +180,29 @@ function Wishlist:GetCurrentProfile()
 	return self.db:GetCurrentProfile()
 end
 
-function Wishlist:AddItem(itemID, setName, slot, isAlternate)
-	if type(itemID) == "number" then
-		itemID = MogIt:ToStringItem(itemID)
+function Wishlist:AddItem(item, setName, slot, isAlternate)
+	if type(item) == "string" then
+		item = MogIt:NormaliseItemString(item)
+	else
+		item = MogIt:ToStringItem(item)
 	end
 	-- don't add single items that are already on the wishlist
-	if not setName and self:IsItemInWishlist(itemID, true) then
+	if not setName and self:IsItemInWishlist(item, true) then
 		return false
 	end
 	-- if a valid set name was provided, the item is supposed to go into the set, otherwise be added as a single item
 	local set = self:GetSet(setName)
 	if set then
-		slot = slot or MogIt.slotsType[select(9, GetItemInfo(itemID))]
+		slot = slot or MogIt.slotsType[select(9, GetItemInfo(item))]
 		if isAlternate then
 			local altItems = set.alternateItems[slot] or {}
 			set.alternateItems[slot] = altItems
-			tinsert(altItems, itemID)
+			tinsert(altItems, item)
 		else
-			set.items[slot] = itemID
+			set.items[slot] = item
 		end
 	else
-		tinsert(self.db.profile.items, itemID)
+		tinsert(self.db.profile.items, item)
 	end
 	return true
 end
@@ -283,13 +285,13 @@ local function tableFind(tbl, value, token)
 	end
 end
 
-function Wishlist:IsItemInWishlist(itemID, noSet, profile)
-	local token = MogIt.tokens[MogIt:ToNumberItem(itemID)]
-	if type(itemID) == "string" then
-		itemID = MogIt:NormaliseItemString(itemID)
+function Wishlist:IsItemInWishlist(item, noSet, profile)
+	if type(item) == "string" then
+		item = MogIt:NormaliseItemString(item)
 	else
-		itemID = MogIt:ToStringItem(itemID)
+		item = MogIt:ToStringItem(item)
 	end
+	local token = MogIt.tokens[MogIt:ToNumberItem(item)]
 	local items
 	if profile then
 		local profile = self.db.profiles[profile]
@@ -298,14 +300,14 @@ function Wishlist:IsItemInWishlist(itemID, noSet, profile)
 	else
 		items = self.db.profile.items
 	end
-	if tableFind(items, itemID, token) then return true end
+	if tableFind(items, item, token) then return true end
 	if not noSet then
 		local sets = self:GetSets(profile)
 		if sets then
 			for i, set in ipairs(sets) do
-				if tableFind(set.items, itemID, token) then return true end
+				if tableFind(set.items, item, token) then return true end
 				for slot, items in pairs(set.alternateItems) do
-					if tableFind(items, itemID, token) then return true end
+					if tableFind(items, item, token) then return true end
 				end
 			end
 		end
