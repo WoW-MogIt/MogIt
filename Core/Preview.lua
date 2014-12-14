@@ -73,14 +73,14 @@ local function resizeOnMouseUp(self)
 	end
 end
 
-local function modelOnMouseWheel(self,v)
+local function modelOnMouseWheel(self, v)
 	local delta = ((v > 0 and 0.6) or -0.6);
 	if mog.db.profile.sync then
 		mog.posZ = mog.posZ + delta;
-		for id,model in ipairs(mog.models) do
+		for id, model in ipairs(mog.models) do
 			model:PositionModel();
 		end
-		for id,preview in ipairs(mog.previews) do
+		for id, preview in ipairs(mog.previews) do
 			preview.model:PositionModel();
 		end
 	else
@@ -89,8 +89,8 @@ local function modelOnMouseWheel(self,v)
 	end
 end
 
-local function slotTexture(f,slot,texture)
-	f.slots[slot].icon:SetTexture(texture or select(2,GetInventorySlotInfo(slot)));
+local function slotTexture(f, slot, texture)
+	f.slots[slot].icon:SetTexture(texture or select(2, GetInventorySlotInfo(slot)));
 end
 
 local function slotOnEnter(self)
@@ -105,13 +105,13 @@ end
 local function slotOnClick(self,btn)
 	if btn == "RightButton" and IsControlKeyDown() then
 		local preview = self:GetParent();
-		mog.view.DelItem(self.slot,preview);
+		mog.view.DelItem(self.slot, preview);
 		if mog.db.profile.gridDress == "preview" and mog.activePreview == preview then
 			mog.scroll:update();
 		end
 		self:OnEnter();
 	else
-		mog.Item_OnClick(self,btn,self);
+		mog.Item_OnClick(self, btn, self);
 	end
 end
 
@@ -725,7 +725,11 @@ function mog:AddToPreview(item, preview, title)
 	end
 	
 	if mog.db.profile.gridDress == "preview" and mog.activePreview == preview then
-		mog.scroll:update();
+		for i, frame in ipairs(mog.models) do
+			if mog.list[frame.data.index] and frame:IsShown() then
+				mog.Item_FrameUpdate(frame, frame.data)
+			end
+		end
 	end
 	
 	return preview;
