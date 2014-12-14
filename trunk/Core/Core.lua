@@ -387,14 +387,17 @@ local bonusDiffs = {
 	[449] = true, -- Heroic (Raid)
 	[450] = true, -- Mythic (Raid)
 	-- WoD
-	[518] = true, -- 5N
-	[519] = true, -- 5N
-	[520] = true, -- 5N
-	[521] = true, -- 5N
-	[522] = true, -- 5N
-	[524] = true, -- 5H
-	[566] = true, -- Heroic (Raid)
-	[567] = true, -- Mythic (Raid)
+	[518] = true, -- dungeon-level-up-1
+	[519] = true, -- dungeon-level-up-2
+	[520] = true, -- dungeon-level-up-3
+	[521] = true, -- dungeon-level-up-4
+	[522] = true, -- dungeon-normal
+	[524] = true, -- dungeon-heroic
+	[525] = true, -- trade-skill
+	[526] = true, -- trade-skill
+	[527] = true, -- trade-skill
+	[566] = true, -- raid-heroic
+	[567] = true, -- raid-mythic
 };
 
 mog.itemStringPattern = "item:(%d+):%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:(%d+):([%d:]+)";

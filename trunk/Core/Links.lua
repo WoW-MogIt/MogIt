@@ -29,7 +29,7 @@ end
 
 function mog:SetToLink(set, race, gender, enchant)
 	local items = {};
-	for k,v in pairs(set) do
+	for k, v in pairs(set) do
 		local itemID, bonusID = mog:ToNumberItem(v);
 		if bonusID then
 			tinsert(items, format("%s.%s", toBase(itemID), toBase(bonusID)));

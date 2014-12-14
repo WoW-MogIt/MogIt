@@ -1,4 +1,4 @@
-local MogIt,mog = ...;
+local MogIt, mog = ...;
 local L = mog.L;
 
 mog.base = {};
@@ -11,21 +11,20 @@ local select = select;
 
 
 --// Input Functions
-function mog.base.AddSlot(slot,addon)
+function mog.base.AddSlot(slot, addon)
 	local module = mog:GetModule(addon);
 	if not module.slots[slot] then
 		module.slots[slot] = {
 			label = LBI[slot] or slot,
 			list = {},
 		};
-		tinsert(module.slotList,slot);
+		tinsert(module.slotList, slot);
 	end
 	local list = module.slots[slot].list;
 	
-	return function(id,display,quality,lvl,faction,class,bind,slot,source,sourceid,zone,sourceinfo)
-		local itemID, bonusID = strsplit(",", id)
-		id = mog:ToStringItem(tonumber(itemID), tonumber(bonusID));
-		tinsert(list,id);
+	return function(itemID, bonusID, display, quality, lvl, faction, class, bind, slot, source, sourceid, zone, sourceinfo)
+		local id = mog:ToStringItem(itemID, bonusID);
+		tinsert(list, id);
 		mog:AddData("item", id, "display", display);
 		mog:AddData("item", id, "quality", quality);
 		mog:AddData("item", id, "level", lvl);
@@ -37,15 +36,15 @@ function mog.base.AddSlot(slot,addon)
 		mog:AddData("item", id, "sourceid", sourceid);
 		mog:AddData("item", id, "sourceinfo", sourceinfo);
 		mog:AddData("item", id, "zone", zone);
-		tinsert(mog:GetData("display",display,"items") or mog:AddData("display",display,"items",{}),id);
+		tinsert(mog:GetData("display", display, "items") or mog:AddData("display", display, "items", {}), id);
 	end
 end
 
-function mog.base.AddColours(display,c1,c2,c3)
+function mog.base.AddColours(display, c1, c2, c3)
 	--mog:AddData("display",display,"colours",colours);
-	mog:AddData("display",display,"colour1",c1);
-	mog:AddData("display",display,"colour2",c2);
-	mog:AddData("display",display,"colour3",c3);
+	mog:AddData("display", display, "colour1", c1);
+	mog:AddData("display", display, "colour2", c2);
+	mog:AddData("display", display, "colour3", c3);
 end
 
 function mog.base.AddNPC(id,name)
@@ -66,7 +65,7 @@ local list = {};
 function mog.base.DropdownTier1(self)
 	if self.value.loaded then
 		self.value.active = nil;
-		mog:SetModule(self.value,self.value.label);
+		mog:SetModule(self.value, self.value.label);
 	else
 		LoadAddOn(self.value.name);
 	end
@@ -74,11 +73,11 @@ end
 
 function mog.base.DropdownTier2(self)
 	self.arg1.active = self.value;
-	mog:SetModule(self.arg1,self.arg1.label.." - "..self.value.label);
+	mog:SetModule(self.arg1, self.arg1.label.." - "..self.value.label);
 	CloseDropDownMenus();
 end
 
-function mog.base.Dropdown(module,tier)
+function mog.base.Dropdown(module, tier)
 	local info;
 	if tier == 1 then
 		info = UIDropDownMenu_CreateInfo();
@@ -89,7 +88,7 @@ function mog.base.Dropdown(module,tier)
 		info.keepShownOnClick = not module.loaded;
 		info.notCheckable = true;
 		info.func = mog.base.DropdownTier1;
-		UIDropDownMenu_AddButton(info,tier);
+		UIDropDownMenu_AddButton(info, tier);
 	elseif tier == 2 then
 		for _,slot in ipairs(module.slotList) do
 			info = UIDropDownMenu_CreateInfo();
@@ -98,7 +97,7 @@ function mog.base.Dropdown(module,tier)
 			info.notCheckable = true;
 			info.func = mog.base.DropdownTier2;
 			info.arg1 = module;
-			UIDropDownMenu_AddButton(info,tier);
+			UIDropDownMenu_AddButton(info, tier);
 		end
 	end
 end
