@@ -4,7 +4,7 @@ local L = mog.L;
 
 local ItemInfo = LibStub("LibItemInfo-1.0");
 
-LibStub("Libra"):EmbedWidgets(mog);
+LibStub("Libra"):Embed(mog);
 
 local character = DataStore_Containers and DataStore:GetCharacter();
 
@@ -285,17 +285,12 @@ local function sortCharacters(a, b)
 end
 
 function mog:PLAYER_LOGIN()
-	local connectedRealms = {};
-	local _, realm = UnitFullName("player");
-	for i, v in ipairs(GetAutoCompleteRealms() or {}) do
-		connectedRealms[v] = true;
-	end
 	self.realmCharacters = {};
-	local myName = UnitName("player");
-	local myRealm = GetRealmName();
+	-- local myName = UnitName("player");
+	-- local myRealm = GetRealmName();
 	for characterKey in pairs(mog.wishlist.db.sv.profileKeys) do
 		local character, realm = characterKey:match("(.+) %- (.+)");
-		if connectedRealms[realm:gsub("[ -]", "")] and (character ~= myName or realm ~= myRealm) then
+		if self:IsConnectedRealm(realm, true) and (character ~= myName or realm ~= myRealm) then
 			table.insert(self.realmCharacters, characterKey);
 		end
 	end
