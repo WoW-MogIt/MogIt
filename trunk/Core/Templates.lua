@@ -280,7 +280,7 @@ function mog.ShowItemTooltip(self, item, items)
 	end
 	local requiredLevel = mog:GetData("item", item, "level")
 	if requiredLevel then
-		GameTooltip:AddLine("Required Level: |cffffffff"..requiredLevel)
+		GameTooltip:AddLine(L["Required Level"]..": |cffffffff"..requiredLevel)
 	end
 	GameTooltip:AddLine(STAT_AVERAGE_ITEM_LEVEL..": |cffffffff"..(itemLevel or "??"))
 	local faction = mog:GetData("item", item, "faction")

@@ -119,7 +119,7 @@ end
 
 function mog.base:OnEnter(frame, value)
 	local data = frame.data;
-	mog.ShowItemTooltip(frame, data.item, data.items, data.cycle);
+	mog.ShowItemTooltip(frame, data.item, data.items);
 end
 
 function mog.base:OnClick(frame, btn, value)

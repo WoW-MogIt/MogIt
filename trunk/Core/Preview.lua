@@ -726,8 +726,9 @@ function mog:AddToPreview(item, preview, title)
 	
 	if mog.db.profile.gridDress == "preview" and mog.activePreview == preview then
 		for i, frame in ipairs(mog.models) do
-			if mog.list[frame.data.index] and frame:IsShown() then
-				mog.Item_FrameUpdate(frame, frame.data)
+			local value = frame.data.value;
+			if value and frame:IsShown() then
+				mog:ModelUpdate(frame, value);
 			end
 		end
 	end
