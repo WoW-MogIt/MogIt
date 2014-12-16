@@ -286,11 +286,9 @@ end
 
 function mog:PLAYER_LOGIN()
 	self.realmCharacters = {};
-	-- local myName = UnitName("player");
-	-- local myRealm = GetRealmName();
 	for characterKey in pairs(mog.wishlist.db.sv.profileKeys) do
 		local character, realm = characterKey:match("(.+) %- (.+)");
-		if self:IsConnectedRealm(realm, true) and (character ~= myName or realm ~= myRealm) then
+		if self:IsConnectedRealm(realm, true) then
 			table.insert(self.realmCharacters, characterKey);
 		end
 	end
