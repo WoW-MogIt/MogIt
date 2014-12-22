@@ -19,7 +19,7 @@ L.source = {
 };
 
 L.diffs = {
-	--[1] = PLAYER_DIFFICULTY1,
+	[1] = PLAYER_DIFFICULTY1,
 	[2] = PLAYER_DIFFICULTY2,
 	
 	[3] = L["10N"],
@@ -28,7 +28,7 @@ L.diffs = {
 	[6] = L["25H"],
 
 	[7] = PLAYER_DIFFICULTY3, -- Raid Finder
-	--[8] = PLAYER_DIFFICULTY4, -- Normal
+	[8] = PLAYER_DIFFICULTY1, -- Normal
 	[9] = PLAYER_DIFFICULTY2, -- Heroic
 	[10] = PLAYER_DIFFICULTY6, -- Mythic
 };
@@ -43,7 +43,7 @@ L.difficulties = {
 	[6] = RAID_DIFFICULTY_25PLAYER_HEROIC;
 
 	[7] = PLAYER_DIFFICULTY3, -- Raid Finder
-	--[8] = PLAYER_DIFFICULTY4, -- Normal
+	[8] = PLAYER_DIFFICULTY1, -- Normal
 	[9] = PLAYER_DIFFICULTY2, -- Heroic
 	[10] = PLAYER_DIFFICULTY6, -- Mythic
 };
