@@ -12,32 +12,40 @@ L.source = {
 	[5] = L["Crafted"],
 	[6] = L["Achievement"],
 	[7] = L["Code Redemption"],
+	[8] = L["In-Game Store"],
+	[9] = L["Black Market Auction House"],
+	[10] = L["Starter Gear"],
+	[11] = L["Event"],
 };
 
 L.diffs = {
 	--[1] = PLAYER_DIFFICULTY1,
 	[2] = PLAYER_DIFFICULTY2,
+	
 	[3] = L["10N"],
 	[4] = L["25N"],
 	[5] = L["10H"],
 	[6] = L["25H"],
-	[7] = PLAYER_DIFFICULTY2,
-	[8] = PLAYER_DIFFICULTY6,
-	[9] = PLAYER_DIFFICULTY3,
-	--[10] = PLAYER_DIFFICULTY4,
+
+	[7] = PLAYER_DIFFICULTY3, -- Raid Finder
+	--[8] = PLAYER_DIFFICULTY4, -- Normal
+	[9] = PLAYER_DIFFICULTY2, -- Heroic
+	[10] = PLAYER_DIFFICULTY6, -- Mythic
 };
 
 L.difficulties = {
 	[1] = DUNGEON_DIFFICULTY_5PLAYER;
 	[2] = DUNGEON_DIFFICULTY_5PLAYER_HEROIC;
+
 	[3] = RAID_DIFFICULTY_10PLAYER;
 	[4] = RAID_DIFFICULTY_25PLAYER;
 	[5] = RAID_DIFFICULTY_10PLAYER_HEROIC;
 	[6] = RAID_DIFFICULTY_25PLAYER_HEROIC;
-	[7] = PLAYER_DIFFICULTY2,
-	[8] = PLAYER_DIFFICULTY6,
-	[9] = PLAYER_DIFFICULTY3,
-	[10] = PLAYER_DIFFICULTY1,
+
+	[7] = PLAYER_DIFFICULTY3, -- Raid Finder
+	--[8] = PLAYER_DIFFICULTY4, -- Normal
+	[9] = PLAYER_DIFFICULTY2, -- Heroic
+	[10] = PLAYER_DIFFICULTY6, -- Mythic
 };
 
 L.slots = {
