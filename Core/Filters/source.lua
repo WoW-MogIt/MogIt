@@ -55,14 +55,14 @@ function f.dd.initialize(self,tier)
 	local info;
 		if tier == 1 then
 		info = UIDropDownMenu_CreateInfo();
-		info.text =	all and L["Select All"] or L["Select None"];
+		info.text = all and L["Select All"] or L["Select None"];
 		info.func = f.dd.SelectAll;
 		info.notCheckable = true;
 		UIDropDownMenu_AddButton(info);
 		
 		for k,v in ipairs(L.source) do
 			info = UIDropDownMenu_CreateInfo();
-			info.text =	v;
+			info.text = v;
 			info.value = k;
 			info.func = f.dd.Tier1;
 			info.keepShownOnClick = true;
@@ -76,7 +76,7 @@ function f.dd.initialize(self,tier)
 		if parent == 1 then
 			for k,v in ipairs(L.difficulties) do
 				info = UIDropDownMenu_CreateInfo();
-				info.text =	v;
+				info.text = v;
 				info.value = k;
 				info.func = f.dd.Tier2;
 				info.keepShownOnClick = true;
@@ -94,6 +94,10 @@ function f.Filter(src1,sub1)
 		return true;
 	elseif selected[src1] then
 		if src1 == 1 then
+			return (not sub1) or sub[1][sub1];
+		end
+		return true;
+		--[=[
 			if not sub1 then
 				return sub[1][8];
 			elseif sub1 == 7 then
@@ -107,6 +111,7 @@ function f.Filter(src1,sub1)
 			end
 		end
 		return true;
+		--]=]
 	end
 end
 
