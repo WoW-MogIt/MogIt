@@ -1,12 +1,15 @@
 == 6.0 ==
 - Possibly add support for bonus ID for items in URL.lua
-- Figure out if/how we will support bonusID in Tokens.lua
-- License txt file / Localization (just needs running + uploading when we're finished)
-- Update extra modules
-- Add support for illusions and localised enchant names in Enchants.lua (for the future)
 - Look over URL site options.
-
+- Localization (just needs running + uploading when we're finished)
 - Heroic dungeon drops incorrect display ID.
+- Source/Difficulty filters/lists
+- Check previews are working
+
+- Update extra modules
+
+- Add support for illusions and localised enchant names in Enchants.lua (for the future)
+- Figure out if/how we will support bonusID in Tokens.lua
 - Model tooltip doesn't reset when moving cursor quickly to another item.
 
 http://wow.curseforge.com/addons/mogit/forum/bugs/66566-white-items/#p1
