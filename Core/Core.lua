@@ -390,6 +390,8 @@ local bonusDiffs = {
 	[525] = true, -- trade-skill
 	[526] = true, -- trade-skill
 	[527] = true, -- trade-skill
+	[558] = true, -- trade-skill
+	[559] = true, -- trade-skill
 	[566] = true, -- raid-heroic
 	[567] = true, -- raid-mythic
 };
