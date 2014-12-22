@@ -222,6 +222,9 @@ local slots = {
 function mog.Item_FrameUpdate(self, data)
 	self:ApplyDress()
 	self:TryOn(format(gsub(data.item, "item:(%d+):0", "item:%1:%%d"), mog.weaponEnchant), slots[mog:GetData("item", data.item, "slot")])
+	if not mog:GetItemInfo(data.item) then
+		mog.doModelUpdate = true;
+	end
 end
 
 local sourceLabels = {
