@@ -16,6 +16,7 @@ L.source = {
 	[9] = L["Black Market Auction House"],
 	[10] = L["Starter Gear"],
 	[11] = L["Event"],
+	[12] = L["Follower Mission"],
 };
 
 L.diffs = {
