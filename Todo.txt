@@ -1,15 +1,14 @@
 == 6.0 ==
 - Possibly add support for bonus ID for items in URL.lua
-- Look over URL site options.
+- Look over URL site options. -- remove MMO-Champion
 - Localization (just needs running + uploading when we're finished)
-- Heroic dungeon drops incorrect display ID.
 - Maybe add headers to the difficulties in the source filter
 - Check previews are working
 
 - Update extra modules
 
 - Add support for illusions and localised enchant names in Enchants.lua (for the future)
-- Figure out if/how we will support bonusID in Tokens.lua
+- Figure out if/how we will support bonusID in Tokens.lua -- should not be very difficult simply using item strings
 - Model tooltip doesn't reset when moving cursor quickly to another item.
 
 http://wow.curseforge.com/addons/mogit/forum/bugs/66566-white-items/#p1
@@ -17,13 +16,6 @@ http://wow.curseforge.com/addons/mogit/forum/bugs/66566-white-items/#p1
 == Old ==
 
 GUI:
-[?] SetAnimation instead of SetSequence
 [?] Disable modules (or the bracket text) in the module dropdown if version isnt compatible?
 
-Modules:
-[A] Update extra modules
-
-Dressing room bug?
-Weapon catalog equip slot
 Preview - uncached equipped items
-Wishlist catalog info
