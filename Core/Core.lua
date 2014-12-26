@@ -295,6 +295,13 @@ function mog:PLAYER_LOGIN()
 	end
 	sort(self.realmCharacters, sortCharacters);
 	
+	for slot in pairs(mog.mogSlots) do
+		local isTransmogrified, _, _, _, _, visibleItemID = GetTransmogrifySlotInfo(slot);
+		if transmogrified then
+			mog:GetItemInfo(visibleItemID);
+		end
+	end
+	
 	mog:LoadSettings();
 	self.frame:SetScript("OnSizeChanged", function(self, width, height)
 		mog.db.profile.gridWidth = width;
@@ -304,15 +311,23 @@ function mog:PLAYER_LOGIN()
 end
 
 function mog:PLAYER_EQUIPMENT_CHANGED(slot, hasItem)
+	local visibleItem;
+	if mog.mogSlots[slot] then
+		local isTransmogrified, _, _, _, _, visibleItemID = GetTransmogrifySlotInfo(slot);
+		if isTransmogrified then
+			mog:GetItemInfo(visibleItemID);
+			visibleItem = visibleItemID;
+		end
+	end
 	-- don't do anything if the slot is not visible (necklace, ring, trinket)
 	if mog.db.profile.gridDress == "equipped" then
 		for i, frame in ipairs(mog.models) do
-			local item = frame.data.item
+			local item = frame.data.item;
 			if item then
 				local slotName = mog.mogSlots[slot];
 				if hasItem then
 					if (slot ~= INVSLOT_HEAD or ShowingHelm()) and (slot ~= INVSLOT_BACK or ShowingCloak()) then
-						frame:TryOn(mog.mogSlots[slot] and select(6, GetTransmogrifySlotInfo(slot)) or GetInventoryItemID("player", slot), slotName);
+						frame:TryOn(visibleItem or GetInventoryItemID("player", slot), slotName);
 					end
 				else
 					frame:UndressSlot(slot);

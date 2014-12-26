@@ -19,7 +19,7 @@ function mog:GetItemLabel(itemID, callback, includeIcon, iconSize)
 end
 
 local function addItemTooltipLine(itemID, slot, selected)
-	local texture = format("|T%s:0|t ", (selected and [[Interface\ChatFrame\ChatFrameExpandArrow]]) or (mog:HasItem(itemID) and TEXTURE) or "")
+	local texture = format("|T%s:0|t ", (selected and [[Interface\ChatFrame\ChatFrameExpandArrow]]) or (mog.wishlist:IsItemInWishlist(itemID) and [[Interface\TargetingFrame\UI-RaidTargetingIcon_1]]) or (mog:HasItem(itemID) and TEXTURE) or "")
 	GameTooltip:AddDoubleLine(texture..(type(slot) == "string" and _G[strupper(slot)]..": " or "")..mog:GetItemLabel(itemID, "ModelOnEnter"), mog.GetItemSourceShort(itemID), nil, nil, nil, 1, 1, 1)
 end
 

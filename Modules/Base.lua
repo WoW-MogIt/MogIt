@@ -91,10 +91,12 @@ function mog.base.Dropdown(module, tier)
 		if not module.loaded then
 			if module.version < mog.moduleVersion then
 				info.tooltipOnButton = true;
-				info.tooltipTitle = L["This module was created for an older version of MogIt and may not work correctly."];
+				info.tooltipTitle = RED_FONT_COLOR_CODE..ADDON_INTERFACE_VERSION;
+				info.tooltipText = L["This module was created for an older version of MogIt and may not work correctly."];
 			elseif module.version > mog.moduleVersion then
 				info.tooltipOnButton = true;
-				info.tooltipTitle = L["This module was created for a newer version of MogIt and may not work correctly."];
+				info.tooltipTitle = RED_FONT_COLOR_CODE..ADDON_INTERFACE_VERSION;
+				info.tooltipText = L["This module was created for a newer version of MogIt and may not work correctly."];
 			end
 		end
 		UIDropDownMenu_AddButton(info, tier);
