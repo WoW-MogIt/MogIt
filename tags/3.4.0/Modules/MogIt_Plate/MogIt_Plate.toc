@@ -1,0 +1,42 @@
+## Interface: 60000
+## Author: Aelobin (The Maelstrom EU) & Lombra (Defias Brotherhood EU)
+## Version: @project-version@
+## LoadOnDemand: 1
+## RequiredDeps: MogIt
+## X-MogItModuleVersion: 3
+
+## Title: MogIt: Plate
+## Title-frFR: MogIt: Plaques
+## Title-deDE: MogIt: Platte
+## Title-esES: MogIt: Placas
+## Title-esMX: MogIt: Placas
+## Title-ruRU: MogIt: Латы
+## Title-koKR: MogIt: 판금
+## Title-zhCN: MogIt: 板甲
+## Title-zhTW: MogIt: 鎧甲
+## Title-ptBR: MogIt: Placas
+## Title-itIT: MogIt: Plate
+
+## Notes: MogIt Data
+## Notes-frFR: MogIt Données
+## Notes-deDE: MogIt Daten
+## Notes-esES: MogIt Datos
+## Notes-esMX: MogIt Datos
+## Notes-ruRU: MogIt данные
+## Notes-koKR: MogIt 데이터
+## Notes-zhCN: MogIt 数据
+## Notes-zhTW: MogIt 的數據
+## Notes-ptBR: MogIt Dados
+## Notes-itIT: MogIt Dati
+
+Bosses.lua
+Colours.lua
+
+Head.lua
+Shoulders.lua
+Chest.lua
+Wrists.lua
+Hands.lua
+Waist.lua
+Legs.lua
+Feet.lua
