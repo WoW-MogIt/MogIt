@@ -849,10 +849,17 @@ end
 --// Popups
 local function onAccept(self, preview)
 	local text = self.editBox:GetText();
-	-- TODO: need support for bonus ID here
-	-- "http://www.wowhead.com/item=(%d+)&bonus=(%d+)"
-	text = text and (text:match("item:(%d+)") or text:match("(%d+).-$"));
-	mog:AddToPreview(tonumber(text), preview);
+	if text then
+		local id,bonus = mog:ToNumberItem(text);
+		if not id then
+			id,bonus = text:match("item=(%d+)"),text:match("bonus=(%d+)");
+		end
+		if not id then
+			id = text:match("(%d+).-$");
+			bonus = nil;
+		end
+		mog:AddToPreview(mog:ToStringItem(tonumber(id),tonumber(bonus)), preview);
+	end
 end
 
 StaticPopupDialogs["MOGIT_PREVIEW_ADDITEM"] = {
