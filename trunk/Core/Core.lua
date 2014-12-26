@@ -76,14 +76,15 @@ function mog:RegisterModule(name,version,data)
 	if mog.modules[name] then
 		--mog:Error(L["The \124cFFFFFFFF%s\124r module is already loaded."]:format(name));
 		return mog.modules[name];
-	elseif type(version) ~= "number" or version < mog.moduleVersion then
-		mog:Error(L["The \124cFFFFFFFF%s\124r module needs to be updated to work with this version of MogIt."]:format(name));
-		return;
-	elseif version > mog.moduleVersion then
-		mog:Error(L["The \124cFFFFFFFF%s\124r module requires you to update MogIt for it to work."]:format(name));
-		return;
+	--elseif type(version) ~= "number" or version < mog.moduleVersion then
+		--mog:Error(L["The \124cFFFFFFFF%s\124r module needs to be updated to work with this version of MogIt."]:format(name));
+		--return;
+	--elseif version > mog.moduleVersion then
+		--mog:Error(L["The \124cFFFFFFFF%s\124r module requires you to update MogIt for it to work."]:format(name));
+		--return;
 	end
 	data = data or {};
+	data.version = version;
 	data.name = name;
 	mog.modules[name] = data;
 	table.insert(mog.moduleList,data);
