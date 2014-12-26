@@ -392,6 +392,7 @@ function mog:ToStringItem(id, bonus)
 end
 
 local bonusDiffs = {
+	[0] = true,
 	-- MoP
 	[451] = true, -- Raid Finder
 	[449] = true, -- Heroic (Raid)

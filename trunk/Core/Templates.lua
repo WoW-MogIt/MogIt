@@ -18,8 +18,8 @@ function mog:GetItemLabel(itemID, callback, includeIcon, iconSize)
 	end
 end
 
-local function addItemTooltipLine(itemID, slot, selected)
-	local texture = format("|T%s:0|t ", (selected and [[Interface\ChatFrame\ChatFrameExpandArrow]]) or (mog.wishlist:IsItemInWishlist(itemID) and [[Interface\TargetingFrame\UI-RaidTargetingIcon_1]]) or (mog:HasItem(itemID) and TEXTURE) or "")
+local function addItemTooltipLine(itemID, slot, selected, wishlist)
+	local texture = format("|T%s:0|t ", (selected and [[Interface\ChatFrame\ChatFrameExpandArrow]]) or (wishlist and [[Interface\TargetingFrame\UI-RaidTargetingIcon_1]]) or (mog:HasItem(itemID) and TEXTURE) or "")
 	GameTooltip:AddDoubleLine(texture..(type(slot) == "string" and _G[strupper(slot)]..": " or "")..mog:GetItemLabel(itemID, "ModelOnEnter"), mog.GetItemSourceShort(itemID), nil, nil, nil, 1, 1, 1)
 end
 
@@ -400,8 +400,15 @@ function mog.Set_FrameUpdate(self, data)
 	self:ShowIndicator("label")
 	self:SetText(data.name)
 	self:Undress()
+	local hasSet = next(data.items)
 	for k, v in pairs(data.items) do
 		self:TryOn(v, k == "SecondaryHandSlot" and k)
+		if not mog:HasItem(v) then
+			hasSet = false
+		end
+	end
+	if hasSet then
+		self:ShowIndicator("hasItem")
 	end
 end
 

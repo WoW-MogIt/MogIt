@@ -2,12 +2,13 @@
 - Updated for 6.0 with Warlords of Draenor items, new difficulty filters.
 - Added support for item difficulty modifiers all across the addon.
 - Update module API version to 3.
-- Outdated modules will now be allowed to load and have a warning tooltip attached to their catalogue menu entry.
+- Outdated modules will now be allowed to load and will have a warning tooltip attached to their catalogue menu entry.
 - Fixed Titan's Grip support.
 - You can now link ingame items into the preview Add item dialog.
 - Preview title will now update when saved to a set.
 - Preview will now appear modified when items are removed.
 - Deleting wishlist sets when alphabetical wishlist sorting is enabled should now work.
+- The green check mark will now appear for sets of which you own all items.
 - Fixed name filter text box behaviour.
 - Various changes to item tooltips.
 - Added an option to include item ID in single item tooltips. Defaults to disabled.
