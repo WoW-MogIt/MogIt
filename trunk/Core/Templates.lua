@@ -336,7 +336,7 @@ function mog.ShowItemTooltip(self, item, items)
 		GameTooltip:AddLine(" ")
 		GameTooltip:AddLine(L["Items using this appearance:"])
 		for i, v in ipairs(items) do
-			addItemTooltipLine(v, nil, v == item)
+			addItemTooltipLine(v, nil, v == item, mog.wishlist:IsItemInWishlist(v))
 		end
 	end
 	
