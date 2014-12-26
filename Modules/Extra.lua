@@ -11,6 +11,13 @@ local function temp(module,tier)
 		info.keepShownOnClick = true;
 		info.notCheckable = true;
 		info.func = mog.base.DropdownTier1;
+		if module.version < mog.moduleVersion then
+			info.tooltipOnButton = true;
+			info.tooltipTitle = L["This module was created for an older version of MogIt and may not work correctly."];
+		elseif module.version > mog.moduleVersion then
+			info.tooltipOnButton = true;
+			info.tooltipTitle = L["This module was created for a newer version of MogIt and may not work correctly."];
+		end
 		UIDropDownMenu_AddButton(info,tier);
 	end
 end

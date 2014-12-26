@@ -88,6 +88,15 @@ function mog.base.Dropdown(module, tier)
 		info.keepShownOnClick = not module.loaded;
 		info.notCheckable = true;
 		info.func = mog.base.DropdownTier1;
+		if not module.loaded then
+			if module.version < mog.moduleVersion then
+				info.tooltipOnButton = true;
+				info.tooltipTitle = L["This module was created for an older version of MogIt and may not work correctly."];
+			elseif module.version > mog.moduleVersion then
+				info.tooltipOnButton = true;
+				info.tooltipTitle = L["This module was created for a newer version of MogIt and may not work correctly."];
+			end
+		end
 		UIDropDownMenu_AddButton(info, tier);
 	elseif tier == 2 then
 		for _,slot in ipairs(module.slotList) do
