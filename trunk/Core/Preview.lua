@@ -879,8 +879,9 @@ local function onAccept(self, preview)
 	if items then
 		local tbl = {};
 		for item in items:gmatch("([^;]+)") do
-			item = item:match("^(%d+)");
-			table.insert(tbl, tonumber(item));
+			local id,bonus = item:match("^(%d+)%.%d+%.%d+%.%d+%.%d+%.%d+%.%d+%.%d+%.%d+%.%d+%.(%d+)");
+			id = id or item:match("^(%d+)");
+			table.insert(tbl, mog:ToStringItem(tonumber(id),tonumber(bonus)));
 		end
 		mog:AddToPreview(tbl, preview);
 	end
@@ -897,11 +898,8 @@ StaticPopupDialogs["MOGIT_PREVIEW_IMPORT"] = {
 		local str;
 		for k, v in pairs(preview.slots) do
 			if v.item then
-				if str then
-					str = str..":"..v.item;
-				else
-					str = L["http://www.wowhead.com/"].."compare?items="..v.item;
-				end
+				local id,bonus = mog:ToNumberItem(v.item);
+				str = (str and str..":" or L["http://www.wowhead.com/"].."compare?items=")..id..(bonus and ".0.0.0.0.0.0.0.0.0."..bonus or "")
 			end
 		end
 		self.editBox:SetText(str or "");

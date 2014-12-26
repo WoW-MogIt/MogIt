@@ -367,7 +367,7 @@ function mog.Item_OnClick(self, btn, data, isSaved)
 		if IsControlKeyDown() then
 			mog:AddToPreview(item)
 		elseif IsShiftKeyDown() then
-			mog:ShowURL(mog:ToNumberItem(item))
+			mog:ShowURL(item,"item")
 		else
 			showMenu(mog.Item_Menu, data, isSaved)
 		end

@@ -1,6 +1,4 @@
 == 6.0 ==
-- Possibly add support for bonus ID for items in URL.lua
-- Look over URL site options. -- remove MMO-Champion
 - Localization (just needs running + uploading when we're finished)
 - Maybe add headers to the difficulties in the source filter
 - Check previews are working

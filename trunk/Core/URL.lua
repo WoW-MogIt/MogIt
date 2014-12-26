@@ -17,9 +17,17 @@ function mog:ShowURL(id,sub,url,force)
 	if mog.url[url] and mog.url[url][sub] then
 		local text;
 		if type(mog.url[url][sub]) == "function" then
-			text = mog.url[url][sub](id);
+			if sub == "item" then
+				text = mog.url[url][sub](mog:ToNumberItem(id));
+			else
+				text = mog.url[url][sub](id);
+			end
 		else
-			text = mog.url[url][sub]:format(id);
+			if sub == "item" then
+				text = mog.url[url][sub]:format(mog:ToNumberItem(id));
+			else
+				text = mog.url[url][sub]:format(id);
+			end
 		end
 		if text then
 			StaticPopup_Show("MOGIT_URL",mog.url[url].fav and "\124T"..mog.url[url].fav..":18:18\124t " or "",url,text);
@@ -53,35 +61,27 @@ StaticPopupDialogs["MOGIT_URL"] = {
 
 mog:AddURL("Battle.net",{
 	fav = "Interface\\AddOns\\MogIt\\Images\\fav_wow",
-	item = L["http://eu.battle.net/wow/en/"].."item/%d",
+	item = function(item,bonus)
+		return L["http://eu.battle.net/wow/en/"].."item/"..item..(bonus and L.BattleNetBonus[bonus] and "/"..L.BattleNetBonus[bonus] or "");
+	end,
 });
 
 mog:AddURL("Wowhead",{
 	fav = "Interface\\AddOns\\MogIt\\Images\\fav_wh",
-	item = L["http://www.wowhead.com/"].."item=%d",
+	item = function(item,bonus)
+		return L["http://www.wowhead.com/"].."item="..item..(bonus and "&bonus="..bonus or "");
+	end,
 	set = L["http://www.wowhead.com/"].."itemset=%d",
 	npc = L["http://www.wowhead.com/"].."npc=%d",
 	spell = L["http://www.wowhead.com/"].."spell=%d",
 	compare = function(tbl)
 		local str;
 		for k,v in pairs(tbl) do
-			v = mog:ToNumberItem(v);
-			if str then
-				str = str..":"..v;
-			else
-				str = L["http://www.wowhead.com/"].."compare?items="..v;
-			end
+			local id,bonus = mog:ToNumberItem(v);
+			str = (str and str..":" or L["http://www.wowhead.com/"].."compare?items=")..id..(bonus and ".0.0.0.0.0.0.0.0.0."..bonus or "")
 		end
 		return str;
 	end,
-});
-
-mog:AddURL("MMO-Champion",{
-	fav = "Interface\\AddOns\\MogIt\\Images\\fav_mmo",
-	item = "http://db.mmo-champion.com/i/%d/",
-	set = "http://db.mmo-champion.com/is/%d/",
-	npc = "http://db.mmo-champion.com/c/%d/",
-	spell = "http://db.mmo-champion.com/s/%d/",
 });
 
 mog:AddURL("WOWDB",{
@@ -130,7 +130,7 @@ mog:AddURL("Buffed.de",{
 
 mog:AddURL("JudgeHype",{
 	fav = "Interface\\AddOns\\MogIt\\Images\\fav_jh",
-	item = "http://worldofwarcraft.judgehype.com/?page=objet&w=%d",
+	"http://worldofwarcraft.judgehype.com/?page=objet&w=%d",
 	npc = "http://worldofwarcraft.judgehype.com/index.php?page=pnj&w=%d",
 	spell = "http://worldofwarcraft.judgehype.com/index.php?page=spell&w=%d",
 });
