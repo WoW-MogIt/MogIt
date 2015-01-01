@@ -297,7 +297,7 @@ function mog:PLAYER_LOGIN()
 	
 	for slot in pairs(mog.mogSlots) do
 		local isTransmogrified, _, _, _, _, visibleItemID = GetTransmogrifySlotInfo(slot);
-		if transmogrified then
+		if isTransmogrified then
 			mog:GetItemInfo(visibleItemID);
 		end
 	end
