@@ -325,8 +325,9 @@ function mog.ShowItemTooltip(self, item, items)
 		if not mog:HasItem(item) then
 			GameTooltip:AddLine(" ")
 		end
-		GameTooltip:AddLine(L["This item is on your wishlist."], 1, 1, 1)
-		GameTooltip:AddTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcon_1")
+		-- GameTooltip:AddLine(L["This item is on your wishlist."], 1, 1, 1)
+		-- GameTooltip:AddTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcon_1")
+		GameTooltip:AddLine("|TInterface\\PetBattles\\PetJournal:0:0:0:0:512:1024:62:78:26:42:255:255:255|t This item is on your wishlist.", 1, 1, 1)
 	end
 	
 	if not items then
@@ -420,7 +421,7 @@ function mog.ShowSetTooltip(self, items, name)
 	for i, slot in ipairs(mog.slots) do
 		local itemID = items[slot] or items[i]
 		if itemID then
-			addItemTooltipLine(mog:ToNumberItem(itemID))
+			addItemTooltipLine(itemID)
 		end
 	end
 	GameTooltip:Show()

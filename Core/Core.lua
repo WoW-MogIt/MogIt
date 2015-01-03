@@ -231,6 +231,18 @@ function mog.LoadSettings()
 	mog:SetSinglePreview(mog.db.profile.singlePreview);
 end
 
+local f = CreateFrame("Frame")
+f:SetScript("OnUpdate", function(self, elapsed)
+	-- this function doesn't yield correct results immediately, so we delay it with one frame
+	for slot in pairs(mog.mogSlots) do
+		local isTransmogrified, _, _, _, _, visibleItemID = GetTransmogrifySlotInfo(slot);
+		if isTransmogrified then
+			mog:GetItemInfo(visibleItemID);
+		end
+	end
+	self:SetScript("OnUpdate", nil)
+end)
+
 mog.frame:RegisterEvent("ADDON_LOADED");
 mog.frame:RegisterEvent("PLAYER_LOGIN");
 mog.frame:RegisterEvent("GET_ITEM_INFO_RECEIVED");
@@ -294,13 +306,6 @@ function mog:PLAYER_LOGIN()
 		end
 	end
 	sort(self.realmCharacters, sortCharacters);
-	
-	for slot in pairs(mog.mogSlots) do
-		local isTransmogrified, _, _, _, _, visibleItemID = GetTransmogrifySlotInfo(slot);
-		if isTransmogrified then
-			mog:GetItemInfo(visibleItemID);
-		end
-	end
 	
 	mog:LoadSettings();
 	self.frame:SetScript("OnSizeChanged", function(self, width, height)

@@ -1,3 +1,7 @@
+[b]3.4.1[/b]
+- Fixed sources for wishlist sets.
+- Attempt to fix equipped transmog items sometimes getting stuck on models.
+
 [b]v3.4.0[/b]
 - Updated for 6.0 with Warlords of Draenor items, new difficulty filters.
 - Added support for item difficulty modifiers all across the addon.
