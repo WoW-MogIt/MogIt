@@ -1,4 +1,10 @@
 == 6.0 ==
+- Smoldercloth
+- Extra modules
+- Cosmetic items
+- Moggable missing - http://wow.curseforge.com/addons/mogit/forum/bugs/66566-white-items/#p1
+- Wowhead import
+
 - Localization (just needs running + uploading when we're finished)
 - Maybe add headers to the difficulties in the source filter
 - Check previews are working
