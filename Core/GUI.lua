@@ -268,8 +268,8 @@ local tryOnSlots = {
 	SecondaryHandSlot = "offhand",
 }
 
-function ModelFramePrototype:TryOn(item, slot)
-	self.model:TryOn(item, tryOnSlots[slot]);
+function ModelFramePrototype:TryOn(item, slot, itemAppearanceModID)
+	self.model:TryOn(item, tryOnSlots[slot], itemAppearanceModID);
 end
 
 function ModelFramePrototype:Undress()
@@ -332,7 +332,7 @@ function mog.DressFromPreview(model, previewFrame)
 	
 	for id, slot in pairs(previewFrame.slots) do
 		if slot.item then
-			model:TryOn(format(gsub(slot.item, "item:(%d+):0", "item:%1:%%d"), previewFrame.data.weaponEnchant), slot.slot);
+			model:TryOn(format(gsub(slot.item, "item:(%d+):0", "item:%1:%%d"), previewFrame.data.weaponEnchant), slot.slot, slot.itemAppearanceModID);
 		end
 	end
 end

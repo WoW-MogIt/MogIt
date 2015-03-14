@@ -231,18 +231,6 @@ function mog.LoadSettings()
 	mog:SetSinglePreview(mog.db.profile.singlePreview);
 end
 
-local f = CreateFrame("Frame")
-f:SetScript("OnUpdate", function(self, elapsed)
-	-- this function doesn't yield correct results immediately, so we delay it with one frame
-	for slot in pairs(mog.mogSlots) do
-		local isTransmogrified, _, _, _, _, visibleItemID = GetTransmogrifySlotInfo(slot);
-		if isTransmogrified then
-			mog:GetItemInfo(visibleItemID);
-		end
-	end
-	self:SetScript("OnUpdate", nil)
-end)
-
 mog.frame:RegisterEvent("ADDON_LOADED");
 mog.frame:RegisterEvent("PLAYER_LOGIN");
 mog.frame:RegisterEvent("GET_ITEM_INFO_RECEIVED");
@@ -298,6 +286,15 @@ local function sortCharacters(a, b)
 end
 
 function mog:PLAYER_LOGIN()
+	C_Timer.After(1, function()
+		-- this function doesn't yield correct results immediately, so we delay it
+		for slot, v in pairs(mog.mogSlots) do
+			local isTransmogrified, _, _, _, _, visibleItemID = GetTransmogrifySlotInfo(slot);
+			if isTransmogrified then
+				mog:GetItemInfo(visibleItemID);
+			end
+		end
+	end)
 	self.realmCharacters = {};
 	for characterKey in pairs(mog.wishlist.db.sv.profileKeys) do
 		local character, realm = characterKey:match("(.+) %- (.+)");
@@ -316,28 +313,28 @@ function mog:PLAYER_LOGIN()
 end
 
 function mog:PLAYER_EQUIPMENT_CHANGED(slot, hasItem)
-	local visibleItem;
-	if mog.mogSlots[slot] then
-		local isTransmogrified, _, _, _, _, visibleItemID = GetTransmogrifySlotInfo(slot);
+	local slotName = mog.mogSlots[slot];
+	local itemID, itemAppearanceModID = GetInventoryItemID("player", slot);
+	if slotName then
+		local isTransmogrified, _, _, _, _, visibleItemID, _, visibleItemAppearanceModID = GetTransmogrifySlotInfo(slot);
 		if isTransmogrified then
 			mog:GetItemInfo(visibleItemID);
-			visibleItem = visibleItemID;
+			itemID = visibleItemID;
+			itemAppearanceModID = visibleItemAppearanceModID;
 		end
 	end
 	-- don't do anything if the slot is not visible (necklace, ring, trinket)
 	if mog.db.profile.gridDress == "equipped" then
 		for i, frame in ipairs(mog.models) do
-			local item = frame.data.item;
-			if item then
-				local slotName = mog.mogSlots[slot];
+			if frame.data.item then
 				if hasItem then
 					if (slot ~= INVSLOT_HEAD or ShowingHelm()) and (slot ~= INVSLOT_BACK or ShowingCloak()) then
-						frame:TryOn(visibleItem or GetInventoryItemID("player", slot), slotName);
+						frame:TryOn(itemID, slotName, itemAppearanceModID);
 					end
 				else
 					frame:UndressSlot(slot);
 				end
-				frame:TryOn(item);
+				frame:TryOn(frame.data.item);
 			end
 		end
 	end
