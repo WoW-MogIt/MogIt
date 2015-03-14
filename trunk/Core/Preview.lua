@@ -885,10 +885,10 @@ local function onAccept(self, preview)
 	items = items and items:match("compare%?items=([^#]+)");
 	if items then
 		local tbl = {};
-		for item in items:gmatch("([^;]+)") do
-			local id,bonus = item:match("^(%d+)%.%d+%.%d+%.%d+%.%d+%.%d+%.%d+%.%d+%.%d+%.%d+%.(%d+)");
+		for item in items:gmatch("([^:;]+)") do
+			local id, bonus = item:match("^(%d+)%.%d+%.%d+%.%d+%.%d+%.%d+%.%d+%.%d+%.%d+%.%d+%.(%d+)");
 			id = id or item:match("^(%d+)");
-			table.insert(tbl, mog:ToStringItem(tonumber(id),tonumber(bonus)));
+			table.insert(tbl, mog:ToStringItem(tonumber(id), tonumber(bonus)));
 		end
 		mog:AddToPreview(tbl, preview);
 	end

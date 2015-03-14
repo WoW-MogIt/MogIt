@@ -224,7 +224,7 @@ local addons = {
 	"MogIt_TwoHanded",
 	"MogIt_Ranged",
 	"MogIt_Other",
-	"MogIt_Accessories",
+	"MogIt_Cosmetic",
 };
 
 local myName = UnitName("player");

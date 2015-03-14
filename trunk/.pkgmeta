@@ -31,6 +31,7 @@ ignore:
 move-folders:
     MogIt/Modules/MogIt_Accessories: MogIt_Accessories
     MogIt/Modules/MogIt_Cloth: MogIt_Cloth
+    MogIt/Modules/MogIt_Cosmetic: MogIt_Cosmetic
     MogIt/Modules/MogIt_Leather: MogIt_Leather
     MogIt/Modules/MogIt_Mail: MogIt_Mail
     MogIt/Modules/MogIt_OneHanded: MogIt_OneHanded
