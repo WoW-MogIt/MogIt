@@ -69,6 +69,9 @@ function Wishlist:MogItLoaded()
 end
 
 local function setModule(self)
+	if MogIt.db.profile.loadModulesWishlist then
+		MogIt:LoadBaseModules()
+	end
 	MogIt:SetModule(Wishlist, L["Wishlist"])
 end
 

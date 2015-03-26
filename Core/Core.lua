@@ -175,15 +175,32 @@ end
 --// Events
 local defaults = {
 	profile = {
-		sortWishlist = false,
 		tooltipItemID = false,
+		
+		noAnim = false,
+		url = "Battle.net",
+		
 		dressupPreview = false,
 		singlePreview = false,
 		previewUIPanel = false,
 		previewFixedSize = false,
-		noAnim = false,
+		
+		sortWishlist = false,
+		loadModulesWishlist = false,
+		
+		tooltip = true,
+		tooltipWidth = 300,
+		tooltipHeight = 300,
+		tooltipMouse = false,
+		tooltipDress = false,
+		tooltipRotate = true,
+		tooltipMog = true,
+		tooltipMod = "None",
+		tooltipCustomModel = false,
+		tooltipRace = 1,
+		tooltipGender = 0,
+		
 		minimap = {},
-		url = "Battle.net",
 		
 		point = "CENTER",
 		gridWidth = 600,
@@ -199,18 +216,6 @@ local defaults = {
 				point = "CENTER",
 			}
 		},
-		
-		tooltip = true,
-		tooltipWidth = 300,
-		tooltipHeight = 300,
-		tooltipMouse = false,
-		tooltipDress = false,
-		tooltipRotate = true,
-		tooltipMog = true,
-		tooltipMod = "None",
-		tooltipCustomModel = false,
-		tooltipRace = 1,
-		tooltipGender = 0,
 	}
 }
 
@@ -229,6 +234,14 @@ function mog.LoadSettings()
 	mog.scroll:update();
 	
 	mog:SetSinglePreview(mog.db.profile.singlePreview);
+end
+
+function mog:LoadBaseModules()
+	for i, module in ipairs(self.baseModules) do
+		if GetAddOnEnableState(myName, module) > 0 and not IsAddOnLoaded(module) then
+			LoadAddOn(module)
+		end
+	end
 end
 
 mog.frame:RegisterEvent("ADDON_LOADED");
