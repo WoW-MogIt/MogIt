@@ -402,6 +402,9 @@ do	-- set functions
 			if not mog:HasItem(item) then
 				hasSet = false
 			end
+			if not mog:GetItemInfo(item) then
+				mog.doModelUpdate = true;
+			end
 		end
 		if hasSet then
 			self:ShowIndicator("hasItem")

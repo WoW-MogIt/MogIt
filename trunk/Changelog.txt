@@ -1,6 +1,11 @@
-[b]3.4.1[/b]
+[b]3.5.0[/b]
+- Removed Accessories module.
+- Added Cosmetic module which now contains previous accessory items in addition to cosmetic items.
 - Fixed sources for wishlist sets.
 - Attempt to fix equipped transmog items sometimes getting stuck on models.
+- Fixed equipped dress using incorrect difficulty version of items.
+- Fixed Wowhead set import.
+- Added option to load all base modules when opening the wishlist module. This will allow item sources to be displayed.
 
 [b]v3.4.0[/b]
 - Updated for 6.0 with Warlords of Draenor items, new difficulty filters.

@@ -68,19 +68,58 @@ function mog.createOptions()
 				width = "full",
 				arg = "minimap",
 			},
-			sortWishlist = {
-				type = "toggle",
-				order = 2,
-				name = L["Sort wishlist sets alphabetically"],
-				width = "full",
-				arg = "sortWishlist",
-			},
 			tooltipItemID = {
 				type = "toggle",
-				order = 3,
+				order = 2,
 				name = L["Show item ID in tooltips"],
 				width = "full",
 				arg = "tooltipItemID",
+			},
+			catalogue = {
+				type = "group",
+				order = 3,
+				name = L["Catalogue"],
+				inline = true,
+				args = {
+					noAnim = {
+						type = "toggle",
+						order = 1,
+						name = L["No animation"],
+						width = "double",
+						arg = "noAnim",
+					},
+					url = {
+						type = "select",
+						order = 2.5,
+						name = L["URL website"],
+						values = function()
+							local tbl = {};
+							for k,v in pairs(mog.url) do
+								tbl[k] = (v.fav and "\124T"..v.fav..":16\124t " or "")..k;
+							end
+							return tbl;
+						end,
+						arg = "url",
+					},
+					rows = {
+						type = "range",
+						order = 4,
+						name = L["Rows"],
+						step = 1,
+						min = 1,
+						max = 10,
+						arg = "rows",
+					},
+					columns = {
+						type = "range",
+						order = 5,
+						name = L["Columns"],
+						step = 1,
+						min = 1,
+						max = 15,
+						arg = "columns",
+					},
+				},
 			},
 			preview = {
 				type = "group",
@@ -127,49 +166,25 @@ function mog.createOptions()
 					},
 				},
 			},
-			catalogue = {
+			wishlist = {
 				type = "group",
 				order = 5,
-				name = L["Catalogue"],
+				name = L["Wishlist"],
 				inline = true,
 				args = {
-					noAnim = {
+					sortSets = {
 						type = "toggle",
 						order = 1,
-						name = L["No animation"],
-						width = "double",
-						arg = "noAnim",
+						name = L["Sort wishlist sets alphabetically"],
+						width = "full",
+						arg = "sortWishlist",
 					},
-					url = {
-						type = "select",
-						order = 2.5,
-						name = L["URL website"],
-						values = function()
-							local tbl = {};
-							for k,v in pairs(mog.url) do
-								tbl[k] = (v.fav and "\124T"..v.fav..":16\124t " or "")..k;
-							end
-							return tbl;
-						end,
-						arg = "url",
-					},
-					rows = {
-						type = "range",
-						order = 4,
-						name = L["Rows"],
-						step = 1,
-						min = 1,
-						max = 10,
-						arg = "rows",
-					},
-					columns = {
-						type = "range",
-						order = 5,
-						name = L["Columns"],
-						step = 1,
-						min = 1,
-						max = 15,
-						arg = "columns",
+					loadModules = {
+						type = "toggle",
+						order = 2,
+						name = L["Load base modules with wishlist"],
+						width = "full",
+						arg = "loadModulesWishlist",
 					},
 				},
 			},

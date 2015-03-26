@@ -215,7 +215,7 @@ end
 
 
 --// Register Modules
-local addons = {
+mog.baseModules = {
 	"MogIt_Cloth",
 	"MogIt_Leather",
 	"MogIt_Mail",
@@ -229,7 +229,7 @@ local addons = {
 
 local myName = UnitName("player");
 
-for _, addon in ipairs(addons) do
+for _, addon in ipairs(mog.baseModules) do
 	local _, title = GetAddOnInfo(addon);
 	if GetAddOnEnableState(myName, addon) > 0 then
 		local module = mog:RegisterModule(addon, tonumber(GetAddOnMetadata(addon, "X-MogItModuleVersion")), {
