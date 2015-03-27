@@ -459,7 +459,7 @@ do	-- set functions
 		for i, slot in ipairs(mog.slots) do
 			local item = items[slot] or items[i]
 			if item then
-				addItemTooltipLine(item, slot)
+				addItemTooltipLine(item)
 			end
 		end
 		GameTooltip:Show()
