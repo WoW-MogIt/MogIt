@@ -1,9 +1,7 @@
 == 6.0 ==
 - Smoldercloth
 - Extra modules
-- Cosmetic items
 - Moggable missing - http://wow.curseforge.com/addons/mogit/forum/bugs/66566-white-items/#p1
-- Wowhead import
 
 - Localization (just needs running + uploading when we're finished)
 - Maybe add headers to the difficulties in the source filter
@@ -14,12 +12,3 @@
 - Add support for illusions and localised enchant names in Enchants.lua (for the future)
 - Figure out if/how we will support bonusID in Tokens.lua -- should not be very difficult simply using item strings
 - Model tooltip doesn't reset when moving cursor quickly to another item.
-
-http://wow.curseforge.com/addons/mogit/forum/bugs/66566-white-items/#p1
-
-== Old ==
-
-GUI:
-[?] Disable modules (or the bracket text) in the module dropdown if version isnt compatible?
-
-Preview - uncached equipped items
