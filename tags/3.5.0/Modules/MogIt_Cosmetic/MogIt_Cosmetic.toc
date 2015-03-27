@@ -1,0 +1,44 @@
+## Interface: 60100
+## Author: Aelobin (The Maelstrom EU) & Lombra (Defias Brotherhood EU)
+## Version: @project-version@
+## LoadOnDemand: 1
+## RequiredDeps: MogIt
+## X-MogItModuleVersion: 3
+
+## Title: MogIt: Cosmetic
+## Title-frFR: MogIt: Cosmétique
+## Title-deDE: MogIt: Kosmetisch
+## Title-esES: MogIt: Cosmético
+## Title-esMX: MogIt: Cosmético
+## Title-ruRU: MogIt: Косметический
+## Title-koKR: MogIt: Cosmetic
+## Title-zhCN: MogIt: 装饰品
+## Title-zhTW: MogIt: 造型
+## Title-ptBR: MogIt: Cosmético
+## Title-itIT: MogIt: Decorativo
+
+## Notes: MogIt Data
+## Notes-frFR: MogIt Données
+## Notes-deDE: MogIt Daten
+## Notes-esES: MogIt Datos
+## Notes-esMX: MogIt Datos
+## Notes-ruRU: MogIt данные
+## Notes-koKR: MogIt 데이터
+## Notes-zhCN: MogIt 数据
+## Notes-zhTW: MogIt 的數據
+## Notes-ptBR: MogIt Dados
+## Notes-itIT: MogIt Dati
+
+Bosses.lua
+Colours.lua
+
+Head.lua
+Shoulders.lua
+Chest.lua
+Wrists.lua
+Hands.lua
+Waist.lua
+Legs.lua
+Feet.lua
+Tabards.lua
+Shirts.lua
