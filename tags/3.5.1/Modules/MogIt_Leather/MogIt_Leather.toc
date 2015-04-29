@@ -1,0 +1,42 @@
+## Interface: 60100
+## Author: Aelobin (The Maelstrom EU) & Lombra (Defias Brotherhood EU)
+## Version: @project-version@
+## LoadOnDemand: 1
+## RequiredDeps: MogIt
+## X-MogItModuleVersion: 3
+
+## Title: MogIt: Leather
+## Title-frFR: MogIt: Cuir
+## Title-deDE: MogIt: Leder
+## Title-esES: MogIt: Cuero
+## Title-esMX: MogIt: Cuero
+## Title-ruRU: MogIt: Кожа
+## Title-koKR: MogIt: 가죽
+## Title-zhCN: MogIt: 皮甲
+## Title-zhTW: MogIt: 皮革
+## Title-ptBR: MogIt: Couro
+## Title-itIT: MogIt: Leather
+
+## Notes: MogIt Data
+## Notes-frFR: MogIt Données
+## Notes-deDE: MogIt Daten
+## Notes-esES: MogIt Datos
+## Notes-esMX: MogIt Datos
+## Notes-ruRU: MogIt данные
+## Notes-koKR: MogIt 데이터
+## Notes-zhCN: MogIt 数据
+## Notes-zhTW: MogIt 的數據
+## Notes-ptBR: MogIt Dados
+## Notes-itIT: MogIt Dati
+
+Bosses.lua
+Colours.lua
+
+Head.lua
+Shoulders.lua
+Chest.lua
+Wrists.lua
+Hands.lua
+Waist.lua
+Legs.lua
+Feet.lua
