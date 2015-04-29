@@ -511,8 +511,7 @@ do	-- set functions
 					self:AddButton(info, level)
 				end
 			end
-		end
-		if level == 2 then
+		else
 			createMenu(self, level, menuList)
 		end
 	end

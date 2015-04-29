@@ -164,6 +164,16 @@ function mog.createOptions()
 							return not (mog.db.profile.singlePreview and mog.db.profile.previewUIPanel);
 						end,
 					},
+					previewConfirmClose = {
+						type = "toggle",
+						order = 5,
+						name = L["Confirm closing multi previews"],
+						width = "full",
+						arg = "previewConfirmClose",
+						disabled = function()
+							return mog.db.profile.singlePreview;
+						end,
+					},
 				},
 			},
 			wishlist = {

@@ -118,8 +118,10 @@ end
 local function previewOnClose(self)
 	if mog.db.profile.singlePreview then
 		mog.view:Hide();
-	else
+	elseif mog.db.profile.previewConfirmClose then
 		StaticPopup_Show("MOGIT_PREVIEW_CLOSE", nil, nil, self:GetParent());
+	else
+		mog:DeletePreview(self:GetParent());
 	end
 end
 

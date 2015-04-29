@@ -184,6 +184,7 @@ local defaults = {
 		singlePreview = false,
 		previewUIPanel = false,
 		previewFixedSize = false,
+		previewConfirmClose = true,
 		
 		sortWishlist = false,
 		loadModulesWishlist = false,
