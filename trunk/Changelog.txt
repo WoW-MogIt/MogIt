@@ -1,3 +1,6 @@
+[b]3.5.2[/b]
+- Updated for new link format. Fixes item difficulty modifiers.
+
 [b]3.5.1[/b]
 - Fixed Add to set menu not displaying for set items.
 - Added option to confirm closing of previews. Only for multi previews. Enabled by default, mimicking previous behaviour.

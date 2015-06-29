@@ -396,7 +396,7 @@ function mog:GetData(data, id, key)
 end
 
 mog.itemStringShort = "item:%d:0";
-mog.itemStringLong = "item:%d:0:0:0:0:0:0:0:0:0:0:%d:%d";
+mog.itemStringLong = "item:%d:0:0:0:0:0:0:0:0:0:0:0:%d:%d";
 
 function mog:ToStringItem(id, bonus)
 	-- itemID, enchantID, instanceDifficulty, numBonusIDs, bonusID1
@@ -427,13 +427,17 @@ local bonusDiffs = {
 	[559] = true, -- trade-skill
 	[566] = true, -- raid-heroic
 	[567] = true, -- raid-mythic
+	[615] = true, -- timewalker
+	[642] = true, -- dungeon-mythic
 };
 
-mog.itemStringPattern = "item:(%d+):%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:(%d+):([%d:]+)";
+mog.itemStringPattern = "item:(%d+):%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:(%d+):([%d:]+)";
 
 function mog:ToNumberItem(item)
 	if type(item) == "string" then
 		local id, numBonusIDs, bonus = item:match(mog.itemStringPattern);
+		-- bonus ID can also be warforged, socketed, etc
+		-- if there is more than one bonus ID, need to check all
 		if numBonusIDs then
 			numBonusIDs = tonumber(numBonusIDs);
 			if numBonusIDs == 1 and not bonusDiffs[tonumber(bonus)] then

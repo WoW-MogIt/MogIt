@@ -28,7 +28,7 @@ function mog.GetItemSourceInfo(itemID)
 	local sourceType = mog:GetData("item", itemID, "source");
 	local sourceID = mog:GetData("item", itemID, "sourceid");
 	local sourceInfo = mog:GetData("item", itemID, "sourceinfo");
-	
+
 	if sourceType == 1 and sourceID then -- Drop
 		source = mog:GetData("npc", sourceID, "name");
 	elseif sourceType == 3 and sourceID then -- Quest
@@ -40,7 +40,7 @@ function mog.GetItemSourceInfo(itemID)
 		source = name;
 		info = complete;
 	end
-	
+
 	local zone = mog:GetData("item", itemID, "zone");
 	if zone then
 		zone = GetMapNameByID(zone);
@@ -51,7 +51,7 @@ function mog.GetItemSourceInfo(itemID)
 			end
 		end
 	end
-	
+
 	return L.source[sourceType], source, zone, info;
 end
 
@@ -92,7 +92,7 @@ local previewItem = {
 		info.notCheckable = true
 		info.arg1 = mog.activePreview
 		UIDropDownMenu_AddButton(info, level)
-		
+
 		for i, preview in ipairs(mog.previews) do
 			local info = UIDropDownMenu_CreateInfo()
 			info.text = format("%s %d", L["Preview"], preview:GetID())
@@ -102,7 +102,7 @@ local previewItem = {
 			info.arg1 = preview
 			UIDropDownMenu_AddButton(info, level)
 		end
-		
+
 		local info = UIDropDownMenu_CreateInfo()
 		info.text = L["New preview"]
 		info.value = UIDROPDOWNMENU_MENU_VALUE
@@ -133,7 +133,7 @@ local itemOptions = {
 			info.colorCode = GREEN_FONT_COLOR_CODE
 			info.notCheckable = true
 			UIDropDownMenu_AddButton(info, level)
-			
+
 			mog.wishlist:AddSetMenuItems(level, "addItem", UIDROPDOWNMENU_MENU_VALUE)
 		end,
 	},
@@ -172,7 +172,7 @@ end
 local function addItemList(dropdown, data, func)
 	local items = data.items
 	local isArray = #items > 0
-	
+
 	for i, v in ipairs(isArray and items or mog.slots) do
 		local item = isArray and v or items[v]
 		if item then
@@ -251,7 +251,7 @@ do	-- item functions
 	function mog.Item_OnClick(self, button, data, isSaved)
 		local item = data.item
 		if not (self and item) then return end
-		
+
 		if button == "LeftButton" then
 			if not HandleModifiedItemClick(select(2, GetItemInfo(item))) and data.items then
 				data.cycle = (data.cycle % #data.items) + 1
@@ -273,7 +273,7 @@ do	-- item functions
 	function mog.ShowItemTooltip(self, item, items)
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 		GameTooltip[mog] = true
-		
+
 		if IsShiftKeyDown() then
 			if type(item) == "number" then
 				GameTooltip:SetItemByID(item)
@@ -285,11 +285,11 @@ do	-- item functions
 			end
 			return
 		end
-		
+
 		local itemInfo = mog:GetItemInfo(item, "ModelOnEnter")
 		local itemLevel = itemInfo and itemInfo.itemLevel
 		GameTooltip:AddLine(mog:GetItemLabel(item, "ModelOnEnter"))
-		
+
 		local sourceType, source, zone, info = mog.GetItemSourceInfo(item)
 		if sourceType then
 			GameTooltip:AddLine(L["Source"]..": |cffffffff"..sourceType)
@@ -303,7 +303,7 @@ do	-- item functions
 		if zone then
 			GameTooltip:AddLine(ZONE..": |cffffffff"..zone)
 		end
-		
+
 		GameTooltip:AddLine(" ")
 		local bindType = mog:GetData("item", item, "bind")
 		if bindType then
@@ -337,18 +337,18 @@ do	-- item functions
 		if slot then
 			GameTooltip:AddLine(L["Slot"]..": |cffffffff"..L.slots[slot])
 		end
-		
+
 		if mog.db.profile.tooltipItemID then
 			GameTooltip:AddLine(" ")
 			GameTooltip:AddLine(L["Item ID"]..": |cffffffff"..mog:ToNumberItem(item))
 		end
-		
+
 		if mog:HasItem(item) then
 			GameTooltip:AddLine(" ")
 			GameTooltip:AddLine(L["You have this item."], 1, 1, 1)
 			GameTooltip:AddTexture(TEXTURE)
 		end
-		
+
 		if (not mog.active or mog.active.name ~= "Wishlist") and mog.wishlist:IsItemInWishlist(item) then
 			if not mog:HasItem(item) then
 				GameTooltip:AddLine(" ")
@@ -356,7 +356,7 @@ do	-- item functions
 			GameTooltip:AddLine(L["This item is on your wishlist."], 1, 1, 1)
 			GameTooltip:AddTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcon_1")
 		end
-		
+
 		if items and #items > 1 then
 			GameTooltip:AddLine(" ")
 			GameTooltip:AddLine(L["Items using this appearance:"])
@@ -364,7 +364,7 @@ do	-- item functions
 				addItemTooltipLine(v, nil, v == item, mog.wishlist:IsItemInWishlist(v))
 			end
 		end
-		
+
 		GameTooltip:Show()
 	end
 
@@ -372,21 +372,17 @@ do	-- item functions
 		data.cycle = index
 		data.item = data.items[index]
 	end
-	
+
 	mog.Item_Menu = mog:CreateDropdown("Menu")
 	mog.Item_Menu.initialize = function(self, level, menuList)
 		local data = self.data
-		
-		if menuList then
-			createMenu(self, level, menuList)
+
+		local items = data.items
+		-- not listing the items if there's only 1 and it's not a set
+		if level == 1 and (items and not (data.item and #items == 1)) then
+			addItemList(self, data, itemOnClick)
 		else
-			local items = data.items
-			-- not listing the items if there's only 1 and it's not a set
-			if items and not (data.item and #items == 1) then
-				addItemList(self, data, itemOnClick)
-			else
-				createMenu(self, level, itemOptions)
-			end
+			createMenu(self, level, menuList or itemOptions)
 		end
 	end
 end
@@ -454,7 +450,7 @@ do	-- set functions
 	function mog.ShowSetTooltip(self, items, name)
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 		GameTooltip[mog] = true
-		
+
 		GameTooltip:AddLine(name)
 		for i, slot in ipairs(mog.slots) do
 			local item = items[slot] or items[i]
@@ -492,11 +488,11 @@ do	-- set functions
 			end,
 		},
 	}
-	
+
 	function mog:AddSetOption(info)
 		tinsert(setOptions, info)
 	end
-	
+
 	mog.Set_Menu = mog:CreateDropdown("Menu")
 	mog.Set_Menu.initialize = function(self, level, menuList)
 		if level == 1 then
