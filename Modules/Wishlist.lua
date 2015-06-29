@@ -33,6 +33,8 @@ function Wishlist:MogItLoaded()
 	local db = LibStub("AceDB-3.0"):New("MogItWishlist", defaults)
 	self.db = db
 	
+	local _, _, _, tocversion = GetBuildInfo()
+	
 	-- add alternate items table to sets
 	for i, set in ipairs(db.profile.sets) do
 		set.alternateItems = set.alternateItems or {}
@@ -62,6 +64,32 @@ function Wishlist:MogItLoaded()
 			end
 		end
 	end
+	
+	-- convert item strings to 6.2 format
+	if not db.global.version then
+		local origPattern = MogIt.itemStringPattern
+		MogIt.itemStringPattern = "item:(%d+):%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:(%d+):([%d:]+)";
+		
+		for k, profile in pairs(self.db.profiles) do
+			if profile.items then
+				for k, item in pairs(profile.items) do
+					profile.items[k] = MogIt:NormaliseItemString(item)
+				end
+			end
+			
+			if profile.sets then
+				for i, set in ipairs(profile.sets) do
+					for k, item in pairs(set.items) do
+						set.items[k] = MogIt:NormaliseItemString(item)
+					end
+				end
+			end
+		end
+		
+		MogIt.itemStringPattern = origPattern
+	end
+	
+	db.global.version = tocversion
 	
 	db.RegisterCallback(self, "OnProfileChanged", onProfileUpdated)
 	db.RegisterCallback(self, "OnProfileCopied", onProfileUpdated)
