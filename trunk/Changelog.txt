@@ -1,3 +1,7 @@
+[b]3.5.3[/b]
+- Updated with items from 6.2.
+- Added support for new bonus IDs.
+
 [b]3.5.2[/b]
 - Updated for new link format. Fixes item difficulty modifiers.
 
