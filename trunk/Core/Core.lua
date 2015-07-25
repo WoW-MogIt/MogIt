@@ -448,9 +448,7 @@ function mog:ToNumberItem(item)
 		-- if there is more than one bonus ID, need to check all
 		if numBonusIDs then
 			numBonusIDs = tonumber(numBonusIDs);
-			if numBonusIDs == 1 and not bonusDiffs[tonumber(bonus)] then
-				bonus = nil;
-			elseif numBonusIDs > 1 then
+			if numBonusIDs > 1 then
 				for bonusID in gmatch(bonus, "%d+") do
 					bonusID = tonumber(bonusID);
 					if bonusDiffs[bonusID] then
@@ -458,6 +456,8 @@ function mog:ToNumberItem(item)
 						break;
 					end
 				end
+			elseif not bonusDiffs[tonumber(bonus)] then
+				bonus = nil;
 			end
 		end
 		id = id or item:match("item:(%d+)");
