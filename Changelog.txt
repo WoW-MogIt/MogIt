@@ -1,3 +1,7 @@
+[b]3.5.5[/b]
+- Fixed tooltip model not appearing for certain tooltips.
+- Fixed previous item getting stuck on tooltip model when quickly moving to a new item.
+
 [b]3.5.4[/b]
 - Fixed parsing of certain link formats.
 

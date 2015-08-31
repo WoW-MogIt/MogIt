@@ -49,9 +49,10 @@ mog.tooltip:RegisterEvent("PLAYER_REGEN_ENABLED");
 mog.tooltip.model = CreateFrame("DressUpModel",nil,mog.tooltip);
 mog.tooltip.model:SetPoint("TOPLEFT",mog.tooltip,"TOPLEFT",5,-5);
 mog.tooltip.model:SetPoint("BOTTOMRIGHT",mog.tooltip,"BOTTOMRIGHT",-5,5);
-mog.tooltip.model:SetScript("OnShow",function(self)
-	if mog.db.profile.tooltipCustomModel then
-		self:SetCustomRace(mog.db.profile.tooltipRace, mog.db.profile.tooltipGender);
+mog.tooltip.model.ResetModel = function(self)
+	local db = mog.db.profile
+	if db.tooltipCustomModel then
+		self:SetCustomRace(db.tooltipRace, db.tooltipGender);
 		-- hack for hidden helm and cloak showing on models
 		local showingHelm, showingCloak = ShowingHelm(), ShowingCloak();
 		local helm, cloak = GetInventoryItemID("player", INVSLOT_HEAD), GetInventoryItemID("player", INVSLOT_BACK);
@@ -67,10 +68,11 @@ mog.tooltip.model:SetScript("OnShow",function(self)
 	else
 		self:Dress();
 	end
-	if not mog.db.profile.tooltipDress then
+	if not db.tooltipDress then
 		self:Undress();
 	end
-end);
+end
+mog.tooltip.model:SetScript("OnShow",mog.tooltip.model.ResetModel);
 
 
 local function GetItemTransmogrifyInfo()
@@ -78,12 +80,15 @@ local function GetItemTransmogrifyInfo()
 end
 
 
-function mog.tooltip.ShowItem(self)
-	local _,itemLink = self:GetItem();
+function mog.tooltip:ShowItem(itemLink)
 	if not itemLink then
 		return;
 	end
 	local itemID = tonumber(itemLink:match("item:(%d+)"));
+	if itemID == 0 then
+		return;
+	end
+	local self = GameTooltip
 	
 	local db = mog.db.profile
 	local tooltip = mog.tooltip
@@ -111,6 +116,8 @@ function mog.tooltip.ShowItem(self)
 					--	tooltip:ClearAllPoints();
 					--	tooltip:SetPoint("BOTTOMRIGHT","UIParent","BOTTOMRIGHT",-CONTAINER_OFFSET_X - 13,CONTAINER_OFFSET_Y);
 					--end
+					-- this seems to be needed for when moving from one item to another without the tooltip hiding in between
+					tooltip.model:ResetModel();
 					tooltip.model:TryOn(itemLink);
 				else
 					tooltip:Hide();
@@ -123,9 +130,9 @@ function mog.tooltip.ShowItem(self)
 	
 	-- add wishlist info about this item
 	if not self[mog] and mog.wishlist:IsItemInWishlist(itemID) then
-			self:AddLine(" ");
-			self:AddLine(L["This item is on your wishlist."], 1, 1, 0);
-			self:AddTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcon_1");
+		self:AddLine(" ");
+		self:AddLine(L["This item is on your wishlist."], 1, 1, 0);
+		self:AddTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcon_1");
 	end
 end
 
@@ -172,8 +179,28 @@ mog.tooltip.repos:SetScript("OnUpdate",function(self)
 	end
 end);
 
-GameTooltip:HookScript("OnTooltipSetItem",mog.tooltip.ShowItem);
+GameTooltip:HookScript("OnTooltipSetItem", function(self)
+	local _, itemLink = self:GetItem();
+	mog.tooltip:ShowItem(itemLink);
+end);
 GameTooltip:HookScript("OnHide",mog.tooltip.HideItem);
+
+-- temporary hacks for tooltips where GameTooltip:GetItem() returns a broken link
+hooksecurefunc(GameTooltip, "SetQuestItem", function(self, itemType, index)
+	mog.tooltip:ShowItem(GetQuestItemLink(itemType, index));
+end);
+
+hooksecurefunc(GameTooltip, "SetQuestLogItem", function(self, itemType, index)
+	mog.tooltip:ShowItem(GetQuestLogItemLink(itemType, index));
+end);
+
+hooksecurefunc(GameTooltip, "SetTradeSkillItem", function(self, skillIndex, reagentIndex)
+	if reagentIndex then
+		mog.tooltip:ShowItem(GetTradeSkillReagentItemLink(skillIndex, reagentIndex));
+	else
+		mog.tooltip:ShowItem(GetTradeSkillItemLink(skillIndex));
+	end
+end);
 --//
 
 
