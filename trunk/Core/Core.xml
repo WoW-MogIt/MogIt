@@ -3,13 +3,13 @@
 ..\FrameXML\UI.xsd">
 
 <Script file="Core.lua"/>
+<Script file="Templates.lua"/>
 <Script file="GUI.lua"/>
 <Script file="Preview.lua"/>
 <Script file="Links.lua"/>
 <Script file="URL.lua"/>
 <Script file="Tooltip.lua"/>
 <Script file="Options.lua"/>
-<Script file="Templates.lua"/>
 <Script file="Enchants.lua"/>
 
 <Include file="Filters\Filters.xml"/>
