@@ -108,7 +108,7 @@ function mog:BuildList(top,module)
 	if (module and mog.active and mog.active.name ~= module) then return end;
 	mog.list = mog.active and mog.active.BuildList and mog.active:BuildList() or {};
 	mog:SortList(nil,true);
-	mog.scroll:update(top and 1);
+	mog:UpdateScroll(top and 1);
 	mog.filt.models:SetText(#mog.list);
 end
 --//
@@ -232,7 +232,7 @@ function mog.LoadSettings()
 	mog.tooltip:SetSize(mog.db.profile.tooltipWidth, mog.db.profile.tooltipHeight);
 	mog.tooltip.rotate:SetShown(mog.db.profile.tooltipRotate);
 	
-	mog.scroll:update();
+	mog:UpdateScroll();
 	
 	mog:SetSinglePreview(mog.db.profile.singlePreview);
 end
@@ -396,19 +396,18 @@ function mog:GetData(data, id, key)
 end
 
 mog.itemStringShort = "item:%d:0";
-mog.itemStringLong = "item:%d:0:0:0:0:0:0:0:0:0:0:0:%d:%d";
+mog.itemStringLong = "item:%d:0:0:0:0:0:0:0:0:0:0:0:1:%d";
 
 function mog:ToStringItem(id, bonus)
 	-- itemID, enchantID, instanceDifficulty, numBonusIDs, bonusID1
-	if bonus then
-		return format(mog.itemStringLong, id, bonus and 1, bonus);
+	if bonus and bonus ~= 0 then
+		return format(mog.itemStringLong, id, bonus);
 	else
 		return format(mog.itemStringShort, id);
 	end
 end
 
 local bonusDiffs = {
-	[0] = true,
 	-- MoP
 	[451] = true, -- Raid Finder
 	[449] = true, -- Heroic (Raid)
@@ -439,19 +438,17 @@ local bonusDiffs = {
 	[651] = true, -- baleful empowered (695)
 };
 
-mog.itemStringPattern = "item:(%d+):%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:(%d+):([%d:]+)";
+mog.itemStringPattern = "item:(%d+):%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:([%d:]+)";
 
 function mog:ToNumberItem(item)
 	if type(item) == "string" then
-		local id, numBonusIDs, bonus = item:match(mog.itemStringPattern);
+		local id, bonus = item:match(mog.itemStringPattern);
 		-- bonus ID can also be warforged, socketed, etc
 		-- if there is more than one bonus ID, need to check all
-		if numBonusIDs then
-			numBonusIDs = tonumber(numBonusIDs);
-			if numBonusIDs > 1 then
+		if bonus then
+			if not tonumber(bonus) then
 				for bonusID in gmatch(bonus, "%d+") do
-					bonusID = tonumber(bonusID);
-					if bonusDiffs[bonusID] then
+					if bonusDiffs[tonumber(bonusID)] then
 						bonus = bonusID;
 						break;
 					end

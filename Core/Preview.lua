@@ -34,7 +34,7 @@ function mog:ActivatePreview(preview)
 		end
 	end
 	if mog.db.profile.gridDress == "preview" then
-		mog.scroll:update();
+		mog:UpdateScroll();
 	end
 end
 
@@ -102,16 +102,52 @@ local function slotOnEnter(self)
 	end
 end
 
-local function slotOnClick(self,btn)
-	if btn == "RightButton" and IsControlKeyDown() then
+local function historyOnClick(self, item, data)
+	mog.view.AddItem(item, data:GetParent(), data.slot)
+end
+
+local function previewSlotHistory(self, level, data)
+	data = self.data
+	if not data.isPreview then return end
+	if #data.history == 0 then return end
+	local info = UIDropDownMenu_CreateInfo()
+	info.text = L["Previous items"]
+	info.isTitle = true
+	info.notCheckable = true
+	self:AddButton(info)
+	for i, item in ipairs(data.history) do
+		local info = UIDropDownMenu_CreateInfo()
+		info.text = mog:GetItemLabel(item)
+		info.func = historyOnClick
+		info.arg1 = item
+		info.arg2 = data
+		info.notCheckable = true
+		self:AddButton(info)
+	end
+end
+
+mog:AddItemOption(previewSlotHistory)
+
+local function slotOnClick(self, button)
+	if button == "RightButton" and IsControlKeyDown() then
 		local preview = self:GetParent();
 		mog.view.DelItem(self.slot, preview);
+		mog.Item_Menu:Close()
 		if mog.db.profile.gridDress == "preview" and mog.activePreview == preview then
-			mog.scroll:update();
+			mog:UpdateScroll();
 		end
 		self:OnEnter();
 	else
-		mog.Item_OnClick(self, btn, self);
+		mog.Item_OnClick(self, button, self, nil, true);
+		-- dropdown is normally not shown for empty slots
+		if button == "RightButton" and not self.item then
+			if mog.Item_Menu.data ~= self then
+				mog.Item_Menu:Hide(1)
+			end
+			self.isPreview = true
+			mog.Item_Menu.data = self
+			mog.Item_Menu:Toggle(nil, "cursor", nil, nil, previewSlotHistory)
+		end
 	end
 end
 
@@ -146,7 +182,7 @@ end
 local function setWeaponEnchant(self, preview, enchant)
 	preview.data.weaponEnchant = enchant;
 	self.owner:Rebuild(2);
-	mog.scroll:update();
+	mog:UpdateScroll();
 	local mainHandItem = preview.slots["MainHandSlot"].item;
 	local offHandItem = preview.slots["SecondaryHandSlot"].item;
 	if mainHandItem then
@@ -217,7 +253,7 @@ local previewMenu = {
 				end
 			end
 			if mog.activePreview == currentPreview and mog.db.profile.gridDress == "preview" then
-				mog.scroll:update();
+				mog:UpdateScroll();
 			end
 		end,
 	},
@@ -227,7 +263,7 @@ local previewMenu = {
 		func = function(self)
 			mog.view:Undress(currentPreview);
 			if mog.activePreview == currentPreview and mog.db.profile.gridDress == "preview" then
-				mog.scroll:update();
+				mog:UpdateScroll();
 			end
 		end,
 	},
@@ -482,6 +518,7 @@ function mog:CreatePreview()
 		slot:SetScript("OnEnter", slotOnEnter);
 		slot:SetScript("OnLeave", GameTooltip_Hide);
 		slot.OnEnter = slotOnEnter;
+		slot.history = {};
 		f.slots[slotIndex] = slot;
 		slotTexture(f, slotIndex);
 	end
@@ -519,6 +556,9 @@ function mog:DeletePreview(f)
 	f:SetPoint("CENTER",mog.view,"CENTER");
 	mog.view:Undress(f);
 	wipe(f.data);
+	for k, slot in pairs(f.slots) do
+		slot.history = {};
+	end
 	tinsert(mog.previewBin,f);
 	for k,v in ipairs(mog.previews) do
 		if v == f then
@@ -529,7 +569,7 @@ function mog:DeletePreview(f)
 	if mog.activePreview == f then
 		mog.activePreview = nil;
 		if mog.db.profile.gridDress == "preview" then
-			mog.scroll:update();
+			mog:UpdateScroll();
 		end
 	end
 	if #mog.previews == 0 then
@@ -606,14 +646,21 @@ function mog:SetPreviewFixedSize(isFixedSize)
 	UpdateUIPanelPositions(MogItPreview1);
 end
 
+local cachedPreviews;
 local doCache = {};
 mog:AddItemCacheCallback("PreviewAddItem", function()
+	cachedPreviews = {};
 	for i = #doCache, 1, -1 do
 		local item = doCache[i];
 		if mog:GetItemInfo(item.id) then
+			cachedPreviews[item.frame] = true;
 			mog.view.AddItem(item.id, item.frame, item.slot, item.set);
 			tremove(doCache, i);
 		end
+	end
+	-- update the grid if using preview grid dress, and an item was cached on the active preview
+	if mog.db.profile.gridDress == "preview" and cachedPreviews[mog.activePreview] then
+		mog:UpdateScroll();
 	end
 end)
 
@@ -675,6 +722,20 @@ function mog.view.AddItem(item, preview, forceSlot, setItem)
 			end
 		end
 		
+		if item ~= preview.slots[slot].item then
+			local history = preview.slots[slot].history
+			for i, v in ipairs(history) do
+				if v == item then
+					tremove(history, i);
+					break;
+				end
+			end
+			if preview.slots[slot].item then
+				tinsert(history, 1, preview.slots[slot].item);
+				-- make sure there's never more than five items
+				history[6] = nil;
+			end
+		end
 		preview.slots[slot].item = item;
 		slotTexture(preview, slot, GetItemIcon(item));
 		if preview:IsVisible() then
@@ -695,6 +756,10 @@ end
 function mog.view.DelItem(slot, preview)
 	if not (preview and slot) or not preview.slots[slot].item then return end;
 	local invType = mog:GetItemInfo(preview.slots[slot].item).invType;
+	local history = preview.slots[slot].history
+	tinsert(history, 1, preview.slots[slot].item);
+	-- make sure there's never more than five items
+	history[6] = nil;
 	preview.slots[slot].item = nil;
 	slotTexture(preview,slot);
 	if preview.data.title then
@@ -715,7 +780,7 @@ function mog:AddToPreview(item, preview, title)
 	ShowUIPanel(mog.view);
 	if type(item) == "table" then
 		mog.view:Undress(preview);
-		for k,v in pairs(item) do
+		for k, v in pairs(item) do
 			mog.view.AddItem(v, preview, k, true);
 		end
 		if title then
@@ -727,17 +792,7 @@ function mog:AddToPreview(item, preview, title)
 	end
 	
 	if mog.db.profile.gridDress == "preview" and mog.activePreview == preview then
-		for i, frame in ipairs(mog.models) do
-			local data = frame.data;
-			local value = data.value;
-			local cycle = data.cycle;
-			local item = data.item;
-			if value and frame:IsShown() then
-				mog:ModelUpdate(frame, value);
-				data.cycle = cycle;
-				data.item = item;
-			end
-		end
+		mog:UpdateScroll();
 	end
 	
 	return preview;

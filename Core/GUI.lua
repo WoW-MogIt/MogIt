@@ -333,6 +333,9 @@ function mog.DressFromPreview(model, previewFrame)
 	for id, slot in pairs(previewFrame.slots) do
 		if slot.item then
 			model:TryOn(format(gsub(slot.item, "item:(%d+):0", "item:%1:%%d"), previewFrame.data.weaponEnchant), slot.slot, slot.itemAppearanceModID);
+			if not mog:GetItemInfo(slot.item) then
+				mog.doModelUpdate = true;
+			end
 		end
 	end
 end
@@ -408,8 +411,8 @@ local updater = CreateFrame("Frame");
 updater:Hide();
 updater:SetScript("OnUpdate", function(self)
 	self:Hide();
-	mog:UpdateScroll();
 	mog.doModelUpdate = nil;
+	mog:UpdateScroll();
 end);
 
 

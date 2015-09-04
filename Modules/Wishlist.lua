@@ -89,6 +89,24 @@ function Wishlist:MogItLoaded()
 		MogIt.itemStringPattern = origPattern
 	end
 	
+	do	-- update item strings wherever possible as the format changes
+		for k, profile in pairs(self.db.profiles) do
+			if profile.items then
+				for k, item in pairs(profile.items) do
+					profile.items[k] = MogIt:NormaliseItemString(item)
+				end
+			end
+			
+			if profile.sets then
+				for i, set in ipairs(profile.sets) do
+					for k, item in pairs(set.items) do
+						set.items[k] = MogIt:NormaliseItemString(item)
+					end
+				end
+			end
+		end
+	end
+	
 	db.global.version = tocversion
 	
 	db.RegisterCallback(self, "OnProfileChanged", onProfileUpdated)

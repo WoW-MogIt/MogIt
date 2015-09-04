@@ -1,5 +1,8 @@
 [b]3.5.5[/b]
 - Updated database for new PvP items, lots of missing 91-99 mail gloves and various fixes.
+- Preview slots now list up to five recently equipped items which can be equipped via the right click menu.
+- Fixed items getting stored with bad item strings.
+- Fixed catalog models not getting dressed up when equipping uncached items on a preview.
 - Fixed tooltip model not appearing for certain tooltips.
 - Fixed previous item getting stuck on tooltip model when quickly moving to a new item.
 

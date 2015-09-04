@@ -83,7 +83,7 @@ end
 
 local previewItem = {
 	text = L["Preview"],
-	menuList = function(level)
+	menuList = function(self, level)
 		local info = UIDropDownMenu_CreateInfo()
 		info.text = L["Active preview"]
 		info.value = UIDROPDOWNMENU_MENU_VALUE
@@ -125,7 +125,7 @@ local itemOptions = {
 	{
 		text = L["Add to set"],
 		hasArrow = true,
-		menuList = function(level)
+		menuList = function(self, level)
 			local info = UIDropDownMenu_CreateInfo()
 			info.text = L["New set..."]
 			info.value = UIDROPDOWNMENU_MENU_VALUE
@@ -194,10 +194,12 @@ end
 local function createMenu(self, level, menuList)
 	local data = self.data
 	if type(menuList) == "function" then
-		menuList(level)
+		menuList(self, level)
 	else
 		for i, info in ipairs(menuList) do
-			if (info.wishlist == nil or info.wishlist == data.isSaved) and (not info.set or data.items) then
+			if type(info) == "function" then
+				info(self, level, data)
+			elseif (info.wishlist == nil or info.wishlist == data.isSaved) and (not info.set or data.items) then
 				info.value = UIDROPDOWNMENU_MENU_VALUE
 				info.notCheckable = true
 				info.arg1 = data
@@ -207,12 +209,13 @@ local function createMenu(self, level, menuList)
 	end
 end
 
-local function showMenu(menu, data, isSaved)
+local function showMenu(menu, data, isSaved, isPreview)
 	if menu:IsShown() and menu.data ~= data then
 		HideDropDownMenu(1)
 	end
 	-- needs to be either true or false
 	data.isSaved = (isSaved ~= nil)
+	data.isPreview = isPreview
 	menu.data = data
 	menu:Toggle(data.item, "cursor")
 end
@@ -248,7 +251,7 @@ do	-- item functions
 		end
 	end
 
-	function mog.Item_OnClick(self, button, data, isSaved)
+	function mog.Item_OnClick(self, button, data, isSaved, isPreview)
 		local item = data.item
 		if not (self and item) then return end
 
@@ -263,9 +266,9 @@ do	-- item functions
 			if IsControlKeyDown() then
 				mog:AddToPreview(item)
 			elseif IsShiftKeyDown() then
-				mog:ShowURL(item,"item")
+				mog:ShowURL(item, "item")
 			else
-				showMenu(mog.Item_Menu, data, isSaved)
+				showMenu(mog.Item_Menu, data, isSaved, isPreview)
 			end
 		end
 	end
