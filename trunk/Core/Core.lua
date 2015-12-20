@@ -6,7 +6,8 @@ local ItemInfo = LibStub("LibItemInfo-1.0");
 
 LibStub("Libra"):Embed(mog);
 
-local character = DataStore_Containers and DataStore:GetCharacter();
+local DataStore_Character = DataStore_Containers and DataStore:GetCharacter();
+local BrotherBags_Player;
 
 mog.frame = CreateFrame("Frame","MogItFrame",UIParent,"ButtonFrameTemplate");
 mog.list = {};
@@ -167,8 +168,25 @@ ItemInfo.RegisterCallback(mog, "OnItemInfoReceivedBatch", "ItemInfoReceived");
 --//
 
 function mog:HasItem(itemID)
-	itemID = self:ToNumberItem(itemID)
-	return GetItemCount(itemID, true) > 0 or (character and select(3, DataStore:GetContainerItemCount(character, itemID)) > 0)
+	itemID = self:ToNumberItem(itemID);
+	-- GetItemCount does not take void storage into account...
+	if GetItemCount(itemID, true) > 0 then
+		return true;
+	end
+	-- ...try third party data for that
+	if DataStore_Character then
+		local _, _, count = DataStore:GetContainerItemCount(DataStore_Character, itemID);
+		if count > 0 then
+			return true;
+		end
+	end
+	if BrotherBags_Player and BrotherBags_Player.vault then
+		for _, item in pairs(BrotherBags_Player.vault) do
+			if tonumber(item) == itemID then
+				return true;
+			end
+		end
+	end
 end
 
 
@@ -176,6 +194,7 @@ end
 local defaults = {
 	profile = {
 		tooltipItemID = false,
+		tooltipAlwaysShowOwned = true,
 		
 		noAnim = false,
 		url = "Battle.net",
@@ -300,6 +319,8 @@ local function sortCharacters(a, b)
 end
 
 function mog:PLAYER_LOGIN()
+	BrotherBags_Player = BrotherBags and BrotherBags[GetRealmName()][UnitName("player")];
+	
 	C_Timer.After(1, function()
 		-- this function doesn't yield correct results immediately, so we delay it
 		for slot, v in pairs(mog.mogSlots) do

@@ -1,3 +1,6 @@
+[b]3.5.6[/b]
+
+
 [b]3.5.5[/b]
 - Updated database for new PvP items, lots of missing 91-99 mail gloves and various fixes.
 - Preview slots now list up to five recently equipped items which can be equipped via the right click menu.

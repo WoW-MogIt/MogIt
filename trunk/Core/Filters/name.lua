@@ -22,11 +22,15 @@ f.edit:HookScript("OnTextChanged",function(self,user)
 	mog:BuildList();
 end);
 
-function f.Filter(itemID)
+function f.Filter(item)
 	if searchString:trim() == "" then
 		return true
 	end
-	local item = mog:GetItemInfo(itemID, "BuildList");
+	-- set
+	if type(item) == "table" then
+		return item.name:lower():find(searchString, nil, true)
+	end
+	local item = mog:GetItemInfo(item, "BuildList");
 	return not item or (item.name:lower():find(searchString, nil, true));
 end
 
