@@ -1,5 +1,7 @@
 [b]3.5.6[/b]
-
+- Added option to show owned item tooltip indicator for all tooltips, not just catalogue. (defaults to enabled)
+- Added support for using BagBrother data for checking void storage for owned items.
+- Added basic filtering for wishlist. (name and owned items)
 
 [b]3.5.5[/b]
 - Updated database for new PvP items, lots of missing 91-99 mail gloves and various fixes.
