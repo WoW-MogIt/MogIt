@@ -20,8 +20,12 @@ f.hasItem:SetScript("OnClick",function(self)
 	mog:BuildList();
 end);
 
-function f.Filter(itemID)
-	return not enabled or mog:HasItem(itemID);
+function f.Filter(item)
+	if not enabled then
+		return true
+	end
+	if type(item) == "table" then return end
+	return mog:HasItem(item);
 end
 
 function f.Default()

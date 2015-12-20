@@ -81,17 +81,14 @@ end
 
 
 function mog.tooltip:ShowItem(itemLink)
-	if not itemLink then
-		return;
-	end
+	if not itemLink then return end
 	local itemID = tonumber(itemLink:match("item:(%d+)"));
-	if itemID == 0 then
-		return;
-	end
-	local self = GameTooltip
+	if itemID == 0 then return end
+	local self = GameTooltip;
 	
-	local db = mog.db.profile
-	local tooltip = mog.tooltip
+	local slot = select(9,GetItemInfo(itemLink));
+	local db = mog.db.profile;
+	local tooltip = mog.tooltip;
 	if db.tooltip and (not tooltip.mod[db.tooltipMod] or tooltip.mod[db.tooltipMod]()) then
 		if not self[mog] then
 			if tooltip.item ~= itemLink then
@@ -105,7 +102,6 @@ function mog.tooltip:ShowItem(itemLink)
 						end
 					end
 				end
-				local slot = select(9,GetItemInfo(itemLink));
 				if (not db.tooltipMog or select(3, GetItemTransmogrifyInfo(itemLink))) and tooltip.slots[slot] and IsDressableItem(itemLink) then
 					tooltip.model:SetFacing(tooltip.slots[slot]-(db.tooltipRotate and 0.5 or 0));
 					tooltip:Show();
@@ -128,9 +124,18 @@ function mog.tooltip:ShowItem(itemLink)
 		end
 	end
 	
+	local addOwnedItem = mog.db.profile.tooltipAlwaysShowOwned and mog.slotsType[slot] and mog:HasItem(itemID);
+	if addOwnedItem then
+		GameTooltip:AddLine(" ");
+		GameTooltip:AddLine(L["You have this item."], 1, 1, 1);
+		GameTooltip:AddTexture([[Interface\RaidFrame\ReadyCheck-Ready]]);
+	end
+	
 	-- add wishlist info about this item
 	if not self[mog] and mog.wishlist:IsItemInWishlist(itemID) then
-		self:AddLine(" ");
+		if not addOwnedItem then
+			self:AddLine(" ");
+		end
 		self:AddLine(L["This item is on your wishlist."], 1, 1, 0);
 		self:AddTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcon_1");
 	end
@@ -188,10 +193,12 @@ GameTooltip:HookScript("OnHide",mog.tooltip.HideItem);
 -- temporary hacks for tooltips where GameTooltip:GetItem() returns a broken link
 hooksecurefunc(GameTooltip, "SetQuestItem", function(self, itemType, index)
 	mog.tooltip:ShowItem(GetQuestItemLink(itemType, index));
+	GameTooltip:Show();
 end);
 
 hooksecurefunc(GameTooltip, "SetQuestLogItem", function(self, itemType, index)
 	mog.tooltip:ShowItem(GetQuestLogItemLink(itemType, index));
+	GameTooltip:Show();
 end);
 
 hooksecurefunc(GameTooltip, "SetTradeSkillItem", function(self, skillIndex, reagentIndex)
@@ -200,6 +207,7 @@ hooksecurefunc(GameTooltip, "SetTradeSkillItem", function(self, skillIndex, reag
 	else
 		mog.tooltip:ShowItem(GetTradeSkillItemLink(skillIndex));
 	end
+	GameTooltip:Show();
 end);
 --//
 

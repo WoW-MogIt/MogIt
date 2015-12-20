@@ -75,6 +75,13 @@ function mog.createOptions()
 				width = "full",
 				arg = "tooltipItemID",
 			},
+			tooltipAlwaysShowOwned = {
+				type = "toggle",
+				order = 2.5,
+				name = L["Always indicate owned item in tooltip"],
+				width = "full",
+				arg = "tooltipAlwaysShowOwned",
+			},
 			catalogue = {
 				type = "group",
 				order = 3,

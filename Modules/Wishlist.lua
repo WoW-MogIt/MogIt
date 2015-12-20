@@ -5,6 +5,27 @@ local Wishlist = MogIt:RegisterModule("Wishlist", MogIt.moduleVersion)
 MogIt.wishlist = Wishlist
 Wishlist.base = true
 
+Wishlist.filters = {
+	"name",
+	-- "level",
+	-- "itemLevel",
+	-- "faction",
+	-- "class",
+	-- "source",
+	-- "quality",
+	-- "bind",
+	-- "chestType",
+	"hasItem",
+}
+
+Wishlist.Help = {
+	L["Right click for additional options"],
+	L["Shift-left click to link"],
+	L["Shift-right click for item URL"],
+	L["Ctrl-left click to try on in dressing room"],
+	L["Ctrl-right click to preview with MogIt"],
+}
+
 local function convertBowSlots()
 	for i, set in ipairs(Wishlist.db.profile.sets) do
 		local offhand = set.items["SecondaryHandSlot"]
@@ -200,21 +221,27 @@ function Wishlist:BuildList()
 	wipe(list)
 	local db = self.db.profile
 	for i, v in ipairs(self:GetSets(nil, true)) do
-		list[#list + 1] = v
+		if MogIt:CheckFilters(self, v) then
+			list[#list + 1] = v
+		end
 	end
 	for i, v in ipairs(db.items) do
-		list[#list + 1] = v
+		if MogIt:CheckFilters(self, v) then
+			list[#list + 1] = v
+		end
 	end
 	return list
 end
 
-Wishlist.Help = {
-	L["Right click for additional options"],
-	L["Shift-left click to link"],
-	L["Shift-right click for item URL"],
-	L["Ctrl-left click to try on in dressing room"],
-	L["Ctrl-right click to preview with MogIt"],
-}
+function Wishlist.GetFilterArgs(filter, item)
+	if filter == "name" or filter == "itemLevel" or filter == "hasItem" or filter == "chestType" then
+		return item;
+	-- elseif filter == "source" then
+		-- return mog:GetData("item", item, "source"),mog:GetData("item", item, "sourceinfo")
+	-- else
+		-- return mog:GetData("item", item, filter)
+	end
+end
 
 local t = {}
 
