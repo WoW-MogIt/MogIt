@@ -102,6 +102,7 @@ function mog.tooltip:ShowItem(itemLink)
 						end
 					end
 				end
+				local slot = select(9,GetItemInfo(itemLink));
 				if (not db.tooltipMog or select(3, GetItemTransmogrifyInfo(itemLink))) and tooltip.slots[slot] and IsDressableItem(itemLink) then
 					tooltip.model:SetFacing(tooltip.slots[slot]-(db.tooltipRotate and 0.5 or 0));
 					tooltip:Show();
