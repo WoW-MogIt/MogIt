@@ -346,18 +346,28 @@ do	-- item functions
 			GameTooltip:AddLine(L["Item ID"]..": |cffffffff"..mog:ToNumberItem(item))
 		end
 
-		if mog:HasItem(item) then
+		local hasItem, characters = mog:HasItem(item)
+		if hasItem then
 			GameTooltip:AddLine(" ")
-			GameTooltip:AddLine(L["You have this item."], 1, 1, 1)
-			GameTooltip:AddTexture(TEXTURE)
+			GameTooltip:AddLine(format("|T%s:0|t ", TEXTURE)..L["You have this item."], 1, 1, 1)
+			if mog.db.profile.tooltipOwnedDetail and characters then
+				for i, character in ipairs(characters) do
+					GameTooltip:AddLine("|T:0|t "..character)
+				end
+			end
 		end
 
-		if (not mog.active or mog.active.name ~= "Wishlist") and mog.wishlist:IsItemInWishlist(item) then
-			if not mog:HasItem(item) then
+		local found, characters = mog.wishlist:IsItemInWishlist(item)
+		if (not mog.active or mog.active.name ~= "Wishlist") and found then
+			if not hasItem then
 				GameTooltip:AddLine(" ")
 			end
-			GameTooltip:AddLine(L["This item is on your wishlist."], 1, 1, 1)
-			GameTooltip:AddTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcon_1")
+			GameTooltip:AddLine("|TInterface\\PetBattles\\PetJournal:0:0:0:0:512:1024:62:78:26:42:255:255:255|t "..L["This item is on your wishlist."], 1, 1, 1)
+			if mog.db.profile.tooltipWishlistDetail and characters then
+				for i, character in ipairs(characters) do
+					GameTooltip:AddLine("|T:0|t "..character)
+				end
+			end
 		end
 
 		if items and #items > 1 then

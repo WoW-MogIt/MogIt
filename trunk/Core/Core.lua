@@ -6,7 +6,7 @@ local ItemInfo = LibStub("LibItemInfo-1.0");
 
 LibStub("Libra"):Embed(mog);
 
-local DataStore_Character = DataStore_Containers and DataStore:GetCharacter();
+local DataStore_Character;
 local BrotherBags_Player;
 
 mog.frame = CreateFrame("Frame","MogItFrame",UIParent,"ButtonFrameTemplate");
@@ -174,7 +174,7 @@ function mog:HasItem(itemID)
 		return true;
 	end
 	-- ...try third party data for that
-	if DataStore_Character then
+	if DataStore_Containers then
 		local _, _, count = DataStore:GetContainerItemCount(DataStore_Character, itemID);
 		if count > 0 then
 			return true;
@@ -187,6 +187,24 @@ function mog:HasItem(itemID)
 			end
 		end
 	end
+	if self.db.profile.ownedCheckAlts then
+		local found = false;
+		local characters = {};
+		if DataStore_Inventory and DataStore_Containers then
+			for realm in pairs(DataStore:GetRealms()) do
+				for k, character in pairs(DataStore:GetCharacters(realm)) do
+					local inventoryCount = DataStore:GetInventoryItemCount(character, itemID);
+					local bagCount, bankCount, voidCount = DataStore:GetContainerItemCount(character, itemID);
+					if (inventoryCount + bagCount + bankCount + voidCount) > 0 then
+						found = true;
+						local accountKey, realmKey, charKey = strsplit(".", character);
+						tinsert(characters, Ambiguate(charKey.."-"..realmKey:gsub(" ", ""), "none"));
+					end
+				end
+			end
+			return found, characters;
+		end
+	end
 end
 
 
@@ -195,6 +213,10 @@ local defaults = {
 	profile = {
 		tooltipItemID = false,
 		tooltipAlwaysShowOwned = true,
+		ownedCheckAlts = true,
+		tooltipOwnedDetail = true,
+		wishlistCheckAlts = true,
+		tooltipWishlistDetail = true,
 		
 		noAnim = false,
 		url = "Battle.net",
@@ -301,24 +323,8 @@ function mog:ADDON_LOADED(addon)
 	end
 end
 
-local function sortCharacters(a, b)
-	local characterA, realmA = a:match("(.+) %- (.+)");
-	local characterB, realmB = b:match("(.+) %- (.+)");
-	if realmA ~= realmB then
-		-- your own realm gets sorted before others
-		if realmA == myRealm then
-			return true;
-		end
-		if realmB == myRealm then
-			return false;
-		end
-		return realmA < realmB;
-	else
-		return characterA < characterB;
-	end
-end
-
 function mog:PLAYER_LOGIN()
+	DataStore_Character = DataStore and DataStore:GetCharacter();
 	BrotherBags_Player = BrotherBags and BrotherBags[GetRealmName()][UnitName("player")];
 	
 	C_Timer.After(1, function()
@@ -330,14 +336,6 @@ function mog:PLAYER_LOGIN()
 			end
 		end
 	end)
-	self.realmCharacters = {};
-	for characterKey in pairs(mog.wishlist.db.sv.profileKeys) do
-		local character, realm = characterKey:match("(.+) %- (.+)");
-		if self:IsConnectedRealm(realm, true) then
-			table.insert(self.realmCharacters, characterKey);
-		end
-	end
-	sort(self.realmCharacters, sortCharacters);
 	
 	mog:LoadSettings();
 	self.frame:SetScript("OnSizeChanged", function(self, width, height)
