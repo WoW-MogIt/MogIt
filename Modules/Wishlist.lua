@@ -263,7 +263,7 @@ function Wishlist:AddItem(item, setName, slot, isAlternate)
 		item = MogIt:ToStringItem(item)
 	end
 	-- don't add single items that are already on the wishlist
-	if not setName and self:IsItemInWishlist(item, true) then
+	if not setName and self:IsItemInWishlist(item, true, nil, true) then
 		return false
 	end
 	-- if a valid set name was provided, the item is supposed to go into the set, otherwise be added as a single item
@@ -361,7 +361,18 @@ local function tableFind(tbl, value, token)
 	end
 end
 
-function Wishlist:IsItemInWishlist(item, noSet, profile)
+function Wishlist:IsItemInWishlist(item, noSet, profile, noAlts)
+	if MogIt.db.profile.wishlistCheckAlts and not noAlts then
+		local found = false
+		local characters = {}
+		for character, profile in pairs(self.db.sv.profileKeys) do
+			if self:IsItemInWishlist(item, nil, profile, true) then
+				found = true
+				tinsert(characters, Ambiguate(character:gsub(" ", ""), "none"))
+			end
+		end
+		return found, characters
+	end
 	if type(item) == "string" then
 		item = MogIt:NormaliseItemString(item)
 	else

@@ -42,6 +42,8 @@ function mog.createOptions()
 				mog.tooltip:SetWidth(value);
 			elseif info.arg == "tooltipHeight" then
 				mog.tooltip:SetHeight(value);
+			elseif info.arg == "ownedCheckAlts" or info.arg == "wishlistCheckAlts" then
+				mog:BuildList();
 			elseif info.arg == "rows" or info.arg == "columns" then
 				mog:UpdateGUI();
 			end
@@ -81,6 +83,40 @@ function mog.createOptions()
 				name = L["Always indicate owned item in tooltip"],
 				width = "full",
 				arg = "tooltipAlwaysShowOwned",
+			},
+			ownedCheckAlts = {
+				type = "toggle",
+				order = 2.6,
+				name = L["Check alts for owned items"],
+				width = "full",
+				arg = "ownedCheckAlts",
+			},
+			tooltipOwnedDetail = {
+				type = "toggle",
+				order = 2.7,
+				name = L["Detailed info for owned items"],
+				width = "full",
+				arg = "tooltipOwnedDetail",
+				disabled = function()
+					return not mog.db.profile.ownedCheckAlts;
+				end,
+			},
+			wishlistCheckAlts = {
+				type = "toggle",
+				order = 2.8,
+				name = L["Check alts for wishlist items"],
+				width = "full",
+				arg = "wishlistCheckAlts",
+			},
+			tooltipWishlistDetail = {
+				type = "toggle",
+				order = 2.9,
+				name = L["Detailed info for wishlist items"],
+				width = "full",
+				arg = "tooltipWishlistDetail",
+				disabled = function()
+					return not mog.db.profile.wishlistCheckAlts;
+				end,
 			},
 			catalogue = {
 				type = "group",

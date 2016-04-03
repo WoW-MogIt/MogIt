@@ -125,20 +125,35 @@ function mog.tooltip:ShowItem(itemLink)
 		end
 	end
 	
-	local addOwnedItem = mog.db.profile.tooltipAlwaysShowOwned and mog.slotsType[slot] and mog:HasItem(itemID);
-	if addOwnedItem then
-		GameTooltip:AddLine(" ");
-		GameTooltip:AddLine(L["You have this item."], 1, 1, 1);
-		GameTooltip:AddTexture([[Interface\RaidFrame\ReadyCheck-Ready]]);
+	local addOwnedItem = mog.db.profile.tooltipAlwaysShowOwned and mog.slotsType[slot];
+	if mog.db.profile.tooltipAlwaysShowOwned and mog.slotsType[slot] then
+		local hasItem, characters = mog:HasItem(itemID);
+		addOwnedItem = hasItem;
+		if hasItem then
+			self:AddLine(" ");
+			self:AddLine("|TInterface\\RaidFrame\\ReadyCheck-Ready:0|t "..L["You have this item."], 1, 1, 1);
+			if mog.db.profile.tooltipOwnedDetail and characters then
+				for i, character in ipairs(characters) do
+					self:AddLine("|T:0|t "..character);
+				end
+			end
+		end
 	end
 	
 	-- add wishlist info about this item
-	if not self[mog] and mog.wishlist:IsItemInWishlist(itemID) then
-		if not addOwnedItem then
-			self:AddLine(" ");
+	if not self[mog] then
+		local found, characters = mog.wishlist:IsItemInWishlist(itemID);
+		if found then
+			if not addOwnedItem then
+				self:AddLine(" ");
+			end
+			self:AddLine("|TInterface\\PetBattles\\PetJournal:0:0:0:0:512:1024:62:78:26:42:255:255:255|t "..L["This item is on your wishlist."], 1, 1, 1);
+			if mog.db.profile.tooltipWishlistDetail and characters then
+				for i, character in ipairs(characters) do
+					self:AddLine("|T:0|t "..character);
+				end
+			end
 		end
-		self:AddLine(L["This item is on your wishlist."], 1, 1, 0);
-		self:AddTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcon_1");
 	end
 end
 
