@@ -1,3 +1,6 @@
+[b]3.5.9[/b]
+* Fixed error when alt search is enabled but alt is missing data.
+
 [b]3.5.8[/b]
 * Added option to check alts for owned and wishlist items using DataStore data. (see forum for details)
 

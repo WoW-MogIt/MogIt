@@ -195,7 +195,7 @@ function mog:HasItem(itemID)
 				for k, character in pairs(DataStore:GetCharacters(realm)) do
 					local inventoryCount = DataStore:GetInventoryItemCount(character, itemID);
 					local bagCount, bankCount, voidCount = DataStore:GetContainerItemCount(character, itemID);
-					if (inventoryCount + bagCount + bankCount + voidCount) > 0 then
+					if ((inventoryCount or 0) + (bagCount or 0) + (bankCount or 0) + (voidCount or 0)) > 0 then
 						found = true;
 						local accountKey, realmKey, charKey = strsplit(".", character);
 						tinsert(characters, Ambiguate(charKey.."-"..realmKey:gsub(" ", ""), "none"));
