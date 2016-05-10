@@ -167,8 +167,54 @@ end
 ItemInfo.RegisterCallback(mog, "OnItemInfoReceivedBatch", "ItemInfoReceived");
 --//
 
-function mog:HasItem(itemID)
+local characters;
+local addedCharacters = {};
+
+function mog:HasItem(itemID, includeAlternate, isAlternate)
+	local found = false;
+	if not isAlternate then
+		characters = {};
+	end
 	itemID = self:ToNumberItem(itemID);
+	if includeAlternate and not isAlternate then
+		addedCharacters = {};
+		local found = mog:HasItem(itemID);
+		-- local itemIDs = mog:GetData("display", mog:GetData("item", mog:NormaliseItemString(itemLink), "display"), "items");
+		local itemIDs = mog:GetData("display", mog:GetData("item", mog:NormaliseItemString(itemID), "display"), "items");
+		if itemIDs then
+			local baseItem = mog:ToStringItem(itemID);
+			for i, alternateItem in ipairs(itemIDs) do
+				if alternateItem ~= baseItem and mog:HasItem(alternateItem, false, true) then
+					found = true;
+				end
+			end
+		end
+		return found, characters;
+	end
+	if self.db.profile.ownedCheckAlts then
+		if DataStore then
+			for realm in pairs(DataStore:GetAccounts()) do
+				for realm in pairs(DataStore:GetRealms()) do
+					for k, character in pairs(DataStore:GetCharacters(realm)) do
+				-- if isAlternate then print(itemID, character, addedCharacters[character]) end
+						if not isAlternate or not addedCharacters[character] then
+				-- if isAlternate then print("D:") end
+							local inventoryCount = DataStore:GetInventoryItemCount(character, itemID);
+							local bagCount, bankCount, voidCount = DataStore:GetContainerItemCount(character, itemID);
+							local mailCount = DataStore:GetMailItemCount(character, itemID);
+							if ((inventoryCount or 0) + (bagCount or 0) + (bankCount or 0) + (voidCount or 0) + (mailCount or 0)) > 0 then
+								found = true;
+								local accountKey, realmKey, charKey = strsplit(".", character);
+								tinsert(characters, Ambiguate(charKey.."-"..realmKey:gsub(" ", "")..(isAlternate and " (*)" or ""), "none"));
+								addedCharacters[character] = true;
+							end
+						end
+					end
+				end
+			end
+			return found, characters;
+		end
+	end
 	-- GetItemCount does not take void storage into account...
 	if GetItemCount(itemID, true) > 0 then
 		return true;
@@ -187,24 +233,6 @@ function mog:HasItem(itemID)
 			end
 		end
 	end
-	if self.db.profile.ownedCheckAlts then
-		local found = false;
-		local characters = {};
-		if DataStore_Inventory and DataStore_Containers then
-			for realm in pairs(DataStore:GetRealms()) do
-				for k, character in pairs(DataStore:GetCharacters(realm)) do
-					local inventoryCount = DataStore:GetInventoryItemCount(character, itemID);
-					local bagCount, bankCount, voidCount = DataStore:GetContainerItemCount(character, itemID);
-					if ((inventoryCount or 0) + (bagCount or 0) + (bankCount or 0) + (voidCount or 0)) > 0 then
-						found = true;
-						local accountKey, realmKey, charKey = strsplit(".", character);
-						tinsert(characters, Ambiguate(charKey.."-"..realmKey:gsub(" ", ""), "none"));
-					end
-				end
-			end
-			return found, characters;
-		end
-	end
 end
 
 
@@ -217,6 +245,7 @@ local defaults = {
 		tooltipOwnedDetail = true,
 		wishlistCheckAlts = true,
 		tooltipWishlistDetail = true,
+		loadModulesDefault = false,
 		
 		noAnim = false,
 		url = "Battle.net",
@@ -314,6 +343,10 @@ function mog:ADDON_LOADED(addon)
 			if module.MogItLoaded then
 				module:MogItLoaded()
 			end
+		end
+
+		if mog.db.profile.loadModulesDefault then
+			mog:LoadBaseModules()
 		end
 	elseif mog.modules[addon] then
 		mog.modules[addon].loaded = true;

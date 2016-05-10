@@ -127,7 +127,8 @@ function mog.tooltip:ShowItem(itemLink)
 	
 	local addOwnedItem = mog.db.profile.tooltipAlwaysShowOwned and mog.slotsType[slot];
 	if mog.db.profile.tooltipAlwaysShowOwned and mog.slotsType[slot] then
-		local hasItem, characters = mog:HasItem(itemID);
+		local addedCharacters = {}
+		local hasItem, characters = mog:HasItem(itemID, true);
 		addOwnedItem = hasItem;
 		if hasItem then
 			self:AddLine(" ");
@@ -135,6 +136,7 @@ function mog.tooltip:ShowItem(itemLink)
 			if mog.db.profile.tooltipOwnedDetail and characters then
 				for i, character in ipairs(characters) do
 					self:AddLine("|T:0|t "..character);
+					addedCharacters[character] = true;
 				end
 			end
 		end
@@ -142,6 +144,7 @@ function mog.tooltip:ShowItem(itemLink)
 	
 	-- add wishlist info about this item
 	if not self[mog] then
+		local addedCharacters = {}
 		local found, characters = mog.wishlist:IsItemInWishlist(itemID);
 		if found then
 			if not addOwnedItem then
@@ -151,6 +154,27 @@ function mog.tooltip:ShowItem(itemLink)
 			if mog.db.profile.tooltipWishlistDetail and characters then
 				for i, character in ipairs(characters) do
 					self:AddLine("|T:0|t "..character);
+					addedCharacters[character] = true;
+				end
+			end
+		end
+		local itemIDs = mog:GetData("display", mog:GetData("item", mog:NormaliseItemString(itemLink), "display"), "items");
+		if itemIDs then
+			for i, item in ipairs(itemIDs) do
+				local foundAlternate, profiles = mog.wishlist:IsItemInWishlist(item);
+				if foundAlternate then
+					if not found then
+						self:AddLine(" ");
+						self:AddLine("|TInterface\\PetBattles\\PetJournal:0:0:0:0:512:1024:62:78:26:42:255:255:255|t "..L["This item is on your wishlist."], 1, 1, 1);
+					end
+					found = true;
+					if mog.db.profile.tooltipWishlistDetail and profiles then
+						for i, character in ipairs(profiles) do
+							if not addedCharacters[character] then
+								self:AddLine("|T:0|t "..character.." (*)");
+							end
+						end
+					end
 				end
 			end
 		end

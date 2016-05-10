@@ -118,6 +118,13 @@ function mog.createOptions()
 					return not mog.db.profile.wishlistCheckAlts;
 				end,
 			},
+			loadModules = {
+				type = "toggle",
+				order = 2.95,
+				name = L["Load base modules on login"],
+				width = "full",
+				arg = "loadModulesDefault",
+			},
 			catalogue = {
 				type = "group",
 				order = 3,

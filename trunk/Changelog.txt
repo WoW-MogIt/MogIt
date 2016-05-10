@@ -1,3 +1,10 @@
+[b]3.5.10[/b]
+* Fixed error when alt search is enabled and very old profiles are present.
+* Added option to load base modules on login. (disabled by default)
+* Take items using same appearance into account when checking for owned and wishlist items. Requires appropriate modules to be loaded. Above option is useful for this. Similar items are denoted with (*) in the tooltip.
+* Check alts for owned items even if current character owns it.
+* Use profile names instead of characters when listing wishlists in tooltips.
+
 [b]3.5.9[/b]
 * Fixed error when alt search is enabled but alt is missing data.
 
