@@ -95,7 +95,7 @@ end
 
 local function slotOnEnter(self)
 	if self.item then
-		mog.ShowItemTooltip(self, self.item);
+		mog.ShowItemTooltip(self, self.item, mog:GetData("display", mog:GetData("item", self.item, "display"), "items"));
 	else
 		GameTooltip:SetOwner(self,"ANCHOR_RIGHT");
 		GameTooltip:SetText(_G[strupper(self.slot)]);

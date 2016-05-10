@@ -179,8 +179,7 @@ function mog:HasItem(itemID, includeAlternate, isAlternate)
 	if includeAlternate and not isAlternate then
 		addedCharacters = {};
 		local found = mog:HasItem(itemID);
-		-- local itemIDs = mog:GetData("display", mog:GetData("item", mog:NormaliseItemString(itemLink), "display"), "items");
-		local itemIDs = mog:GetData("display", mog:GetData("item", mog:NormaliseItemString(itemID), "display"), "items");
+		local itemIDs = mog:GetData("display", mog:GetData("item", mog:ToStringItem(itemID), "display"), "items");
 		if itemIDs then
 			local baseItem = mog:ToStringItem(itemID);
 			for i, alternateItem in ipairs(itemIDs) do
@@ -196,9 +195,7 @@ function mog:HasItem(itemID, includeAlternate, isAlternate)
 			for realm in pairs(DataStore:GetAccounts()) do
 				for realm in pairs(DataStore:GetRealms()) do
 					for k, character in pairs(DataStore:GetCharacters(realm)) do
-				-- if isAlternate then print(itemID, character, addedCharacters[character]) end
 						if not isAlternate or not addedCharacters[character] then
-				-- if isAlternate then print("D:") end
 							local inventoryCount = DataStore:GetInventoryItemCount(character, itemID);
 							local bagCount, bankCount, voidCount = DataStore:GetContainerItemCount(character, itemID);
 							local mailCount = DataStore:GetMailItemCount(character, itemID);
