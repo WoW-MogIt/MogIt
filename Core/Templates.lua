@@ -18,8 +18,8 @@ function mog:GetItemLabel(itemID, callback, includeIcon, iconSize)
 	end
 end
 
-local function addItemTooltipLine(itemID, slot, selected, wishlist)
-	local texture = format("|T%s:0|t ", (selected and [[Interface\ChatFrame\ChatFrameExpandArrow]]) or (wishlist and [[Interface\TargetingFrame\UI-RaidTargetingIcon_1]]) or (mog:HasItem(itemID) and TEXTURE) or "")
+local function addItemTooltipLine(itemID, slot, selected, wishlist, isSetItem)
+	local texture = format("|T%s:0|t ", (selected and [[Interface\ChatFrame\ChatFrameExpandArrow]]) or (wishlist and [[Interface\TargetingFrame\UI-RaidTargetingIcon_1]]) or (mog:HasItem(itemID, isSetItem) and TEXTURE) or "")
 	GameTooltip:AddDoubleLine(texture..(type(slot) == "string" and _G[strupper(slot)]..": " or "")..mog:GetItemLabel(itemID, "ModelOnEnter"), mog.GetItemSourceShort(itemID), nil, nil, nil, 1, 1, 1)
 end
 
@@ -357,14 +357,14 @@ do	-- item functions
 			end
 		end
 
-		local found, characters = mog.wishlist:IsItemInWishlist(item)
+		local found, profiles = mog.wishlist:IsItemInWishlist(item)
 		if (not mog.active or mog.active.name ~= "Wishlist") and found then
 			if not hasItem then
 				GameTooltip:AddLine(" ")
 			end
 			GameTooltip:AddLine("|TInterface\\PetBattles\\PetJournal:0:0:0:0:512:1024:62:78:26:42:255:255:255|t "..L["This item is on your wishlist."], 1, 1, 1)
-			if mog.db.profile.tooltipWishlistDetail and characters then
-				for i, character in ipairs(characters) do
+			if mog.db.profile.tooltipWishlistDetail and profiles then
+				for i, character in ipairs(profiles) do
 					GameTooltip:AddLine("|T:0|t "..character)
 				end
 			end
@@ -374,7 +374,7 @@ do	-- item functions
 			GameTooltip:AddLine(" ")
 			GameTooltip:AddLine(L["Items using this appearance:"])
 			for i, v in ipairs(items) do
-				addItemTooltipLine(v, nil, v == item, mog.wishlist:IsItemInWishlist(v))
+				addItemTooltipLine(v, nil, v == item, (mog.wishlist:IsItemInWishlist(v)))
 			end
 		end
 
@@ -408,7 +408,7 @@ do	-- set functions
 		local hasSet = next(data.items)
 		for slot, item in pairs(data.items) do
 			self:TryOn(item, slot == "SecondaryHandSlot" and slot)
-			if not mog:HasItem(item) then
+			if not mog:HasItem(item, true) then
 				hasSet = false
 			end
 			if not mog:GetItemInfo(item) then
@@ -468,7 +468,7 @@ do	-- set functions
 		for i, slot in ipairs(mog.slots) do
 			local item = items[slot] or items[i]
 			if item then
-				addItemTooltipLine(item)
+				addItemTooltipLine(item, nil, nil, nil, true)
 			end
 		end
 		GameTooltip:Show()

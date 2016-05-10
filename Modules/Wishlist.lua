@@ -364,14 +364,14 @@ end
 function Wishlist:IsItemInWishlist(item, noSet, profile, noAlts)
 	if MogIt.db.profile.wishlistCheckAlts and not noAlts then
 		local found = false
-		local characters = {}
-		for character, profile in pairs(self.db.sv.profileKeys) do
+		local profiles = {}
+		for i, profile in ipairs(self.db:GetProfiles()) do
 			if self:IsItemInWishlist(item, nil, profile, true) then
 				found = true
-				tinsert(characters, Ambiguate(character:gsub(" ", ""), "none"))
+				tinsert(profiles, profile)
 			end
 		end
-		return found, characters
+		return found, profiles
 	end
 	if type(item) == "string" then
 		item = MogIt:NormaliseItemString(item)
@@ -393,9 +393,9 @@ function Wishlist:IsItemInWishlist(item, noSet, profile, noAlts)
 		if sets then
 			for i, set in ipairs(sets) do
 				if tableFind(set.items, item, token) then return true end
-				for slot, items in pairs(set.alternateItems) do
-					if tableFind(items, item, token) then return true end
-				end
+				-- for slot, items in pairs(set.alternateItems) do
+					-- if tableFind(items, item, token) then return true end
+				-- end
 			end
 		end
 	end
