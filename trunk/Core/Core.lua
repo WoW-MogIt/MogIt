@@ -192,9 +192,9 @@ function mog:HasItem(itemID, includeAlternate, isAlternate)
 	end
 	if self.db.profile.ownedCheckAlts then
 		if DataStore then
-			for realm in pairs(DataStore:GetAccounts()) do
-				for realm in pairs(DataStore:GetRealms()) do
-					for k, character in pairs(DataStore:GetCharacters(realm)) do
+			for account in pairs(DataStore:GetAccounts()) do
+				for realm in pairs(DataStore:GetRealms(account)) do
+					for k, character in pairs(DataStore:GetCharacters(realm, account)) do
 						if not isAlternate or not addedCharacters[character] then
 							local inventoryCount = DataStore:GetInventoryItemCount(character, itemID);
 							local bagCount, bankCount, voidCount = DataStore:GetContainerItemCount(character, itemID);
