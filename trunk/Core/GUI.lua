@@ -141,7 +141,7 @@ function mog:CreateModelFrame(parent)
 	
 	f.bg = f:CreateTexture(nil,"BACKGROUND");
 	f.bg:SetAllPoints(f);
-	f.bg:SetTexture(0.3,0.3,0.3,0.2);
+	f.bg:SetColorTexture(0.3,0.3,0.3,0.2);
 	
 	f:RegisterForClicks("AnyUp");
 	f:RegisterForDrag("LeftButton","RightButton");
@@ -300,17 +300,6 @@ function ModelFramePrototype:ResetModel()
 		model:Dress();
 	else
 		model:SetCustomRace(info.displayRace, info.displayGender);
-		-- hack for hidden helm and cloak showing on models
-		local showingHelm, showingCloak = ShowingHelm(), ShowingCloak();
-		local helm, cloak = GetInventoryItemID("player", INVSLOT_HEAD), GetInventoryItemID("player", INVSLOT_BACK);
-		if not showingHelm and helm then
-			model:TryOn(helm);
-			model:UndressSlot(INVSLOT_HEAD);
-		end
-		if not showingCloak and cloak then
-			model:TryOn(cloak);
-			model:UndressSlot(INVSLOT_BACK);
-		end
 	end
 	self:PositionModel();
 end
@@ -616,11 +605,11 @@ local function menuOnEnter(self)
 			self.menuBar:ToggleMenu(nil, self);
 		end
 	end
-	self.nt:SetTexture(1,0.82,0,1);
+	self.nt:SetColorTexture(1,0.82,0,1);
 end
 
 local function menuOnLeave(self)
-	self.nt:SetTexture(0,0,0,0);
+	self.nt:SetColorTexture(0,0,0,0);
 end
 
 local function createMenu(menuBar, label, func)
@@ -634,8 +623,8 @@ local function createMenu(menuBar, label, func)
 	f.menuBar.yOffset = 0
 	
 	f.nt = f:CreateTexture(nil,"BACKGROUND");
-	--nt:SetTexture(0.8,0.3,0.8,1);
-	f.nt:SetTexture(0,0,0,0);
+	--nt:SetColorTexture(0.8,0.3,0.8,1);
+	f.nt:SetColorTexture(0,0,0,0);
 	f.nt:SetAllPoints(f);
 	f:SetNormalTexture(f.nt);
 	
@@ -950,11 +939,11 @@ help:SetScript("OnEnter", function(self)
 		end
 	end
 	GameTooltip:Show()
-	self.nt:SetTexture(1, 0.82, 0, 1);
+	self.nt:SetColorTexture(1, 0.82, 0, 1);
 end);
 help:SetScript("OnLeave", function(self)
 	GameTooltip_Hide()
-	self.nt:SetTexture(0, 0, 0, 0);
+	self.nt:SetColorTexture(0, 0, 0, 0);
 end);
 
 
