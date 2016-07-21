@@ -360,9 +360,10 @@ function mog:PLAYER_LOGIN()
 	C_Timer.After(1, function()
 		-- this function doesn't yield correct results immediately, so we delay it
 		for slot, v in pairs(mog.mogSlots) do
-			local isTransmogrified, _, _, _, _, visibleItemID = GetTransmogrifySlotInfo(slot);
+			local isTransmogrified, _, _, _, _, _, _, visibleItemID = C_Transmog.GetSlotInfo(slot, LE_TRANSMOG_TYPE_APPEARANCE);
 			if isTransmogrified then
-				mog:GetItemInfo(visibleItemID);
+				-- we need an item ID here if we still need to cache these at all
+				-- mog:GetItemInfo(visibleItemID);
 			end
 		end
 	end)
@@ -377,12 +378,14 @@ end
 
 function mog:PLAYER_EQUIPMENT_CHANGED(slot, hasItem)
 	local slotName = mog.mogSlots[slot];
-	local itemID, itemAppearanceModID = GetInventoryItemID("player", slot);
+	local item = GetInventoryItemLink("player", slot);
 	if slotName then
-		local isTransmogrified, _, _, _, _, visibleItemID, _, visibleItemAppearanceModID = GetTransmogrifySlotInfo(slot);
+		local baseSourceID, baseVisualID, appliedSourceID, appliedVisualID = C_Transmog.GetSlotVisualInfo(slot, LE_TRANSMOG_TYPE_APPEARANCE);
+		local isTransmogrified, _, _, _, _, _, isHideVisual, texture = C_Transmog.GetSlotInfo(slot, LE_TRANSMOG_TYPE_APPEARANCE);
 		if isTransmogrified then
-			mog:GetItemInfo(visibleItemID);
-			itemID = visibleItemID;
+			-- we need an item ID here if we still need to cache these at all
+			-- mog:GetItemInfo(visibleItemID);
+			item = appliedSourceID;
 			itemAppearanceModID = visibleItemAppearanceModID;
 		end
 	end
@@ -391,9 +394,7 @@ function mog:PLAYER_EQUIPMENT_CHANGED(slot, hasItem)
 		for i, frame in ipairs(mog.models) do
 			if frame.data.item then
 				if hasItem then
-					if (slot ~= INVSLOT_HEAD or ShowingHelm()) and (slot ~= INVSLOT_BACK or ShowingCloak()) then
-						frame:TryOn(itemID, slotName, itemAppearanceModID);
-					end
+					frame:TryOn(item, slotName, itemAppearanceModID);
 				else
 					frame:UndressSlot(slot);
 				end

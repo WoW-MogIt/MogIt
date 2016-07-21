@@ -53,17 +53,6 @@ mog.tooltip.model.ResetModel = function(self)
 	local db = mog.db.profile
 	if db.tooltipCustomModel then
 		self:SetCustomRace(db.tooltipRace, db.tooltipGender);
-		-- hack for hidden helm and cloak showing on models
-		local showingHelm, showingCloak = ShowingHelm(), ShowingCloak();
-		local helm, cloak = GetInventoryItemID("player", INVSLOT_HEAD), GetInventoryItemID("player", INVSLOT_BACK);
-		if not showingHelm and helm then
-			self:TryOn(helm);
-			self:UndressSlot(INVSLOT_HEAD);
-		end
-		if not showingCloak and cloak then
-			self:TryOn(cloak);
-			self:UndressSlot(INVSLOT_BACK);
-		end
 		self:RefreshCamera();
 	else
 		self:Dress();
@@ -241,12 +230,13 @@ hooksecurefunc(GameTooltip, "SetQuestLogItem", function(self, itemType, index)
 	GameTooltip:Show();
 end);
 
-hooksecurefunc(GameTooltip, "SetTradeSkillItem", function(self, skillIndex, reagentIndex)
-	if reagentIndex then
-		mog.tooltip:ShowItem(GetTradeSkillReagentItemLink(skillIndex, reagentIndex));
-	else
-		mog.tooltip:ShowItem(GetTradeSkillItemLink(skillIndex));
-	end
+hooksecurefunc(GameTooltip, "SetRecipeResultItem", function(self, recipeID)
+	mog.tooltip:ShowItem(C_TradeSkillUI.GetRecipeItemLink(recipeID));
+	GameTooltip:Show();
+end);
+
+hooksecurefunc(GameTooltip, "SetRecipeReagentItem", function(self, recipeID, reagentIndex)
+	mog.tooltip:ShowItem(C_TradeSkillUI.GetRecipeReagentItemLink(recipeID, reagentIndex));
 	GameTooltip:Show();
 end);
 --//
