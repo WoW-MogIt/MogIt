@@ -1,3 +1,18 @@
+[b]3.6.0[/b]
+* Owned items now checks whether it's collected in wardrobe instead. A new option to also search in bags has been added and is disabled by default.
+* Items in the wardrobe may now be ctrl-right clicked to be added to a MogIt preview.
+* Enable hidden option in the default UI to show tooltip info for all missing wardrobe items.
+* Fixed items getting added as the normal difficulty version under certain circumstances.
+* Fixed some dual wielding model issues.
+* Use transmogrify target for shirt and tabard when equipping current gear in preview.
+* Restore "Only transmog items" tooltip option. (semi experimental)
+* Fixed tooltip models for item exchange tokens.
+* Added option to display tooltip model on the left or right instead of above or below.
+* Update ToC for base module addons.
+
+[b]3.5.12[/b]
+* Fixed some errors introduced in 7.0.
+
 [b]3.5.11[/b]
 * Fixed tooltip alt info for synced DataStore accounts.
 
