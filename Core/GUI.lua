@@ -264,8 +264,8 @@ function ModelFramePrototype:SetText(text)
 end
 
 local tryOnSlots = {
-	MainHandSlot = "mainhand",
-	SecondaryHandSlot = "offhand",
+	MainHandSlot = "MAINHANDSLOT",
+	SecondaryHandSlot = "SECONDARYHANDSLOT",
 }
 
 function ModelFramePrototype:TryOn(item, slot, itemAppearanceModID)

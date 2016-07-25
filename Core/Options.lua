@@ -42,7 +42,7 @@ function mog.createOptions()
 				mog.tooltip:SetWidth(value);
 			elseif info.arg == "tooltipHeight" then
 				mog.tooltip:SetHeight(value);
-			elseif info.arg == "ownedCheckAlts" or info.arg == "wishlistCheckAlts" then
+			elseif info.arg == "ownedSearchBags" or info.arg == "ownedCheckAlts" or info.arg == "wishlistCheckAlts" then
 				mog:BuildList();
 			elseif info.arg == "rows" or info.arg == "columns" then
 				mog:UpdateGUI();
@@ -84,12 +84,22 @@ function mog.createOptions()
 				width = "full",
 				arg = "tooltipAlwaysShowOwned",
 			},
+			ownedSearchBags = {
+				type = "toggle",
+				order = 2.55,
+				name = L["Search bags for owned items"],
+				width = "full",
+				arg = "ownedSearchBags",
+			},
 			ownedCheckAlts = {
 				type = "toggle",
 				order = 2.6,
 				name = L["Check alts for owned items"],
 				width = "full",
 				arg = "ownedCheckAlts",
+				disabled = function()
+					return not mog.db.profile.ownedSearchBags;
+				end,
 			},
 			tooltipOwnedDetail = {
 				type = "toggle",
@@ -98,7 +108,7 @@ function mog.createOptions()
 				width = "full",
 				arg = "tooltipOwnedDetail",
 				disabled = function()
-					return not mog.db.profile.ownedCheckAlts;
+					return not (mog.db.profile.ownedSearchBags and mog.db.profile.ownedCheckAlts);
 				end,
 			},
 			wishlistCheckAlts = {
@@ -371,6 +381,16 @@ function mog.createOptions()
 				disabled = function()
 					return not mog.db.profile.tooltipCustomModel;
 				end,
+			},
+			anchor = {
+				type = "select",
+				order = 12,
+				name = L["Anchor point"],
+				values = {
+					vertical = "Top/bottom",
+					horizontal = "Left/right",
+				},
+				arg = "tooltipAnchor",
 			},
 		},
 	};
