@@ -1,3 +1,8 @@
+[b]3.6.1[/b]
+* Fixed error for broken tooltip links.
+* Fixed tooltip model for item tokens when only transmog items are allowed.
+* Allow shirts and tabards for tooltip model.
+
 [b]3.6.0[/b]
 * Owned items now checks whether it's collected in wardrobe instead. A new option to also search in bags has been added and is disabled by default.
 * Items in the wardrobe may now be ctrl-right clicked to be added to a MogIt preview.

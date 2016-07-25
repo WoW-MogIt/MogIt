@@ -66,11 +66,10 @@ mog.tooltip.model:SetScript("OnShow",mog.tooltip.model.ResetModel);
 
 function mog.tooltip:ShowItem(itemLink)
 	if not itemLink then return end
-	local itemID = tonumber(itemLink:match("item:(%d+)"));
-	if itemID == 0 then return end
+	local itemID, _, _, slot = GetItemInfoInstant(itemLink);
+	if not itemID then return end
 	local self = GameTooltip;
 	
-	local slot = select(4, GetItemInfoInstant(itemLink));
 	local db = mog.db.profile;
 	local tooltip = mog.tooltip;
 	if db.tooltip and (not tooltip.mod[db.tooltipMod] or tooltip.mod[db.tooltipMod]()) then
@@ -82,6 +81,7 @@ function mog.tooltip:ShowItem(itemLink)
 					for item, classBit in pairs(token) do
 						if bit.band(class, classBit) > 0 then
 							itemLink = "item:"..item;
+							itemID = item;
 							break;
 						end
 					end
@@ -270,6 +270,8 @@ mog.tooltip.slots = {
 	INVTYPE_CLOAK = 3.4,
 	INVTYPE_CHEST = 0,
 	INVTYPE_ROBE = 0,
+	INVTYPE_SHIRT = 0,
+	INVTYPE_TABARD = 0,
 	INVTYPE_WRIST = 0,
 	INVTYPE_2HWEAPON = 1.6,
 	INVTYPE_WEAPON = 1.6,
