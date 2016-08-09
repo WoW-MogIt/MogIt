@@ -42,6 +42,8 @@ function mog.createOptions()
 				mog.tooltip:SetWidth(value);
 			elseif info.arg == "tooltipHeight" then
 				mog.tooltip:SetHeight(value);
+			elseif info.arg == "alwaysShowCollected" then
+				C_TransmogCollection.SetShowMissingSourceInItemTooltips(value);
 			elseif info.arg == "ownedSearchBags" or info.arg == "ownedCheckAlts" or info.arg == "wishlistCheckAlts" then
 				mog:BuildList();
 			elseif info.arg == "rows" or info.arg == "columns" then
@@ -76,6 +78,13 @@ function mog.createOptions()
 				name = L["Show item ID in tooltips"],
 				width = "full",
 				arg = "tooltipItemID",
+			},
+			alwaysShowCollected = {
+				type = "toggle",
+				order = 2.4,
+				name = L["Always indicate collected appearance in tooltip"],
+				width = "full",
+				arg = "alwaysShowCollected",
 			},
 			tooltipAlwaysShowOwned = {
 				type = "toggle",

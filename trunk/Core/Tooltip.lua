@@ -70,6 +70,13 @@ function mog.tooltip:ShowItem(itemLink)
 	if not itemID then return end
 	local self = GameTooltip;
 	
+	for i = 1, GameTooltip:NumLines() do
+		local line = _G["GameTooltipTextLeft"..i]
+		if line:GetText() == TRANSMOGRIFY_TOOLTIP_ITEM_UNKNOWN_APPEARANCE_KNOWN then
+			line:SetTextColor(136 / 255, 1, 170 / 255)
+		end
+	end
+	
 	local db = mog.db.profile;
 	local tooltip = mog.tooltip;
 	if db.tooltip and (not tooltip.mod[db.tooltipMod] or tooltip.mod[db.tooltipMod]()) then
