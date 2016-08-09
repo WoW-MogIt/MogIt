@@ -1,3 +1,9 @@
+[b]3.6.2[/b]
+* Added option to show tooltip info for all missing wardrobe items. (enabled by default)
+* Support additional item difficulty modifiers.
+* Implemented workaround for certain broken plugins.
+* Use different color for "known from other item" tooltip text.
+
 [b]3.6.1[/b]
 * Fixed error for broken tooltip links.
 * Fixed tooltip model for item tokens when only transmog items are allowed.

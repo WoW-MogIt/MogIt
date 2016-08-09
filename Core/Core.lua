@@ -278,6 +278,7 @@ end
 local defaults = {
 	profile = {
 		tooltipItemID = false,
+		alwaysShowCollected = true,
 		tooltipAlwaysShowOwned = true,
 		ownedSearchBags = false,
 		ownedCheckAlts = true,
@@ -384,6 +385,8 @@ function mog:ADDON_LOADED(addon)
 				module:MogItLoaded()
 			end
 		end
+		
+		C_TransmogCollection.SetShowMissingSourceInItemTooltips(mog.db.profile.tooltipAlwaysShowOwned)
 
 		if mog.db.profile.loadModulesDefault then
 			mog:LoadBaseModules()
@@ -416,7 +419,6 @@ function mog:ADDON_LOADED(addon)
 	end
 end
 
-C_TransmogCollection.SetShowMissingSourceInItemTooltips(true)
 
 function mog:PLAYER_LOGIN()
 	DataStore_Character = DataStore and DataStore:GetCharacter();
@@ -553,6 +555,12 @@ local bonusDiffs = {
 	[651] = true, -- baleful empowered (695)
 	[1798] = true, -- ???
 	[1799] = true, -- ???
+	[1805] = true, -- raid-heroic
+	[1806] = true, -- raid-mythic
+	[3379] = true, -- ???
+	[3444] = true, -- ???
+	[3445] = true, -- ???
+	[3446] = true, -- ???
 };
 
 mog.itemStringPattern = "item:(%d+):%d*:%d*:%d*:%d*:%d*:%d*:%d*:%d*:%d*:%d*:%d*:%d*:([%d:]+)";
