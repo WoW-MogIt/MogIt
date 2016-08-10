@@ -1,3 +1,6 @@
+[b]3.6.3[/b]
+* Fix demon hunter error.
+
 [b]3.6.2[/b]
 * Added option to show tooltip info for all missing wardrobe items. (enabled by default)
 * Support additional item difficulty modifiers.
