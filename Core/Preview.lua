@@ -346,7 +346,7 @@ end
 
 local function newSetOnClick(self)
 	wipe(newSet.items)
-	newSet.name = "Set "..(#mog.wishlist:GetSets() + 1)
+	newSet.name = currentPreview.data.title or ("Set "..(#mog.wishlist:GetSets() + 1))
 	newSet.previewFrame = currentPreview
 	for slot, v in pairs(currentPreview.slots) do
 		newSet.items[slot] = v.item
@@ -899,15 +899,49 @@ local function hookInspectUI()
 		_G["Inspect"..v]:RegisterForClicks("AnyUp");
 		_G["Inspect"..v]:SetScript("OnClick", onClick);
 	end
+	
+	InspectPaperDollFrame.ViewButton:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+	InspectPaperDollFrame.ViewButton:SetScript("OnClick", function(self, button)
+		if IsControlKeyDown() and button == "RightButton" then
+			local appearanceSources, mainHandEnchant, offHandEnchant = C_TransmogCollection.GetInspectSources();
+			local mainHandSlotID = GetInventorySlotInfo("MAINHANDSLOT");
+			local secondaryHandSlotID = GetInventorySlotInfo("SECONDARYHANDSLOT");
+			for i, source in pairs(appearanceSources) do
+				if source ~= NO_TRANSMOG_SOURCE_ID and i ~= mainHandSlotID and i ~= secondaryHandSlotID then
+					local _, _, _, _, _, link = C_TransmogCollection.GetAppearanceSourceInfo(source);
+					appearanceSources[i] = link;
+				end
+			end
+
+			-- remap handheld items into string IDs instead as numerical IDs are not supported
+			appearanceSources["MainHandSlot"] = select(6, C_TransmogCollection.GetAppearanceSourceInfo(appearanceSources[mainHandSlotID]));
+			appearanceSources["SecondaryHandSlot"] = select(6, C_TransmogCollection.GetAppearanceSourceInfo(appearanceSources[secondaryHandSlotID]));
+			appearanceSources[mainHandSlotID] = nil;
+			appearanceSources[secondaryHandSlotID] = nil;
+			
+			mog:AddToPreview(appearanceSources, mog:GetPreview());
+		else
+			InspectPaperDollViewButton_OnClick(self);
+		end
+	end);
+	
 	hookInspectUI = nil;
 end
 
 if InspectFrame then
 	hookInspectUI();
 else
-	mog.view:SetScript("OnEvent",function(self,event,addon)
+	mog.view:SetScript("OnEvent",function(self, event, addon)
+		if addon == "Blizzard_AuctionUI" then
+			for i = 1, NUM_BROWSE_TO_DISPLAY do
+				local frame = _G["BrowseButton"..i.."Item"];
+				frame:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+			end
+		end
 		if addon == "Blizzard_InspectUI" then
 			hookInspectUI();
+		end
+		if IsAddOnLoaded("Blizzard_AuctionUI") and IsAddOnLoaded("Blizzard_InspectUI") then
 			self:UnregisterEvent(event);
 			self:SetScript("OnEvent", nil);
 		end

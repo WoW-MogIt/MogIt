@@ -186,22 +186,27 @@ local function isItemCollected(item)
 	if type(item) == "number" then
 		item = "item:"..item
 	end
-	local sourceID = itemSourceID[item]
+	local sourceID = mog:GetSourceFromItem(item)
 	if sourceID then
 		local categoryID, appearanceID, canEnchant, icon, isCollected = C_TransmogCollection.GetAppearanceSourceInfo(sourceID)
 		return isCollected
 	end
-	model:SetUnit("player")
-	model:Undress()
-	model:TryOn(item, tryOnSlots[slot])
-	for i = 1, 17 do
-		sourceID = model:GetSlotTransmogSources(i)
-		if sourceID ~= 0 then
-			local categoryID, appearanceID, canEnchant, icon, isCollected = C_TransmogCollection.GetAppearanceSourceInfo(sourceID)
-			itemSourceID[item] = sourceID
-			return isCollected
+end
+
+function mog:GetSourceFromItem(item)
+	if not itemSourceID[item] then
+		model:SetUnit("player")
+		model:Undress()
+		model:TryOn(item)
+		for i = 1, 19 do
+			local source, illusion = model:GetSlotTransmogSources(i)
+			if source ~= 0 then
+				itemSourceID[item] = source
+				break
+			end
 		end
 	end
+	return itemSourceID[item]
 end
 
 local characters;
@@ -210,9 +215,6 @@ local addedCharacters = {};
 function mog:HasItem(itemID, includeAlternate, isAlternate)
 	local found = false;
 	found = isItemCollected(itemID);
-	if not mog.db.profile.ownedSearchBags then
-		return found;
-	end
 	if not isAlternate then
 		characters = {};
 	end
@@ -230,6 +232,9 @@ function mog:HasItem(itemID, includeAlternate, isAlternate)
 			end
 		end
 		return found, characters;
+	end
+	if not mog.db.profile.ownedSearchBags then
+		return found;
 	end
 	if self.db.profile.ownedCheckAlts then
 		if DataStore then

@@ -1,3 +1,11 @@
+[b]3.6.4[/b]
+* Fix flashing tooltip model in tradeskill frame.
+* Saving a new set from preview will now put the name of the loaded set, if applicable, in the naming dialog.
+* Indicating ownership of alternate items should now work even if "Search bags" is not enabled.
+* Models should no longer play random idle animations such as bouncing. Maybe. (they will still breathe)
+* "View in dressing room" button in inspect frame can now be ctrl-right clicked for previewing.
+* Auction house listings may now be ctrl-right clicked for previewing.
+
 [b]3.6.3[/b]
 * Fix demon hunter error.
 
