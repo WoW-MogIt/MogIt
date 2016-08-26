@@ -249,10 +249,10 @@ hooksecurefunc(GameTooltip, "SetQuestLogItem", function(self, itemType, index)
 	GameTooltip:Show();
 end);
 
-hooksecurefunc(GameTooltip, "SetRecipeResultItem", function(self, recipeID)
-	mog.tooltip:ShowItem(C_TradeSkillUI.GetRecipeItemLink(recipeID));
-	GameTooltip:Show();
-end);
+-- hooksecurefunc(GameTooltip, "SetRecipeResultItem", function(self, recipeID)
+	-- mog.tooltip:ShowItem(C_TradeSkillUI.GetRecipeItemLink(recipeID));
+	-- GameTooltip:Show();
+-- end);
 
 hooksecurefunc(GameTooltip, "SetRecipeReagentItem", function(self, recipeID, reagentIndex)
 	mog.tooltip:ShowItem(C_TradeSkillUI.GetRecipeReagentItemLink(recipeID, reagentIndex));

@@ -304,6 +304,7 @@ function ModelFramePrototype:ResetModel()
 	else
 		model:SetCustomRace(info.displayRace, info.displayGender);
 	end
+	model:SetAnimation(0, 0)
 	self:PositionModel();
 end
 

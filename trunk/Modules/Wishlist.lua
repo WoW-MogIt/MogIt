@@ -511,8 +511,8 @@ do
 			onAccept(parent, data)
 			parent:Hide()
 		end,
-		OnShow = function(self)
-			self.editBox:SetText("Set "..(#Wishlist:GetSets() + 1))
+		OnShow = function(self, data)
+			self.editBox:SetText(data.name)
 			self.editBox:HighlightText()
 		end,
 		whileDead = true,
