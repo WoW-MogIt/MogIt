@@ -77,7 +77,7 @@ end
 
 -- create a new set and add the item to it
 local function newSetOnClick(self)
-	StaticPopup_Show("MOGIT_WISHLIST_CREATE_SET", nil, nil, self.value)
+	StaticPopup_Show("MOGIT_WISHLIST_CREATE_SET", nil, nil, {items = {self.value}})
 	CloseDropDownMenus()
 end
 

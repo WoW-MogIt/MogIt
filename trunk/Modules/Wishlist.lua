@@ -269,7 +269,10 @@ function Wishlist:AddItem(item, setName, slot, isAlternate)
 	-- if a valid set name was provided, the item is supposed to go into the set, otherwise be added as a single item
 	local set = self:GetSet(setName)
 	if set then
-		slot = slot or MogIt.slotsType[select(9, GetItemInfo(item))]
+		if type(slot) ~= "string" then
+			slot = nil
+		end
+		slot = slot or MogIt.slotsType[select(4, GetItemInfoInstant(item))]
 		if isAlternate then
 			local altItems = set.alternateItems[slot] or {}
 			set.alternateItems[slot] = altItems
@@ -441,7 +444,7 @@ end
 
 local setFuncs = {
 	addItem = function(self, set, item)
-		if Wishlist:AddItem(item, set, select(9, GetItemInfo(item)) == "INVTYPE_WEAPON" and IsShiftKeyDown() and "SecondaryHandSlot" or nil) then
+		if Wishlist:AddItem(item, set, select(4, GetItemInfoInstant(item)) == "INVTYPE_WEAPON" and IsShiftKeyDown() and "SecondaryHandSlot" or nil) then
 			MogIt:BuildList(nil, "Wishlist")
 		end
 		CloseDropDownMenus()
@@ -457,7 +460,7 @@ function Wishlist:AddSetMenuItems(level, func, arg2, profile)
 	local onehand
 	if type(func) ~= "function" then
 		func = setFuncs[func]
-		if select(9, GetItemInfo(arg2)) == "INVTYPE_WEAPON" then
+		if select(4, GetItemInfoInstant(arg2)) == "INVTYPE_WEAPON" then
 			onehand = true
 		end
 	end
@@ -485,16 +488,12 @@ do
 			return
 		end
 		if data then
-			if type(data) == "table" then
-				for slot, v in pairs(data.items) do
-					Wishlist:AddItem(v, text, slot)
-				end
-				if data.previewFrame then
-					data.previewFrame.TitleText:SetText(text)
-					data.previewFrame.data.title = text
-				end
-			else
-				Wishlist:AddItem(data, text)
+			for slot, v in pairs(data.items) do
+				Wishlist:AddItem(v, text, slot)
+			end
+			if data.previewFrame then
+				data.previewFrame.TitleText:SetText(text)
+				data.previewFrame.data.title = text
 			end
 		end
 		MogIt:BuildList(nil, "Wishlist")
@@ -512,7 +511,7 @@ do
 			parent:Hide()
 		end,
 		OnShow = function(self, data)
-			self.editBox:SetText(data.name)
+			self.editBox:SetText(data and data.name or ("Set "..(#Wishlist:GetSets() + 1)))
 			self.editBox:HighlightText()
 		end,
 		whileDead = true,
