@@ -391,7 +391,7 @@ function mog:ADDON_LOADED(addon)
 			end
 		end
 		
-		C_TransmogCollection.SetShowMissingSourceInItemTooltips(mog.db.profile.tooltipAlwaysShowOwned)
+		C_TransmogCollection.SetShowMissingSourceInItemTooltips(mog.db.profile.alwaysShowCollected)
 
 		if mog.db.profile.loadModulesDefault then
 			mog:LoadBaseModules()

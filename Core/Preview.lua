@@ -383,16 +383,50 @@ local function loadInitialize(self, level)
 		
 		local info = UIDropDownMenu_CreateInfo()
 		info.text = L["Other profiles"]
+		info.value = "profiles"
+		info.hasArrow = true
+		info.notCheckable = true
+		self:AddButton(info, level)
+		
+		local info = UIDropDownMenu_CreateInfo()
+		info.text = "Wardrobe outfits"
+		info.value = "outfits"
 		info.hasArrow = true
 		info.notCheckable = true
 		self:AddButton(info, level)
 	elseif level == 2 then
-		local curProfile = mog.wishlist:GetCurrentProfile()
-		for i, profile in ipairs(mog.wishlist:GetProfiles()) do
-			if profile ~= curProfile and mog.wishlist:GetSets(profile) then
+		if UIDROPDOWNMENU_MENU_VALUE == "profiles" then
+			local curProfile = mog.wishlist:GetCurrentProfile()
+			for i, profile in ipairs(mog.wishlist:GetProfiles()) do
+				if profile ~= curProfile and mog.wishlist:GetSets(profile) then
+					local info = UIDropDownMenu_CreateInfo()
+					info.text = profile
+					info.hasArrow = true
+					info.notCheckable = true
+					self:AddButton(info, level)
+				end
+			end
+		end
+		if UIDROPDOWNMENU_MENU_VALUE == "outfits" then
+			if #C_TransmogCollection.GetOutfits() > 0 then
+				for i, outfit in ipairs(C_TransmogCollection.GetOutfits()) do
+					local info = UIDropDownMenu_CreateInfo()
+					info.text = outfit.name
+					info.notCheckable = true
+					info.func = function(self, outfitID)
+						mog:PreviewFromOutfit(currentPreview, C_TransmogCollection.GetOutfitSources(outfitID))
+						local title = C_TransmogCollection.GetOutfitName(outfitID)
+						currentPreview.TitleText:SetText(title)
+						currentPreview.data.title = title
+						CloseDropDownMenus()
+					end
+					info.arg1 = outfit.outfitID
+					self:AddButton(info, level)
+				end
+			else
 				local info = UIDropDownMenu_CreateInfo()
-				info.text = profile
-				info.hasArrow = true
+				info.text = "No outfits"
+				info.disabled = true
 				info.notCheckable = true
 				self:AddButton(info, level)
 			end
@@ -817,6 +851,25 @@ function mog.view:Undress(preview)
 		mog.view.DelItem(k, preview);
 	end
 end
+
+function mog:PreviewFromOutfit(preview, appearanceSources, mainHandEnchant, offHandEnchant)
+	local mainHandSlotID = GetInventorySlotInfo("MAINHANDSLOT");
+	local secondaryHandSlotID = GetInventorySlotInfo("SECONDARYHANDSLOT");
+	for i, source in pairs(appearanceSources) do
+		if source ~= NO_TRANSMOG_SOURCE_ID and i ~= mainHandSlotID and i ~= secondaryHandSlotID then
+			local _, _, _, _, _, link = C_TransmogCollection.GetAppearanceSourceInfo(source);
+			appearanceSources[i] = link;
+		end
+	end
+
+	-- remap handheld items into string IDs instead as numerical IDs are not supported
+	appearanceSources["MainHandSlot"] = select(6, C_TransmogCollection.GetAppearanceSourceInfo(appearanceSources[mainHandSlotID]));
+	appearanceSources["SecondaryHandSlot"] = select(6, C_TransmogCollection.GetAppearanceSourceInfo(appearanceSources[secondaryHandSlotID]));
+	appearanceSources[mainHandSlotID] = nil;
+	appearanceSources[secondaryHandSlotID] = nil;
+	
+	mog:AddToPreview(appearanceSources, preview);
+end
 --//
 
 
@@ -903,23 +956,7 @@ local function hookInspectUI()
 	InspectPaperDollFrame.ViewButton:RegisterForClicks("LeftButtonUp", "RightButtonUp");
 	InspectPaperDollFrame.ViewButton:SetScript("OnClick", function(self, button)
 		if IsControlKeyDown() and button == "RightButton" then
-			local appearanceSources, mainHandEnchant, offHandEnchant = C_TransmogCollection.GetInspectSources();
-			local mainHandSlotID = GetInventorySlotInfo("MAINHANDSLOT");
-			local secondaryHandSlotID = GetInventorySlotInfo("SECONDARYHANDSLOT");
-			for i, source in pairs(appearanceSources) do
-				if source ~= NO_TRANSMOG_SOURCE_ID and i ~= mainHandSlotID and i ~= secondaryHandSlotID then
-					local _, _, _, _, _, link = C_TransmogCollection.GetAppearanceSourceInfo(source);
-					appearanceSources[i] = link;
-				end
-			end
-
-			-- remap handheld items into string IDs instead as numerical IDs are not supported
-			appearanceSources["MainHandSlot"] = select(6, C_TransmogCollection.GetAppearanceSourceInfo(appearanceSources[mainHandSlotID]));
-			appearanceSources["SecondaryHandSlot"] = select(6, C_TransmogCollection.GetAppearanceSourceInfo(appearanceSources[secondaryHandSlotID]));
-			appearanceSources[mainHandSlotID] = nil;
-			appearanceSources[secondaryHandSlotID] = nil;
-			
-			mog:AddToPreview(appearanceSources, mog:GetPreview());
+			mog:PreviewFromOutfit(mog:GetPreview(), C_TransmogCollection.GetInspectSources());
 		else
 			InspectPaperDollViewButton_OnClick(self);
 		end
@@ -934,8 +971,14 @@ else
 	mog.view:SetScript("OnEvent",function(self, event, addon)
 		if addon == "Blizzard_AuctionUI" then
 			for i = 1, NUM_BROWSE_TO_DISPLAY do
-				local frame = _G["BrowseButton"..i.."Item"];
-				frame:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+				local frame = _G["BrowseButton"..i];
+				if frame then
+					frame:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+				end
+				local iconFrame = _G["BrowseButton"..i.."Item"];
+				if iconFrame then
+					iconFrame:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+				end
 			end
 		end
 		if addon == "Blizzard_InspectUI" then

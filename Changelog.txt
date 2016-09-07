@@ -1,3 +1,10 @@
+[b]3.6.5[/b]
+* Fixed option for extra tooltip appearance info.
+* Wardrobe outfits may now be loaded into a preview via the load menu.
+* Fixed auction house error happening while certain auction house addons were used.
+* Whole auction house item listing frame should now be clickable for MogIt previewing.
+* Fixed error when trying to add items to a new set.
+
 [b]3.6.4[/b]
 * Fix flashing tooltip model in tradeskill frame.
 * Saving a new set from preview will now put the name of the loaded set, if applicable, in the naming dialog.
