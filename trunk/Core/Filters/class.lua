@@ -37,6 +37,18 @@ function f.dd.SelectAll(self)
 	mog:BuildList();
 end
 
+function f:SelectAll(self)
+	num = 0;
+	class = 0;
+	for k,v in pairs(LOCALIZED_CLASS_NAMES_MALE) do
+		selected[k] = all;
+		num = num + 1;
+		class = class + L.classBits[k];
+	end
+	all = false;
+	UIDropDownMenu_SetText(f.dd,L["%d selected"]:format(num));
+end
+
 function f.dd.Tier1(self)
 	if selected[self.value] and (not self.checked) then
 		class = class - L.classBits[self.value];

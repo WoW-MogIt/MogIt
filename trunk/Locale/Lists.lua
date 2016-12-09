@@ -11,12 +11,12 @@ L.source = {
 	[4] = L["Vendor"],
 	[5] = L["Crafted"],
 	[6] = L["Achievement"],
-	[7] = L["Code Redemption"],
-	[8] = L["In-Game Store"],
-	[9] = L["Black Market Auction House"],
-	[10] = L["Starter Gear"],
-	[11] = L["Event"],
-	[12] = L["Follower Mission"],
+	-- [7] = L["Code Redemption"],
+	-- [8] = L["In-Game Store"],
+	-- [9] = L["Black Market Auction House"],
+	-- [10] = L["Starter Gear"],
+	-- [11] = L["Event"],
+	-- [12] = L["Follower Mission"],
 };
 
 L.diffs = {
@@ -102,10 +102,10 @@ L.classBits = {
 };
 
 L.bind = {
-	[1] = NONE,
-	[2] = ITEM_BIND_ON_EQUIP,
-	[3] = ITEM_BIND_ON_PICKUP,
-	[4] = ITEM_BIND_TO_BNETACCOUNT,
+	[LE_ITEM_BIND_NONE] = NONE,
+	[LE_ITEM_BIND_ON_EQUIP] = ITEM_BIND_ON_EQUIP,
+	[LE_ITEM_BIND_ON_ACQUIRE] = ITEM_BIND_ON_PICKUP,
+	-- [4] = ITEM_BIND_TO_BNETACCOUNT,
 };
 
 L.BattleNetBonus = {

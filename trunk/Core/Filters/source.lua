@@ -68,7 +68,7 @@ function f.dd.initialize(self,tier)
 			info.keepShownOnClick = true;
 			info.isNotRadio = true;
 			info.checked = selected[k];
-			info.hasArrow = sub[k] and true;
+			-- info.hasArrow = sub[k] and true;
 			UIDropDownMenu_AddButton(info);
 		end
 	elseif tier == 2 then
@@ -93,9 +93,9 @@ function f.Filter(src1,sub1)
 	if not src1 then
 		return true;
 	elseif selected[src1] then
-		if src1 == 1 then
-			return (not sub1) or sub[1][sub1];
-		end
+		-- if src1 == 1 then
+			-- return (not sub1) or sub[1][sub1];
+		-- end
 		return true;
 		--[=[
 			if not sub1 then

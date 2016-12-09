@@ -981,10 +981,20 @@ else
 				end
 			end
 		end
+		if addon == "Blizzard_EncounterJournal" then
+			for i, button in ipairs(EncounterJournal.encounter.info.lootScroll.buttons) do
+				button:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+			end
+			local LegendariesFrame = EncounterJournal.LootJournal.LegendariesFrame
+			for i, button in ipairs(LegendariesFrame.buttons) do
+				button:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+				LegendariesFrame.rightSideButtons[i]:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+			end
+		end
 		if addon == "Blizzard_InspectUI" then
 			hookInspectUI();
 		end
-		if IsAddOnLoaded("Blizzard_AuctionUI") and IsAddOnLoaded("Blizzard_InspectUI") then
+		if IsAddOnLoaded("Blizzard_AuctionUI") and IsAddOnLoaded("Blizzard_InspectUI") and IsAddOnLoaded("Blizzard_EncounterJournal") then
 			self:UnregisterEvent(event);
 			self:SetScript("OnEvent", nil);
 		end

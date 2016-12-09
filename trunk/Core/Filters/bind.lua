@@ -22,8 +22,8 @@ UIDropDownMenu_JustifyText(f.dd,"LEFT");
 
 function f.dd.SelectAll(self)
 	num = 0;
-	for k,v in ipairs(L.bind) do
-		selected[k] = all;
+	for i = 0, 2 do
+		selected[i] = all;
 		num = num + (all and 1 or 0);
 	end
 	all = not all;
@@ -51,28 +51,31 @@ function f.dd.initialize(self)
 	info.notCheckable = true;
 	UIDropDownMenu_AddButton(info);
 	
-	for k,v in ipairs(L.bind) do
+	for i = 0, 2 do
+		local v = L.bind[i]
 		info = UIDropDownMenu_CreateInfo();
 		info.text =	v;
-		info.value = k;
+		info.value = i;
 		info.func = f.dd.Tier1;
 		info.keepShownOnClick = true;
 		info.isNotRadio = true;
-		info.checked = selected[k];
+		info.checked = selected[i];
 		UIDropDownMenu_AddButton(info);
 	end
 end
 
-function f.Filter(bind)
-	return ((not bind) and selected[1]) or selected[bind];
+function f.Filter(item)
+	if num == 3 then return true end
+	local item = mog:GetItemInfo(C_TransmogCollection.GetSourceInfo(item).itemID, "BuildList");
+	return not item or (selected[item.bindType]);
 end
 
 function f.Default()
 	selected = {};
 	num = 0;
 	all = nil;
-	for k,v in ipairs(L.bind) do
-		selected[k] = true;
+	for i = 0, 2 do
+		selected[i] = true;
 		num = num + 1;
 	end
 	UIDropDownMenu_SetText(f.dd,L["%d selected"]:format(num));

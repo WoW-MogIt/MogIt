@@ -25,7 +25,7 @@ function f.Filter(item)
 		return true
 	end
 	if type(item) == "table" then return end
-	return mog:HasItem(item);
+	return mog:HasItem(C_TransmogCollection.GetSourceInfo(item).itemID);
 end
 
 function f.Default()
