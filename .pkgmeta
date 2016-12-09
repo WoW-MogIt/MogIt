@@ -20,7 +20,7 @@ externals:
     Libs/LibBabble-Inventory-3.0: svn://svn.wowace.com/wow/libbabble-inventory-3-0/mainline/trunk
     Libs/LibBabble-Race-3.0: svn://svn.wowace.com/wow/libbabble-race-3-0/mainline/trunk
     Libs/Libra: svn://svn.wowace.com/wow/libra/mainline/trunk/Libra
-    Libs/LibItemInfo-1.0: svn://svn.wowace.com/wow/libiteminfo-1-0/mainline/trunk/LibItemInfo-1.0
+    Libs/LibItemInfo-1.0: https://repos.wowace.com/wow/libiteminfo-1-0/trunk/LibItemInfo-1.0
 
 ignore:
     - Changelog.txt
@@ -29,13 +29,9 @@ ignore:
     - Todo.txt
 
 move-folders:
-    MogIt/Modules/MogIt_Accessories: MogIt_Accessories
     MogIt/Modules/MogIt_Cloth: MogIt_Cloth
-    MogIt/Modules/MogIt_Cosmetic: MogIt_Cosmetic
     MogIt/Modules/MogIt_Leather: MogIt_Leather
     MogIt/Modules/MogIt_Mail: MogIt_Mail
-    MogIt/Modules/MogIt_OneHanded: MogIt_OneHanded
-    MogIt/Modules/MogIt_Other: MogIt_Other
     MogIt/Modules/MogIt_Plate: MogIt_Plate
-    MogIt/Modules/MogIt_Ranged: MogIt_Ranged
-    MogIt/Modules/MogIt_TwoHanded: MogIt_TwoHanded
+    MogIt/Modules/MogIt_Other: MogIt_Other
+    MogIt/Modules/MogIt_Weapons: MogIt_Weapons
