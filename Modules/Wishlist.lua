@@ -235,11 +235,7 @@ end
 
 function Wishlist.GetFilterArgs(filter, item)
 	if filter == "name" or filter == "itemLevel" or filter == "hasItem" or filter == "chestType" then
-		return item;
-	-- elseif filter == "source" then
-		-- return mog:GetData("item", item, "source"),mog:GetData("item", item, "sourceinfo")
-	-- else
-		-- return mog:GetData("item", item, filter)
+		return select(2, C_TransmogCollection.GetItemInfo(item))
 	end
 end
 

@@ -83,7 +83,7 @@ function mog.base.DropdownTier2(self)
 	else
 		mog:GetFilter("class"):SelectAll()
 	end
-	mog:SetModule(self.arg1, self.arg1.label.." - "..mog.slotLabels[self.value.label]);
+	mog:SetModule(self.arg1, self.arg1.label.." - "..mog.db.profile.slotLabels[self.value.label]);
 	CloseDropDownMenus();
 end
 
