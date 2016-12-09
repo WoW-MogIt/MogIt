@@ -57,7 +57,7 @@ function f.Filter(item)
 	if not (isMinSpecified or isMaxSpecified) then
 		return true
 	end
-	local item = mog:GetItemInfo(item, "BuildList");
+	local item = mog:GetItemInfo(select(6, C_TransmogCollection.GetAppearanceSourceInfo(item)), "BuildList");
 	return not item or ((not isMinSpecified or item.itemLevel >= minlvl) and (not isMaxSpecified or item.itemLevel <= maxlvl));
 end
 

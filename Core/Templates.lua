@@ -24,13 +24,21 @@ local function addItemTooltipLine(itemID, slot, selected, wishlist, isSetItem)
 end
 
 function mog.GetItemSourceInfo(itemID)
-	local source, info;
+	local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemID)
+	itemID = sourceID
+	local source, info, zone;
 	local sourceType = mog:GetData("item", itemID, "source");
 	local sourceID = mog:GetData("item", itemID, "sourceid");
 	local sourceInfo = mog:GetData("item", itemID, "sourceinfo");
 
-	if sourceType == 1 and sourceID then -- Drop
-		source = mog:GetData("npc", sourceID, "name");
+	if sourceType == 1 and sourceInfo then -- Drop
+		local drop = sourceInfo[1]
+		source = drop.encounter
+		zone = drop.instance
+		local diff = drop.difficulties[1]
+		if diff then
+			zone = format("%s (%s)", zone, diff);
+		end
 	elseif sourceType == 3 and sourceID then -- Quest
 		info = IsQuestFlaggedCompleted(sourceID) or false;
 	elseif sourceType == 5 and sourceInfo then -- Crafted
@@ -41,16 +49,16 @@ function mog.GetItemSourceInfo(itemID)
 		info = complete;
 	end
 
-	local zone = mog:GetData("item", itemID, "zone");
-	if zone then
-		zone = GetMapNameByID(zone);
-		if zone then
-			local diff = L.diffs[sourceInfo];
-			if sourceType == 1 and diff then
-				zone = format("%s (%s)", zone, diff);
-			end
-		end
-	end
+	-- local zone = mog:GetData("item", itemID, "zone");
+	-- if zone then
+		-- zone = GetMapNameByID(zone);
+		-- if zone then
+			-- local diff = L.diffs[sourceInfo];
+			-- if sourceType == 1 and diff then
+				-- zone = format("%s (%s)", zone, diff);
+			-- end
+		-- end
+	-- end
 
 	return L.source[sourceType], source, zone, info;
 end
@@ -245,7 +253,12 @@ do	-- item functions
 	function mog.Item_FrameUpdate(self, data)
 		local item = data.item
 		self:ApplyDress()
-		self:TryOn(format(gsub(item, "item:(%d+):0", "item:%1:%%d"), mog.weaponEnchant), slots[mog:GetData("item", item, "slot")])
+		local slot = slots[mog:GetData("item", item, "slot")]
+		if data.sourceID then
+			self.model:TryOn(data.sourceID, slot)
+		else
+			self:TryOn(format(gsub(item, "item:(%d+):0", "item:%1:%%d"), mog.weaponEnchant), slot)
+		end
 		if not mog:GetItemInfo(item) then
 			mog.doModelUpdate = true;
 		end

@@ -51,7 +51,7 @@ function f.Filter(item)
 	if not selected then
 		return true;
 	end
-	local item = mog:GetItemInfo(item, "BuildList");
+	local item = mog:GetItemInfo(C_TransmogCollection.GetSourceInfo(item).itemID, "BuildList");
 	return not item or selected == item.invType;
 end
 

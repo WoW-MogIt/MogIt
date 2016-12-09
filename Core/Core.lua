@@ -333,6 +333,8 @@ local defaults = {
 				point = "CENTER",
 			}
 		},
+		
+		slotLabels = {},
 	}
 }
 
@@ -365,6 +367,7 @@ mog.frame:RegisterEvent("ADDON_LOADED");
 mog.frame:RegisterEvent("PLAYER_LOGIN");
 mog.frame:RegisterEvent("GET_ITEM_INFO_RECEIVED");
 mog.frame:RegisterEvent("PLAYER_EQUIPMENT_CHANGED");
+mog.frame:RegisterEvent("APPEARANCE_SEARCH_UPDATED");
 mog.frame:SetScript("OnEvent", function(self, event, ...)
 	return mog[event] and mog[event](mog, ...)
 end);
@@ -397,6 +400,7 @@ function mog:ADDON_LOADED(addon)
 			mog:LoadBaseModules()
 		end
 	elseif mog.modules[addon] then
+		mog:LoadDB(addon)
 		mog.modules[addon].loaded = true;
 		if mog.menu.active == mog.menu.modules then
 			mog.menu:Rebuild(1)
@@ -425,6 +429,178 @@ function mog:ADDON_LOADED(addon)
 end
 
 
+local SLOTS = {
+	[LE_TRANSMOG_COLLECTION_TYPE_HEAD] = "Head",
+	[LE_TRANSMOG_COLLECTION_TYPE_SHOULDER] = "Shoulder",
+	[LE_TRANSMOG_COLLECTION_TYPE_BACK] = "Back",
+	[LE_TRANSMOG_COLLECTION_TYPE_CHEST] = "Chest",
+	[LE_TRANSMOG_COLLECTION_TYPE_SHIRT] = "Shirt",
+	[LE_TRANSMOG_COLLECTION_TYPE_TABARD] = "Tabard",
+	[LE_TRANSMOG_COLLECTION_TYPE_WRIST] = "Wrist",
+	[LE_TRANSMOG_COLLECTION_TYPE_HANDS] = "Hands",
+	[LE_TRANSMOG_COLLECTION_TYPE_WAIST] = "Waist",
+	[LE_TRANSMOG_COLLECTION_TYPE_LEGS] = "Legs",
+	[LE_TRANSMOG_COLLECTION_TYPE_FEET] = "Feet",
+	[LE_TRANSMOG_COLLECTION_TYPE_WAND] = "Wand",
+	[LE_TRANSMOG_COLLECTION_TYPE_1H_AXE] = "1H-axe",
+	[LE_TRANSMOG_COLLECTION_TYPE_1H_SWORD] = "1H-sword",
+	[LE_TRANSMOG_COLLECTION_TYPE_1H_MACE] = "1H-mace",
+	[LE_TRANSMOG_COLLECTION_TYPE_DAGGER] = "Dagger",
+	[LE_TRANSMOG_COLLECTION_TYPE_FIST] = "Fist",
+	[LE_TRANSMOG_COLLECTION_TYPE_SHIELD] = "Shield",
+	[LE_TRANSMOG_COLLECTION_TYPE_HOLDABLE] = "Holdable",
+	[LE_TRANSMOG_COLLECTION_TYPE_2H_AXE] = "2H-axe",
+	[LE_TRANSMOG_COLLECTION_TYPE_2H_SWORD] = "2H-sword",
+	[LE_TRANSMOG_COLLECTION_TYPE_2H_MACE] = "2H-mace",
+	[LE_TRANSMOG_COLLECTION_TYPE_STAFF] = "Staff",
+	[LE_TRANSMOG_COLLECTION_TYPE_POLEARM] = "Polearm",
+	[LE_TRANSMOG_COLLECTION_TYPE_BOW] = "Bow",
+	[LE_TRANSMOG_COLLECTION_TYPE_GUN] = "Gun",
+	[LE_TRANSMOG_COLLECTION_TYPE_CROSSBOW] = "Crossbow",
+	[LE_TRANSMOG_COLLECTION_TYPE_WARGLAIVES] = "Warglaives",
+}
+
+local OTHER_SLOTS = {
+	[LE_TRANSMOG_COLLECTION_TYPE_BACK] = true,
+	[LE_TRANSMOG_COLLECTION_TYPE_SHIRT] = true,
+	[LE_TRANSMOG_COLLECTION_TYPE_TABARD] = true,
+}
+
+mog.relevantCategories = {}
+
+function mog:APPEARANCE_SEARCH_UPDATED()
+	local ARMOR_CLASSES = {
+		WARRIOR = "Plate",
+		DEATHKNIGHT = "Plate",
+		PALADIN = "Plate",
+		MONK = "Leather",
+		PRIEST = "Cloth",
+		SHAMAN = "Mail",
+		DRUID = "Leather",
+		ROGUE = "Leather",
+		MAGE = "Cloth",
+		WARLOCK = "Cloth",
+		HUNTER = "Mail",
+		DEMONHUNTER = "Leather",
+	}
+	
+	local FACTIONS = {
+		["Alliance"] = 1,
+		["Horde"] = 2,
+	}
+	
+	local _, playerClass = UnitClass("player")
+	local faction = UnitFactionGroup("player")
+	
+	local armorClass = ARMOR_CLASSES[playerClass]
+	
+	mog.relevantCategories[armorClass] = true
+	
+	LoadAddOn("MogIt_"..armorClass)
+	LoadAddOn("MogIt_Weapons")
+	LoadAddOn("MogIt_Other")
+	
+	local ArmorDB = _G["MogIt_"..armorClass.."DB"] or {}
+	local WeaponDB = MogIt_WeaponsDB or {}
+	local OtherDB = MogIt_OtherDB or {}
+	
+	_G["MogIt_"..armorClass.."DB"] = ArmorDB
+	MogIt_WeaponsDB = WeaponDB
+	MogIt_OtherDB = OtherDB
+	
+	for i = 1, NUM_LE_TRANSMOG_COLLECTION_TYPES do
+		local name, isWeapon, canEnchant, canMainHand, canOffHand = C_TransmogCollection.GetCategoryInfo(i)
+		if name then
+			name = SLOTS[i]
+			local db = db
+			if isWeapon then
+				db = WeaponDB
+				mog.relevantCategories[name] = true
+			elseif OTHER_SLOTS[i] then
+				db = OtherDB
+			else
+				db = ArmorDB
+			end
+			db[name] = db[name] or {}
+			for i, appearance in ipairs(C_TransmogCollection.GetCategoryAppearances(i)) do
+				if not appearance.isHideVisual then
+					db[name][appearance.visualID] = {}
+					for i, source in ipairs(C_TransmogCollection.GetAppearanceSources(appearance.visualID)) do
+						local _, _, _, _, _, link = C_TransmogCollection.GetSourceInfo(source.sourceID)
+						db[name][appearance.visualID][i] = {
+							sourceID = source.sourceID,
+							sourceType = source.sourceType,
+							drops = C_TransmogCollection.GetAppearanceSourceDrops(source.sourceID),
+							classes = bit.bor(0, L.classBits[playerClass]),
+							faction = bit.bor(0, FACTIONS[faction]),
+						}
+					end
+				end
+			end
+		end
+	end
+	
+	self:LoadDB("MogIt_"..armorClass)
+	self:LoadDB("MogIt_Weapons")
+	self:LoadDB("MogIt_Other")
+	
+	self.frame:UnregisterEvent("APPEARANCE_SEARCH_UPDATED")
+end
+
+
+function mog:LoadDB(addon)
+	local SOURCE_TYPES = {
+		[1] = 1,
+		[2] = 3,
+		[3] = 4,
+		[4] = 1,
+		[5] = 6,
+		[6] = 5,
+	}
+	
+	local module = mog:GetModule(addon)
+	local moduleDB = _G[addon.."DB"]
+	
+	-- won't exist if module was never loaded
+	if not moduleDB then return end
+	
+	for slot, appearances in pairs(moduleDB) do
+		local list = {}
+		module.slots[slot] = {
+			label = slot,
+			list = list,
+		}
+		wipe(module.slotList)
+		for visualID, appearance in pairs(appearances) do
+			-- tinsert(mog:GetData("display", display, "items") or mog:AddData("display", display, "items", {}), id)
+			mog:AddData("display", visualID, "items", {})
+			for i, source in ipairs(appearance) do
+				local id = source.sourceID
+				tinsert(list, id)
+				mog:AddData("item", id, "display", visualID)
+				-- mog:AddData("item", id, "quality", quality)
+				-- mog:AddData("item", id, "level", lvl)
+				mog:AddData("item", id, "faction", source.faction)
+				mog:AddData("item", id, "class", source.classes)
+				-- mog:AddData("item", id, "bind", bind)
+				-- mog:AddData("item", id, "slot", slot)
+				mog:AddData("item", id, "source", SOURCE_TYPES[source.sourceType])
+				-- mog:AddData("item", id, "sourceid", sourceid)
+				mog:AddData("item", id, "sourceinfo", source.drops)
+				-- mog:AddData("item", id, "zone", zone)
+			end
+		end
+	end
+	
+	for i = 1, NUM_LE_TRANSMOG_COLLECTION_TYPES do
+		local slotID = SLOTS[i]
+		if moduleDB[slotID] then
+			tinsert(module.slotList, slotID)
+		end
+	end
+end
+
+
 function mog:PLAYER_LOGIN()
 	DataStore_Character = DataStore and DataStore:GetCharacter();
 	BrotherBags_Player = BrotherBags and BrotherBags[GetRealmName()][UnitName("player")];
@@ -439,6 +615,13 @@ function mog:PLAYER_LOGIN()
 			end
 		end
 	end)
+	
+	for k, slot in pairs(SLOTS) do
+		local name = C_TransmogCollection.GetCategoryInfo(k)
+		if name then
+			mog.db.profile.slotLabels[slot] = name
+		end
+	end
 	
 	mog:LoadSettings();
 	self.frame:SetScript("OnSizeChanged", function(self, width, height)

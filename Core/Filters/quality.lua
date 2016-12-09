@@ -65,8 +65,10 @@ function f.dd.initialize(self)
 	end
 end
 
-function f.Filter(qual)
-	return (not qual) or selected[qual];
+function f.Filter(item)
+	if num == #L.quality then return true end
+	local item = mog:GetItemInfo(C_TransmogCollection.GetSourceInfo(item).itemID, "BuildList");
+	return not item or selected[item.quality];
 end
 
 function f.Default()

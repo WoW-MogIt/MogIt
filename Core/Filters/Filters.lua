@@ -142,26 +142,3 @@ function mog:CheckFilters(module,value)
 	end
 	return true;
 end
-
-
---[[
-VENDOR?
-Valor Points
-Justice Points
-Conquest Points
-Honor Points
-Tier Tokens
---> Tier 1
---> Tier 2
---> etc
-Gold
-Other
-
-ZONES
--- current zone
-
-NAME
-
-QUEST/ACHI
-- complete?
---]]

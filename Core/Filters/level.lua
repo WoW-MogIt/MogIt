@@ -51,15 +51,19 @@ f.max:SetScript("OnTextChanged",function(self,user)
 	end
 end);
 
-function f.Filter(lvl)
-	lvl = lvl or 0;
-	return (lvl >= minlvl) and (lvl <= maxlvl);
+function f.Filter(item)
+	-- don't process filter if values encompass the entire player level range
+	if minlvl <= 1 and (maxlvl >= MAX_PLAYER_LEVEL or maxlvl == 0) then
+		return true
+	end
+	local item = mog:GetItemInfo(C_TransmogCollection.GetSourceInfo(item).itemID, "BuildList");
+	return not item or ((item.reqLevel >= minlvl) and (item.reqLevel <= maxlvl));
 end
 
 function f.Default()
 	minlvl = 0;
 	f.min:SetNumber(minlvl);
-	maxlvl = UnitLevel("PLAYER");
+	maxlvl = MAX_PLAYER_LEVEL;
 	f.max:SetNumber(maxlvl);
 end
 f.Default();

@@ -1,6 +1,7 @@
-## Interface: 70000
+## Interface: 70100
 ## Author: Aelobin (The Maelstrom EU) & Lombra (Defias Brotherhood EU)
 ## Version: @project-version@
+## SavedVariables: MogIt_PlateDB
 ## LoadOnDemand: 1
 ## RequiredDeps: MogIt
 ## X-MogItModuleVersion: 3
@@ -28,15 +29,3 @@
 ## Notes-zhTW: MogIt 的數據
 ## Notes-ptBR: MogIt Dados
 ## Notes-itIT: MogIt Dati
-
-Bosses.lua
-Colours.lua
-
-Head.lua
-Shoulders.lua
-Chest.lua
-Wrists.lua
-Hands.lua
-Waist.lua
-Legs.lua
-Feet.lua
