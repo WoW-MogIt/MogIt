@@ -235,7 +235,10 @@ end
 
 function Wishlist.GetFilterArgs(filter, item)
 	if filter == "name" or filter == "itemLevel" or filter == "hasItem" or filter == "chestType" then
-		return select(2, C_TransmogCollection.GetItemInfo(item))
+		if type(item) ~= "table" then
+			item = select(2, C_TransmogCollection.GetItemInfo(item))
+		end
+		return item
 	end
 end
 
