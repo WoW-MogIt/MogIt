@@ -10,55 +10,6 @@ local ipairs = ipairs;
 local select = select;
 
 
---// Input Functions
--- function mog.base.AddSlot(slot, addon)
-	-- local module = mog:GetModule(addon);
-	-- if not module.slots[slot] then
-		-- module.slots[slot] = {
-			-- label = LBI[slot] or slot,
-			-- list = {},
-		-- };
-		-- tinsert(module.slotList, slot);
-	-- end
-	-- local list = module.slots[slot].list;
-	
-	-- return function(itemID, bonusID, display, quality, lvl, faction, class, bind, slot, source, sourceid, zone, sourceinfo)
-		-- local id = mog:ToStringItem(itemID, bonusID);
-		-- tinsert(list, id);
-		-- mog:AddData("item", id, "display", display);
-		-- mog:AddData("item", id, "quality", quality);
-		-- mog:AddData("item", id, "level", lvl);
-		-- mog:AddData("item", id, "faction", faction);
-		-- mog:AddData("item", id, "class", class);
-		-- mog:AddData("item", id, "bind", bind);
-		-- mog:AddData("item", id, "slot", slot);
-		-- mog:AddData("item", id, "source", source);
-		-- mog:AddData("item", id, "sourceid", sourceid);
-		-- mog:AddData("item", id, "sourceinfo", sourceinfo);
-		-- mog:AddData("item", id, "zone", zone);
-		-- tinsert(mog:GetData("display", display, "items") or mog:AddData("display", display, "items", {}), id);
-	-- end
--- end
-
-function mog.base.AddColours(display, c1, c2, c3)
-	--mog:AddData("display",display,"colours",colours);
-	mog:AddData("display", display, "colour1", c1);
-	mog:AddData("display", display, "colour2", c2);
-	mog:AddData("display", display, "colour3", c3);
-end
-
-function mog.base.AddNPC(id,name)
-	mog:AddData("npc", id, "name", LBB[name] or name);
-end
-
---[=[
-function mog.base.AddObject(id,name)
-	mog:AddData("object", id, "name", LBB[name] or name);
-end
---]=]
---//
-
-
 --// Base Functions
 local list = {};
 
@@ -94,8 +45,8 @@ function mog.base.Dropdown(module, tier)
 		info = UIDropDownMenu_CreateInfo();
 		info.text = module.label..(module.loaded and "" or " \124cFFFFFFFF("..L["Click to load addon"]..")");
 		info.value = module;
-		info.colorCode = "\124cFF"..(module.loaded and (moduleDB and "00FF00" or "c0c0c0") or "FF0000");
-		info.hasArrow = module.loaded and moduleDB;
+		info.colorCode = "\124cFF"..(module.loaded and ((moduleDB and next(moduleDB)) and "00FF00" or "c0c0c0") or "FF0000");
+		info.hasArrow = module.loaded and moduleDB and next(moduleDB);
 		info.keepShownOnClick = not module.loaded;
 		info.notCheckable = true;
 		info.func = (not module.loaded or moduleDB) and mog.base.DropdownTier1;
@@ -109,7 +60,7 @@ function mog.base.Dropdown(module, tier)
 				info.tooltipTitle = RED_FONT_COLOR_CODE..ADDON_INTERFACE_VERSION;
 				info.tooltipText = L["This module was created for a newer version of MogIt and may not work correctly."];
 			end
-		elseif not moduleDB then
+		elseif not moduleDB or not next(moduleDB) then
 			info.tooltipOnButton = true;
 			info.tooltipTitle = RED_FONT_COLOR_CODE..L["No data"];
 			info.tooltipText = L["This module has no items registered. Please log in with a character of appropriate armor class to register items."];
@@ -138,7 +89,7 @@ function mog.base:FrameUpdate(frame, value)
 	frame.data.cycle = 1;
 	frame.data.item = items[frame.data.cycle];
 	for i, item in ipairs(items) do
-		if mog:HasItem(item) then
+		if mog:HasItem(value[i]) then
 			frame:ShowIndicator("hasItem");
 		end
 		if mog.wishlist:IsItemInWishlist(item) then
@@ -231,8 +182,10 @@ mog.baseModules = {
 	"MogIt_Leather",
 	"MogIt_Mail",
 	"MogIt_Plate",
-	"MogIt_Weapons",
 	"MogIt_Other",
+	"MogIt_OneHanded",
+	"MogIt_TwoHanded",
+	"MogIt_Ranged",
 };
 
 local myName = UnitName("player");

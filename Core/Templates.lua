@@ -19,7 +19,7 @@ function mog:GetItemLabel(itemID, callback, includeIcon, iconSize)
 end
 
 local function addItemTooltipLine(itemID, slot, selected, wishlist, isSetItem)
-	local texture = format("|T%s:0|t ", (selected and [[Interface\ChatFrame\ChatFrameExpandArrow]]) or (wishlist and [[Interface\TargetingFrame\UI-RaidTargetingIcon_1]]) or (mog:HasItem(itemID, isSetItem) and TEXTURE) or "")
+	local texture = format("|T%s:0|t ", (selected and [[Interface\ChatFrame\ChatFrameExpandArrow]]) or (mog:HasItem(mog:GetSourceFromItem(itemID), isSetItem) and TEXTURE) or (wishlist and [[Interface\TargetingFrame\UI-RaidTargetingIcon_1]]) or "")
 	GameTooltip:AddDoubleLine(texture..(type(slot) == "string" and _G[strupper(slot)]..": " or "")..mog:GetItemLabel(itemID, "ModelOnEnter"), mog.GetItemSourceShort(itemID), nil, nil, nil, 1, 1, 1)
 end
 
@@ -31,7 +31,7 @@ function mog.GetItemSourceInfo(itemID)
 	local sourceID = mog:GetData("item", itemID, "sourceid");
 	local sourceInfo = mog:GetData("item", itemID, "sourceinfo");
 
-	if sourceType == 1 and sourceInfo then -- Drop
+	if sourceType == 1 and sourceInfo and #sourceInfo > 0 then -- Drop
 		local drop = sourceInfo[1]
 		source = drop.encounter
 		zone = drop.instance
@@ -326,8 +326,8 @@ do	-- item functions
 			GameTooltip:AddLine(L.bind[bindType], 1.0, 1.0, 1.0)
 		end
 		local requiredLevel = mog:GetData("item", item, "level")
-		if requiredLevel then
-			GameTooltip:AddLine(L["Required Level"]..": |cffffffff"..requiredLevel)
+		if itemInfo and itemInfo.reqLevel and itemInfo.reqLevel > 0 then
+			GameTooltip:AddLine(L["Required Level"]..": |cffffffff"..itemInfo.reqLevel)
 		end
 		GameTooltip:AddLine(STAT_AVERAGE_ITEM_LEVEL..": |cffffffff"..(itemLevel or "??"))
 		local faction = mog:GetData("item", item, "faction")
@@ -358,16 +358,12 @@ do	-- item functions
 			GameTooltip:AddLine(" ")
 			GameTooltip:AddLine(L["Item ID"]..": |cffffffff"..mog:ToNumberItem(item))
 		end
-
-		local hasItem, characters = mog:HasItem(item)
+		
+		-- source sometimes can't be determined if item is not cached
+		local hasItem = itemInfo and mog:HasItem(mog:GetSourceFromItem(item))
 		if hasItem then
 			GameTooltip:AddLine(" ")
 			GameTooltip:AddLine(format("|T%s:0|t ", TEXTURE)..L["You have this item."], 1, 1, 1)
-			if mog.db.profile.tooltipOwnedDetail and characters then
-				for i, character in ipairs(characters) do
-					GameTooltip:AddLine("|T:0|t "..character)
-				end
-			end
 		end
 
 		local found, profiles = mog.wishlist:IsItemInWishlist(item)
@@ -421,7 +417,7 @@ do	-- set functions
 		local hasSet = next(data.items)
 		for slot, item in pairs(data.items) do
 			self:TryOn(item, slot == "SecondaryHandSlot" and slot)
-			if not mog:HasItem(item, true) then
+			if not mog:HasItem(mog:GetSourceFromItem(item), true) then
 				hasSet = false
 			end
 			if not mog:GetItemInfo(item) then

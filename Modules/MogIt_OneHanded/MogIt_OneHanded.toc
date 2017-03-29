@@ -1,22 +1,22 @@
 ## Interface: 70200
 ## Author: Aelobin (The Maelstrom EU) & Lombra (Defias Brotherhood EU)
 ## Version: @project-version@
-## SavedVariables: MogIt_PlateDB
+## SavedVariables: MogIt_OneHandedDB
 ## LoadOnDemand: 1
 ## RequiredDeps: MogIt
 ## X-MogItModuleVersion: 3
 
-## Title: MogIt: Plate
-## Title-frFR: MogIt: Plaques
-## Title-deDE: MogIt: Platte
-## Title-esES: MogIt: Placas
-## Title-esMX: MogIt: Placas
-## Title-ruRU: MogIt: Латы
-## Title-koKR: MogIt: 판금
-## Title-zhCN: MogIt: 板甲
-## Title-zhTW: MogIt: 鎧甲
-## Title-ptBR: MogIt: Placas
-## Title-itIT: MogIt: Plate
+## Title: MogIt: One-Hand
+## Title-frFR: MogIt: A une main
+## Title-deDE: MogIt: Einhändig
+## Title-esES: MogIt: Una Mano
+## Title-esMX: MogIt: Una Mano
+## Title-ruRU: MogIt: Одноручное
+## Title-koKR: MogIt: 한손
+## Title-zhCN: MogIt: 单手
+## Title-zhTW: MogIt: 單手
+## Title-ptBR: MogIt: Uma Mão
+## Title-itIT: MogIt: One-Hand
 
 ## Notes: MogIt Data
 ## Notes-frFR: MogIt Données

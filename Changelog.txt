@@ -1,4 +1,12 @@
-[b]From 3.7 on prebuilt databases are no longer provided. Read [url=https://wow.curseforge.com/projects/mogit/pages/370-beta-information]this[/url] for more information.[/b]
+[b]3.8.0[/b]
+Changes since 3.6.5:
+* Implemented automatic database collection. Database is now empty by default. Log in on characters to store the items they can use. Read [url=https://wow.curseforge.com/projects/mogit/pages/370-beta-information]this[/url] for more information.[/b]
+* Updated for patch 7.2.
+* Removed tracking of bag items. This was relevant when transmogging was based on physical items and for some time after transitioning to the wardrobe system, but is now out of scope for MogIt.
+* Logic regarding indication of owned items was revisited and should now work better. Should no longer flag all difficulty versions of items as owned, for one.
+* Weapons may now be sheathed on preview and catalogue models. Look for the option in the preview and catalogue menus, respectively.
+* Models now get omnidirectional lighting and should no longer be half cast in shadow.
+* Added click-to-preview support to dungeon journal boss loot items.
 
 [b]3.7.1[/b]
 * Fix wishlist error.

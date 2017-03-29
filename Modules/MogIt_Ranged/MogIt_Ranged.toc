@@ -1,22 +1,22 @@
 ## Interface: 70200
 ## Author: Aelobin (The Maelstrom EU) & Lombra (Defias Brotherhood EU)
 ## Version: @project-version@
-## SavedVariables: MogIt_PlateDB
+## SavedVariables: MogIt_RangedDB
 ## LoadOnDemand: 1
 ## RequiredDeps: MogIt
 ## X-MogItModuleVersion: 3
 
-## Title: MogIt: Plate
-## Title-frFR: MogIt: Plaques
-## Title-deDE: MogIt: Platte
-## Title-esES: MogIt: Placas
-## Title-esMX: MogIt: Placas
-## Title-ruRU: MogIt: Латы
-## Title-koKR: MogIt: 판금
-## Title-zhCN: MogIt: 板甲
-## Title-zhTW: MogIt: 鎧甲
-## Title-ptBR: MogIt: Placas
-## Title-itIT: MogIt: Plate
+## Title: MogIt: Ranged
+## Title-frFR: MogIt: À distance
+## Title-deDE: MogIt: Distanz
+## Title-esES: MogIt: Rango
+## Title-esMX: MogIt: Rango
+## Title-ruRU: MogIt: Для оружия дальнего боя
+## Title-koKR: MogIt: 원거리 장비
+## Title-zhCN: MogIt: 远程
+## Title-zhTW: MogIt: 遠程
+## Title-ptBR: MogIt: Longo alcance
+## Title-itIT: MogIt: Ranged
 
 ## Notes: MogIt Data
 ## Notes-frFR: MogIt Données

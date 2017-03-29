@@ -53,6 +53,8 @@ mog.playerGender = myGender;
 mog.displayRace = myRace
 mog.displayGender = myGender
 
+mog.sheathe = false
+
 local ModelFramePrototype = CreateFrame("Button")
 local ModelFrame_MT = {__index = ModelFramePrototype}
 
@@ -138,6 +140,7 @@ function mog:CreateModelFrame(parent)
 	f.model:SetModelScale(2);
 	f.model:SetUnit("PLAYER");
 	f.model:SetPosition(0,0,0);
+	f.model:SetLight(true, false, 0, 0.8, -1, 1, 1, 1, 1, 0.3, 1, 1, 1);
 	
 	f.bg = f:CreateTexture(nil,"BACKGROUND");
 	f.bg:SetAllPoints(f);
@@ -161,6 +164,7 @@ function mog:DeleteModelFrame(f)
 	f:SetScript("OnEnter",nil);
 	f:SetScript("OnLeave",nil);
 	f:SetScript("OnMouseWheel",nil);
+	f.model:SetSheathed(false);
 	f:EnableMouseWheel(false);
 	for ind,frame in pairs(f.indicators) do
 		frame:Hide();
@@ -493,6 +497,7 @@ function mog.scroll.update(self, value, offset, onscroll)
 			else
 				frame:Show();
 			end
+			frame.model:SetSheathed(mog.sheathe);
 			frame:SetAlpha(1);
 			frame:Enable();
 		else
@@ -749,7 +754,7 @@ local dressOptions = {
 }
 
 local function setGridDress(self)
-	mog.db.profile.gridDress = self.value;
+	mog.db.profile.gridDress = self.value
 	for i, model in ipairs(mog.models) do
 		model.model:SetPosition(0, 0, 0)
 	end
@@ -757,7 +762,15 @@ local function setGridDress(self)
 	for i, model in ipairs(mog.models) do
 		model:PositionModel()
 	end
-	CloseDropDownMenus(1);
+	CloseDropDownMenus(1)
+end
+
+local function setSheathe(self, arg1, arg2, checked)
+	checked = not checked
+	mog.sheathe = checked
+	for i, model in ipairs(mog.models) do
+		model.model:SetSheathed(checked)
+	end
 end
 
 function mog:ToggleFilters()
@@ -808,6 +821,13 @@ mog.menu.catalogue = mog.menu:CreateMenu(L["Catalogue"], function(self, tier)
 		info.value = "gridDress";
 		info.notCheckable = true;
 		info.hasArrow = true;
+		UIDropDownMenu_AddButton(info,tier);
+		
+		local info = UIDropDownMenu_CreateInfo();
+		info.text = L["Sheathe weapons"];
+		info.checked = mog.sheathe;
+		info.isNotRadio = true;
+		info.func = setSheathe;
 		UIDropDownMenu_AddButton(info,tier);
 	elseif self.tier[2] == "sorting" then
 		if tier == 2 then

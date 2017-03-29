@@ -1,22 +1,22 @@
-## Interface: 70100
+## Interface: 70200
 ## Author: Aelobin (The Maelstrom EU) & Lombra (Defias Brotherhood EU)
 ## Version: @project-version@
-## SavedVariables: MogIt_WeaponsDB
+## SavedVariables: MogIt_TwoHandedDB
 ## LoadOnDemand: 1
 ## RequiredDeps: MogIt
 ## X-MogItModuleVersion: 3
 
-## Title: MogIt: Weapons
-## Title-frFR: MogIt: Armes
-## Title-deDE: MogIt: Waffen
-## Title-esES: MogIt: Armas
-## Title-esMX: MogIt: Armas
-## Title-ruRU: MogIt: Оружие
-## Title-koKR: MogIt: 무기
-## Title-zhCN: MogIt: 武器
-## Title-zhTW: MogIt: 武器
-## Title-ptBR: MogIt: Armas
-## Title-itIT: MogIt: Armi
+## Title: MogIt: Two-Hand
+## Title-frFR: MogIt: Deux mains
+## Title-deDE: MogIt: Zweihändig
+## Title-esES: MogIt: Dos Manos
+## Title-esMX: MogIt: Dos Manos
+## Title-ruRU: MogIt: Двуручное
+## Title-koKR: MogIt: 양손
+## Title-zhCN: MogIt: 双手
+## Title-zhTW: MogIt: 雙手
+## Title-ptBR: MogIt: Duas Mãos
+## Title-itIT: MogIt: Two-Hand
 
 ## Notes: MogIt Data
 ## Notes-frFR: MogIt Données
