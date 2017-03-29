@@ -506,6 +506,7 @@ end
 
 
 function mog:LoadDB(addon)
+	if not IsAddOnLoaded(addon) then return end
 	local SOURCE_TYPES = {
 		[1] = 1,
 		[2] = 3,
