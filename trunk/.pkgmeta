@@ -34,4 +34,6 @@ move-folders:
     MogIt/Modules/MogIt_Mail: MogIt_Mail
     MogIt/Modules/MogIt_Plate: MogIt_Plate
     MogIt/Modules/MogIt_Other: MogIt_Other
-    MogIt/Modules/MogIt_Weapons: MogIt_Weapons
+    MogIt/Modules/MogIt_OneHanded: MogIt_OneHanded
+    MogIt/Modules/MogIt_TwoHanded: MogIt_TwoHanded
+    MogIt/Modules/MogIt_Ranged: MogIt_Ranged

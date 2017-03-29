@@ -1,4 +1,4 @@
-## Interface: 70100
+## Interface: 70200
 ## Author: Aelobin (The Maelstrom EU) & Lombra (Defias Brotherhood EU)
 ## Version: @project-version@
 ## SavedVariables: MogIt_LeatherDB

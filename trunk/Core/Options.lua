@@ -44,7 +44,7 @@ function mog.createOptions()
 				mog.tooltip:SetHeight(value);
 			elseif info.arg == "alwaysShowCollected" then
 				C_TransmogCollection.SetShowMissingSourceInItemTooltips(value);
-			elseif info.arg == "ownedSearchBags" or info.arg == "ownedCheckAlts" or info.arg == "wishlistCheckAlts" then
+			elseif info.arg == "wishlistCheckAlts" then
 				mog:BuildList();
 			elseif info.arg == "rows" or info.arg == "columns" then
 				mog:UpdateGUI();
@@ -92,33 +92,6 @@ function mog.createOptions()
 				name = L["Always indicate owned item in tooltip"],
 				width = "full",
 				arg = "tooltipAlwaysShowOwned",
-			},
-			ownedSearchBags = {
-				type = "toggle",
-				order = 2.55,
-				name = L["Search bags for owned items"],
-				width = "full",
-				arg = "ownedSearchBags",
-			},
-			ownedCheckAlts = {
-				type = "toggle",
-				order = 2.6,
-				name = L["Check alts for owned items"],
-				width = "full",
-				arg = "ownedCheckAlts",
-				disabled = function()
-					return not mog.db.profile.ownedSearchBags;
-				end,
-			},
-			tooltipOwnedDetail = {
-				type = "toggle",
-				order = 2.7,
-				name = L["Detailed info for owned items"],
-				width = "full",
-				arg = "tooltipOwnedDetail",
-				disabled = function()
-					return not (mog.db.profile.ownedSearchBags and mog.db.profile.ownedCheckAlts);
-				end,
 			},
 			wishlistCheckAlts = {
 				type = "toggle",

@@ -215,6 +215,18 @@ local previewMenu = {
 		hasArrow = true,
 	},
 	{
+		text = L["Sheathe weapons"],
+		isNotRadio = true,
+		checked = function(self)
+			return currentPreview.data.sheathe
+		end,
+		func = function(self, arg1, arg2, checked)
+			checked = not checked
+			currentPreview.data.sheathe = checked
+			currentPreview.model.model:SetSheathed(checked)
+		end,
+	},
+	{
 		text = L["Add Item"],
 		notCheckable = true,
 		func = function(self)
@@ -717,11 +729,7 @@ local playerClass = select(2, UnitClass("player"));
 function mog.view.AddItem(item, preview, forceSlot, setItem)
 	if not (item and preview) then return end;
 	
-	local itemID, bonusID = item
-	if type(item) == "string" then
-		itemID, bonusID = mog:ToNumberItem(item);
-	end
-	item = mog:ToStringItem(itemID, bonusID);
+	item = mog:NormaliseItemString(item);
 	
 	local itemInfo = mog:GetItemInfo(item, "PreviewAddItem");
 	if not itemInfo then

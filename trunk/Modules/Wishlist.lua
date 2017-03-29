@@ -184,16 +184,8 @@ function Wishlist:FrameUpdate(frame, value, index)
 		MogIt.Set_FrameUpdate(frame, data)
 	else
 		data.item = value
-		if MogIt:HasItem(value) then
+		if MogIt:HasItem(MogIt:GetSourceFromItem(value), true) then
 			frame:ShowIndicator("hasItem")
-		end
-		local displayIDs = MogIt:GetData("display", MogIt:GetData("item", value, "display"), "items")
-		if displayIDs and #displayIDs > 1 then
-			for i, item in ipairs(displayIDs) do
-				if MogIt:HasItem(item) then
-					frame:ShowIndicator("hasItem")
-				end
-			end
 		end
 		MogIt.Item_FrameUpdate(frame, data)
 	end
@@ -256,11 +248,7 @@ function Wishlist:GetCurrentProfile()
 end
 
 function Wishlist:AddItem(item, setName, slot, isAlternate)
-	if type(item) == "string" then
-		item = MogIt:NormaliseItemString(item)
-	else
-		item = MogIt:ToStringItem(item)
-	end
+	item = MogIt:NormaliseItemString(item)
 	-- don't add single items that are already on the wishlist
 	if not setName and self:IsItemInWishlist(item, true, nil, true) then
 		return false
@@ -375,11 +363,7 @@ function Wishlist:IsItemInWishlist(item, noSet, profile, noAlts)
 		end
 		return found, profiles
 	end
-	if type(item) == "string" then
-		item = MogIt:NormaliseItemString(item)
-	else
-		item = MogIt:ToStringItem(item)
-	end
+	item = MogIt:NormaliseItemString(item)
 	local token = MogIt.tokens[MogIt:ToNumberItem(item)]
 	local items
 	if profile then

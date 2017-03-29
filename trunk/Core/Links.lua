@@ -30,9 +30,9 @@ end
 function mog:SetToLink(set, race, gender, enchant)
 	local items = {};
 	for k, v in pairs(set) do
-		local itemID, bonusID = mog:ToNumberItem(v);
-		if bonusID then
-			tinsert(items, format("%s.%s", toBase(itemID), toBase(bonusID)));
+		local itemID, bonusID, diffID = mog:ToNumberItem(v);
+		if bonusID or diffID then
+			tinsert(items, format("%s.%s.%s", toBase(itemID), toBase(bonusID or 0), toBase(diffID or 0)));
 		else
 			tinsert(items, toBase(itemID));
 		end
@@ -47,8 +47,8 @@ function mog:LinkToSet(link)
 	if items then
 		if items:find("[.;]") then
 			for item in gmatch(items, "[^;]+") do
-				local itemID, bonusID = strsplit(".", item);
-				table.insert(set, mog:ToStringItem(tonumber(fromBase(itemID)), bonusID and tonumber(fromBase(bonusID))));
+				local itemID, bonusID, diffID = strsplit(".", item);
+				table.insert(set, mog:ToStringItem(tonumber(fromBase(itemID)), bonusID and tonumber(fromBase(bonusID)), diffID and tonumber(fromBase(diffID))));
 			end
 		else
 			for i = 1, #items/maxlen do

@@ -172,110 +172,41 @@ local itemSourceID = {}
 local model = CreateFrame("DressUpModel")
 model:SetAutoDress(false)
 
-local tryOnSlots = {
-	MainHandSlot = "MAINHANDSLOT",
-	SecondaryHandSlot = "SECONDARYHANDSLOT",
-}
-
-local function isItemCollected(item)
-	-- local _, _, canBeSource = C_Transmog.GetItemInfo(GetItemInfoInstant(itemLink))
-	local itemID, _, _, slot = GetItemInfoInstant(item)
-	if slot == "INVTYPE_BODY" or slot == "INVTYPE_TABARD" then
-		return C_TransmogCollection.PlayerHasTransmog(itemID)
-	end
-	if type(item) == "number" then
-		item = "item:"..item
-	end
-	local sourceID = mog:GetSourceFromItem(item)
-	if sourceID then
-		local categoryID, appearanceID, canEnchant, icon, isCollected = C_TransmogCollection.GetAppearanceSourceInfo(sourceID)
-		return isCollected
-	end
-end
-
 function mog:GetSourceFromItem(item)
 	if not itemSourceID[item] then
-		model:SetUnit("player")
-		model:Undress()
-		model:TryOn(item)
-		for i = 1, 19 do
-			local source, illusion = model:GetSlotTransmogSources(i)
-			if source ~= 0 then
-				itemSourceID[item] = source
-				break
+		local visualID, sourceID = C_TransmogCollection.GetItemInfo(item)
+		itemSourceID[item] = sourceID
+		if not itemSourceID[item] then
+			model:SetUnit("player")
+			model:Undress()
+			model:TryOn(item)
+			for i = 1, 19 do
+				local source = model:GetSlotTransmogSources(i)
+				if source ~= 0 then
+					itemSourceID[item] = source
+					break
+				end
 			end
 		end
 	end
 	return itemSourceID[item]
 end
 
-local characters;
-local addedCharacters = {};
-
-function mog:HasItem(itemID, includeAlternate, isAlternate)
+function mog:HasItem(sourceID, includeAlternate)
 	local found = false;
-	found = isItemCollected(itemID);
-	if not isAlternate then
-		characters = {};
-	end
-	itemID = self:ToNumberItem(itemID);
-	if includeAlternate and not isAlternate then
-		addedCharacters = {};
-		local found = mog:HasItem(itemID);
-		local itemIDs = mog:GetData("display", mog:GetData("item", mog:ToStringItem(itemID), "display"), "items");
-		if itemIDs then
-			local baseItem = mog:ToStringItem(itemID);
-			for i, alternateItem in ipairs(itemIDs) do
-				if alternateItem ~= baseItem and mog:HasItem(alternateItem, false, true) then
-					found = true;
-				end
-			end
-		end
-		return found, characters;
-	end
-	if not mog.db.profile.ownedSearchBags then
-		return found;
-	end
-	if self.db.profile.ownedCheckAlts then
-		if DataStore then
-			for account in pairs(DataStore:GetAccounts()) do
-				for realm in pairs(DataStore:GetRealms(account)) do
-					for k, character in pairs(DataStore:GetCharacters(realm, account)) do
-						if not isAlternate or not addedCharacters[character] then
-							local inventoryCount = DataStore:GetInventoryItemCount(character, itemID);
-							local bagCount, bankCount, voidCount = DataStore:GetContainerItemCount(character, itemID);
-							local mailCount = DataStore:GetMailItemCount(character, itemID);
-							if ((inventoryCount or 0) + (bagCount or 0) + (bankCount or 0) + (voidCount or 0) + (mailCount or 0)) > 0 then
-								found = true;
-								local accountKey, realmKey, charKey = strsplit(".", character);
-								tinsert(characters, Ambiguate(charKey.."-"..realmKey:gsub(" ", "")..(isAlternate and " (*)" or ""), "none"));
-								addedCharacters[character] = true;
-							end
-						end
-					end
-				end
-			end
-			return found, characters;
-		end
-	end
-	-- GetItemCount does not take void storage into account...
-	if GetItemCount(itemID, true) > 0 then
-		return true;
-	end
-	-- ...try third party data for that
-	if DataStore_Containers then
-		local _, _, count = DataStore:GetContainerItemCount(DataStore_Character, itemID);
-		if count > 0 then
-			return true;
-		end
-	end
-	if BrotherBags_Player and BrotherBags_Player.vault then
-		for _, item in pairs(BrotherBags_Player.vault) do
-			if tonumber(item) == itemID then
-				return true;
+	local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+	found = sourceInfo.isCollected;
+	if includeAlternate then
+		local sources = C_TransmogCollection.GetAllAppearanceSources(sourceInfo.visualID)
+		for i, sourceID in ipairs(sources) do
+			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+			if sourceInfo.isCollected then
+				found = true
+				break
 			end
 		end
 	end
+	return found;
 end
 
 
@@ -285,9 +216,6 @@ local defaults = {
 		tooltipItemID = false,
 		alwaysShowCollected = true,
 		tooltipAlwaysShowOwned = true,
-		ownedSearchBags = false,
-		ownedCheckAlts = true,
-		tooltipOwnedDetail = true,
 		wishlistCheckAlts = true,
 		tooltipWishlistDetail = true,
 		loadModulesDefault = false,
@@ -367,7 +295,7 @@ mog.frame:RegisterEvent("ADDON_LOADED");
 mog.frame:RegisterEvent("PLAYER_LOGIN");
 mog.frame:RegisterEvent("GET_ITEM_INFO_RECEIVED");
 mog.frame:RegisterEvent("PLAYER_EQUIPMENT_CHANGED");
-mog.frame:RegisterEvent("APPEARANCE_SEARCH_UPDATED");
+mog.frame:RegisterEvent("TRANSMOG_SEARCH_UPDATED");
 mog.frame:SetScript("OnEvent", function(self, event, ...)
 	return mog[event] and mog[event](mog, ...)
 end);
@@ -406,25 +334,35 @@ function mog:ADDON_LOADED(addon)
 			mog.menu:Rebuild(1)
 		end
 	elseif addon == "Blizzard_Collections" then
-		for i, model in ipairs(WardrobeCollectionFrame.ModelsFrame.Models) do
+		for i, model in ipairs(WardrobeCollectionFrame.ItemsCollectionFrame.Models) do
 			model:SetScript("OnMouseDown", function(self, button)
 				if IsControlKeyDown() and button == "RightButton" then
 					local link
 					local sources = WardrobeCollectionFrame_GetSortedAppearanceSources(self.visualInfo.visualID)
-					local offset = WardrobeCollectionFrame.tooltipIndexOffset
-					if offset then
-						if offset < 0 then
-							offset = #sources + offset
-						end
-						local index = mod(offset, #sources) + 1
+					if WardrobeCollectionFrame.tooltipSourceIndex then
+						local index = WardrobeUtils_GetValidIndexForNumSources(WardrobeCollectionFrame.tooltipSourceIndex, #sources)
 						link = select(6, C_TransmogCollection.GetAppearanceSourceInfo(sources[index].sourceID))
 					end
 					mog:AddToPreview(link)
 					return
 				end
-				WardrobeCollectionFrameModel_OnMouseDown(self, button)
+				self:OnMouseDown(button)
 			end)
 		end
+		local orig_OnMouseUp = WardrobeCollectionFrame.SetsCollectionFrame.ScrollFrame.buttons[1]:GetScript("OnMouseUp")
+		for i, button in ipairs(WardrobeCollectionFrame.SetsCollectionFrame.ScrollFrame.buttons) do
+			button:SetScript("OnMouseUp", function(self, button)
+				if IsControlKeyDown() and button == "RightButton" then
+					local preview = mog:GetPreview()
+					for source in pairs(C_TransmogSets.GetSetSources(self.setID)) do
+						mog:AddToPreview(select(6, C_TransmogCollection.GetAppearanceSourceInfo(source)), preview)
+					end
+					return
+				end
+				orig_OnMouseUp(self, button)
+			end)
+		end
+		-- WardrobeCollectionFrame.SetsCollectionFrame.DetailsFrame.itemFramesPool.resetterFunc = function(self, obj) obj:RegisterForDrag("LeftButton", "RightButton") end
 	end
 end
 
@@ -460,15 +398,32 @@ local SLOTS = {
 	[LE_TRANSMOG_COLLECTION_TYPE_WARGLAIVES] = "Warglaives",
 }
 
-local OTHER_SLOTS = {
-	[LE_TRANSMOG_COLLECTION_TYPE_BACK] = true,
-	[LE_TRANSMOG_COLLECTION_TYPE_SHIRT] = true,
-	[LE_TRANSMOG_COLLECTION_TYPE_TABARD] = true,
+local SLOT_MODULES = {
+	[LE_TRANSMOG_COLLECTION_TYPE_BACK] = "Other",
+	[LE_TRANSMOG_COLLECTION_TYPE_SHIRT] = "Other",
+	[LE_TRANSMOG_COLLECTION_TYPE_TABARD] = "Other",
+	[LE_TRANSMOG_COLLECTION_TYPE_WAND] = "Ranged",
+	[LE_TRANSMOG_COLLECTION_TYPE_1H_AXE] = "OneHanded",
+	[LE_TRANSMOG_COLLECTION_TYPE_1H_SWORD] = "OneHanded",
+	[LE_TRANSMOG_COLLECTION_TYPE_1H_MACE] = "OneHanded",
+	[LE_TRANSMOG_COLLECTION_TYPE_DAGGER] = "OneHanded",
+	[LE_TRANSMOG_COLLECTION_TYPE_FIST] = "OneHanded",
+	[LE_TRANSMOG_COLLECTION_TYPE_SHIELD] = "Other",
+	[LE_TRANSMOG_COLLECTION_TYPE_HOLDABLE] = "Other",
+	[LE_TRANSMOG_COLLECTION_TYPE_2H_AXE] = "TwoHanded",
+	[LE_TRANSMOG_COLLECTION_TYPE_2H_SWORD] = "TwoHanded",
+	[LE_TRANSMOG_COLLECTION_TYPE_2H_MACE] = "TwoHanded",
+	[LE_TRANSMOG_COLLECTION_TYPE_STAFF] = "TwoHanded",
+	[LE_TRANSMOG_COLLECTION_TYPE_POLEARM] = "TwoHanded",
+	[LE_TRANSMOG_COLLECTION_TYPE_BOW] = "Ranged",
+	[LE_TRANSMOG_COLLECTION_TYPE_GUN] = "Ranged",
+	[LE_TRANSMOG_COLLECTION_TYPE_CROSSBOW] = "Ranged",
+	[LE_TRANSMOG_COLLECTION_TYPE_WARGLAIVES] = "OneHanded",
 }
 
 mog.relevantCategories = {}
 
-function mog:APPEARANCE_SEARCH_UPDATED()
+function mog:TRANSMOG_SEARCH_UPDATED()
 	local ARMOR_CLASSES = {
 		WARRIOR = "Plate",
 		DEATHKNIGHT = "Plate",
@@ -497,16 +452,18 @@ function mog:APPEARANCE_SEARCH_UPDATED()
 	mog.relevantCategories[armorClass] = true
 	
 	LoadAddOn("MogIt_"..armorClass)
-	LoadAddOn("MogIt_Weapons")
 	LoadAddOn("MogIt_Other")
+	LoadAddOn("MogIt_OneHanded")
+	LoadAddOn("MogIt_TwoHanded")
+	LoadAddOn("MogIt_Ranged")
 	
 	local ArmorDB = _G["MogIt_"..armorClass.."DB"] or {}
-	local WeaponDB = MogIt_WeaponsDB or {}
-	local OtherDB = MogIt_OtherDB or {}
+	MogIt_OtherDB = MogIt_OtherDB or {}
+	MogIt_OneHandedDB = MogIt_OneHandedDB or {}
+	MogIt_TwoHandedDB = MogIt_TwoHandedDB or {}
+	MogIt_RangedDB = MogIt_RangedDB or {}
 	
 	_G["MogIt_"..armorClass.."DB"] = ArmorDB
-	MogIt_WeaponsDB = WeaponDB
-	MogIt_OtherDB = OtherDB
 	
 	for i = 1, NUM_LE_TRANSMOG_COLLECTION_TYPES do
 		local name, isWeapon, canEnchant, canMainHand, canOffHand = C_TransmogCollection.GetCategoryInfo(i)
@@ -514,10 +471,10 @@ function mog:APPEARANCE_SEARCH_UPDATED()
 			name = SLOTS[i]
 			local db = db
 			if isWeapon then
-				db = WeaponDB
 				mog.relevantCategories[name] = true
-			elseif OTHER_SLOTS[i] then
-				db = OtherDB
+			end
+			if SLOT_MODULES[i] then
+				db = _G["MogIt_"..SLOT_MODULES[i].."DB"]
 			else
 				db = ArmorDB
 			end
@@ -541,10 +498,12 @@ function mog:APPEARANCE_SEARCH_UPDATED()
 	end
 	
 	self:LoadDB("MogIt_"..armorClass)
-	self:LoadDB("MogIt_Weapons")
 	self:LoadDB("MogIt_Other")
+	self:LoadDB("MogIt_OneHanded")
+	self:LoadDB("MogIt_TwoHanded")
+	self:LoadDB("MogIt_Ranged")
 	
-	self.frame:UnregisterEvent("APPEARANCE_SEARCH_UPDATED")
+	self.frame:UnregisterEvent("TRANSMOG_SEARCH_UPDATED")
 end
 
 
@@ -572,8 +531,6 @@ function mog:LoadDB(addon)
 		}
 		wipe(module.slotList)
 		for visualID, appearance in pairs(appearances) do
-			-- tinsert(mog:GetData("display", display, "items") or mog:AddData("display", display, "items", {}), id)
-			mog:AddData("display", visualID, "items", {})
 			for i, source in ipairs(appearance) do
 				local id = source.sourceID
 				tinsert(list, id)
@@ -588,6 +545,7 @@ function mog:LoadDB(addon)
 				-- mog:AddData("item", id, "sourceid", sourceid)
 				mog:AddData("item", id, "sourceinfo", source.drops)
 				-- mog:AddData("item", id, "zone", zone)
+				tinsert(mog:GetData("display", visualID, "items") or mog:AddData("display", visualID, "items", {}), id)
 			end
 		end
 	end
@@ -701,12 +659,12 @@ function mog:GetData(data, id, key)
 end
 
 mog.itemStringShort = "item:%d:0";
-mog.itemStringLong = "item:%d:0:0:0:0:0:0:0:0:0:0:0:1:%d";
+mog.itemStringLong = "item:%d:0::::::::::%d:1:%d";
 
-function mog:ToStringItem(id, bonus)
+function mog:ToStringItem(id, bonus, diff)
 	-- itemID, enchantID, instanceDifficulty, numBonusIDs, bonusID1
-	if bonus and bonus ~= 0 then
-		return format(mog.itemStringLong, id, bonus);
+	if (bonus and bonus ~= 0) or (diff and diff ~= 0) then
+		return format(mog.itemStringLong, id, diff or 0, bonus or 0);
 	else
 		return format(mog.itemStringShort, id);
 	end
@@ -749,13 +707,15 @@ local bonusDiffs = {
 	[3444] = true, -- ???
 	[3445] = true, -- ???
 	[3446] = true, -- ???
+	
+	[3524] = true, -- magical bonus ID for items that instead use the instance difficulty ID parameter
 };
 
-mog.itemStringPattern = "item:(%d+):%d*:%d*:%d*:%d*:%d*:%d*:%d*:%d*:%d*:%d*:%d*:%d*:([%d:]+)";
+mog.itemStringPattern = "item:(%d+):%d*:%d*:%d*:%d*:%d*:%d*:%d*:%d*:%d*:%d*:(%d*):%d*:([%d:]+)";
 
 function mog:ToNumberItem(item)
 	if type(item) == "string" then
-		local id, bonus = item:match(mog.itemStringPattern);
+		local id, diff, bonus = item:match(mog.itemStringPattern);
 		-- bonus ID can also be warforged, socketed, etc
 		-- if there is more than one bonus ID, need to check all
 		if bonus then
@@ -771,7 +731,7 @@ function mog:ToNumberItem(item)
 			end
 		end
 		id = id or item:match("item:(%d+)");
-		return tonumber(id), tonumber(bonus);
+		return tonumber(id), tonumber(bonus), tonumber(diff);
 	elseif type(item) == "number" then
 		return item;
 	end

@@ -49,6 +49,8 @@ mog.tooltip:RegisterEvent("PLAYER_REGEN_ENABLED");
 mog.tooltip.model = CreateFrame("DressUpModel",nil,mog.tooltip);
 mog.tooltip.model:SetPoint("TOPLEFT",mog.tooltip,"TOPLEFT",5,-5);
 mog.tooltip.model:SetPoint("BOTTOMRIGHT",mog.tooltip,"BOTTOMRIGHT",-5,5);
+mog.tooltip.model:SetAnimation(0, 0);
+mog.tooltip.model:SetLight(true, false, 0, 0.8, -1, 1, 1, 1, 1, 0.3, 1, 1, 1);
 mog.tooltip.model.ResetModel = function(self)
 	local db = mog.db.profile
 	if db.tooltipCustomModel then
@@ -118,18 +120,12 @@ function mog.tooltip:ShowItem(itemLink)
 	
 	local addOwnedItem = mog.db.profile.tooltipAlwaysShowOwned and mog.slotsType[slot];
 	if mog.db.profile.tooltipAlwaysShowOwned and mog.slotsType[slot] then
-		local addedCharacters = {}
-		local hasItem, characters = mog:HasItem(itemID, true);
+		local sourceID = mog:GetSourceFromItem(itemLink);
+		local hasItem = sourceID and mog:HasItem(sourceID, true);
 		addOwnedItem = hasItem;
 		if hasItem then
 			self:AddLine(" ");
 			self:AddLine("|TInterface\\RaidFrame\\ReadyCheck-Ready:0|t "..L["You have this item."], 1, 1, 1);
-			if mog.db.profile.tooltipOwnedDetail and characters then
-				for i, character in ipairs(characters) do
-					self:AddLine("|T:0|t "..character);
-					addedCharacters[character] = true;
-				end
-			end
 		end
 	end
 	
