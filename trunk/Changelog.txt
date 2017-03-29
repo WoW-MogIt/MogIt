@@ -1,6 +1,7 @@
-[b]3.8.0[/b]
+**3.8.0**  
 Changes since 3.6.5:
-* Implemented automatic database collection. Database is now empty by default. Log in on characters to store the items they can use. Read [url=https://wow.curseforge.com/projects/mogit/pages/370-beta-information]this[/url] for more information.[/b]
+
+* Implemented automatic database collection. Database is now empty by default. Log in on characters to store the items they can use. Read [this](https://wow.curseforge.com/projects/mogit/pages/370-beta-information) for more information.
 * Updated for patch 7.2.
 * Removed tracking of bag items. This was relevant when transmogging was based on physical items and for some time after transitioning to the wardrobe system, but is now out of scope for MogIt.
 * Logic regarding indication of owned items was revisited and should now work better. Should no longer flag all difficulty versions of items as owned, for one.

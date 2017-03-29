@@ -2,10 +2,7 @@ enable-nolib-creation: no
 
 manual-changelog:
     filename: Changelog.txt
-    markup-type: bbcode
-
-optional-dependencies:
-    - datastore_containers
+    markup-type: markdown
 
 externals:
     Libs/LibStub: https://repos.wowace.com/wow/ace3/trunk/LibStub
@@ -26,7 +23,6 @@ ignore:
     - Changelog.txt
     - LocaleExtractor.lua
     - LocaleList.lua
-    - Todo.txt
 
 move-folders:
     MogIt/Modules/MogIt_Cloth: MogIt_Cloth
