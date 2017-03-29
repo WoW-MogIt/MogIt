@@ -8,18 +8,18 @@ optional-dependencies:
     - datastore_containers
 
 externals:
-    Libs/LibStub: svn://svn.wowace.com/wow/ace3/mainline/trunk/LibStub
-    Libs/CallbackHandler-1.0: svn://svn.wowace.com/wow/callbackhandler/mainline/trunk/CallbackHandler-1.0
-    Libs/AceGUI-3.0: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceGUI-3.0
-    Libs/AceConfig-3.0: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceConfig-3.0
-    Libs/AceDB-3.0: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceDB-3.0
-    Libs/AceDBOptions-3.0: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceDBOptions-3.0
-    Libs/LibDataBroker-1.1: git://git.wowace.com/wow/libdatabroker-1-1/mainline.git
-    Libs/LibDBIcon-1.0: svn://svn.wowace.com/wow/libdbicon-1-0/mainline/trunk/LibDBIcon-1.0
-    Libs/LibBabble-Boss-3.0: svn://svn.wowace.com/wow/libbabble-boss-3-0/mainline/trunk
-    Libs/LibBabble-Inventory-3.0: svn://svn.wowace.com/wow/libbabble-inventory-3-0/mainline/trunk
-    Libs/LibBabble-Race-3.0: svn://svn.wowace.com/wow/libbabble-race-3-0/mainline/trunk
-    Libs/Libra: svn://svn.wowace.com/wow/libra/mainline/trunk/Libra
+    Libs/LibStub: https://repos.wowace.com/wow/ace3/trunk/LibStub
+    Libs/CallbackHandler-1.0: https://repos.wowace.com/wow/callbackhandler/trunk/CallbackHandler-1.0
+    Libs/AceGUI-3.0: https://repos.wowace.com/wow/ace3/trunk/AceGUI-3.0
+    Libs/AceConfig-3.0: https://repos.wowace.com/wow/ace3/trunk/AceConfig-3.0
+    Libs/AceDB-3.0: https://repos.wowace.com/wow/ace3/trunk/AceDB-3.0
+    Libs/AceDBOptions-3.0: https://repos.wowace.com/wow/ace3/trunk/AceDBOptions-3.0
+    Libs/LibDataBroker-1.1: https://repos.wowace.com/wow/libdatabroker-1-1
+    Libs/LibDBIcon-1.0: https://repos.wowace.com/wow/libdbicon-1-0/trunk/LibDBIcon-1.0
+    Libs/LibBabble-Boss-3.0: https://repos.wowace.com/wow/libbabble-boss-3-0/mainline/trunk
+    Libs/LibBabble-Inventory-3.0: https://repos.wowace.com/wow/libbabble-inventory-3-0/mainline/trunk
+    Libs/LibBabble-Race-3.0: https://repos.wowace.com/wow/libbabble-race-3-0/trunk
+    Libs/Libra: https://repos.wowace.com/wow/libra/trunk/Libra
     Libs/LibItemInfo-1.0: https://repos.wowace.com/wow/libiteminfo-1-0/trunk/LibItemInfo-1.0
 
 ignore:

@@ -6,9 +6,6 @@ local ItemInfo = LibStub("LibItemInfo-1.0");
 
 LibStub("Libra"):Embed(mog);
 
-local DataStore_Character;
-local BrotherBags_Player;
-
 mog.frame = CreateFrame("Frame","MogItFrame",UIParent,"ButtonFrameTemplate");
 mog.list = {};
 
@@ -560,9 +557,6 @@ end
 
 
 function mog:PLAYER_LOGIN()
-	DataStore_Character = DataStore and DataStore:GetCharacter();
-	BrotherBags_Player = BrotherBags and BrotherBags[GetRealmName()][UnitName("player")];
-	
 	C_Timer.After(1, function()
 		-- this function doesn't yield correct results immediately, so we delay it
 		for slot, v in pairs(mog.mogSlots) do
