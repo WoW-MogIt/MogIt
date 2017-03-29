@@ -190,6 +190,7 @@ function mog:GetSourceFromItem(item)
 end
 
 function mog:HasItem(sourceID, includeAlternate)
+	if not sourceID then return end
 	local found = false;
 	local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
 	found = sourceInfo.isCollected;
