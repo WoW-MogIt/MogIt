@@ -195,7 +195,7 @@ function Wishlist:OnEnter(frame, value)
 	if type(value) == "table" then
 		MogIt.ShowSetTooltip(frame, value.items, value.name)
 	else
-		MogIt.ShowItemTooltip(frame, value, MogIt:GetData("display", MogIt:GetData("item", value, "display"), "items"))
+		MogIt.ShowItemTooltip(frame, value, value)
 	end
 end
 
@@ -345,7 +345,7 @@ end
 local function tableFind(tbl, value, token)
 	if not tbl then return end
 	for i, v in pairs(tbl) do
-		if v == value or (token and token[v]) then
+		if MogIt:GetSourceFromItem(v) == value or (token and token[v]) then
 			return true
 		end
 	end
@@ -373,15 +373,14 @@ function Wishlist:IsItemInWishlist(item, noSet, profile, noAlts)
 	else
 		items = self.db.profile.items
 	end
+	local _, item = C_TransmogCollection.GetItemInfo(item)
+	if not item then return end
 	if tableFind(items, item, token) then return true end
 	if not noSet then
 		local sets = self:GetSets(profile)
 		if sets then
 			for i, set in ipairs(sets) do
 				if tableFind(set.items, item, token) then return true end
-				-- for slot, items in pairs(set.alternateItems) do
-					-- if tableFind(items, item, token) then return true end
-				-- end
 			end
 		end
 	end

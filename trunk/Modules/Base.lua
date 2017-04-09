@@ -124,7 +124,7 @@ end
 
 local function buildList(module, slot, list, items)
 	for _, item in ipairs(slot) do
-		if mog:CheckFilters(module,item) then
+		if mog:CheckFilters(module, item) then
 			local display = mog:GetData("item", item, "display");
 			if display then
 				if not items[display] then

@@ -6,8 +6,8 @@ local alliance;
 local horde;
 
 local factions = {
-	[1] = "Alliance",
-	[2] = "Horde",
+	Alliance = 1,
+	Horde = 2,
 }
 
 local settings = {
@@ -41,11 +41,15 @@ f.Horde:SetScript("OnClick",onClick);
 f.Horde.value = "Horde";
 
 function f.Filter(faction)
-	return (not faction) or (settings[factions[faction]]);
+	local mask = 0
+	for k, v in pairs(factions) do
+		mask = bit.bor(mask, settings[k] and v or 0)
+	end
+	return (not faction) or (bit.band(faction, mask) ~= 0);
 end
 
 function f.Default()
-	for i, faction in ipairs(factions) do
+	for faction in pairs(factions) do
 		local value = UnitFactionGroup("PLAYER") == faction;
 		settings[faction] = value;
 		f[faction]:SetChecked(value);
