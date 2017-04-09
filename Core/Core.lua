@@ -193,7 +193,7 @@ function mog:HasItem(sourceID, includeAlternate)
 	if not sourceID then return end
 	local found = false;
 	local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-	found = sourceInfo.isCollected;
+	found = sourceInfo.isCollected
 	if includeAlternate then
 		local sources = C_TransmogCollection.GetAllAppearanceSources(sourceInfo.visualID)
 		for i, sourceID in ipairs(sources) do
@@ -204,7 +204,7 @@ function mog:HasItem(sourceID, includeAlternate)
 			end
 		end
 	end
-	return found;
+	return found
 end
 
 
@@ -463,6 +463,10 @@ function mog:TRANSMOG_SEARCH_UPDATED()
 	
 	_G["MogIt_"..armorClass.."DB"] = ArmorDB
 	
+	local GetAppearanceSources = C_TransmogCollection.GetAppearanceSources
+	local GetAppearanceSourceDrops = C_TransmogCollection.GetAppearanceSourceDrops
+	local bor = bit.bor
+	
 	for i = 1, NUM_LE_TRANSMOG_COLLECTION_TYPES do
 		local name, isWeapon, canEnchant, canMainHand, canOffHand = C_TransmogCollection.GetCategoryInfo(i)
 		if name then
@@ -479,16 +483,18 @@ function mog:TRANSMOG_SEARCH_UPDATED()
 			db[name] = db[name] or {}
 			for i, appearance in ipairs(C_TransmogCollection.GetCategoryAppearances(i)) do
 				if not appearance.isHideVisual then
-					db[name][appearance.visualID] = {}
-					for i, source in ipairs(C_TransmogCollection.GetAppearanceSources(appearance.visualID)) do
-						local _, _, _, _, _, link = C_TransmogCollection.GetSourceInfo(source.sourceID)
-						db[name][appearance.visualID][i] = {
-							sourceID = source.sourceID,
-							sourceType = source.sourceType,
-							drops = C_TransmogCollection.GetAppearanceSourceDrops(source.sourceID),
-							classes = bit.bor(0, L.classBits[playerClass]),
-							faction = bit.bor(0, FACTIONS[faction]),
-						}
+					local v = db[name][appearance.visualID] or {}
+					db[name][appearance.visualID] = v
+					if v[1] and v[1].sourceID then
+						db[name][appearance.visualID] = {}
+					end
+					for i, source in ipairs(GetAppearanceSources(appearance.visualID)) do
+						local s = v[source.sourceID] or {}
+						v[source.sourceID] = s
+						s.sourceType = source.sourceType
+						s.drops = GetAppearanceSourceDrops(source.sourceID)
+						s.classes = bor(s.classes or 0, L.classBits[playerClass])
+						s.faction = bor(s.faction or 0, FACTIONS[faction])
 					end
 				end
 			end
@@ -530,21 +536,17 @@ function mog:LoadDB(addon)
 		}
 		wipe(module.slotList)
 		for visualID, appearance in pairs(appearances) do
-			for i, source in ipairs(appearance) do
-				local id = source.sourceID
+			for sourceID, source in pairs(appearance) do
+				local id = source.sourceID or sourceID
 				tinsert(list, id)
 				mog:AddData("item", id, "display", visualID)
-				-- mog:AddData("item", id, "quality", quality)
 				-- mog:AddData("item", id, "level", lvl)
 				mog:AddData("item", id, "faction", source.faction)
 				mog:AddData("item", id, "class", source.classes)
-				-- mog:AddData("item", id, "bind", bind)
-				-- mog:AddData("item", id, "slot", slot)
 				mog:AddData("item", id, "source", SOURCE_TYPES[source.sourceType])
 				-- mog:AddData("item", id, "sourceid", sourceid)
 				mog:AddData("item", id, "sourceinfo", source.drops)
 				-- mog:AddData("item", id, "zone", zone)
-				tinsert(mog:GetData("display", visualID, "items") or mog:AddData("display", visualID, "items", {}), id)
 			end
 		end
 	end
@@ -555,6 +557,10 @@ function mog:LoadDB(addon)
 			tinsert(module.slotList, slotID)
 		end
 	end
+end
+
+
+function mog:TRANSMOG_COLLECTION_SOURCE_ADDED(sourceID)
 end
 
 

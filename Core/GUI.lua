@@ -276,7 +276,7 @@ function ModelFramePrototype:TryOn(item, slot, itemAppearanceModID)
 	if type(item) == "number" then
 		item = "item:"..item
 	end
-	self.model:TryOn(item, tryOnSlots[slot], itemAppearanceModID);
+	self.model:TryOn(item, tryOnSlots[slot] or slot, itemAppearanceModID);
 end
 
 function ModelFramePrototype:Undress()
