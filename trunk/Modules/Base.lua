@@ -82,7 +82,7 @@ end
 function mog.base:FrameUpdate(frame, value)
 	local items = {}
 	for i, source in ipairs(value) do
-		items[i] = select(6, C_TransmogCollection.GetAppearanceSourceInfo(source))
+		tinsert(items, (select(6, C_TransmogCollection.GetAppearanceSourceInfo(source))))
 	end
 	frame.data.items = items;
 	frame.data.sourceID = value[1];

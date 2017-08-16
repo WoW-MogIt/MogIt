@@ -1,4 +1,10 @@
+**3.8.2**
+
+* Fixed errors relating to neutral pandaren.
+* Fixed rare tooltip error.
+
 **3.8.1**
+
 * Fixed some issues with class and faction filters for data collected from different characters.
 * Fixed alternate items missing from non catalogue tooltips.
 * Wishlist tooltip info should now better match saved items.
