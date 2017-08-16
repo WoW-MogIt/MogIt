@@ -247,6 +247,8 @@ do	-- item functions
 	function mog.Item_FrameUpdate(self, data)
 		local item = data.item
 		self:ApplyDress()
+		-- hack for items not returning any transmog info
+		if not item then return end
 		local _, _, _, slot = GetItemInfoInstant(item)
 		local tryonSlot
 		if slot == "INVTYPE_WEAPON" then
@@ -285,6 +287,9 @@ do	-- item functions
 	end
 
 	function mog.ShowItemTooltip(self, item, items)
+		-- hack for items not returning any transmog info
+		if not item then return end
+		
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 		GameTooltip[mog] = true
 
@@ -487,7 +492,7 @@ do	-- set functions
 		for i, slot in ipairs(mog.slots) do
 			local item = items[slot] or items[i]
 			if item then
-				addItemTooltipLine(item, nil, nil, nil, true)
+				addItemTooltipLine(item, items[slot] and slot, nil, nil, true)
 			end
 		end
 		GameTooltip:Show()

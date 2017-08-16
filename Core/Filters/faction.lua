@@ -50,7 +50,7 @@ end
 
 function f.Default()
 	for faction in pairs(factions) do
-		local value = UnitFactionGroup("PLAYER") == faction;
+		local value = (UnitFactionGroup("PLAYER") == faction) or (UnitFactionGroup("PLAYER") == "Neutral");
 		settings[faction] = value;
 		f[faction]:SetChecked(value);
 	end

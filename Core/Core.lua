@@ -193,6 +193,7 @@ function mog:HasItem(sourceID, includeAlternate)
 	if not sourceID then return end
 	local found = false;
 	local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+	if not sourceInfo then return end
 	found = sourceInfo.isCollected
 	if includeAlternate then
 		local sources = C_TransmogCollection.GetAllAppearanceSources(sourceInfo.visualID)
@@ -422,6 +423,7 @@ local SLOT_MODULES = {
 mog.relevantCategories = {}
 
 function mog:TRANSMOG_SEARCH_UPDATED()
+	
 	local ARMOR_CLASSES = {
 		WARRIOR = "Plate",
 		DEATHKNIGHT = "Plate",
@@ -440,6 +442,8 @@ function mog:TRANSMOG_SEARCH_UPDATED()
 	local FACTIONS = {
 		["Alliance"] = 1,
 		["Horde"] = 2,
+		-- hack for neutral pandaren, the items they can see are for both factions
+		["Neutral"] = 3,
 	}
 	
 	local _, playerClass = UnitClass("player")
@@ -508,6 +512,7 @@ function mog:TRANSMOG_SEARCH_UPDATED()
 	self:LoadDB("MogIt_Ranged")
 	
 	self.frame:UnregisterEvent("TRANSMOG_SEARCH_UPDATED")
+	
 end
 
 
