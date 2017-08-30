@@ -1,5 +1,6 @@
 **3.8.2**
 
+* Fixed some issues making name and item level filters unusable.
 * Fixed errors relating to neutral pandaren.
 * Fixed rare tooltip error.
 
