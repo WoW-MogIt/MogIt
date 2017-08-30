@@ -164,6 +164,16 @@ end
 ItemInfo.RegisterCallback(mog, "OnItemInfoReceivedBatch", "ItemInfoReceived");
 --//
 
+local sourceItemLink = {}
+
+function mog:GetItemLinkFromSource(source)
+	if not sourceItemLink[source] then
+		local _, _, _, _, _, link = C_TransmogCollection.GetAppearanceSourceInfo(source)
+		sourceItemLink[source] = link
+	end
+	return sourceItemLink[source]
+end
+
 local itemSourceID = {}
 
 local model = CreateFrame("DressUpModel")
@@ -423,6 +433,7 @@ local SLOT_MODULES = {
 mog.relevantCategories = {}
 
 function mog:TRANSMOG_SEARCH_UPDATED()
+	-- local t = debugprofilestop()
 	
 	local ARMOR_CLASSES = {
 		WARRIOR = "Plate",
@@ -513,6 +524,7 @@ function mog:TRANSMOG_SEARCH_UPDATED()
 	
 	self.frame:UnregisterEvent("TRANSMOG_SEARCH_UPDATED")
 	
+	-- print(format("MogIt modules loaded in %d ms.", debugprofilestop() - t))
 end
 
 

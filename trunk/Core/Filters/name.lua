@@ -30,8 +30,10 @@ function f.Filter(item)
 	if type(item) == "table" then
 		return item.name:lower():find(searchString, nil, true)
 	end
-	local item = mog:GetItemInfo(C_TransmogCollection.GetSourceInfo(item).itemID, "BuildList");
-	return not item or (item.name:lower():find(searchString, nil, true));
+	local link = mog:GetItemLinkFromSource(item)
+	if not link then return end
+	local item = mog:GetItemInfo(link, "BuildList");
+	return item and (item.name:lower():find(searchString, nil, true));
 end
 
 function f.Default()
