@@ -17,6 +17,10 @@ local races = {
    "Blood Elf",
    "Goblin",
    "Pandaren",
+   "Lightforged Draenei",
+   "Void Elf",
+   "Highmountain Tauren",
+   "Nightborne",
 }
 
 local raceID = {
@@ -33,6 +37,10 @@ local raceID = {
    ["Draenei"] = 11,
    ["Worgen"] = 22,
    ["Pandaren"] = 24,
+   ["Nightborne"] = 27,
+   ["Highmountain Tauren"] = 28,
+   ["Void Elf"] = 29,
+   ["Lightforged Draenei"] = 30,
 }
 
 -- UnitRace returns differently for the following races, so need to include exceptions
