@@ -56,7 +56,9 @@ function f.Filter(item)
 	if minlvl <= 1 and (maxlvl >= MAX_PLAYER_LEVEL or maxlvl == 0) then
 		return true
 	end
-	local item = mog:GetItemInfo(C_TransmogCollection.GetSourceInfo(item).itemID, "BuildList");
+	local sourceInfo = C_TransmogCollection.GetSourceInfo(item)
+	if not sourceInfo then return end
+	local item = mog:GetItemInfo(sourceInfo.itemID, "BuildList");
 	return not item or ((item.reqLevel >= minlvl) and (item.reqLevel <= maxlvl));
 end
 
