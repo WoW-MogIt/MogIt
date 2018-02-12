@@ -1,6 +1,7 @@
 **3.8.3**
 
 * Added allied races to race dropdowns. (usual texture glitch caveats apply)
+* Fixed level filter error.
 * Fixed chest type filter error.
 
 
