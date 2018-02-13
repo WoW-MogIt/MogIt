@@ -44,9 +44,11 @@ local raceID = {
 }
 
 -- UnitRace returns differently for the following races, so need to include exceptions
-raceID["NightElf"] = raceID["Night Elf"]
 raceID["Scourge"] = raceID["Undead"]
-raceID["BloodElf"] = raceID["Blood Elf"]
+-- most are just with the space removed
+for i, race in ipairs(races) do
+	raceID[race:gsub("%s", "")] = raceID[race]
+end
 
 local gender = {
 	[0] = MALE,
