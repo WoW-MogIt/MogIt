@@ -235,6 +235,7 @@ do	-- item functions
 
 	GameTooltip:RegisterEvent("MODIFIER_STATE_CHANGED")
 	GameTooltip:HookScript("OnEvent", function(self, event, key, state)
+		if self:IsForbidden() then return end
 		local owner = self:GetOwner()
 		if owner and self[mog] then
 			owner:OnEnter()

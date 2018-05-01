@@ -1,3 +1,7 @@
+**3.8.5**
+* Attempt to fix tooltip error related to nameplates.
+* Bump module interface versions.
+
 **3.8.4**
 
 * Fixed error related to allied races.
