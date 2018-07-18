@@ -405,6 +405,7 @@ local SLOTS = {
 	[LE_TRANSMOG_COLLECTION_TYPE_GUN] = "Gun",
 	[LE_TRANSMOG_COLLECTION_TYPE_CROSSBOW] = "Crossbow",
 	[LE_TRANSMOG_COLLECTION_TYPE_WARGLAIVES] = "Warglaives",
+	[LE_TRANSMOG_COLLECTION_TYPE_PAIRED] = "ArtifactLegion",
 }
 
 local SLOT_MODULES = {
@@ -428,6 +429,7 @@ local SLOT_MODULES = {
 	[LE_TRANSMOG_COLLECTION_TYPE_GUN] = "Ranged",
 	[LE_TRANSMOG_COLLECTION_TYPE_CROSSBOW] = "Ranged",
 	[LE_TRANSMOG_COLLECTION_TYPE_WARGLAIVES] = "OneHanded",
+	[LE_TRANSMOG_COLLECTION_TYPE_PAIRED] = "Artifact",
 }
 
 mog.relevantCategories = {}
@@ -469,12 +471,14 @@ function mog:TRANSMOG_SEARCH_UPDATED()
 	LoadAddOn("MogIt_OneHanded")
 	LoadAddOn("MogIt_TwoHanded")
 	LoadAddOn("MogIt_Ranged")
+	LoadAddOn("MogIt_Artifact")
 	
 	local ArmorDB = _G["MogIt_"..armorClass.."DB"] or {}
 	MogIt_OtherDB = MogIt_OtherDB or {}
 	MogIt_OneHandedDB = MogIt_OneHandedDB or {}
 	MogIt_TwoHandedDB = MogIt_TwoHandedDB or {}
 	MogIt_RangedDB = MogIt_RangedDB or {}
+	MogIt_ArtifactDB = MogIt_ArtifactDB or {}
 	
 	_G["MogIt_"..armorClass.."DB"] = ArmorDB
 	
@@ -496,7 +500,12 @@ function mog:TRANSMOG_SEARCH_UPDATED()
 				db = ArmorDB
 			end
 			db[name] = db[name] or {}
-			for i, appearance in ipairs(C_TransmogCollection.GetCategoryAppearances(i)) do
+			-- required to include all artifacts
+			local exclusionCategory
+			if canMainHand then
+				exclusionCategory = 2
+			end
+			for i, appearance in ipairs(C_TransmogCollection.GetCategoryAppearances(i, exclusionCategory)) do
 				if not appearance.isHideVisual then
 					local v = db[name][appearance.visualID] or {}
 					db[name][appearance.visualID] = v
@@ -521,6 +530,7 @@ function mog:TRANSMOG_SEARCH_UPDATED()
 	self:LoadDB("MogIt_OneHanded")
 	self:LoadDB("MogIt_TwoHanded")
 	self:LoadDB("MogIt_Ranged")
+	self:LoadDB("MogIt_Artifact")
 	
 	self.frame:UnregisterEvent("TRANSMOG_SEARCH_UPDATED")
 	

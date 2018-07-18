@@ -1,22 +1,22 @@
-## Interface: 80000
+﻿## Interface: 80000
 ## Author: Aelobin (The Maelstrom EU) & Lombra (Defias Brotherhood EU)
 ## Version: @project-version@
-## SavedVariables: MogIt_PlateDB
+## SavedVariables: MogIt_ArtifactDB
 ## LoadOnDemand: 1
 ## RequiredDeps: MogIt
 ## X-MogItModuleVersion: 3
 
-## Title: MogIt: Plate
-## Title-frFR: MogIt: Plaques
-## Title-deDE: MogIt: Platte
-## Title-esES: MogIt: Placas
-## Title-esMX: MogIt: Placas
-## Title-ruRU: MogIt: Латы
-## Title-koKR: MogIt: 판금
-## Title-zhCN: MogIt: 板甲
-## Title-zhTW: MogIt: 鎧甲
-## Title-ptBR: MogIt: Placas
-## Title-itIT: MogIt: Plate
+## Title: MogIt: Artifact
+## Title-frFR: MogIt: Artefact
+## Title-deDE: MogIt: Artefakt
+## Title-esES: MogIt: Artefacto
+## Title-esMX: MogIt: Artefacto
+## Title-ruRU: MogIt: Артефакт
+## Title-koKR: MogIt: 유물
+## Title-zhCN: MogIt: 神器
+## Title-zhTW: MogIt: 神器
+## Title-ptBR: MogIt: Artefato
+## Title-itIT: MogIt: Artefatto
 
 ## Notes: MogIt Data
 ## Notes-frFR: MogIt Données

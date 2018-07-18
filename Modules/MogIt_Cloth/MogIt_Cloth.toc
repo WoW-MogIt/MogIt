@@ -1,4 +1,4 @@
-## Interface: 70300
+﻿## Interface: 80000
 ## Author: Aelobin (The Maelstrom EU) & Lombra (Defias Brotherhood EU)
 ## Version: @project-version@
 ## SavedVariables: MogIt_ClothDB
