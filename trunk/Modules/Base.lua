@@ -43,10 +43,10 @@ function mog.base.Dropdown(module, tier)
 	if tier == 1 then
 		local moduleDB = _G[module.name.."DB"]
 		info = UIDropDownMenu_CreateInfo();
-		info.text = module.label..(module.loaded and "" or " \124cFFFFFFFF("..L["Click to load addon"]..")");
+		info.text = module.label..(module.loaded and "" or " |cFFFFFFFF("..L["Click to load addon"]..")");
 		info.value = module;
-		info.colorCode = "\124cFF"..(module.loaded and ((moduleDB and next(moduleDB)) and "00FF00" or "c0c0c0") or "FF0000");
-		info.hasArrow = module.loaded and moduleDB and next(moduleDB);
+		info.colorCode = "|cFF"..(module.loaded and ((moduleDB and next(moduleDB)) and "00FF00" or "c0c0c0") or "FF0000");
+		info.hasArrow = module.loaded and moduleDB and next(moduleDB) and module.label ~= "Artifact";
 		info.keepShownOnClick = not module.loaded;
 		info.notCheckable = true;
 		info.func = (not module.loaded or moduleDB) and mog.base.DropdownTier1;
@@ -186,6 +186,7 @@ mog.baseModules = {
 	"MogIt_OneHanded",
 	"MogIt_TwoHanded",
 	"MogIt_Ranged",
+	"MogIt_Artifact",
 };
 
 local myName = UnitName("player");
