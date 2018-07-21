@@ -993,11 +993,13 @@ else
 			for i, button in ipairs(EncounterJournal.encounter.info.lootScroll.buttons) do
 				button:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 			end
-			local LegendariesFrame = EncounterJournal.LootJournal.LegendariesFrame
-			for i, button in ipairs(LegendariesFrame.buttons) do
-				button:RegisterForClicks("LeftButtonUp", "RightButtonUp")
-				LegendariesFrame.rightSideButtons[i]:RegisterForClicks("LeftButtonUp", "RightButtonUp")
-			end
+			
+			-- removed in BFA, to return??
+			-- local LegendariesFrame = EncounterJournal.LootJournal.LegendariesFrame
+			-- for i, button in ipairs(LegendariesFrame.buttons) do
+				-- button:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+				-- LegendariesFrame.rightSideButtons[i]:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+			-- end
 		end
 		if addon == "Blizzard_InspectUI" then
 			hookInspectUI();

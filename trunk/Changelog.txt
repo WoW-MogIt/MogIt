@@ -1,3 +1,9 @@
+**3.8.7**
+
+* Added dark iron dwarves and mag'hari orcs.
+* Fixed error opening adventure guide.
+
+
 **3.8.6**
 
 * Added artifact module.
