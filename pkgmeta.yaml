@@ -25,6 +25,7 @@ ignore:
     - LocaleList.lua
 
 move-folders:
+    MogIt/Modules/MogIt_Artifact: MogIt_Artifact
     MogIt/Modules/MogIt_Cloth: MogIt_Cloth
     MogIt/Modules/MogIt_Leather: MogIt_Leather
     MogIt/Modules/MogIt_Mail: MogIt_Mail
