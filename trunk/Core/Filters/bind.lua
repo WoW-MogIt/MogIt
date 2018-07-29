@@ -66,7 +66,9 @@ end
 
 function f.Filter(item)
 	if num == 3 then return true end
-	local item = mog:GetItemInfo(C_TransmogCollection.GetSourceInfo(item).itemID, "BuildList");
+	local sourceInfo = C_TransmogCollection.GetSourceInfo(item)
+	if not sourceInfo or not C_Item.DoesItemExistByID(sourceInfo.itemID) then return end
+	local item = mog:GetItemInfo(sourceInfo.itemID, "BuildList");
 	return not item or (selected[item.bindType]);
 end
 

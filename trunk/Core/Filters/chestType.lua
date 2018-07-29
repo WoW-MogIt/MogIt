@@ -52,7 +52,7 @@ function f.Filter(item)
 		return true;
 	end
 	local sourceInfo = C_TransmogCollection.GetSourceInfo(item)
-	if not sourceInfo then return end
+	if not sourceInfo or not C_Item.DoesItemExistByID(sourceInfo.itemID) then return end
 	local item = mog:GetItemInfo(sourceInfo.itemID, "BuildList");
 	return not item or selected == item.invType;
 end
