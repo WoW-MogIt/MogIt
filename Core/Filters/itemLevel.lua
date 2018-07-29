@@ -58,7 +58,7 @@ function f.Filter(item)
 		return true
 	end
 	local link = mog:GetItemLinkFromSource(item)
-	if not link then return end
+	if not link or not C_Item.DoesItemExistByID(link) then return end
 	local item = mog:GetItemInfo(link, "BuildList");
 	return item and ((not isMinSpecified or item.itemLevel >= minlvl) and (not isMaxSpecified or item.itemLevel <= maxlvl));
 end

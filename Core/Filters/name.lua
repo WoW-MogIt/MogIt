@@ -31,7 +31,7 @@ function f.Filter(item)
 		return item.name:lower():find(searchString, nil, true)
 	end
 	local link = mog:GetItemLinkFromSource(item)
-	if not link then return end
+	if not link or not C_Item.DoesItemExistByID(link) then return end
 	local item = mog:GetItemInfo(link, "BuildList");
 	return item and (item.name:lower():find(searchString, nil, true));
 end
