@@ -51,6 +51,7 @@ mog.tooltip.model = CreateFrame("DressUpModel", nil, mog.tooltip);
 mog.tooltip.model:SetPoint("TOPLEFT", mog.tooltip, "TOPLEFT", 5, -5);
 mog.tooltip.model:SetPoint("BOTTOMRIGHT", mog.tooltip, "BOTTOMRIGHT", -5, 5);
 mog.tooltip.model:SetAnimation(0, 0);
+mog.tooltip.model:SetAutoDress(false);
 mog.tooltip.model:SetLight(true, false, 0, 0.8, -1, 1, 1, 1, 1, 0.3, 1, 1, 1);
 mog.tooltip.model.ResetModel = function(self)
 	local db = mog.db.profile
@@ -172,6 +173,8 @@ function mog.tooltip:ShowItem(itemLink)
 end
 
 function mog.tooltip.HideItem(self)
+	mog.tooltip.owner = nil;
+	mog.tooltip.repos:Hide();
 	mog.tooltip.check:Show();
 end
 --//
