@@ -1,6 +1,7 @@
 **3.8.9**
 
 * Fixed issue where using certain filters would result in heavy CPU usage.
+* Attempt to fix issues with tooltip model not hiding in certain cases.
 
 
 **3.8.8**
