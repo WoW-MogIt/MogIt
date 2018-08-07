@@ -152,6 +152,7 @@ function mog:CreateModelFrame(parent)
 	f.model = CreateFrame("DressUpModel",nil,f);
 	f.model:SetAllPoints(f);
 	f.model:SetModelScale(2);
+	f.model:SetAutoDress(false);
 	f.model:SetUnit("PLAYER");
 	f.model:SetPosition(0,0,0);
 	f.model:SetLight(true, false, 0, 0.8, -1, 1, 1, 1, 1, 0.3, 1, 1, 1);
