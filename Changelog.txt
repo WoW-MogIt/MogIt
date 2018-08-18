@@ -1,3 +1,9 @@
+**3.8.10**
+
+* Fixed custom races not dressing up.
+* Attempt to fix issues with armor models getting stuck on character.
+
+
 **3.8.9**
 
 * Fixed issue where using certain filters would result in heavy CPU usage.
