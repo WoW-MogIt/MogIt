@@ -51,7 +51,6 @@ mog.tooltip.model = CreateFrame("DressUpModel", nil, mog.tooltip);
 mog.tooltip.model:SetPoint("TOPLEFT", mog.tooltip, "TOPLEFT", 5, -5);
 mog.tooltip.model:SetPoint("BOTTOMRIGHT", mog.tooltip, "BOTTOMRIGHT", -5, 5);
 mog.tooltip.model:SetAnimation(0, 0);
-mog.tooltip.model:SetAutoDress(false);
 mog.tooltip.model:SetLight(true, false, 0, 0.8, -1, 1, 1, 1, 1, 0.3, 1, 1, 1);
 mog.tooltip.model.ResetModel = function(self)
 	local db = mog.db.profile
@@ -62,7 +61,17 @@ mog.tooltip.model.ResetModel = function(self)
 		self:Dress();
 	end
 	if not db.tooltipDress then
-		self:Undress();
+		-- the worst of hacks to prevent certain armor model pieces from getting stuck on the character
+		for i, slotName in ipairs(mog.slots) do
+			local slot = GetInventorySlotInfo(slotName);
+			local item = GetInventoryItemLink("player", slot);
+			if item then
+				self:TryOn(item);
+				self:UndressSlot(slot);
+			end
+		end
+		self:UndressSlot(GetInventorySlotInfo("MainHandSlot"));
+		self:UndressSlot(GetInventorySlotInfo("SecondaryHandSlot"));
 	end
 end
 mog.tooltip.model:SetScript("OnShow", mog.tooltip.model.ResetModel);

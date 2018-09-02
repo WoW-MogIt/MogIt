@@ -1,3 +1,8 @@
+**3.8.11**
+
+* Fixed tooltip model custom races not dressing up.
+
+
 **3.8.10**
 
 * Fixed custom races not dressing up.
