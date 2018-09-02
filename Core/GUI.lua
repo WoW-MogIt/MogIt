@@ -294,7 +294,17 @@ function ModelFramePrototype:TryOn(item, slot, itemAppearanceModID)
 end
 
 function ModelFramePrototype:Undress()
-	self.model:Undress()
+	-- the worst of hacks to prevent certain armor model pieces from getting stuck on the character
+	for i, slotName in ipairs(mog.slots) do
+		local slot = GetInventorySlotInfo(slotName);
+		local item = GetInventoryItemLink("player", slot);
+		if item then
+			self:TryOn(item);
+			self:UndressSlot(slot);
+		end
+	end
+	self:UndressSlot(GetInventorySlotInfo("MainHandSlot"));
+	self:UndressSlot(GetInventorySlotInfo("SecondaryHandSlot"));
 end
 
 function ModelFramePrototype:UndressSlot(slot)
@@ -321,14 +331,6 @@ function ModelFramePrototype:ResetModel()
 		model:Dress();
 	else
 		model:SetCustomRace(info.displayRace, info.displayGender);
-		-- the worst of hacks to prevent certain armor model pieces from getting stuck on the character
-		for slot in pairs(mog.slots) do
-			local item = GetInventoryItemLink("player", slot);
-			if item then
-				model:TryOn(item);
-				model:UndressSlot(slot);
-			end
-		end
 	end
 	model:SetAnimation(0, 0)
 	self:PositionModel();
