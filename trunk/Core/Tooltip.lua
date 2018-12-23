@@ -136,7 +136,7 @@ function mog.tooltip:ShowItem(itemLink)
 		addOwnedItem = hasItem;
 		if hasItem then
 			self:AddLine(" ");
-			self:AddLine("|TInterface\\RaidFrame\\ReadyCheck-Ready:0|t "..L["You have this item."], 1, 1, 1);
+			self:AddLine("|TInterface\\RaidFrame\\ReadyCheck-Ready:0|t "..TRANSMOGRIFY_TOOLTIP_APPEARANCE_KNOWN, 1, 1, 1);
 		end
 	end
 	
