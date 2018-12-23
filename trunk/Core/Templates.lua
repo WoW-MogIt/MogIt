@@ -367,7 +367,7 @@ do	-- item functions
 		local hasItem = itemInfo and mog:HasItem(mog:GetSourceFromItem(item))
 		if hasItem then
 			GameTooltip:AddLine(" ")
-			GameTooltip:AddLine(format("|T%s:0|t ", TEXTURE)..L["You have this item."], 1, 1, 1)
+			GameTooltip:AddLine(format("|T%s:0|t ", TEXTURE)..TRANSMOGRIFY_TOOLTIP_APPEARANCE_KNOWN, 1, 1, 1)
 		end
 
 		local found, profiles = mog.wishlist:IsItemInWishlist(item)
