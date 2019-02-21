@@ -1,3 +1,8 @@
+**3.8.12**
+
+* Added filter to show items that are not collected.
+
+
 **3.8.11**
 
 * Fixed tooltip model custom races not dressing up.

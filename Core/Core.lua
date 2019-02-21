@@ -206,10 +206,12 @@ function mog:HasItem(sourceID, includeAlternate)
 	if not sourceInfo then return end
 	found = sourceInfo.isCollected
 	if includeAlternate then
+		local _, _, _, _, _, itemClassID, itemSubclassID = GetItemInfoInstant(sourceInfo.itemID);
 		local sources = C_TransmogCollection.GetAllAppearanceSources(sourceInfo.visualID)
 		for i, sourceID in ipairs(sources) do
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-			if sourceInfo.isCollected then
+			local _, _, _, _, _, itemClassID2, itemSubclassID2 = GetItemInfoInstant(sourceInfo.itemID);
+			if itemSubclassID2 == itemSubclassID and sourceInfo.isCollected then
 				found = true
 				break
 			end
