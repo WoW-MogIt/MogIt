@@ -1,3 +1,9 @@
+**3.9.0**
+
+* Added Kul Tirans and Zandalari trolls.
+* Fixed preview frame.
+
+
 **3.8.12**
 
 * Added filter to show items that are not collected.

@@ -20,9 +20,11 @@ local races = {
    "Lightforged Draenei",
    "Void Elf",
    "Dark Iron Dwarf",
+   "Kul Tiran",
    "Highmountain Tauren",
    "Nightborne",
    "Mag'har Orc",
+   "Zandalari Troll",
 }
 
 local raceID = {
@@ -43,6 +45,8 @@ local raceID = {
    ["Highmountain Tauren"] = 28,
    ["Void Elf"] = 29,
    ["Lightforged Draenei"] = 30,
+   ["Zandalari Troll"] = 31,
+   ["Kul Tiran"] = 32,
    ["Dark Iron Dwarf"] = 34,
    ["Mag'har Orc"] = 36,
 }
