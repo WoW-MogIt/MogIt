@@ -562,7 +562,7 @@ function mog:CreatePreview()
 	
 	f.slots = {};
 	for i, slotIndex in ipairs(mog.slots) do
-		local slot = CreateFrame("Button", nil, f, "ItemButtonTemplate");
+		local slot = CreateFrame("ItemButton", nil, f);
 		slot.slot = slotIndex;
 		if i == 1 then
 			slot:SetPoint("TOPLEFT", f.Inset, "TOPLEFT", 8, -8);
