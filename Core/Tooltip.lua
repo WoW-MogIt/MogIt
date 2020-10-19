@@ -182,7 +182,7 @@ function mog.tooltip:ShowItem(itemLink)
 end
 
 function mog.tooltip.HideItem(self)
-	mog.tooltip.owner = nil;
+	-- mog.tooltip.owner = nil;
 	mog.tooltip.repos:Hide();
 	mog.tooltip.check:Show();
 end

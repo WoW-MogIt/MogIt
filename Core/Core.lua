@@ -379,59 +379,59 @@ end
 
 
 local SLOTS = {
-	[LE_TRANSMOG_COLLECTION_TYPE_HEAD] = "Head",
-	[LE_TRANSMOG_COLLECTION_TYPE_SHOULDER] = "Shoulder",
-	[LE_TRANSMOG_COLLECTION_TYPE_BACK] = "Back",
-	[LE_TRANSMOG_COLLECTION_TYPE_CHEST] = "Chest",
-	[LE_TRANSMOG_COLLECTION_TYPE_SHIRT] = "Shirt",
-	[LE_TRANSMOG_COLLECTION_TYPE_TABARD] = "Tabard",
-	[LE_TRANSMOG_COLLECTION_TYPE_WRIST] = "Wrist",
-	[LE_TRANSMOG_COLLECTION_TYPE_HANDS] = "Hands",
-	[LE_TRANSMOG_COLLECTION_TYPE_WAIST] = "Waist",
-	[LE_TRANSMOG_COLLECTION_TYPE_LEGS] = "Legs",
-	[LE_TRANSMOG_COLLECTION_TYPE_FEET] = "Feet",
-	[LE_TRANSMOG_COLLECTION_TYPE_WAND] = "Wand",
-	[LE_TRANSMOG_COLLECTION_TYPE_1H_AXE] = "1H-axe",
-	[LE_TRANSMOG_COLLECTION_TYPE_1H_SWORD] = "1H-sword",
-	[LE_TRANSMOG_COLLECTION_TYPE_1H_MACE] = "1H-mace",
-	[LE_TRANSMOG_COLLECTION_TYPE_DAGGER] = "Dagger",
-	[LE_TRANSMOG_COLLECTION_TYPE_FIST] = "Fist",
-	[LE_TRANSMOG_COLLECTION_TYPE_SHIELD] = "Shield",
-	[LE_TRANSMOG_COLLECTION_TYPE_HOLDABLE] = "Holdable",
-	[LE_TRANSMOG_COLLECTION_TYPE_2H_AXE] = "2H-axe",
-	[LE_TRANSMOG_COLLECTION_TYPE_2H_SWORD] = "2H-sword",
-	[LE_TRANSMOG_COLLECTION_TYPE_2H_MACE] = "2H-mace",
-	[LE_TRANSMOG_COLLECTION_TYPE_STAFF] = "Staff",
-	[LE_TRANSMOG_COLLECTION_TYPE_POLEARM] = "Polearm",
-	[LE_TRANSMOG_COLLECTION_TYPE_BOW] = "Bow",
-	[LE_TRANSMOG_COLLECTION_TYPE_GUN] = "Gun",
-	[LE_TRANSMOG_COLLECTION_TYPE_CROSSBOW] = "Crossbow",
-	[LE_TRANSMOG_COLLECTION_TYPE_WARGLAIVES] = "Warglaives",
-	[LE_TRANSMOG_COLLECTION_TYPE_PAIRED] = "ArtifactLegion",
+	[Enum.TransmogCollectionType["Head"]] = "Head",
+	[Enum.TransmogCollectionType["Shoulder"]] = "Shoulder",
+	[Enum.TransmogCollectionType["Back"]] = "Back",
+	[Enum.TransmogCollectionType["Chest"]] = "Chest",
+	[Enum.TransmogCollectionType["Shirt"]] = "Shirt",
+	[Enum.TransmogCollectionType["Tabard"]] = "Tabard",
+	[Enum.TransmogCollectionType["Wrist"]] = "Wrist",
+	[Enum.TransmogCollectionType["Hands"]] = "Hands",
+	[Enum.TransmogCollectionType["Waist"]] = "Waist",
+	[Enum.TransmogCollectionType["Legs"]] = "Legs",
+	[Enum.TransmogCollectionType["Feet"]] = "Feet",
+	[Enum.TransmogCollectionType["Wand"]] = "Wand",
+	[Enum.TransmogCollectionType["OneHAxe"]] = "1H-axe",
+	[Enum.TransmogCollectionType["OneHSword"]] = "1H-sword",
+	[Enum.TransmogCollectionType["OneHMace"]] = "1H-mace",
+	[Enum.TransmogCollectionType["Dagger"]] = "Dagger",
+	[Enum.TransmogCollectionType["Fist"]] = "Fist",
+	[Enum.TransmogCollectionType["Shield"]] = "Shield",
+	[Enum.TransmogCollectionType["Holdable"]] = "Holdable",
+	[Enum.TransmogCollectionType["TwoHAxe"]] = "2H-axe",
+	[Enum.TransmogCollectionType["TwoHSword"]] = "2H-sword",
+	[Enum.TransmogCollectionType["TwoHMace"]] = "2H-mace",
+	[Enum.TransmogCollectionType["Staff"]] = "Staff",
+	[Enum.TransmogCollectionType["Polearm"]] = "Polearm",
+	[Enum.TransmogCollectionType["Bow"]] = "Bow",
+	[Enum.TransmogCollectionType["Gun"]] = "Gun",
+	[Enum.TransmogCollectionType["Crossbow"]] = "Crossbow",
+	[Enum.TransmogCollectionType["Warglaives"]] = "Warglaives",
+	[Enum.TransmogCollectionType["Paired"]] = "ArtifactLegion",
 }
 
 local SLOT_MODULES = {
-	[LE_TRANSMOG_COLLECTION_TYPE_BACK] = "Other",
-	[LE_TRANSMOG_COLLECTION_TYPE_SHIRT] = "Other",
-	[LE_TRANSMOG_COLLECTION_TYPE_TABARD] = "Other",
-	[LE_TRANSMOG_COLLECTION_TYPE_WAND] = "Ranged",
-	[LE_TRANSMOG_COLLECTION_TYPE_1H_AXE] = "OneHanded",
-	[LE_TRANSMOG_COLLECTION_TYPE_1H_SWORD] = "OneHanded",
-	[LE_TRANSMOG_COLLECTION_TYPE_1H_MACE] = "OneHanded",
-	[LE_TRANSMOG_COLLECTION_TYPE_DAGGER] = "OneHanded",
-	[LE_TRANSMOG_COLLECTION_TYPE_FIST] = "OneHanded",
-	[LE_TRANSMOG_COLLECTION_TYPE_SHIELD] = "Other",
-	[LE_TRANSMOG_COLLECTION_TYPE_HOLDABLE] = "Other",
-	[LE_TRANSMOG_COLLECTION_TYPE_2H_AXE] = "TwoHanded",
-	[LE_TRANSMOG_COLLECTION_TYPE_2H_SWORD] = "TwoHanded",
-	[LE_TRANSMOG_COLLECTION_TYPE_2H_MACE] = "TwoHanded",
-	[LE_TRANSMOG_COLLECTION_TYPE_STAFF] = "TwoHanded",
-	[LE_TRANSMOG_COLLECTION_TYPE_POLEARM] = "TwoHanded",
-	[LE_TRANSMOG_COLLECTION_TYPE_BOW] = "Ranged",
-	[LE_TRANSMOG_COLLECTION_TYPE_GUN] = "Ranged",
-	[LE_TRANSMOG_COLLECTION_TYPE_CROSSBOW] = "Ranged",
-	[LE_TRANSMOG_COLLECTION_TYPE_WARGLAIVES] = "OneHanded",
-	[LE_TRANSMOG_COLLECTION_TYPE_PAIRED] = "Artifact",
+	[Enum.TransmogCollectionType["Back"]] = "Other",
+	[Enum.TransmogCollectionType["Shirt"]] = "Other",
+	[Enum.TransmogCollectionType["Tabard"]] = "Other",
+	[Enum.TransmogCollectionType["Wand"]] = "Ranged",
+	[Enum.TransmogCollectionType["OneHAxe"]] = "OneHanded",
+	[Enum.TransmogCollectionType["OneHSword"]] = "OneHanded",
+	[Enum.TransmogCollectionType["OneHMace"]] = "OneHanded",
+	[Enum.TransmogCollectionType["Dagger"]] = "OneHanded",
+	[Enum.TransmogCollectionType["Fist"]] = "OneHanded",
+	[Enum.TransmogCollectionType["Shield"]] = "Other",
+	[Enum.TransmogCollectionType["Holdable"]] = "Other",
+	[Enum.TransmogCollectionType["TwoHAxe"]] = "TwoHanded",
+	[Enum.TransmogCollectionType["TwoHSword"]] = "TwoHanded",
+	[Enum.TransmogCollectionType["TwoHMace"]] = "TwoHanded",
+	[Enum.TransmogCollectionType["Staff"]] = "TwoHanded",
+	[Enum.TransmogCollectionType["Polearm"]] = "TwoHanded",
+	[Enum.TransmogCollectionType["Bow"]] = "Ranged",
+	[Enum.TransmogCollectionType["Gun"]] = "Ranged",
+	[Enum.TransmogCollectionType["Crossbow"]] = "Ranged",
+	[Enum.TransmogCollectionType["Warglaives"]] = "OneHanded",
+	[Enum.TransmogCollectionType["Paired"]] = "Artifact",
 }
 
 mog.relevantCategories = {}
@@ -488,8 +488,8 @@ function mog:TRANSMOG_SEARCH_UPDATED()
 	local GetAppearanceSourceDrops = C_TransmogCollection.GetAppearanceSourceDrops
 	local bor = bit.bor
 	
-	for i = 1, NUM_LE_TRANSMOG_COLLECTION_TYPES do
-		local name, isWeapon, canEnchant, canMainHand, canOffHand = C_TransmogCollection.GetCategoryInfo(i)
+	for i = Enum.TransmogCollectionTypeMeta.MinValue, Enum.TransmogCollectionTypeMeta.MaxValue do
+		local name, isWeapon, canEnchant, canMainHand, canOffHand = C_TransmogCollection.GetCategoryInfo(i + 1)
 		if name then
 			name = SLOTS[i]
 			local db = db
@@ -507,7 +507,7 @@ function mog:TRANSMOG_SEARCH_UPDATED()
 			if canMainHand then
 				exclusionCategory = 2
 			end
-			for i, appearance in ipairs(C_TransmogCollection.GetCategoryAppearances(i, exclusionCategory)) do
+			for i, appearance in ipairs(C_TransmogCollection.GetCategoryAppearances(i + 1, exclusionCategory)) do
 				if not appearance.isHideVisual then
 					local v = db[name][appearance.visualID] or {}
 					db[name][appearance.visualID] = v
@@ -580,7 +580,7 @@ function mog:LoadDB(addon)
 		end
 	end
 	
-	for i = 1, NUM_LE_TRANSMOG_COLLECTION_TYPES do
+	for i = 1, Enum.TransmogCollectionTypeMeta.NumValues do
 		local slotID = SLOTS[i]
 		if moduleDB[slotID] then
 			tinsert(module.slotList, slotID)
@@ -594,16 +594,18 @@ end
 
 
 function mog:PLAYER_LOGIN()
+	--[[
 	C_Timer.After(1, function()
 		-- this function doesn't yield correct results immediately, so we delay it
 		for slot, v in pairs(mog.mogSlots) do
-			local isTransmogrified, _, _, _, _, _, _, visibleItemID = C_Transmog.GetSlotInfo(slot, LE_TRANSMOG_TYPE_APPEARANCE);
+			local isTransmogrified, _, _, _, _, _, _, visibleItemID = C_Transmog.GetSlotInfo(slot, Enum.TransmogType.Appearance);
 			if isTransmogrified then
 				-- we need an item ID here if we still need to cache these at all
 				-- mog:GetItemInfo(visibleItemID);
 			end
 		end
 	end)
+	]]
 	
 	for k, slot in pairs(SLOTS) do
 		local name = C_TransmogCollection.GetCategoryInfo(k)
@@ -620,12 +622,13 @@ function mog:PLAYER_LOGIN()
 	end)
 end
 
-function mog:PLAYER_EQUIPMENT_CHANGED(slot, hasItem)
+function mog:PLAYER_EQUIPMENT_CHANGED(slot)
 	local slotName = mog.mogSlots[slot];
 	local item = GetInventoryItemLink("player", slot);
 	if slotName then
-		local baseSourceID, baseVisualID, appliedSourceID, appliedVisualID = C_Transmog.GetSlotVisualInfo(slot, LE_TRANSMOG_TYPE_APPEARANCE);
-		local isTransmogrified, _, _, _, _, _, isHideVisual, texture = C_Transmog.GetSlotInfo(slot, LE_TRANSMOG_TYPE_APPEARANCE);
+		local transmogLocation = TransmogUtil.GetTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.None);
+		local baseSourceID, baseVisualID, appliedSourceID, appliedVisualID = C_Transmog.GetSlotVisualInfo(transmogLocation);
+		local isTransmogrified, _, _, _, _, _, isHideVisual, texture = C_Transmog.GetSlotInfo(transmogLocation);
 		if isTransmogrified then
 			-- we need an item ID here if we still need to cache these at all
 			-- mog:GetItemInfo(visibleItemID);
@@ -637,7 +640,7 @@ function mog:PLAYER_EQUIPMENT_CHANGED(slot, hasItem)
 	if mog.db.profile.gridDress == "equipped" then
 		for i, frame in ipairs(mog.models) do
 			if frame.data.item then
-				if hasItem then
+				if item then
 					frame:TryOn(item, slotName, itemAppearanceModID);
 				else
 					frame:UndressSlot(slot);
