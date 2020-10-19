@@ -1,0 +1,12 @@
+**3.9.3**
+
+- Fixed categories getting mixed up. (attempt 2)
+
+**3.9.2**
+
+- Fixed categories getting mixed up.
+
+**3.9.1**
+
+- Update for WoW 9.0 API changes.
+- Fix tooltip model flickering.
