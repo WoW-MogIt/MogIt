@@ -453,17 +453,8 @@ do	-- set functions
 				if mog.db.profile.dressupPreview then
 					mog:AddToPreview(data.items, mog:GetPreview(), data.name)
 				else
-					if not DressUpFrame:IsShown() or DressUpFrame.mode ~= "player" then
-						DressUpFrame.mode = "player"
-						DressUpFrame.ResetButton:Show()
-
-						local race, fileName = UnitRace("player")
-						SetDressUpBackground(DressUpFrame, fileName)
-
-						ShowUIPanel(DressUpFrame)
-						DressUpModel:SetUnit("player")
-					end
-					DressUpModel:Undress()
+					DressUpFrame_Show(DressUpFrame)
+					DressUpFrame.ModelScene:GetPlayerActor():Undress()
 					for k, v in pairs(data.items) do
 						DressUpItemLink(v)
 					end
