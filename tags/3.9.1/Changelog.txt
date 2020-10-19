@@ -1,0 +1,4 @@
+**3.9.1**
+
+- Update for WoW 9.0 API changes.
+- Fix tooltip model flickering.
