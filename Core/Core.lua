@@ -488,16 +488,16 @@ function mog:TRANSMOG_SEARCH_UPDATED()
 	local GetAppearanceSourceDrops = C_TransmogCollection.GetAppearanceSourceDrops
 	local bor = bit.bor
 	
-	for i = Enum.TransmogCollectionTypeMeta.MinValue + 1, Enum.TransmogCollectionTypeMeta.MaxValue + 1 do
+	for i = 1, Enum.TransmogCollectionTypeMeta.NumValues do
 		local name, isWeapon, canEnchant, canMainHand, canOffHand = C_TransmogCollection.GetCategoryInfo(i)
 		if name then
-			name = SLOTS[i]
+			name = SLOTS[i - 1]
 			local db = db
 			if isWeapon then
 				mog.relevantCategories[name] = true
 			end
-			if SLOT_MODULES[i] then
-				db = _G["MogIt_"..SLOT_MODULES[i].."DB"]
+			if SLOT_MODULES[i - 1] then
+				db = _G["MogIt_"..SLOT_MODULES[i - 1].."DB"]
 			else
 				db = ArmorDB
 			end
@@ -581,7 +581,7 @@ function mog:LoadDB(addon)
 	end
 	
 	for i = 1, Enum.TransmogCollectionTypeMeta.NumValues do
-		local slotID = SLOTS[i]
+		local slotID = SLOTS[i - 1]
 		if moduleDB[slotID] then
 			tinsert(module.slotList, slotID)
 		end
@@ -608,7 +608,7 @@ function mog:PLAYER_LOGIN()
 	]]
 	
 	for k, slot in pairs(SLOTS) do
-		local name = C_TransmogCollection.GetCategoryInfo(k)
+		local name = C_TransmogCollection.GetCategoryInfo(k + 1)
 		if name then
 			mog.db.profile.slotLabels[slot] = name
 		end
