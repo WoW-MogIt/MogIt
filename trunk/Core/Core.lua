@@ -488,8 +488,8 @@ function mog:TRANSMOG_SEARCH_UPDATED()
 	local GetAppearanceSourceDrops = C_TransmogCollection.GetAppearanceSourceDrops
 	local bor = bit.bor
 	
-	for i = Enum.TransmogCollectionTypeMeta.MinValue, Enum.TransmogCollectionTypeMeta.MaxValue do
-		local name, isWeapon, canEnchant, canMainHand, canOffHand = C_TransmogCollection.GetCategoryInfo(i + 1)
+	for i = Enum.TransmogCollectionTypeMeta.MinValue + 1, Enum.TransmogCollectionTypeMeta.MaxValue + 1 do
+		local name, isWeapon, canEnchant, canMainHand, canOffHand = C_TransmogCollection.GetCategoryInfo(i)
 		if name then
 			name = SLOTS[i]
 			local db = db
@@ -507,7 +507,7 @@ function mog:TRANSMOG_SEARCH_UPDATED()
 			if canMainHand then
 				exclusionCategory = 2
 			end
-			for i, appearance in ipairs(C_TransmogCollection.GetCategoryAppearances(i + 1, exclusionCategory)) do
+			for i, appearance in ipairs(C_TransmogCollection.GetCategoryAppearances(i, exclusionCategory)) do
 				if not appearance.isHideVisual then
 					local v = db[name][appearance.visualID] or {}
 					db[name][appearance.visualID] = v
