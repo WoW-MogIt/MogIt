@@ -506,6 +506,8 @@ function mog:TRANSMOG_SEARCH_UPDATED()
 			local exclusionCategory
 			if canMainHand then
 				exclusionCategory = 2
+			elseif canOffHand then
+				exclusionCategory = 1
 			end
 			for i, appearance in ipairs(C_TransmogCollection.GetCategoryAppearances(i, exclusionCategory)) do
 				if not appearance.isHideVisual then

@@ -1,3 +1,7 @@
+**3.9.4**
+
+- Fixed shields and off hand items missing.
+
 **3.9.3**
 
 - Fixed categories getting mixed up. (attempt 2)
