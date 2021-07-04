@@ -1,3 +1,7 @@
+**3.9.5**
+
+- Update for game version 9.1.0.
+
 **3.9.4**
 
 - Fixed shields and off hand items missing.

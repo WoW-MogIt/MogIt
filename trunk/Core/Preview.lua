@@ -905,7 +905,7 @@ end
 tinsert(ModifiedItemClickHandlers, function(link)
 	local button = GetMouseButtonClicked()
 	if button then
-		if link and IsDressableItem(link) then
+		if link and C_Item.IsDressableItemByID(link) then
 			if IsModifiedClick("DRESSUP") then
 				return DressUpItemLink(link);
 			elseif IsControlKeyDown() and button == "RightButton" then
@@ -916,7 +916,7 @@ tinsert(ModifiedItemClickHandlers, function(link)
 	elseif IsModifiedClick("DRESSUP") then
 		-- if no mouse button was detected, this happened through a chat link
 		-- if it's a dressup modified click and a dressable item, intercept the call here and let SetItemRef hook handle it
-		return link and IsDressableItem(link);
+		return link and C_Item.IsDressableItemByID(link);
 	end
 	local _, staticPopup = StaticPopup_Visible("MOGIT_PREVIEW_ADDITEM");
 	if IsModifiedClick("CHATLINK") and staticPopup then
@@ -938,7 +938,7 @@ end)
 
 local origDressUpItemLink = DressUpItemLink;
 function DressUpItemLink(link)
-	if not (link and IsDressableItem(link)) then
+	if not (link and C_Item.IsDressableItemByID(link)) then
 		return false;
 	end
 	if mog.db.profile.dressupPreview then
