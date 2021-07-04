@@ -1,7 +1,6 @@
 local MogIt, mog = ...;
 local L = mog.L;
 
-local IsDressableItem = IsDressableItem;
 local GetScreenWidth = GetScreenWidth;
 local GetScreenHeight = GetScreenHeight;
 
@@ -106,8 +105,8 @@ function mog.tooltip:ShowItem(itemLink)
 						end
 					end
 				end
-				local slot = select(4, GetItemInfoInstant(itemLink));
-				if (not db.tooltipMog or select(3, C_Transmog.GetItemInfo(itemID))) and tooltip.slots[slot] and IsDressableItem(itemLink) then
+				local _, _, _, slot = GetItemInfoInstant(itemLink);
+				if (not db.tooltipMog or select(3, C_Transmog.CanTransmogItem(itemID))) and tooltip.slots[slot] and C_Item.IsDressableItemByID(itemLink) then
 					tooltip.model:SetFacing(tooltip.slots[slot]-(db.tooltipRotate and 0.5 or 0));
 					tooltip:Show();
 					tooltip.owner = self;
