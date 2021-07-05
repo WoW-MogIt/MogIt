@@ -1,3 +1,8 @@
+**3.9.6**
+
+- Fixed error on equipping items.
+- Fixed Equip current gear function in Preview frame.
+
 **3.9.5**
 
 - Update for game version 9.1.0.
