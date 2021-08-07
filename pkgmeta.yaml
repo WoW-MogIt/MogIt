@@ -13,8 +13,8 @@ externals:
     Libs/AceDBOptions-3.0: https://repos.wowace.com/wow/ace3/trunk/AceDBOptions-3.0
     Libs/LibDataBroker-1.1: https://repos.wowace.com/wow/libdatabroker-1-1
     Libs/LibDBIcon-1.0: https://repos.wowace.com/wow/libdbicon-1-0/trunk/LibDBIcon-1.0
-    Libs/LibBabble-Boss-3.0: https://repos.wowace.com/wow/libbabble-boss-3-0/mainline/trunk
-    Libs/LibBabble-Inventory-3.0: https://repos.wowace.com/wow/libbabble-inventory-3-0/mainline/trunk
+    Libs/LibBabble-Boss-3.0: https://repos.wowace.com/wow/libbabble-boss-3-0/trunk
+    Libs/LibBabble-Inventory-3.0: https://repos.wowace.com/wow/libbabble-inventory-3-0/trunk
     Libs/LibBabble-Race-3.0: https://repos.wowace.com/wow/libbabble-race-3-0/trunk
     Libs/Libra: https://repos.wowace.com/wow/libra/trunk/Libra
     Libs/LibItemInfo-1.0: https://repos.wowace.com/wow/libiteminfo-1-0/trunk/LibItemInfo-1.0
