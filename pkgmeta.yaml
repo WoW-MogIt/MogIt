@@ -21,6 +21,8 @@ externals:
 
 ignore:
     - Changelog.txt
+    - create-module-links.cmd
+    - Install-Externals.ps1
     - LocaleExtractor.lua
     - LocaleList.lua
 
