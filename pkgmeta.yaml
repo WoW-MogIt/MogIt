@@ -1,7 +1,7 @@
 enable-nolib-creation: no
 
 manual-changelog:
-    filename: Changelog.txt
+    filename: CHANGELOG.md
     markup-type: markdown
 
 externals:
@@ -20,7 +20,6 @@ externals:
     Libs/LibItemInfo-1.0: https://repos.wowace.com/wow/libiteminfo-1-0/trunk/LibItemInfo-1.0
 
 ignore:
-    - Changelog.txt
     - create-module-links.cmd
     - Install-Externals.ps1
     - LocaleExtractor.lua
