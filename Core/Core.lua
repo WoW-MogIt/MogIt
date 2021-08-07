@@ -188,9 +188,10 @@ function mog:GetSourceFromItem(item)
 			model:Undress()
 			model:TryOn(item)
 			for i = 1, 19 do
-				local source = model:GetSlotTransmogSources(i)
-				if source ~= 0 then
-					itemSourceID[item] = source
+				local itemTransmogInfo = model:GetItemTransmogInfo(i)
+				local appearanceID = itemTransmogInfo and itemTransmogInfo.appearanceID or Constants.Transmog.NoTransmogID
+				if appearanceID ~= Constants.Transmog.NoTransmogID then
+					itemSourceID[item] = appearanceID
 					break
 				end
 			end
@@ -333,7 +334,7 @@ function mog:ADDON_LOADED(addon)
 			end
 		end
 		
-		C_TransmogCollection.SetShowMissingSourceInItemTooltips(mog.db.profile.alwaysShowCollected)
+		SetCVar("missingTransmogSourceInItemTooltips", mog.db.profile.alwaysShowCollected)
 
 		if mog.db.profile.loadModulesDefault then
 			mog:LoadBaseModules()
@@ -488,16 +489,16 @@ function mog:TRANSMOG_SEARCH_UPDATED()
 	local GetAppearanceSourceDrops = C_TransmogCollection.GetAppearanceSourceDrops
 	local bor = bit.bor
 	
-	for i = 1, Enum.TransmogCollectionTypeMeta.NumValues do
+	for i = Enum.TransmogCollectionTypeMeta.MinValue, Enum.TransmogCollectionTypeMeta.MaxValue do
 		local name, isWeapon, canEnchant, canMainHand, canOffHand = C_TransmogCollection.GetCategoryInfo(i)
 		if name then
-			name = SLOTS[i - 1]
+			name = SLOTS[i]
 			local db = db
 			if isWeapon then
 				mog.relevantCategories[name] = true
 			end
-			if SLOT_MODULES[i - 1] then
-				db = _G["MogIt_"..SLOT_MODULES[i - 1].."DB"]
+			if SLOT_MODULES[i] then
+				db = _G["MogIt_"..SLOT_MODULES[i].."DB"]
 			else
 				db = ArmorDB
 			end
@@ -583,7 +584,7 @@ function mog:LoadDB(addon)
 	end
 	
 	for i = 1, Enum.TransmogCollectionTypeMeta.NumValues do
-		local slotID = SLOTS[i - 1]
+		local slotID = SLOTS[i]
 		if moduleDB[slotID] then
 			tinsert(module.slotList, slotID)
 		end
@@ -610,7 +611,7 @@ function mog:PLAYER_LOGIN()
 	]]
 	
 	for k, slot in pairs(SLOTS) do
-		local name = C_TransmogCollection.GetCategoryInfo(k + 1)
+		local name = C_TransmogCollection.GetCategoryInfo(k)
 		if name then
 			mog.db.profile.slotLabels[slot] = name
 		end
@@ -628,7 +629,7 @@ function mog:PLAYER_EQUIPMENT_CHANGED(slot)
 	local slotName = mog.mogSlots[slot];
 	local item = GetInventoryItemLink("player", slot);
 	if slotName then
-		local transmogLocation = TransmogUtil.GetTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.None);
+		local transmogLocation = TransmogUtil.GetTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
 		local baseSourceID, baseVisualID, appliedSourceID, appliedVisualID = C_Transmog.GetSlotVisualInfo(transmogLocation);
 		local isTransmogrified, _, _, _, _, _, isHideVisual, texture = C_Transmog.GetSlotInfo(transmogLocation);
 		if isTransmogrified then

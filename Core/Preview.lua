@@ -263,7 +263,7 @@ local previewMenu = {
 				local slotID = GetInventorySlotInfo(k);
 				local item = GetInventoryItemLink("player", slotID);
 				if item then
-					local transmogLocation = TransmogUtil.GetTransmogLocation(slotID, Enum.TransmogType.Appearance, Enum.TransmogModification.None);
+					local transmogLocation = TransmogUtil.GetTransmogLocation(slotID, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
 					local isTransmogrified, _, _, _, _, _, isHideVisual, texture = C_Transmog.GetSlotInfo(transmogLocation);
 					local baseSourceID, baseVisualID, appliedSourceID, appliedVisualID = C_Transmog.GetSlotVisualInfo(transmogLocation);
 					if isTransmogrified then
