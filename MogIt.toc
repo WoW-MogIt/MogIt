@@ -6,8 +6,8 @@
 ## Notes: Transmogrification Assistant
 ## Notes-frFR: Transmogrification Assistante
 ## Notes-deDE: Transmogrifikation Assistentin
-## Notes-esES: Transfigurar Ayudante
-## Notes-esMX: Transfigurar Ayudante
+## Notes-esES: Asistente de transfiguración
+## Notes-esMX: Asistente de transfiguración
 ## Notes-ruRU: трансмогрификация помощником
 ## Notes-koKR: 형상변환 조교
 ## Notes-zhCN: 物品幻化系统 助理
