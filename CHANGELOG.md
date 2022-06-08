@@ -1,3 +1,8 @@
+**3.9.7**
+
+- Update for game version 9.2.5
+- Update Spanish localization.
+
 **3.9.6**
 
 - Fixed error on equipping items.
