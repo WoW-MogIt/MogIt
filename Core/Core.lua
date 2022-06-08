@@ -488,36 +488,30 @@ function mog:TRANSMOG_SEARCH_UPDATED()
 	local GetAppearanceSources = C_TransmogCollection.GetAppearanceSources
 	local GetAppearanceSourceDrops = C_TransmogCollection.GetAppearanceSourceDrops
 	local bor = bit.bor
-	
-	for i = Enum.TransmogCollectionTypeMeta.MinValue, Enum.TransmogCollectionTypeMeta.MaxValue do
-		local name, isWeapon, canEnchant, canMainHand, canOffHand = C_TransmogCollection.GetCategoryInfo(i)
+
+	for categoryType = Enum.TransmogCollectionTypeMeta.MinValue, Enum.TransmogCollectionTypeMeta.MaxValue do
+		local name, isWeapon, canEnchant, canMainHand, canOffHand = C_TransmogCollection.GetCategoryInfo(categoryType)
 		if name then
-			name = SLOTS[i]
+			name = SLOTS[categoryType]
 			local db = db
 			if isWeapon then
 				mog.relevantCategories[name] = true
 			end
-			if SLOT_MODULES[i] then
-				db = _G["MogIt_"..SLOT_MODULES[i].."DB"]
+			if SLOT_MODULES[categoryType] then
+				db = _G["MogIt_"..SLOT_MODULES[categoryType].."DB"]
 			else
 				db = ArmorDB
 			end
 			db[name] = db[name] or {}
-			-- required to include all artifacts
-			local exclusionCategory
-			if canMainHand then
-				exclusionCategory = 2
-			elseif canOffHand then
-				exclusionCategory = 1
-			end
-			for i, appearance in ipairs(C_TransmogCollection.GetCategoryAppearances(i, exclusionCategory)) do
+			local transmogLocation = TransmogUtil.GetTransmogLocation(1, Enum.TransmogType.Appearance, Enum.TransmogModification.Main)
+			for i, appearance in ipairs(C_TransmogCollection.GetCategoryAppearances(categoryType, transmogLocation)) do
 				if not appearance.isHideVisual then
 					local v = db[name][appearance.visualID] or {}
 					db[name][appearance.visualID] = v
 					if v[1] and v[1].sourceID then
 						db[name][appearance.visualID] = {}
 					end
-					for i, source in ipairs(GetAppearanceSources(appearance.visualID)) do
+					for i, source in ipairs(GetAppearanceSources(appearance.visualID, categoryType, transmogLocation)) do
 						local s = v[source.sourceID] or {}
 						v[source.sourceID] = s
 						s.sourceType = source.sourceType
