@@ -349,21 +349,17 @@ function mog:ADDON_LOADED(addon)
 		for i, model in ipairs(WardrobeCollectionFrame.ItemsCollectionFrame.Models) do
 			model:SetScript("OnMouseDown", function(self, button)
 				if IsControlKeyDown() and button == "RightButton" then
-					local link
 					local itemsCollectionFrame = self:GetParent()
 					if not itemsCollectionFrame.transmogLocation:IsIllusion() then
 						local sources = CollectionWardrobeUtil.GetSortedAppearanceSources(self.visualInfo.visualID, itemsCollectionFrame:GetActiveCategory(), itemsCollectionFrame.transmogLocation)
 						if WardrobeCollectionFrame.tooltipSourceIndex then
 							local index = WardrobeUtils_GetValidIndexForNumSources(WardrobeCollectionFrame.tooltipSourceIndex, #sources)
-							link = select(6, C_TransmogCollection.GetAppearanceSourceInfo(sources[index].sourceID))
+							local link = select(6, C_TransmogCollection.GetAppearanceSourceInfo(sources[index].sourceID))
+							mog:AddToPreview(link)
+							return
 						end
 					else
-						local name;
-						name, link = C_TransmogCollection.GetIllusionStrings(self.visualInfo.sourceID);
-					end
-					if link then
-						mog:AddToPreview(link)
-						return
+						mog:SetPreviewEnchant(mog:GetPreview(mog.activePreview), self.visualInfo.sourceID);
 					end
 				end
 				self:OnMouseDown(button)

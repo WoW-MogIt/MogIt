@@ -199,6 +199,19 @@ local function setWeaponEnchant(self, preview, enchant)
 	end
 end
 
+function mog:SetPreviewEnchant(preview, enchant)
+	preview.data.weaponEnchant = enchant;
+	mog:UpdateScroll();
+	local mainHandItem = preview.slots["MainHandSlot"].item;
+	local offHandItem = preview.slots["SecondaryHandSlot"].item;
+	if mainHandItem then
+		preview.model:TryOn(format("item:%s:%d", mainHandItem:match("item:(%d+)"), preview.data.weaponEnchant), "MainHandSlot");
+	end
+	if offHandItem then
+		preview.model:TryOn(format("item:%s:%d", offHandItem:match("item:(%d+)"), preview.data.weaponEnchant), "SecondaryHandSlot");
+	end
+end
+
 local previewMenu = {
 	{
 		text = RACE,
@@ -303,7 +316,7 @@ local previewMenu = {
 local function previewInitialize(self, level)
 	if level == 1 then
 		currentPreview = self.parent;
-		
+
 		for i, info in ipairs(previewMenu) do
 			UIDropDownMenu_AddButton(info, level);
 		end
@@ -321,7 +334,7 @@ local function previewInitialize(self, level)
 			info.checked = (self.parent.data.weaponEnchant == nil);
 			info.keepShownOnClick = true;
 			self:AddButton(info, level);
-			
+
 			for i, enchantCategory in ipairs(mog.enchants) do
 				local info = UIDropDownMenu_CreateInfo();
 				info.text = enchantCategory.name;
@@ -373,14 +386,14 @@ end
 
 local function saveInitialize(self, level)
 	currentPreview = self.parent;
-	
+
 	local info = UIDropDownMenu_CreateInfo()
 	info.text = L["New set..."]
 	info.func = newSetOnClick
 	info.colorCode = GREEN_FONT_COLOR_CODE
 	info.notCheckable = true
 	self:AddButton(info, level)
-	
+
 	mog.wishlist:AddSetMenuItems(level, onClick)
 end
 --//
@@ -394,17 +407,17 @@ end
 
 local function loadInitialize(self, level)
 	currentPreview = self.parent;
-	
+
 	if level == 1 then
 		mog.wishlist:AddSetMenuItems(level, onClick)
-		
+
 		local info = UIDropDownMenu_CreateInfo()
 		info.text = L["Other profiles"]
 		info.value = "profiles"
 		info.hasArrow = true
 		info.notCheckable = true
 		self:AddButton(info, level)
-		
+
 		local info = UIDropDownMenu_CreateInfo()
 		info.text = "Wardrobe outfits"
 		info.value = "outfits"
@@ -484,16 +497,16 @@ end
 
 local function createMenuBar(parent)
 	local menuBar = mog.CreateMenuBar(parent)
-	
+
 	menuBar.preview = menuBar:CreateMenu(L["Preview"], previewInitialize);
 	menuBar.preview:SetPoint("TOPLEFT", parent, 62, -31);
 
 	menuBar.load = menuBar:CreateMenu(L["Load"], loadInitialize);
 	menuBar.load:SetPoint("LEFT", menuBar.preview, "RIGHT", 5, 0);
-	
+
 	menuBar.save = menuBar:CreateMenu(L["Save"], saveInitialize);
 	menuBar.save:SetPoint("LEFT", menuBar.load, "RIGHT", 5, 0);
-	
+
 	menuBar.help = menuBar:CreateMenu(L["Help"]);
 	menuBar.help:SetPoint("LEFT", menuBar.save, "RIGHT", 5, 0);
 	menuBar.help:SetScript("OnEnter",helpOnEnter);
@@ -535,24 +548,24 @@ function mog:CreatePreview()
 		tinsert(mog.previews, f);
 		return f;
 	end
-	
+
 	mog.previewNum = mog.previewNum + 1;
 	local id = mog.previewNum;
 	local f = CreateFrame("Frame", "MogItPreview"..id, mog.view, "ButtonFrameTemplate");
 	initPreview(f, id);
-	
+
 	f:SetToplevel(true);
 	f:SetClampedToScreen(true);
 	f:EnableMouse(true);
 	f:SetMovable(true);
 	f:SetResizable(true);
 	f:Raise();
-	
+
 	f.onCloseCallback = previewOnClose;
 	f.Bg = _G["MogItPreview"..id.."Bg"];
 	--f.Bg:SetVertexColor(0.8,0.3,0.8);
 	ButtonFrameTemplate_HidePortrait(f);
-	
+
 	f.resize = CreateFrame("Button", nil, f);
 	f.resize:SetSize(16, 16);
 	f.resize:SetPoint("BOTTOMRIGHT", -4, 3);
@@ -564,7 +577,7 @@ function mog:CreatePreview()
 	f.resize:SetNormalTexture([[Interface\ChatFrame\UI-ChatIM-SizeGrabber-Up]]);
 	f.resize:SetPushedTexture([[Interface\ChatFrame\UI-ChatIM-SizeGrabber-Down]])
 	f.resize:SetHighlightTexture([[Interface\ChatFrame\UI-ChatIM-SizeGrabber-Highlight]])
-	
+
 	f.slots = {};
 	for i, slotIndex in ipairs(mog.slots) do
 		local slot = CreateFrame("ItemButton", nil, f);
@@ -587,7 +600,7 @@ function mog:CreatePreview()
 		f.slots[slotIndex] = slot;
 		slotTexture(f, slotIndex);
 	end
-	
+
 	f.model = mog:CreateModelFrame(f);
 	f.model.type = "preview";
 	f.model:Show();
@@ -595,22 +608,22 @@ function mog:CreatePreview()
 	f.model:SetScript("OnMouseWheel", modelOnMouseWheel);
 	f.model:SetPoint("TOPLEFT", f.Inset, "TOPLEFT", 49, -8);
 	f.model:SetPoint("BOTTOMRIGHT", f.Inset, "BOTTOMRIGHT", -49, 8);
-	
+
 	f.activate = CreateFrame("Button", "MogItPreview"..id.."Activate", f, "MagicButtonTemplate");
 	f.activate:SetText(L["Activate"]);
 	f.activate:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", 5, 5);
 	f.activate:SetWidth(100);
 	f.activate:SetScript("OnClick", previewActivate);
-	
+
 	f:SetScript("OnMouseDown", f.StartMoving);
 	f:SetScript("OnMouseUp", stopMovingOrSizing);
-	
+
 	createMenuBar(f);
 	mog:ActivatePreview(f);
-	
+
 	-- child frames occasionally appears behind the parent for whatever reason, so we raise them here
 	--raiseAll(f, f:GetChildren())
-	
+
 	tinsert(mog.previews, f);
 	return f;
 end
@@ -733,9 +746,9 @@ local playerClass = select(2, UnitClass("player"));
 
 function mog.view.AddItem(item, preview, forceSlot, setItem)
 	if not (item and preview) then return end;
-	
+
 	item = mog:NormaliseItemString(item);
-	
+
 	local itemInfo = mog:GetItemInfo(item, "PreviewAddItem");
 	if not itemInfo then
 		tinsert(doCache, {
@@ -747,7 +760,7 @@ function mog.view.AddItem(item, preview, forceSlot, setItem)
 		return;
 	end
 	local invType = itemInfo.invType;
-	
+
 	local slot = mog:GetSlot(invType);
 	if type(forceSlot) == "string" then
 		slot = forceSlot;
@@ -760,14 +773,14 @@ function mog.view.AddItem(item, preview, forceSlot, setItem)
 					invType = "INVTYPE_WEAPON";
 				end
 			end
-			
+
 			if invType == "INVTYPE_WEAPON" then
 				-- put one handed weapons in the off hand if: main hand is occupied, off hand is free and a two handed weapon isn't equipped
 				if preview.slots["MainHandSlot"].item and not preview.slots["SecondaryHandSlot"].item and not preview.data.twohand then
 					slot = "SecondaryHandSlot";
 				end
 			end
-			
+
 			if invType == "INVTYPE_2HWEAPON" or invType == "INVTYPE_RANGED" or (invType == "INVTYPE_RANGEDRIGHT" and itemInfo.subType ~= LBI["Wands"]) then
 				-- if any two handed weapon is being equipped, first clear up both hands
 				mog.view.DelItem("MainHandSlot", preview);
@@ -782,7 +795,7 @@ function mog.view.AddItem(item, preview, forceSlot, setItem)
 				end
 			end
 		end
-		
+
 		if item ~= preview.slots[slot].item then
 			local history = preview.slots[slot].history
 			for i, v in ipairs(history) do
@@ -837,7 +850,7 @@ end
 function mog:AddToPreview(item, preview, title)
 	if not item then return end;
 	preview = mog:GetPreview(preview or mog.activePreview);
-	
+
 	ShowUIPanel(mog.view);
 	if type(item) == "table" then
 		mog.view:Undress(preview);
@@ -851,11 +864,11 @@ function mog:AddToPreview(item, preview, title)
 	else
 		mog.view.AddItem(item, preview);
 	end
-	
+
 	if mog.db.profile.gridDress == "preview" and mog.activePreview == preview then
 		mog:UpdateScroll();
 	end
-	
+
 	return preview;
 end
 
@@ -880,7 +893,7 @@ function mog:PreviewFromOutfit(preview, appearanceSources, mainHandEnchant, offH
 	appearanceSources["SecondaryHandSlot"] = select(6, C_TransmogCollection.GetAppearanceSourceInfo(appearanceSources[secondaryHandSlotID].appearanceID));
 	appearanceSources[mainHandSlotID] = nil;
 	appearanceSources[secondaryHandSlotID] = nil;
-	
+
 	mog:AddToPreview(appearanceSources, preview);
 end
 --//
@@ -889,9 +902,9 @@ end
 --// Hooks
 if not ModifiedItemClickHandlers then
 	ModifiedItemClickHandlers = {};
-	
+
 	local origHandleModifiedItemClick = HandleModifiedItemClick;
-	
+
 	function HandleModifiedItemClick(link)
 		if not link then
 			return false;
@@ -965,7 +978,7 @@ local function hookInspectUI()
 		_G["Inspect"..v]:RegisterForClicks("AnyUp");
 		_G["Inspect"..v]:SetScript("OnClick", onClick);
 	end
-	
+
 	InspectPaperDollFrame.ViewButton:RegisterForClicks("LeftButtonUp", "RightButtonUp");
 	InspectPaperDollFrame.ViewButton:SetScript("OnClick", function(self, button)
 		if IsControlKeyDown() and button == "RightButton" then
@@ -974,7 +987,7 @@ local function hookInspectUI()
 			InspectPaperDollViewButton_OnClick(self);
 		end
 	end);
-	
+
 	hookInspectUI = nil;
 end
 
@@ -998,7 +1011,7 @@ else
 			for i, button in ipairs(EncounterJournal.encounter.info.lootScroll.buttons) do
 				button:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 			end
-			
+
 			-- removed in BFA, to return??
 			-- local LegendariesFrame = EncounterJournal.LootJournal.LegendariesFrame
 			-- for i, button in ipairs(LegendariesFrame.buttons) do
