@@ -94,7 +94,7 @@ local function stopMovingOrSizing(self)
 end
 mog.frame:SetScript("OnMouseUp", stopMovingOrSizing);
 mog.frame:SetScript("OnHide", stopMovingOrSizing);
-tinsert(UISpecialFrames,"MogItFrame")
+tinsert(UISpecialFrames,"MogItFrame");
 
 mog.frame:SetTitle("MogIt");
 mog.frame:GetTitleText():SetPoint("RIGHT",mog.frame,"RIGHT",-28,0);
@@ -108,7 +108,7 @@ mog.frame.resize:SetPoint("BOTTOMRIGHT",-4,3);
 mog.frame.resize:SetHitRectInsets(0, -4, 0, -3)
 mog.frame.resize:SetScript("OnMouseDown", function(self)
 	if mog.frame.SetResizeBounds then
-		mog.frame:SetResizeBounds(510, 350, GetScreenWidth(), GetScreenHeight())
+		mog.frame:SetResizeBounds(510, 350, GetScreenWidth(), GetScreenHeight());
 	else
 		mog.frame:SetMinResize(510,350);
 		mog.frame:SetMaxResize(GetScreenWidth(), GetScreenHeight());

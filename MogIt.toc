@@ -1,7 +1,7 @@
 ﻿## Interface: 100000
 ## Title: MogIt
 ## Author: Aelobin (The Maelstrom EU) & Lombra (Defias Brotherhood EU)
-## Version: v3.9.8
+## Version: @project-version@
 ## SavedVariables: MogItDB, MogItWishlist
 ## Notes: Transmogrification Assistant
 ## Notes-frFR: Transmogrification Assistante

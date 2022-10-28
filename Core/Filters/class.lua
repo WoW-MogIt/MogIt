@@ -90,7 +90,6 @@ function f.dd.initialize(self)
 			info.tCoordTop = coords[k][3];
 			info.tCoordBottom = coords[k][4];
 			UIDropDownMenu_AddButton(info);
-
 		end
 	end
 end

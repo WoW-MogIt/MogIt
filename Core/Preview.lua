@@ -58,7 +58,7 @@ end
 local function resizeOnMouseDown(self)
 	local f = self:GetParent();
 	if f.SetResizeBounds then
-		f:SetResizeBounds(335, 385, GetScreenWidth(), GetScreenHeight())
+		f:SetResizeBounds(335, 385, GetScreenWidth(), GetScreenHeight());
 	else
 		f:SetMinResize(335,385);
 		f:SetMaxResize(GetScreenWidth(), GetScreenHeight());
@@ -870,7 +870,7 @@ function mog:PreviewFromOutfit(preview, appearanceSources, mainHandEnchant, offH
 	local secondaryHandSlotID = GetInventorySlotInfo("SECONDARYHANDSLOT");
 	for i, source in ipairs(appearanceSources) do
 		if source ~= NO_TRANSMOG_SOURCE_ID and i ~= mainHandSlotID and i ~= secondaryHandSlotID then
-			local _, _, _, _, _, link = C_TransmogCollection.GetAppearanceSourceInfo(source.appearanceID)
+			local _, _, _, _, _, link = C_TransmogCollection.GetAppearanceSourceInfo(source.appearanceID);
 			appearanceSources[i] = link;
 		end
 	end
