@@ -361,23 +361,22 @@ function mog:ADDON_LOADED(addon)
 				self:OnMouseDown(button)
 			end)
 		end
-		local orig_OnMouseUp = WardrobeCollectionFrame.SetsCollectionFrame.ScrollFrame.buttons[1]:GetScript("OnMouseUp")
-		for i, button in ipairs(WardrobeCollectionFrame.SetsCollectionFrame.ScrollFrame.buttons) do
-			button:SetScript("OnMouseUp", function(self, button)
-				if IsControlKeyDown() and button == "RightButton" then
+		ScrollUtil.AddInitializedFrameCallback(WardrobeCollectionFrame.SetsCollectionFrame.ListContainer.ScrollBox, function(self, button, elementData)
+			local orig_OnClick = button:GetScript("OnClick");
+			button:SetScript("OnClick", function(self, button2)
+				if IsControlKeyDown() and button2 == "RightButton" then
 					local preview = mog:GetPreview()
 					for source in pairs(C_TransmogSets.GetSetSources(self.setID)) do
 						mog:AddToPreview(select(6, C_TransmogCollection.GetAppearanceSourceInfo(source)), preview)
 					end
 					return
 				end
-				orig_OnMouseUp(self, button)
-			end)
-		end
+				orig_OnClick(self, button2);
+			end);
+		end, self, false);
 		-- WardrobeCollectionFrame.SetsCollectionFrame.DetailsFrame.itemFramesPool.resetterFunc = function(self, obj) obj:RegisterForDrag("LeftButton", "RightButton") end
 	end
 end
-
 
 local SLOTS = {
 	[Enum.TransmogCollectionType["Head"]] = "Head",

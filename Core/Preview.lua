@@ -57,8 +57,12 @@ end
 
 local function resizeOnMouseDown(self)
 	local f = self:GetParent();
-	f:SetMinResize(335,385);
-	f:SetMaxResize(GetScreenWidth(),GetScreenHeight());
+	if f.SetResizeBounds then
+		f:SetResizeBounds(335, 385, GetScreenWidth(), GetScreenHeight())
+	else
+		f:SetMinResize(335,385);
+		f:SetMaxResize(GetScreenWidth(), GetScreenHeight());
+	end
 	f:StartSizing();
 end
 
@@ -424,16 +428,16 @@ local function loadInitialize(self, level)
 			if #C_TransmogCollection.GetOutfits() > 0 then
 				for i, outfit in ipairs(C_TransmogCollection.GetOutfits()) do
 					local info = UIDropDownMenu_CreateInfo()
-					info.text = outfit.name
+					info.text = C_TransmogCollection.GetOutfitInfo(outfit)
 					info.notCheckable = true
 					info.func = function(self, outfitID)
-						mog:PreviewFromOutfit(currentPreview, C_TransmogCollection.GetOutfitSources(outfitID))
-						local title = C_TransmogCollection.GetOutfitName(outfitID)
-						currentPreview.TitleText:SetText(title)
+						mog:PreviewFromOutfit(currentPreview, C_TransmogCollection.GetOutfitItemTransmogInfoList(outfitID))
+						local title = C_TransmogCollection.GetOutfitInfo(outfitID)
+						currentPreview:SetTitle(title)
 						currentPreview.data.title = title
 						CloseDropDownMenus()
 					end
-					info.arg1 = outfit.outfitID
+					info.arg1 = outfit
 					self:AddButton(info, level)
 				end
 			else
@@ -505,7 +509,7 @@ local function initPreview(frame, id)
 	frame:ClearAllPoints();
 	frame:SetPoint(props.point, props.x, props.y);
 	frame:SetSize(props.w, props.h);
-	frame.TitleText:SetText(L["Preview %d"]:format(id));
+	frame:SetTitle(L["Preview %d"]:format(id));
 	frame.data = {
 		displayRace = mog.playerRace,
 		displayGender = mog.playerGender,
@@ -605,7 +609,7 @@ function mog:CreatePreview()
 	mog:ActivatePreview(f);
 	
 	-- child frames occasionally appears behind the parent for whatever reason, so we raise them here
-	raiseAll(f, f:GetChildren())
+	--raiseAll(f, f:GetChildren())
 	
 	tinsert(mog.previews, f);
 	return f;
@@ -804,7 +808,7 @@ function mog.view.AddItem(item, preview, forceSlot, setItem)
 			end
 			preview.model:TryOn(item, slot);
 			if preview.data.title and not setItem then
-				preview.TitleText:SetText("*"..preview.data.title);
+				preview:SetTitle("*"..preview.data.title);
 			end
 		end
 	end
@@ -820,7 +824,7 @@ function mog.view.DelItem(slot, preview)
 	preview.slots[slot].item = nil;
 	slotTexture(preview,slot);
 	if preview.data.title then
-		preview.TitleText:SetText("*"..preview.data.title);
+		preview:SetTitle("*"..preview.data.title);
 	end
 	if preview:IsVisible() then
 		if invType == "INVTYPE_RANGED" then
@@ -841,7 +845,7 @@ function mog:AddToPreview(item, preview, title)
 			mog.view.AddItem(v, preview, k, true);
 		end
 		if title then
-			preview.TitleText:SetText(title);
+			preview:SetTitle(title);
 			preview.data.title = title;
 		end
 	else
@@ -864,16 +868,16 @@ end
 function mog:PreviewFromOutfit(preview, appearanceSources, mainHandEnchant, offHandEnchant)
 	local mainHandSlotID = GetInventorySlotInfo("MAINHANDSLOT");
 	local secondaryHandSlotID = GetInventorySlotInfo("SECONDARYHANDSLOT");
-	for i, source in pairs(appearanceSources) do
+	for i, source in ipairs(appearanceSources) do
 		if source ~= NO_TRANSMOG_SOURCE_ID and i ~= mainHandSlotID and i ~= secondaryHandSlotID then
-			local _, _, _, _, _, link = C_TransmogCollection.GetAppearanceSourceInfo(source);
+			local _, _, _, _, _, link = C_TransmogCollection.GetAppearanceSourceInfo(source.appearanceID)
 			appearanceSources[i] = link;
 		end
 	end
 
 	-- remap handheld items into string IDs instead as numerical IDs are not supported
-	appearanceSources["MainHandSlot"] = select(6, C_TransmogCollection.GetAppearanceSourceInfo(appearanceSources[mainHandSlotID]));
-	appearanceSources["SecondaryHandSlot"] = select(6, C_TransmogCollection.GetAppearanceSourceInfo(appearanceSources[secondaryHandSlotID]));
+	appearanceSources["MainHandSlot"] = select(6, C_TransmogCollection.GetAppearanceSourceInfo(appearanceSources[mainHandSlotID].appearanceID));
+	appearanceSources["SecondaryHandSlot"] = select(6, C_TransmogCollection.GetAppearanceSourceInfo(appearanceSources[secondaryHandSlotID].appearanceID));
 	appearanceSources[mainHandSlotID] = nil;
 	appearanceSources[secondaryHandSlotID] = nil;
 	

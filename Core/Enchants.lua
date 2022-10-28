@@ -371,6 +371,29 @@ MogIt.enchants = {
 	},
 	{
 		{
+			id = 6223,
+			name = "Lightless Force"
+		},
+		{
+			id = 6226,
+			name = "Eternal Grace"
+		},
+		{
+			id = 6227,
+			name = "Ascended Vigor"
+		},
+		{
+			id = 6228,
+			name = "Sinful Revelation"
+		},
+		{
+			id = 6229,
+			name = "Celestial Guidance"
+		},
+		name = L["Shadowlands"],
+	},
+	{
+		{
 			id = 3369,
 			name = "Rune of Cinderglacier",
 		},

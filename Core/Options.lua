@@ -1,4 +1,4 @@
-﻿local MogIt,mog = ...;
+local MogIt,mog = ...;
 local L = mog.L;
 
 local LBR = LibStub("LibBabble-Race-3.0"):GetUnstrictLookupTable();
