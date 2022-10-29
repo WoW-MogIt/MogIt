@@ -182,7 +182,9 @@ end
 
 local function setWeaponEnchant(self, preview, enchant)
 	preview.data.weaponEnchant = enchant;
-	self.owner:Rebuild(2);
+	if self.owner then
+		self.owner:Rebuild(2);
+	end
 	mog:UpdateScroll();
 	local mainHandItem = preview.slots["MainHandSlot"].item;
 	local offHandItem = preview.slots["SecondaryHandSlot"].item;
@@ -195,16 +197,7 @@ local function setWeaponEnchant(self, preview, enchant)
 end
 
 function mog:SetPreviewEnchant(preview, enchant)
-	preview.data.weaponEnchant = enchant;
-	mog:UpdateScroll();
-	local mainHandItem = preview.slots["MainHandSlot"].item;
-	local offHandItem = preview.slots["SecondaryHandSlot"].item;
-	if mainHandItem then
-		preview.model:TryOn(format("item:%s:%d", mainHandItem:match("item:(%d+)"), preview.data.weaponEnchant), "MainHandSlot");
-	end
-	if offHandItem then
-		preview.model:TryOn(format("item:%s:%d", offHandItem:match("item:(%d+)"), preview.data.weaponEnchant), "SecondaryHandSlot");
-	end
+	setWeaponEnchant(preview, preview, enchant)
 end
 
 local previewMenu = {
