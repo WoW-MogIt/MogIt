@@ -965,7 +965,7 @@ local function hookInspectUI()
 	InspectPaperDollFrame.ViewButton:RegisterForClicks("LeftButtonUp", "RightButtonUp");
 	InspectPaperDollFrame.ViewButton:SetScript("OnClick", function(self, button)
 		if IsControlKeyDown() and button == "RightButton" then
-			mog:PreviewFromOutfit(mog:GetPreview(), C_TransmogCollection.GetInspectSources());
+			mog:PreviewFromOutfit(mog:GetPreview(), C_TransmogCollection.GetInspectItemTransmogInfoList());
 		else
 			InspectPaperDollViewButton_OnClick(self);
 		end
