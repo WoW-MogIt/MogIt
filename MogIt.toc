@@ -15,8 +15,7 @@
 ## Notes-ptBR: Assistente Transmogrification
 ## Notes-itIT: Transmogrification Assistant
 ## X-Category: Roleplay & Transmogrification
-## X-Website: http://www.curse.com/addons/wow/mogit
-## X-Email: aelobin@gmail.com
+## X-Website: https://www.curseforge.com/wow/addons/mogit
 ## X-Localizations: enUS, frFR, deDE, esES, esMX, ruRU, koKR, zhCN, zhTW, ptBR, itIT
 
 Libs\Embeds.xml
