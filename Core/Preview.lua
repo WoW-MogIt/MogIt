@@ -57,12 +57,7 @@ end
 
 local function resizeOnMouseDown(self)
 	local f = self:GetParent();
-	if f.SetResizeBounds then
-		f:SetResizeBounds(335, 385, GetScreenWidth(), GetScreenHeight());
-	else
-		f:SetMinResize(335,385);
-		f:SetMaxResize(GetScreenWidth(), GetScreenHeight());
-	end
+	f:SetResizeBounds(335, 385, GetScreenWidth(), GetScreenHeight());
 	f:StartSizing();
 end
 

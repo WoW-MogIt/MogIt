@@ -107,12 +107,7 @@ mog.frame.resize:SetSize(16,16);
 mog.frame.resize:SetPoint("BOTTOMRIGHT",-4,3);
 mog.frame.resize:SetHitRectInsets(0, -4, 0, -3)
 mog.frame.resize:SetScript("OnMouseDown", function(self)
-	if mog.frame.SetResizeBounds then
-		mog.frame:SetResizeBounds(510, 350, GetScreenWidth(), GetScreenHeight());
-	else
-		mog.frame:SetMinResize(510,350);
-		mog.frame:SetMaxResize(GetScreenWidth(), GetScreenHeight());
-	end
+	mog.frame:SetResizeBounds(510, 350, GetScreenWidth(), GetScreenHeight());
 	mog.frame:StartSizing();
 end);
 local function stopMovingOrSizing()
