@@ -366,18 +366,21 @@ function mog:ADDON_LOADED(addon)
 			end)
 		end
 		ScrollUtil.AddInitializedFrameCallback(WardrobeCollectionFrame.SetsCollectionFrame.ListContainer.ScrollBox, function(self, button, elementData)
-			local orig_OnClick = button:GetScript("OnClick");
-			button:SetScript("OnClick", function(self, button2)
-				if IsControlKeyDown() and button2 == "RightButton" then
-					local preview = mog:GetPreview()
-					for source in pairs(C_TransmogSets.GetSetSources(self.setID)) do
-						mog:AddToPreview(select(6, C_TransmogCollection.GetAppearanceSourceInfo(source)), preview)
+			if not button.mogitInit then
+				local orig_OnClick = button:GetScript("OnClick");
+				button:SetScript("OnClick", function(self, button2)
+					if IsControlKeyDown() and button2 == "RightButton" then
+						local preview = mog:GetPreview();
+						for source in pairs(C_TransmogSets.GetSetSources(self.setID)) do
+							mog:AddToPreview(select(6, C_TransmogCollection.GetAppearanceSourceInfo(source)), preview);
+						end
+						return
 					end
-					return
-				end
-				orig_OnClick(self, button2);
-			end);
-		end, self, false);
+					orig_OnClick(self, button2);
+				end);
+				button.mogitInit = true;
+			end
+		end, self, true);
 		-- WardrobeCollectionFrame.SetsCollectionFrame.DetailsFrame.itemFramesPool.resetterFunc = function(self, obj) obj:RegisterForDrag("LeftButton", "RightButton") end
 	end
 end
