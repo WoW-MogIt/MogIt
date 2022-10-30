@@ -610,7 +610,10 @@ function mog:CreatePreview()
 	mog:ActivatePreview(f);
 
 	-- child frames occasionally appears behind the parent for whatever reason, so we raise them here
-	--raiseAll(f, f:GetChildren())
+	raiseAll(f, f:GetChildren());
+	-- above function doesn't raise the close button
+	local newLevel = f.CloseButton:GetFrameLevel() + 1;
+	f.CloseButton:SetFrameLevel(newLevel);
 
 	tinsert(mog.previews, f);
 	return f;
