@@ -1,3 +1,8 @@
+**3.9.8**
+
+- Updated for WoW 10.0.
+- Added bonus IDs from Battle for Azeroth and Shadowlands, allowing previewing of correct item variations for certain sets.
+
 **3.9.7**
 
 - Update for game version 9.2.5
