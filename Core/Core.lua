@@ -349,35 +349,41 @@ function mog:ADDON_LOADED(addon)
 		for i, model in ipairs(WardrobeCollectionFrame.ItemsCollectionFrame.Models) do
 			model:SetScript("OnMouseDown", function(self, button)
 				if IsControlKeyDown() and button == "RightButton" then
-					local link
-					local sources = WardrobeCollectionFrame_GetSortedAppearanceSources(self.visualInfo.visualID)
-					if WardrobeCollectionFrame.tooltipSourceIndex then
-						local index = WardrobeUtils_GetValidIndexForNumSources(WardrobeCollectionFrame.tooltipSourceIndex, #sources)
-						link = select(6, C_TransmogCollection.GetAppearanceSourceInfo(sources[index].sourceID))
+					local itemsCollectionFrame = self:GetParent()
+					if not itemsCollectionFrame.transmogLocation:IsIllusion() then
+						local sources = CollectionWardrobeUtil.GetSortedAppearanceSources(self.visualInfo.visualID, itemsCollectionFrame:GetActiveCategory(), itemsCollectionFrame.transmogLocation)
+						if WardrobeCollectionFrame.tooltipSourceIndex then
+							local index = WardrobeUtils_GetValidIndexForNumSources(WardrobeCollectionFrame.tooltipSourceIndex, #sources)
+							local link = select(6, C_TransmogCollection.GetAppearanceSourceInfo(sources[index].sourceID))
+							mog:AddToPreview(link)
+							return
+						end
+					else
+						mog:SetPreviewEnchant(mog:GetPreview(mog.activePreview), self.visualInfo.sourceID);
 					end
-					mog:AddToPreview(link)
-					return
 				end
 				self:OnMouseDown(button)
 			end)
 		end
-		local orig_OnMouseUp = WardrobeCollectionFrame.SetsCollectionFrame.ScrollFrame.buttons[1]:GetScript("OnMouseUp")
-		for i, button in ipairs(WardrobeCollectionFrame.SetsCollectionFrame.ScrollFrame.buttons) do
-			button:SetScript("OnMouseUp", function(self, button)
-				if IsControlKeyDown() and button == "RightButton" then
-					local preview = mog:GetPreview()
-					for source in pairs(C_TransmogSets.GetSetSources(self.setID)) do
-						mog:AddToPreview(select(6, C_TransmogCollection.GetAppearanceSourceInfo(source)), preview)
+		ScrollUtil.AddInitializedFrameCallback(WardrobeCollectionFrame.SetsCollectionFrame.ListContainer.ScrollBox, function(self, button, elementData)
+			if not button.mogitInit then
+				local orig_OnClick = button:GetScript("OnClick");
+				button:SetScript("OnClick", function(self, button2)
+					if IsControlKeyDown() and button2 == "RightButton" then
+						local preview = mog:GetPreview();
+						for source in pairs(C_TransmogSets.GetSetSources(self.setID)) do
+							mog:AddToPreview(select(6, C_TransmogCollection.GetAppearanceSourceInfo(source)), preview);
+						end
+						return
 					end
-					return
-				end
-				orig_OnMouseUp(self, button)
-			end)
-		end
+					orig_OnClick(self, button2);
+				end);
+				button.mogitInit = true;
+			end
+		end, self, true);
 		-- WardrobeCollectionFrame.SetsCollectionFrame.DetailsFrame.itemFramesPool.resetterFunc = function(self, obj) obj:RegisterForDrag("LeftButton", "RightButton") end
 	end
 end
-
 
 local SLOTS = {
 	[Enum.TransmogCollectionType["Head"]] = "Head",
@@ -439,7 +445,7 @@ mog.relevantCategories = {}
 
 function mog:TRANSMOG_SEARCH_UPDATED()
 	-- local t = debugprofilestop()
-	
+
 	local ARMOR_CLASSES = {
 		WARRIOR = "Plate",
 		DEATHKNIGHT = "Plate",
@@ -454,37 +460,37 @@ function mog:TRANSMOG_SEARCH_UPDATED()
 		HUNTER = "Mail",
 		DEMONHUNTER = "Leather",
 	}
-	
+
 	local FACTIONS = {
 		["Alliance"] = 1,
 		["Horde"] = 2,
 		-- hack for neutral pandaren, the items they can see are for both factions
 		["Neutral"] = 3,
 	}
-	
+
 	local _, playerClass = UnitClass("player")
 	local faction = UnitFactionGroup("player")
-	
+
 	local armorClass = ARMOR_CLASSES[playerClass]
-	
+
 	mog.relevantCategories[armorClass] = true
-	
+
 	LoadAddOn("MogIt_"..armorClass)
 	LoadAddOn("MogIt_Other")
 	LoadAddOn("MogIt_OneHanded")
 	LoadAddOn("MogIt_TwoHanded")
 	LoadAddOn("MogIt_Ranged")
 	LoadAddOn("MogIt_Artifact")
-	
+
 	local ArmorDB = _G["MogIt_"..armorClass.."DB"] or {}
 	MogIt_OtherDB = MogIt_OtherDB or {}
 	MogIt_OneHandedDB = MogIt_OneHandedDB or {}
 	MogIt_TwoHandedDB = MogIt_TwoHandedDB or {}
 	MogIt_RangedDB = MogIt_RangedDB or {}
 	MogIt_ArtifactDB = MogIt_ArtifactDB or {}
-	
+
 	_G["MogIt_"..armorClass.."DB"] = ArmorDB
-	
+
 	local GetAppearanceSources = C_TransmogCollection.GetAppearanceSources
 	local GetAppearanceSourceDrops = C_TransmogCollection.GetAppearanceSourceDrops
 	local bor = bit.bor
@@ -523,16 +529,16 @@ function mog:TRANSMOG_SEARCH_UPDATED()
 			end
 		end
 	end
-	
+
 	self:LoadDB("MogIt_"..armorClass)
 	self:LoadDB("MogIt_Other")
 	self:LoadDB("MogIt_OneHanded")
 	self:LoadDB("MogIt_TwoHanded")
 	self:LoadDB("MogIt_Ranged")
 	self:LoadDB("MogIt_Artifact")
-	
+
 	self.frame:UnregisterEvent("TRANSMOG_SEARCH_UPDATED")
-	
+
 	-- print(format("MogIt modules loaded in %d ms.", debugprofilestop() - t))
 end
 
@@ -547,13 +553,13 @@ function mog:LoadDB(addon)
 		[5] = 6,
 		[6] = 5,
 	}
-	
+
 	local module = mog:GetModule(addon)
 	local moduleDB = _G[addon.."DB"]
-	
+
 	-- won't exist if module was never loaded
 	if not moduleDB then return end
-	
+
 	for slot, appearances in pairs(moduleDB) do
 		local list = {}
 		module.slots[slot] = {
@@ -576,7 +582,7 @@ function mog:LoadDB(addon)
 			end
 		end
 	end
-	
+
 	for i = 1, Enum.TransmogCollectionTypeMeta.NumValues do
 		local slotID = SLOTS[i]
 		if moduleDB[slotID] then
@@ -603,14 +609,14 @@ function mog:PLAYER_LOGIN()
 		end
 	end)
 	]]
-	
+
 	for k, slot in pairs(SLOTS) do
 		local name = C_TransmogCollection.GetCategoryInfo(k)
 		if name then
 			mog.db.profile.slotLabels[slot] = name
 		end
 	end
-	
+
 	mog:LoadSettings();
 	self.frame:SetScript("OnSizeChanged", function(self, width, height)
 		mog.db.profile.gridWidth = width;
@@ -655,11 +661,11 @@ mog.data = {};
 
 function mog:AddData(data, id, key, value)
 	if not (data and id and key) then return end;
-	
+
 	--if data == "item" then
 	--	id = mog:ItemToString(id);
 	--end
-	
+
 	if not mog.data[data] then
 		mog.data[data] = {};
 	end

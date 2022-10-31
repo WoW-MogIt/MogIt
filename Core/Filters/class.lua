@@ -27,9 +27,11 @@ function f.dd.SelectAll(self)
 	num = 0;
 	class = 0;
 	for k,v in pairs(LOCALIZED_CLASS_NAMES_MALE) do
-		selected[k] = all;
-		num = num + (all and 1 or 0);
-		class = class + (all and L.classBits[k] or 0);
+		if k ~= "Adventurer" then
+			selected[k] = all;
+			num = num + (all and 1 or 0);
+			class = class + (all and L.classBits[k] or 0);
+		end
 	end
 	all = not all;
 	UIDropDownMenu_SetText(f.dd,L["%d selected"]:format(num));
@@ -41,9 +43,11 @@ function f:SelectAll(self)
 	num = 0;
 	class = 0;
 	for k,v in pairs(LOCALIZED_CLASS_NAMES_MALE) do
-		selected[k] = all;
-		num = num + 1;
-		class = class + L.classBits[k];
+		if k ~= "Adventurer" then
+			selected[k] = all;
+			num = num + 1;
+			class = class + L.classBits[k];
+		end
 	end
 	all = false;
 	UIDropDownMenu_SetText(f.dd,L["%d selected"]:format(num));
@@ -71,20 +75,22 @@ function f.dd.initialize(self)
 	UIDropDownMenu_AddButton(info);
 	
 	for k,v in pairs(LOCALIZED_CLASS_NAMES_MALE) do
-		info = UIDropDownMenu_CreateInfo();
-		info.text =	v;
-		info.value = k;
-		info.colorCode = string.format("\124cff%.2x%.2x%.2x",colours[k].r*255,colours[k].g*255,colours[k].b*255);
-		info.func = f.dd.Tier1;
-		info.keepShownOnClick = true;
-		info.isNotRadio = true;
-		info.checked = selected[k];
-		info.icon = "Interface\\Glues\\CharacterCreate\\UI-CharacterCreate-Classes";
-		info.tCoordLeft = coords[k][1];
-		info.tCoordRight = coords[k][2];
-		info.tCoordTop = coords[k][3];
-		info.tCoordBottom = coords[k][4];
-		UIDropDownMenu_AddButton(info);
+		if k ~= "Adventurer" then
+			info = UIDropDownMenu_CreateInfo();
+			info.text =	v;
+			info.value = k;
+			info.colorCode = string.format("\124cff%.2x%.2x%.2x",colours[k].r*255,colours[k].g*255,colours[k].b*255);
+			info.func = f.dd.Tier1;
+			info.keepShownOnClick = true;
+			info.isNotRadio = true;
+			info.checked = selected[k];
+			info.icon = "Interface\\Glues\\CharacterCreate\\UI-CharacterCreate-Classes";
+			info.tCoordLeft = coords[k][1];
+			info.tCoordRight = coords[k][2];
+			info.tCoordTop = coords[k][3];
+			info.tCoordBottom = coords[k][4];
+			UIDropDownMenu_AddButton(info);
+		end
 	end
 end
 

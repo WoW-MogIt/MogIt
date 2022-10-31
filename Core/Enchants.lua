@@ -371,6 +371,80 @@ MogIt.enchants = {
 	},
 	{
 		{
+			id = 5946,
+			name = "Coastal Surge"
+		},
+		{
+			id = 6148,
+			name = "Force Multiplier"
+		},
+		{
+			id = 5950,
+			name = "Gale-Force Striking"
+		},
+		{
+			id = 6112,
+			name = "Machinist's Brilliance"
+		},
+		{
+			id = 5964,
+			name = "Masterful Navigation"
+		},
+		{
+			id = 6150,
+			name = "Naga Hide"
+		},
+		{
+			id = 6149,
+			name = "Oceanic Restoration"
+		},
+		{
+			id = 5963,
+			name = "Quick Navigation"
+		},
+		{
+			id = 5948,
+			name = "Siphoning"
+		},
+		{
+			id = 5966,
+			name = "Stalwart Navigation"
+		},
+		{
+			id = 5949,
+			name = "Torrent of Elements"
+		},
+		{
+			id = 5962,
+			name = "Versatile Navigation"
+		},
+		name = L["Battle for Azeroth"],
+	},
+	{
+		{
+			id = 6227,
+			name = "Ascended Vigor"
+		},
+		{
+			id = 6229,
+			name = "Celestial Guidance"
+		},
+		{
+			id = 6226,
+			name = "Eternal Grace"
+		},
+		{
+			id = 6223,
+			name = "Lightless Force"
+		},
+		{
+			id = 6228,
+			name = "Sinful Revelation"
+		},
+		name = L["Shadowlands"],
+	},
+	{
+		{
 			id = 3369,
 			name = "Rune of Cinderglacier",
 		},

@@ -96,10 +96,10 @@ mog.frame:SetScript("OnMouseUp", stopMovingOrSizing);
 mog.frame:SetScript("OnHide", stopMovingOrSizing);
 tinsert(UISpecialFrames,"MogItFrame");
 
-mog.frame.TitleText:SetText("MogIt");
-mog.frame.TitleText:SetPoint("RIGHT",mog.frame,"RIGHT",-28,0);
-mog.frame.portrait:SetTexture("Interface\\AddOns\\MogIt\\Images\\MogIt");
-mog.frame.portrait:SetTexCoord(0,106/128,0,105/128);
+mog.frame:SetTitle("MogIt");
+mog.frame:GetTitleText():SetPoint("RIGHT",mog.frame,"RIGHT",-28,0);
+mog.frame:SetPortraitTextureRaw("Interface\\AddOns\\MogIt\\Images\\MogIt");
+mog.frame:SetPortraitTexCoord(0,106/128,0,105/128);
 MogItFrameBg:SetVertexColor(0.8,0.3,0.8);
 
 mog.frame.resize = CreateFrame("Button",nil,mog.frame);
@@ -107,8 +107,7 @@ mog.frame.resize:SetSize(16,16);
 mog.frame.resize:SetPoint("BOTTOMRIGHT",-4,3);
 mog.frame.resize:SetHitRectInsets(0, -4, 0, -3)
 mog.frame.resize:SetScript("OnMouseDown", function(self)
-	mog.frame:SetMinResize(510,350);
-	mog.frame:SetMaxResize(GetScreenWidth(), GetScreenHeight());
+	mog.frame:SetResizeBounds(510, 350, GetScreenWidth(), GetScreenHeight());
 	mog.frame:StartSizing();
 end);
 local function stopMovingOrSizing()
@@ -158,7 +157,9 @@ function mog:CreateModelFrame(parent)
 	f.model:SetModelScale(2);
 	f.model:SetUnit("PLAYER");
 	f.model:SetPosition(0,0,0);
-	f.model:SetLight(true, false, 0, 0.8, -1, 1, 1, 1, 1, 0.3, 1, 1, 1);
+
+	local lightValues = { omnidirectional = false, point = CreateVector3D(0, 0.8, -1), ambientIntensity = 1, ambientColor = CreateColor(1, 1, 1), diffuseIntensity = 0.3, diffuseColor = CreateColor(1, 1, 1) };
+	f.model:SetLight(true, lightValues);
 	
 	f.bg = f:CreateTexture(nil,"BACKGROUND");
 	f.bg:SetAllPoints(f);
@@ -463,9 +464,12 @@ mog.scroll.down:SetScript("OnClick",function(self)
 	mog.scroll:update(nil,1);
 end);
 
-function mog.scroll.update(self, value, offset, onscroll)
+function mog.scroll:update(value, offset, onscroll)
 	local models = #mog.models;
 	local total = ceil(#mog.list/models);
+	if total == math.huge then
+		total = 1;
+	end
 	
 	if onscroll then
 		value = onscroll;
