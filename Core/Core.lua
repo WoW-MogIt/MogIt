@@ -459,6 +459,7 @@ function mog:TRANSMOG_SEARCH_UPDATED()
 		WARLOCK = "Cloth",
 		HUNTER = "Mail",
 		DEMONHUNTER = "Leather",
+		EVOKER = "Mail",
 	}
 
 	local FACTIONS = {
