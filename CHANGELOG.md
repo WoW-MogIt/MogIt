@@ -1,3 +1,8 @@
+**3.9.9**
+
+- Added support for the Evoker class.
+- Fixed tooltip error in tradeskill frame.
+
 **3.9.8**
 
 - Updated for WoW 10.0.

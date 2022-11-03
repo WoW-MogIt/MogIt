@@ -267,7 +267,7 @@ end);
 -- end);
 
 hooksecurefunc(GameTooltip, "SetRecipeReagentItem", function(self, recipeID, reagentIndex)
-	mog.tooltip:ShowItem(C_TradeSkillUI.GetRecipeReagentItemLink(recipeID, reagentIndex));
+	mog.tooltip:ShowItem(C_TradeSkillUI.GetRecipeFixedReagentItemLink(recipeID, reagentIndex));
 	GameTooltip:Show();
 end);
 --//
