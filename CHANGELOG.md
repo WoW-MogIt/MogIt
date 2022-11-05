@@ -2,6 +2,7 @@
 
 - Added support for the Evoker class.
 - Fixed tooltip error in tradeskill frame.
+- Fixed addon compatibility issue related to modified item clicks.
 
 **3.9.8**
 

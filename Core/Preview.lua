@@ -896,21 +896,21 @@ if not ModifiedItemClickHandlers then
 
 	local origHandleModifiedItemClick = HandleModifiedItemClick;
 
-	function HandleModifiedItemClick(link)
+	function HandleModifiedItemClick(link, itemLocation)
 		if not link then
 			return false;
 		end
 		for i, v in ipairs(ModifiedItemClickHandlers) do
-			if v(link) then
+			if v(link, itemLocation) then
 				return true;
 			end
 		end
-		return origHandleModifiedItemClick(link);
+		return origHandleModifiedItemClick(link, itemLocation);
 	end
 end
 
 -- hack to allow post hooking SetItemRef for previewing
-tinsert(ModifiedItemClickHandlers, function(link)
+tinsert(ModifiedItemClickHandlers, function(link, itemLocation)
 	local button = GetMouseButtonClicked()
 	if button then
 		if link and C_Item.IsDressableItemByID(link) then
