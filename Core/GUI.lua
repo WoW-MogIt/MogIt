@@ -963,7 +963,7 @@ mog.menu.preview:SetPoint("LEFT", mog.menu.catalogue, "RIGHT", 5, 0);
 
 --// Options Menu
 function mog:ToggleOptions()
-	InterfaceOptionsFrame_OpenToCategory(MogIt);
+	Settings.OpenToCategory(MogIt);
 end
 
 mog.menu.options = mog.menu:CreateMenu(L["Options"]);
