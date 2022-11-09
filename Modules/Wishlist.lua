@@ -474,7 +474,7 @@ do
 				Wishlist:AddItem(v, text, slot)
 			end
 			if data.previewFrame then
-				data.previewFrame.TitleText:SetText(text)
+				data.previewFrame:SetTitle(text)
 				data.previewFrame.data.title = text
 			end
 		end
@@ -553,7 +553,7 @@ StaticPopupDialogs["MOGIT_WISHLIST_OVERWRITE_SET"] = {
 			Wishlist:AddItem(v, setName, slot)
 		end
 		if data.previewFrame then
-			data.previewFrame.TitleText:SetText(setName)
+			data.previewFrame:SetTitle(setName)
 			data.previewFrame.data.title = setName
 		end
 		MogIt:BuildList(nil, "Wishlist")

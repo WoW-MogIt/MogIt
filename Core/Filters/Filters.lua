@@ -25,10 +25,10 @@ mog.filt:SetPoint("TOPLEFT",mog.frame,"TOPRIGHT");
 mog.filt:SetSize(200,300);
 mog.filt:SetClampedToScreen(true);
 mog.filt:EnableMouse(true);
+mog.filt:SetTitle(FILTERS);
 --MogItFiltersCloseButton:SetNormalTexture("Interface\\BUTTONS\\UI-Panel-HideButton-Up");
 --MogItFiltersCloseButton:SetPushedTexture("Interface\\BUTTONS\\UI-Panel-HideButton-Down");
 MogItFiltersBg:SetVertexColor(0.8,0.3,0.8);
-MogItFiltersTitleText:SetText(FILTERS);
 ButtonFrameTemplate_HidePortrait(mog.filt);
 
 mog.filt.results = mog.filt:CreateFontString(nil,"ARTWORK","GameFontNormal");
