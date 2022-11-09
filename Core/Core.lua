@@ -336,6 +336,8 @@ function mog:ADDON_LOADED(addon)
 		
 		SetCVar("missingTransmogSourceInItemTooltips", mog.db.profile.alwaysShowCollected)
 
+		mog.createOptions();
+
 		if mog.db.profile.loadModulesDefault then
 			mog:LoadBaseModules()
 		end

@@ -406,11 +406,3 @@ function mog.createOptions()
 	
 	mog.options = options;
 end
-
-local hook = CreateFrame("Frame",nil,InterfaceOptionsFrame);
-hook:SetScript("OnShow",function(self)
-	if not mog.options then
-		mog.createOptions();
-	end
-	self:SetScript("OnShow",nil);
-end);
