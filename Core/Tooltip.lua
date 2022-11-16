@@ -8,7 +8,7 @@ local class = L.classBits[select(2, UnitClass("PLAYER"))];
 
 
 --// Tooltip
-mog.tooltip = CreateFrame("GameTooltip", "MogItTooltip", UIParent, "GameTooltipTemplate");
+mog.tooltip = CreateFrame("Frame", "MogItTooltip", UIParent, "TooltipBorderedFrameTemplate");
 mog.tooltip:Hide();
 mog.tooltip:SetClampedToScreen(true);
 mog.tooltip:SetFrameStrata("TOOLTIP");
