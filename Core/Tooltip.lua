@@ -244,9 +244,11 @@ mog.tooltip.repos:SetScript("OnUpdate", function(self)
 	end
 end);
 
-TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(self)
-	local _, itemLink = TooltipUtil.GetDisplayedItem(self);
-	mog.tooltip:ShowItem(itemLink);
+TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(tooltip)
+	if tooltip == GameTooltip then
+		local _, itemLink = TooltipUtil.GetDisplayedItem(tooltip);
+		mog.tooltip:ShowItem(itemLink);
+	end
 end);
 GameTooltip:HookScript("OnHide", mog.tooltip.HideItem);
 
