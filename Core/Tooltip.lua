@@ -8,7 +8,7 @@ local class = L.classBits[select(2, UnitClass("PLAYER"))];
 
 
 --// Tooltip
-mog.tooltip = CreateFrame("Frame", "MogItTooltip", UIParent, "TooltipBorderedFrameTemplate");
+mog.tooltip = CreateFrame("GameTooltip", "MogItTooltip", UIParent, "GameTooltipTemplate");
 mog.tooltip:Hide();
 mog.tooltip:SetClampedToScreen(true);
 mog.tooltip:SetFrameStrata("TOOLTIP");
@@ -244,7 +244,10 @@ mog.tooltip.repos:SetScript("OnUpdate", function(self)
 	end
 end);
 
-GameTooltip:HookScript("OnTooltipSetItem", function(self)
+TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(self)
+	if self ~= GameTooltip and self ~= ItemRefTooltip then
+		return;
+	end
 	local _, itemLink = self:GetItem();
 	mog.tooltip:ShowItem(itemLink);
 end);
