@@ -355,7 +355,7 @@ function mog:ADDON_LOADED(addon)
 					if not itemsCollectionFrame.transmogLocation:IsIllusion() then
 						local sources = CollectionWardrobeUtil.GetSortedAppearanceSources(self.visualInfo.visualID, itemsCollectionFrame:GetActiveCategory(), itemsCollectionFrame.transmogLocation)
 						if WardrobeCollectionFrame.tooltipSourceIndex then
-							local index = WardrobeUtils_GetValidIndexForNumSources(WardrobeCollectionFrame.tooltipSourceIndex, #sources)
+							local index = CollectionWardrobeUtil.GetValidIndexForNumSources(WardrobeCollectionFrame.tooltipSourceIndex, #sources)
 							local link = select(6, C_TransmogCollection.GetAppearanceSourceInfo(sources[index].sourceID))
 							mog:AddToPreview(link)
 							return
@@ -373,8 +373,10 @@ function mog:ADDON_LOADED(addon)
 				button:SetScript("OnClick", function(self, button2)
 					if IsControlKeyDown() and button2 == "RightButton" then
 						local preview = mog:GetPreview();
-						for source in pairs(C_TransmogSets.GetSetSources(self.setID)) do
-							mog:AddToPreview(select(6, C_TransmogCollection.GetAppearanceSourceInfo(source)), preview);
+						local primaryAppearances = C_TransmogSets.GetSetPrimaryAppearances(self.setID);
+						for _, primaryAppearance in ipairs(primaryAppearances) do
+							local sourceID = primaryAppearance.appearanceID;
+							mog:AddToPreview(select(6, C_TransmogCollection.GetAppearanceSourceInfo(sourceID)), preview);
 						end
 						return
 					end
