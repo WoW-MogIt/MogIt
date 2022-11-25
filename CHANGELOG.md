@@ -1,1 +1,1 @@
-- Updated for game version 10.0.2.
+- Fixed error when toggling tooltip option.

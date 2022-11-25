@@ -43,7 +43,7 @@ function mog.createOptions()
 			elseif info.arg == "tooltipHeight" then
 				mog.tooltip:SetHeight(value);
 			elseif info.arg == "alwaysShowCollected" then
-				C_TransmogCollection.SetShowMissingSourceInItemTooltips(value);
+				SetCVar("missingTransmogSourceInItemTooltips", value);
 			elseif info.arg == "wishlistCheckAlts" then
 				mog:BuildList();
 			elseif info.arg == "rows" or info.arg == "columns" then
