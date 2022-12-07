@@ -1275,28 +1275,33 @@ local bonusDiffs = {
 mog.itemStringPattern = "item:(%d+):%d*:%d*:%d*:%d*:%d*:%d*:%d*:%d*:%d*:%d*:(%d*):%d*:([%d:]+)";
 
 function mog:ToNumberItem(item)
-	if type(item) == "string" then
-		local id, diff, bonus = item:match(mog.itemStringPattern);
-		-- bonus ID can also be warforged, socketed, etc
-		-- if there is more than one bonus ID, need to check all
-		if bonus then
-			if not tonumber(bonus) then
-				for bonusID in gmatch(bonus, "%d+") do
-					if bonusDiffs[tonumber(bonusID)] then
-						bonus = bonusID;
-						break;
-					end
-				end
-			elseif not bonusDiffs[tonumber(bonus)] then
-				bonus = nil;
-			end
-		end
-		id = id or item:match("item:(%d+)");
-		return tonumber(id), tonumber(bonus), tonumber(diff);
-	elseif type(item) == "number" then
-		return item;
+	if type(item) == "number" then
+		print("Era un número")
+		return item
 	end
+
+	local id, diff, bonus = item:match(mog.itemStringPattern);
+	-- bonus ID can also be warforged, socketed, etc
+	-- if there is more than one bonus ID, need to check all
+	if bonus and not tonumber(bonus) then
+
+		bonus = MatchBonus(bonus)
+
+	elseif not bonusDiffs[tonumber(bonus)] then
+		bonus = nil;
+	end
+
+	id = id or item:match("item:(%d+)");
+	return tonumber(id), tonumber(bonus), tonumber(diff);
 end
+
+function MatchBonus(bonus)
+	for bonusID in gmatch(bonus, "%d+") do
+		if bonusDiffs[tonumber(bonusID)] then
+			return bonusID
+		end
+	end
+end 
 
 function mog:NormaliseItemString(item)
 	return self:ToStringItem(self:ToNumberItem(item));
