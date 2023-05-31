@@ -1,6 +1,7 @@
 ## Interface: 100002
 ## Author: Aelobin (The Maelstrom EU) & Lombra (Defias Brotherhood EU)
 ## Version: @project-version@
+## IconTexture: Interface\Icons\INV_Enchant_EssenceCosmicGreater
 ## SavedVariables: MogIt_PlateDB
 ## LoadOnDemand: 1
 ## RequiredDeps: MogIt
