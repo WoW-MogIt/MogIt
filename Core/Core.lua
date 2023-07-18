@@ -57,6 +57,15 @@ mog.mmb = LibStub("LibDataBroker-1.1"):NewDataObject("MogIt",{
 --//
 
 
+AddonCompartmentFrame:RegisterAddon({
+	text = "MogIt",
+	icon = "Interface\\Icons\\INV_Enchant_EssenceCosmicGreater",
+	notCheckable = true,
+	func = function()
+		mog:ToggleFrame();
+	end,
+})
+
 --// Module API
 mog.moduleVersion = 3;
 mog.modules = {};
