@@ -27,7 +27,7 @@ local function fromBase(str)
 	return num;
 end
 
-function mog:SetToLink(set, race, gender, enchant)
+function mog:SetToLink(set, enchant)
 	local items = {};
 	for k, v in pairs(set) do
 		local itemID, bonusID, diffID = mog:ToNumberItem(v);
@@ -37,13 +37,12 @@ function mog:SetToLink(set, race, gender, enchant)
 			tinsert(items, toBase(itemID));
 		end
 	end
-	return format("[MogIt:%s:%s%s:%s]", table.concat(items, ";"), toBase(race or mog.playerRace), (gender or mog.playerGender), toBase(enchant or 0));
+	return format("[MogIt:%s:00:%s]", table.concat(items, ";"), toBase(enchant or 0));
 end
 
 function mog:LinkToSet(link)
 	local set = {};
-	-- local items, race, gender, enchant = strsplit(":", link:match("MogIt:(.+)"));
-	local items, race, gender, enchant = link:match("MogIt:([^:]*):?(%w?)(%w?):?(%w*)");
+	local items, enchant = link:match("MogIt:([^:]*):?%w?%w?:?(%w*)");
 	if items then
 		if items:find("[.;]") then
 			for item in gmatch(items, "[^;]+") do
@@ -57,10 +56,8 @@ function mog:LinkToSet(link)
 			end
 		end
 	end
-	race = race and fromBase(race);
-	gender = tonumber(gender);
 	enchant = enchant ~= "" and fromBase(enchant) or nil;
-	return set, race, gender, enchant;
+	return set, enchant;
 end
 
 local function filter(self, event, msg, ...)
@@ -102,14 +99,8 @@ function ItemRefTooltip:SetHyperlink(link)
 			ChatEdit_InsertLink("["..link.."]")
 		else
 			local preview = mog:GetPreview();
-			local set, race, gender, enchant = mog:LinkToSet(link);
-			if race and gender then
-				preview.data.displayRace = race;
-				preview.data.displayGender = gender;
-				preview.data.weaponEnchant = enchant;
-				preview.model:ResetModel();
-				preview.model:Undress();
-			end
+			local set, enchant = mog:LinkToSet(link);
+			preview.data.weaponEnchant = enchant;
 			mog:AddToPreview(set, preview);
 		end
 	else

@@ -261,9 +261,6 @@ local defaults = {
 		tooltipRotate = true,
 		tooltipMog = true,
 		tooltipMod = "None",
-		tooltipCustomModel = false,
-		tooltipRace = 1,
-		tooltipGender = 0,
 		tooltipAnchor = "vertical",
 		
 		minimap = {},

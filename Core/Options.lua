@@ -320,50 +320,6 @@ function mog.createOptions()
 				end,
 				arg = "tooltipMod",
 			},
-			customModel = {
-				type = "toggle",
-				order = 9,
-				name = L["Use custom model"],
-				width = "full",
-				arg = "tooltipCustomModel",
-			},
-			race = {
-				type = "select",
-				order = 10,
-				name = L["Model race"],
-				values = {
-					[1] = LBR["Human"],
-					[3] = LBR["Dwarf"],
-					[4] = LBR["Night Elf"],
-					[7] = LBR["Gnome"],
-					[11] = LBR["Draenei"],
-					[22] = LBR["Worgen"],
-					[2] = LBR["Orc"],
-					[5] = LBR["Undead"],
-					[6] = LBR["Tauren"],
-					[8] = LBR["Troll"],
-					[10] = LBR["Blood Elf"],
-					[9] = LBR["Goblin"],
-					[24] = LBR["Pandaren"],
-				},
-				arg = "tooltipRace",
-				disabled = function()
-					return not mog.db.profile.tooltipCustomModel;
-				end,
-			},
-			gender = {
-				type = "select",
-				order = 11,
-				name = L["Model gender"],
-				values = {
-					[0] = MALE,
-					[1] = FEMALE,
-				},
-				arg = "tooltipGender",
-				disabled = function()
-					return not mog.db.profile.tooltipCustomModel;
-				end,
-			},
 			anchor = {
 				type = "select",
 				order = 12,

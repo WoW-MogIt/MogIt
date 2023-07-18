@@ -54,12 +54,7 @@ local lightValues = { omnidirectional = false, point = CreateVector3D(0, 0.8, -1
 mog.tooltip.model:SetLight(true, lightValues);
 mog.tooltip.model.ResetModel = function(self)
 	local db = mog.db.profile
-	if db.tooltipCustomModel then
-		self:SetCustomRace(db.tooltipRace, db.tooltipGender);
-		self:RefreshCamera();
-	else
-		self:Dress();
-	end
+	self:Dress();
 	if not db.tooltipDress then
 		-- the worst of hacks to prevent certain armor model pieces from getting stuck on the character
 		for i, slotName in ipairs(mog.slots) do

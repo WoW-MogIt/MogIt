@@ -40,7 +40,6 @@ L["Right click and drag to move"] = true
 L["Module controls"] = true
 
 	--[[ Core\Preview.lua ]]--
-L["Gender"] = true
 L["Add Item"] = true
 L["Chat Link"] = true
 L["Import / Export"] = true
@@ -98,9 +97,6 @@ L["Width"] = true
 L["Height"] = true
 L["Only transmogrification items"] = true
 L["Only show if modifier is pressed"] = true
-L["Use custom model"] = true
-L["Model race"] = true
-L["Model gender"] = true
 L["Wishlist"] = true
 L["Options profile"] = true
 L["Wishlist profile"] = true

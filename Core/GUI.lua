@@ -3,74 +3,6 @@ local L = mog.L;
 
 local LBR = LibStub("LibBabble-Race-3.0"):GetUnstrictLookupTable();
 
-local races = {
-   "Human",
-   "Dwarf",
-   "Night Elf",
-   "Gnome",
-   "Draenei",
-   "Worgen",
-   "Orc",
-   "Undead",
-   "Tauren",
-   "Troll",
-   "Blood Elf",
-   "Goblin",
-   "Pandaren",
-   "Lightforged Draenei",
-   "Void Elf",
-   "Dark Iron Dwarf",
-   "Kul Tiran",
-   "Highmountain Tauren",
-   "Nightborne",
-   "Mag'har Orc",
-   "Zandalari Troll",
-}
-
-local raceID = {
-   ["Human"] = 1,
-   ["Orc"] = 2,
-   ["Dwarf"] = 3,
-   ["Night Elf"] = 4,
-   ["Undead"] = 5,
-   ["Tauren"] = 6,
-   ["Gnome"] = 7,
-   ["Troll"] = 8,
-   ["Goblin"] = 9,
-   ["Blood Elf"] = 10,
-   ["Draenei"] = 11,
-   ["Worgen"] = 22,
-   ["Pandaren"] = 24,
-   ["Nightborne"] = 27,
-   ["Highmountain Tauren"] = 28,
-   ["Void Elf"] = 29,
-   ["Lightforged Draenei"] = 30,
-   ["Zandalari Troll"] = 31,
-   ["Kul Tiran"] = 32,
-   ["Dark Iron Dwarf"] = 34,
-   ["Mag'har Orc"] = 36,
-}
-
--- UnitRace returns differently for the following races, so need to include exceptions
-raceID["Scourge"] = raceID["Undead"]
--- most are just with the space removed
-for i, race in ipairs(races) do
-	raceID[race:gsub("[%A]", "")] = raceID[race]
-end
-
-local gender = {
-	[0] = MALE,
-	[1] = FEMALE,
-}
-
-local myRace = raceID[select(2, UnitRace("player"))]
-local myGender = UnitSex("player") - 2
-mog.playerRace = myRace;
-mog.playerGender = myGender;
-
-mog.displayRace = myRace
-mog.displayGender = myGender
-
 mog.sheathe = false
 
 local ModelFramePrototype = CreateFrame("Button")
@@ -330,13 +262,7 @@ end
 function ModelFramePrototype:ResetModel()
 	local model = self.model;
 	model:SetPosition(0, 0, 0);
-	local info = self.type == "preview" and self.parent.data or mog;
-	-- :Dress resets the custom race, and :SetCustomRace does :Dress, so if we're using a custom race, just :SetCustomRace again instead of :Dress
-	if info.displayRace == myRace and info.displayGender == myGender then
-		model:Dress();
-	else
-		model:SetCustomRace(info.displayRace, info.displayGender);
-	end
+	model:Dress();
 	model:SetAnimation(0, 0)
 	self:PositionModel();
 end
@@ -739,46 +665,6 @@ local function setWeaponEnchant(self, enchant)
 	mog.scroll:update();
 end
 
-local function setDisplayModel(self, arg1, value)
-	mog[arg1] = value;
-	for i, model in ipairs(mog.models) do
-		-- reset positions first since they tend to go nuts when manipulating the model
-		local modelData = model.parent.data
-		mog.posX = 0;
-		mog.posY = 0;
-		mog.posZ = 0;
-		model:ResetModel();
-		if model:IsEnabled() then
-			mog:ModelUpdate(model, model.data.value);
-		end
-	end
-	CloseDropDownMenus(1);
-end
-
-function mog:CreateRaceMenu(dropdown, level, func, selectedRace)
-	for i, race in ipairs(races) do
-		local info = UIDropDownMenu_CreateInfo();
-		info.text = LBR[race] or race;
-		info.func = func;
-		info.checked = selectedRace == raceID[race];
-		info.arg1 = "displayRace";
-		info.arg2 = raceID[race];
-		dropdown:AddButton(info, level);
-	end
-end
-
-function mog:CreateGenderMenu(dropdown, level, func, selectedGender)
-	for i = 0, 1 do
-		local info = UIDropDownMenu_CreateInfo();
-		info.text = gender[i];
-		info.func = func;
-		info.checked = selectedGender == i;
-		info.arg1 = "displayGender";
-		info.arg2 = i;
-		dropdown:AddButton(info, level);
-	end
-end
-
 local dressOptions = {
 	none = NONE,
 	preview = L["Preview"],
@@ -828,20 +714,6 @@ mog.menu.catalogue = mog.menu:CreateMenu(L["Catalogue"], function(self, tier)
 		UIDropDownMenu_AddButton(info,tier);
 		
 		local info = UIDropDownMenu_CreateInfo();
-		info.text = RACE;
-		info.value = "race";
-		info.notCheckable = true;
-		info.hasArrow = true;
-		UIDropDownMenu_AddButton(info,tier);
-		
-		local info = UIDropDownMenu_CreateInfo();
-		info.text = "Gender";
-		info.value = "gender";
-		info.notCheckable = true;
-		info.hasArrow = true;
-		UIDropDownMenu_AddButton(info,tier);
-		
-		local info = UIDropDownMenu_CreateInfo();
 		info.text = L["Weapon enchant"];
 		info.value = "weaponEnchant";
 		info.notCheckable = true;
@@ -873,10 +745,6 @@ mog.menu.catalogue = mog.menu:CreateMenu(L["Catalogue"], function(self, tier)
 		elseif self.tier[3] and self.tier[3].Dropdown then
 			self.tier[3].Dropdown(mog.active,tier);
 		end
-	elseif self.tier[2] == "race" then
-		mog:CreateRaceMenu(self, tier, setDisplayModel, mog.displayRace)
-	elseif self.tier[2] == "gender" then
-		mog:CreateGenderMenu(self, tier, setDisplayModel, mog.displayGender)
 	elseif self.tier[2] == "weaponEnchant" then
 		if tier == 2 then
 			local info = UIDropDownMenu_CreateInfo();

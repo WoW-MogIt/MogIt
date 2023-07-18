@@ -171,15 +171,6 @@ end
 --// Preview Menu
 local currentPreview;
 
-local function setDisplayModel(self, arg1, value)
-	currentPreview.data[arg1] = value;
-	local model = currentPreview.model;
-	model:ResetModel();
-	model:Undress();
-	mog.DressFromPreview(model, currentPreview);
-	CloseDropDownMenus();
-end
-
 local function setWeaponEnchant(self, preview, enchant)
 	preview.data.weaponEnchant = enchant;
 	if self.owner then
@@ -201,18 +192,6 @@ function mog:SetPreviewEnchant(preview, enchant)
 end
 
 local previewMenu = {
-	{
-		text = RACE,
-		value = "race",
-		notCheckable = true,
-		hasArrow = true,
-	},
-	{
-		text = L["Gender"],
-		value = "gender",
-		notCheckable = true,
-		hasArrow = true,
-	},
 	{
 		text = L["Weapon enchant"],
 		value = "weaponEnchant",
@@ -248,7 +227,7 @@ local previewMenu = {
 					table.insert(tbl, v.item);
 				end
 			end
-			ChatEdit_InsertLink(mog:SetToLink(tbl, currentPreview.data.displayRace, currentPreview.data.displayGender, currentPreview.data.weaponEnchant));
+			ChatEdit_InsertLink(mog:SetToLink(tbl, currentPreview.data.weaponEnchant));
 			--ChatFrame_OpenChat(link);
 		end,
 	},
@@ -308,10 +287,6 @@ local function previewInitialize(self, level)
 		for i, info in ipairs(previewMenu) do
 			UIDropDownMenu_AddButton(info, level);
 		end
-	elseif self.tier[2] == "race" then
-		mog:CreateRaceMenu(self, level, setDisplayModel, self.parent.data.displayRace)
-	elseif self.tier[2] == "gender" then
-		mog:CreateGenderMenu(self, level, setDisplayModel, self.parent.data.displayGender)
 	elseif self.tier[2] == "weaponEnchant" then
 		if level == 2 then
 			local info = UIDropDownMenu_CreateInfo();
@@ -511,10 +486,7 @@ local function initPreview(frame, id)
 	frame:SetPoint(props.point, props.x, props.y);
 	frame:SetSize(props.w, props.h);
 	frame:SetTitle(L["Preview %d"]:format(id));
-	frame.data = {
-		displayRace = mog.playerRace,
-		displayGender = mog.playerGender,
-	};
+	frame.data = { };
 end
 
 mog.previews = {};
