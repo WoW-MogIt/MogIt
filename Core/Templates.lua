@@ -432,7 +432,7 @@ do	-- set functions
 		self:Undress()
 		local hasSet = next(data.items)
 		for slot, item in pairs(data.items) do
-			self:TryOn(item, slot == "SecondaryHandSlot" and slot)
+			self:TryOn(item, slot == "SecondaryHandSlot" and slot or nil)
 			if not mog:HasItem(mog:GetSourceFromItem(item), true) then
 				hasSet = false
 			end
