@@ -1,4 +1,2 @@
-- Updated for WoW 10.1.5.
-- Removed custom model race options as the relevant API was removed.
-- Added addon compartment entry.
-- Added addon icon.
+- Updated for WoW 10.2.
+- Fixed tooltip model flickering for quest rewards.
