@@ -74,8 +74,8 @@ mog.tooltip.model:SetScript("OnShow", mog.tooltip.model.ResetModel);
 
 function mog.tooltip:ShowItem(itemLink)
 	for i = 1, GameTooltip:NumLines() do
-		local line = _G["GameTooltipTextLeft"..i]
-		if line:GetText() == TRANSMOGRIFY_TOOLTIP_ITEM_UNKNOWN_APPEARANCE_KNOWN then
+		local line = GameTooltip["TextLeft"..i]
+		if line and line:GetText() == TRANSMOGRIFY_TOOLTIP_ITEM_UNKNOWN_APPEARANCE_KNOWN then
 			line:SetTextColor(136 / 255, 1, 170 / 255)
 		end
 	end
@@ -89,8 +89,9 @@ function mog.tooltip:ShowItem(itemLink)
 	local tooltip = mog.tooltip;
 	if db.tooltip and (not tooltip.mod[db.tooltipMod] or tooltip.mod[db.tooltipMod]()) then
 		if not self[mog] then
-			if tooltip.item ~= itemLink then
-				tooltip.item = itemLink;
+			local sourceID = mog:GetSourceFromItem(itemLink);
+			if tooltip.item ~= sourceID then
+				tooltip.item = sourceID;
 				local token = mog.tokens[itemID];
 				if token then
 					for item, classBit in pairs(token) do
