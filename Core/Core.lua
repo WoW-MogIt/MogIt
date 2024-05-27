@@ -506,7 +506,7 @@ function mog:TRANSMOG_SEARCH_UPDATED()
 	local GetAppearanceSourceDrops = C_TransmogCollection.GetAppearanceSourceDrops
 	local bor = bit.bor
 
-	for categoryType = Enum.TransmogCollectionTypeMeta.MinValue, Enum.TransmogCollectionTypeMeta.MaxValue do
+	local function processCategory(categoryType)
 		local name, isWeapon, canEnchant, canMainHand, canOffHand = C_TransmogCollection.GetCategoryInfo(categoryType)
 		if name then
 			name = SLOTS[categoryType]
@@ -541,12 +541,25 @@ function mog:TRANSMOG_SEARCH_UPDATED()
 		end
 	end
 
-	self:LoadDB("MogIt_"..armorClass)
-	self:LoadDB("MogIt_Other")
-	self:LoadDB("MogIt_OneHanded")
-	self:LoadDB("MogIt_TwoHanded")
-	self:LoadDB("MogIt_Ranged")
-	self:LoadDB("MogIt_Artifact")
+	local function processCategoryAndScheduleNext(categoryType)
+		if categoryType ~= Enum.TransmogCollectionTypeMeta.MaxValue then
+			processCategory(categoryType)
+			C_Timer.After(0, function()
+				processCategoryAndScheduleNext(categoryType + 1)
+			end)
+		else
+			self:LoadDB("MogIt_"..armorClass)
+			self:LoadDB("MogIt_Other")
+			self:LoadDB("MogIt_OneHanded")
+			self:LoadDB("MogIt_TwoHanded")
+			self:LoadDB("MogIt_Ranged")
+			self:LoadDB("MogIt_Artifact")
+		end
+	end
+
+	C_Timer.After(0, function()
+		processCategoryAndScheduleNext(Enum.TransmogCollectionTypeMeta.MinValue)
+	end)
 
 	self.frame:UnregisterEvent("TRANSMOG_SEARCH_UPDATED")
 
