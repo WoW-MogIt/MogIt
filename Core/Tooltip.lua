@@ -6,6 +6,13 @@ local GetScreenHeight = GetScreenHeight;
 
 local class = L.classBits[select(2, UnitClass("PLAYER"))];
 
+local function isModifierKeyDown(key)
+	local modifierFunc = mog.tooltip.mod[key]
+	if not modifierFunc then
+		return true
+	end
+	return modifierFunc()
+end
 
 --// Tooltip
 mog.tooltip = CreateFrame("Frame", "MogItTooltip", UIParent, "TooltipBorderedFrameTemplate");
@@ -55,7 +62,7 @@ mog.tooltip.model:SetLight(true, lightValues);
 mog.tooltip.model.ResetModel = function(self)
 	local db = mog.db.profile
 	self:Dress();
-	if not db.tooltipDress then
+	if not (db.tooltipDress and isModifierKeyDown(db.tooltipDressMod)) then
 		-- the worst of hacks to prevent certain armor model pieces from getting stuck on the character
 		for i, slotName in ipairs(mog.slots) do
 			local slot = GetInventorySlotInfo(slotName);
@@ -79,15 +86,15 @@ function mog.tooltip:ShowItem(itemLink)
 			line:SetTextColor(136 / 255, 1, 170 / 255)
 		end
 	end
-	
+
 	if not itemLink then return end
 	local itemID, _, _, slot = GetItemInfoInstant(itemLink);
 	if not itemID then return end
 	local self = GameTooltip;
-	
+
 	local db = mog.db.profile;
 	local tooltip = mog.tooltip;
-	if db.tooltip and (not tooltip.mod[db.tooltipMod] or tooltip.mod[db.tooltipMod]()) then
+	if db.tooltip and (isModifierKeyDown(db.tooltipMod)) then
 		if not self[mog] then
 			local sourceID = mog:GetSourceFromItem(itemLink);
 			if tooltip.item ~= sourceID then
@@ -124,7 +131,7 @@ function mog.tooltip:ShowItem(itemLink)
 			-- tooltip:Hide();
 		end
 	end
-	
+
 	local addOwnedItem = mog.db.profile.tooltipAlwaysShowOwned and mog.slotsType[slot];
 	if mog.db.profile.tooltipAlwaysShowOwned and mog.slotsType[slot] then
 		local sourceID = mog:GetSourceFromItem(itemLink);
@@ -135,7 +142,7 @@ function mog.tooltip:ShowItem(itemLink)
 			self:AddLine("|TInterface\\RaidFrame\\ReadyCheck-Ready:0|t "..TRANSMOGRIFY_TOOLTIP_APPEARANCE_KNOWN, 1, 1, 1);
 		end
 	end
-	
+
 	-- add wishlist info about this item
 	if not self[mog] then
 		local addedCharacters = {}

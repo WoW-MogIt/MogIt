@@ -240,31 +240,32 @@ local defaults = {
 		wishlistCheckAlts = true,
 		tooltipWishlistDetail = true,
 		loadModulesDefault = false,
-		
+
 		noAnim = false,
 		url = "Battle.net",
-		
+
 		dressupPreview = false,
 		singlePreview = false,
 		previewUIPanel = false,
 		previewFixedSize = false,
 		previewConfirmClose = true,
-		
+
 		sortWishlist = false,
 		loadModulesWishlist = false,
-		
+
 		tooltip = true,
 		tooltipWidth = 300,
 		tooltipHeight = 300,
 		tooltipMouse = false,
 		tooltipDress = false,
+		tooltipDressMod = "None",
 		tooltipRotate = true,
 		tooltipMog = true,
 		tooltipMod = "None",
 		tooltipAnchor = "vertical",
-		
+
 		minimap = {},
-		
+
 		point = "CENTER",
 		gridWidth = 600,
 		gridHeight = 400,
@@ -279,25 +280,25 @@ local defaults = {
 				point = "CENTER",
 			}
 		},
-		
+
 		slotLabels = {},
 	}
 }
 
 function mog.LoadSettings()
 	mog:UpdateGUI();
-	
+
 	if mog.db.profile.minimap.hide then
 		mog.LDBI:Hide("MogIt");
 	else
 		mog.LDBI:Show("MogIt");
 	end
-	
+
 	mog.tooltip:SetSize(mog.db.profile.tooltipWidth, mog.db.profile.tooltipHeight);
 	mog.tooltip.rotate:SetShown(mog.db.profile.tooltipRotate);
-	
+
 	mog:UpdateScroll();
-	
+
 	mog:SetSinglePreview(mog.db.profile.singlePreview);
 end
 
@@ -330,16 +331,16 @@ function mog:ADDON_LOADED(addon)
 			mog:Error(L["MogIt has loaded! Type \"/mog\" to open it."]);
 		end
 		mog.db.global.version = GetAddOnMetadata(MogIt,"Version");
-		
+
 		mog.LDBI:Register("MogIt",mog.mmb,mog.db.profile.minimap);
-		
-		
+
+
 		for name,module in pairs(mog.moduleList) do
 			if module.MogItLoaded then
 				module:MogItLoaded()
 			end
 		end
-		
+
 		SetCVar("missingTransmogSourceInItemTooltips", mog.db.profile.alwaysShowCollected)
 
 		mog.createOptions();
@@ -1274,7 +1275,7 @@ local bonusDiffs = {
 	[8399] = true, -- Combatant I
 	[8400] = true, -- Challenger I
 	[8401] = true, -- Rival I
-	
+
 	[3524] = true, -- magical bonus ID for items that instead use the instance difficulty ID parameter
 };
 

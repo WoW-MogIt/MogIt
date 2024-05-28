@@ -1,2 +1,1 @@
-- Updated for WoW 10.2.
-- Fixed tooltip model flickering for quest rewards.
+- Added option to dress tooltip model only if a modifier is pressed.

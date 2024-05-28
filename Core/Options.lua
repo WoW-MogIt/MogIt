@@ -17,7 +17,7 @@ function mog.createOptions()
 			return mog.db.profile[info.arg];
 		end
 	end
-	
+
 	local function set(info,value)
 		if info.arg == "minimap" then
 			mog.db.profile.minimap.hide = value;
@@ -51,7 +51,7 @@ function mog.createOptions()
 			end
 		end
 	end
-	
+
 	local options = {
 		type = "group",
 		name = MogIt,
@@ -244,7 +244,7 @@ function mog.createOptions()
 	};
 	config:RegisterOptionsTable("MogIt_General",options.args.general);
 	dialog:AddToBlizOptions("MogIt_General",options.args.general.name,MogIt);
-	
+
 	options.args.tooltip = {
 		type = "group",
 		order = 1,
@@ -265,6 +265,21 @@ function mog.createOptions()
 				name = L["Dress model"],
 				width = "double",
 				arg = "tooltipDress",
+			},
+			dressModifier = {
+				type = "select",
+				order = 2.5,
+				name = L["Only dress if modifier is pressed"],
+				values = function()
+					local tbl = {
+						None = "None",
+					};
+					for k,v in pairs(mog.tooltip.mod) do
+						tbl[k] = k;
+					end
+					return tbl;
+				end,
+				arg = "tooltipDressMod",
 			},
 			mouse = {
 				type = "toggle",
@@ -334,7 +349,7 @@ function mog.createOptions()
 	};
 	config:RegisterOptionsTable("MogIt_Tooltip",options.args.tooltip);
 	dialog:AddToBlizOptions("MogIt_Tooltip",options.args.tooltip.name,MogIt);
-	
+
 	--[[options.args.modules = {
 		type = "group",
 		order = 2,
@@ -353,12 +368,12 @@ function mog.createOptions()
 	options.args.options.order = 5;
 	config:RegisterOptionsTable("MogIt_Options",options.args.options);
 	dialog:AddToBlizOptions("MogIt_Options",options.args.options.name,MogIt);
-	
+
 	options.args.wishlist = db:GetOptionsTable(mog.wishlist.db);
 	options.args.wishlist.name = L["Wishlist profile"];
 	options.args.wishlist.order = 6;
 	config:RegisterOptionsTable("MogIt_Wishlist",options.args.wishlist);
 	dialog:AddToBlizOptions("MogIt_Wishlist",options.args.wishlist.name,MogIt);
-	
+
 	mog.options = options;
 end
