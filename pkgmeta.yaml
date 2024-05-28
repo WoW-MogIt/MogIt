@@ -21,7 +21,7 @@ externals:
 
 ignore:
   - create-module-links.cmd
-  - Install-Externals.ps1
+  - Makefile
   - LocaleExtractor.lua
   - LocaleList.lua
 

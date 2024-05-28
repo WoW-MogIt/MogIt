@@ -18,6 +18,7 @@
 ## X-Category: Roleplay & Transmogrification
 ## X-Website: https://www.curseforge.com/wow/addons/mogit
 ## X-Localizations: enUS, frFR, deDE, esES, esMX, ruRU, koKR, zhCN, zhTW, ptBR, itIT
+## X-Curse-Project-ID: 30961
 
 Libs\Embeds.xml
 Locale\Locale.xml
