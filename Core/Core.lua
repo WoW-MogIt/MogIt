@@ -314,6 +314,7 @@ mog.frame:RegisterEvent("PLAYER_LOGIN");
 mog.frame:RegisterEvent("GET_ITEM_INFO_RECEIVED");
 mog.frame:RegisterEvent("PLAYER_EQUIPMENT_CHANGED");
 mog.frame:RegisterEvent("TRANSMOG_SEARCH_UPDATED");
+mog.frame:RegisterEvent("ITEM_DATA_LOAD_RESULT");
 mog.frame:SetScript("OnEvent", function(self, event, ...)
 	return mog[event] and mog[event](mog, ...)
 end);
@@ -453,6 +454,8 @@ local SLOT_MODULES = {
 
 mog.relevantCategories = {}
 
+local deferredItemLookups = {}
+
 function mog:TRANSMOG_SEARCH_UPDATED()
 	-- local t = debugprofilestop()
 
@@ -502,25 +505,36 @@ function mog:TRANSMOG_SEARCH_UPDATED()
 
 	_G["MogIt_"..armorClass.."DB"] = ArmorDB
 
-	local GetAppearanceSources = C_TransmogCollection.GetAppearanceSources
+	local GetAllAppearanceSources = C_TransmogCollection.GetAllAppearanceSources
+	local GetSourceInfo = C_TransmogCollection.GetSourceInfo
 	local GetAppearanceSourceDrops = C_TransmogCollection.GetAppearanceSourceDrops
 	local bor = bit.bor
 
-	local function processCategory(categoryType)
+	--[[
+		Attempting to load item data in the same frame as this function can sometimes cause the game to freeze
+		for this reason we avoid calling functions that implicitly cause item data to be loaded
+		* C_TransmogCollection.GetAppearanceSources
+		* C_TransmogCollection.GetSourceInfo
+	]]
+
+	for categoryType = Enum.TransmogCollectionTypeMeta.MinValue, Enum.TransmogCollectionTypeMeta.MaxValue do
 		local name, isWeapon, canEnchant, canMainHand, canOffHand = C_TransmogCollection.GetCategoryInfo(categoryType)
 		if name then
 			name = SLOTS[categoryType]
+			local module
 			local db = db
 			if isWeapon then
 				mog.relevantCategories[name] = true
 			end
 			if SLOT_MODULES[categoryType] then
+				module = mog:GetModule("MogIt_"..SLOT_MODULES[categoryType])
 				db = _G["MogIt_"..SLOT_MODULES[categoryType].."DB"]
 			else
+				module = mog:GetModule("MogIt_"..armorClass)			
 				db = ArmorDB
 			end
 			db[name] = db[name] or {}
-			local transmogLocation = TransmogUtil.GetTransmogLocation(1, Enum.TransmogType.Appearance, Enum.TransmogModification.Main)
+			local transmogLocation = TransmogUtil.GetTransmogLocation(CollectionWardrobeUtil.GetSlotFromCategoryID(categoryType) or 1, Enum.TransmogType.Appearance, Enum.TransmogModification.Main)
 			for i, appearance in ipairs(C_TransmogCollection.GetCategoryAppearances(categoryType, transmogLocation)) do
 				if not appearance.isHideVisual then
 					local v = db[name][appearance.visualID] or {}
@@ -528,44 +542,78 @@ function mog:TRANSMOG_SEARCH_UPDATED()
 					if v[1] and v[1].sourceID then
 						db[name][appearance.visualID] = {}
 					end
-					for i, source in ipairs(GetAppearanceSources(appearance.visualID, categoryType, transmogLocation)) do
-						local s = v[source.sourceID] or {}
-						v[source.sourceID] = s
-						s.sourceType = source.sourceType
-						s.drops = GetAppearanceSourceDrops(source.sourceID)
+					for _, sourceID in ipairs(GetAllAppearanceSources(appearance.visualID)) do
+						local s = v[sourceID] or {}
+						v[sourceID] = s
 						s.classes = bor(s.classes or 0, L.classBits[playerClass])
 						s.faction = bor(s.faction or 0, FACTIONS[faction])
+						s.drops = GetAppearanceSourceDrops(sourceID)
+
+						local function addSourceType()
+							s.sourceType = GetSourceInfo(sourceID).sourceType
+						end
+
+						local itemID = C_TransmogCollection.GetSourceItemID(sourceID)
+						if C_Item.IsItemDataCachedByID(itemID) then -- raw use of IsItemDataCachedByID instead of Item:ContinueOnItemLoad because we want to be also notified on failure
+							addSourceType()
+						else
+							local deferred = deferredItemLookups[itemID] or { onSuccess = {}, onFailure = {} }
+							deferredItemLookups[itemID] = deferred
+							tinsert(deferred.onSuccess, addSourceType)
+							tinsert(deferred.onFailure, function()
+								-- erase the source from loaded lists to remove them from display
+								-- fixes unending "Retrieving item information" on some appearances that prevents switching to alternate sources (if they exist)
+								v[sourceID] = nil
+								if TableIsEmpty(v) then
+									db[name][appearance.visualID] = nil
+								end
+								tDeleteItem(module.slots[name].list, sourceID)
+								mog:DeleteData("item", sourceID, "display")
+								-- mog:DeleteData("item", sourceID, "level")
+								mog:DeleteData("item", sourceID, "faction")
+								mog:DeleteData("item", sourceID, "class")
+								mog:DeleteData("item", sourceID, "source")
+								-- mog:DeleteData("item", sourceID, "sourceid")
+								mog:DeleteData("item", sourceID, "sourceinfo")
+								-- mog:DeleteData("item", sourceID, "zone")
+							end)
+						end
 					end
 				end
 			end
 		end
 	end
 
-	local function processCategoryAndScheduleNext(categoryType)
-		if categoryType ~= Enum.TransmogCollectionTypeMeta.MaxValue then
-			processCategory(categoryType)
-			C_Timer.After(0, function()
-				processCategoryAndScheduleNext(categoryType + 1)
-			end)
-		else
-			self:LoadDB("MogIt_"..armorClass)
-			self:LoadDB("MogIt_Other")
-			self:LoadDB("MogIt_OneHanded")
-			self:LoadDB("MogIt_TwoHanded")
-			self:LoadDB("MogIt_Ranged")
-			self:LoadDB("MogIt_Artifact")
+	-- future TODO
+	-- at this point is is unknown why loading item data in current frame can cause game freezes
+	-- *IF* it is related to the amount of item loads this may need to be chunked over several frames once item count grows past a certain number
+	RunNextFrame(function()
+		for itemID, _ in pairs(deferredItemLookups) do
+			C_Item.RequestLoadItemDataByID(itemID)
 		end
-	end
-
-	C_Timer.After(0, function()
-		processCategoryAndScheduleNext(Enum.TransmogCollectionTypeMeta.MinValue)
 	end)
 
 	self.frame:UnregisterEvent("TRANSMOG_SEARCH_UPDATED")
 
+	self:LoadDB("MogIt_"..armorClass)
+	self:LoadDB("MogIt_Other")
+	self:LoadDB("MogIt_OneHanded")
+	self:LoadDB("MogIt_TwoHanded")
+	self:LoadDB("MogIt_Ranged")
+	self:LoadDB("MogIt_Artifact")
+
 	-- print(format("MogIt modules loaded in %d ms.", debugprofilestop() - t))
 end
 
+function mog:ITEM_DATA_LOAD_RESULT(itemID, success)
+	local itemCallbacks = deferredItemLookups[itemID]
+	if not itemCallbacks then return end
+	
+	local callbacks = success and itemCallbacks.onSuccess or itemCallbacks.onFailure
+	for _, callback in ipairs(callbacks) do
+		callback()
+	end
+end
 
 function mog:LoadDB(addon)
 	if not IsAddOnLoaded(addon) then return end
