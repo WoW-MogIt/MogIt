@@ -46,14 +46,14 @@ f.max:SetScript("OnTabPressed",function(self)
 end);
 f.max:SetScript("OnTextChanged",function(self,user)
 	if user then
-		maxlvl = self:GetNumber() or MAX_PLAYER_LEVEL;
+		maxlvl = self:GetNumber() or GetMaxPlayerLevel();
 		mog:BuildList();
 	end
 end);
 
 function f.Filter(item)
 	-- don't process filter if values encompass the entire player level range
-	if minlvl <= 1 and (maxlvl >= MAX_PLAYER_LEVEL or maxlvl == 0) then
+	if minlvl <= 1 and (maxlvl >= GetMaxPlayerLevel() or maxlvl == 0) then
 		return true
 	end
 	local sourceInfo = C_TransmogCollection.GetSourceInfo(item)
@@ -65,7 +65,7 @@ end
 function f.Default()
 	minlvl = 0;
 	f.min:SetNumber(minlvl);
-	maxlvl = MAX_PLAYER_LEVEL;
+	maxlvl = GetMaxPlayerLevel();
 	f.max:SetNumber(maxlvl);
 end
 f.Default();
@@ -89,7 +89,7 @@ end);
 
 f.max:SetScript("OnEnterPressed",function(self)
 	self:ClearFocus();
-	maxlvl = self:GetNumber() or MAX_PLAYER_LEVEL;
+	maxlvl = self:GetNumber() or GetMaxPlayerLevel();
 	mog:BuildList();
 end);
 f.max:SetScript("OnEscapePressed",function(self)
@@ -98,7 +98,7 @@ f.max:SetScript("OnEscapePressed",function(self)
 end);
 f.max:SetScript("OnTabPressed",function(self)
 	f.min:SetFocus();
-	maxlvl = self:GetNumber() or MAX_PLAYER_LEVEL;
+	maxlvl = self:GetNumber() or GetMaxPlayerLevel();
 	mog:BuildList();
 end);
 --]]

@@ -2,6 +2,8 @@ local MogIt,mog = ...;
 _G["MogIt"] = mog;
 local L = mog.L;
 
+local GetSpellName = C_Spell.GetSpellName
+
 
 --// Useful Lists
 L.source = {
@@ -22,7 +24,7 @@ L.source = {
 L.diffs = {
 	[1] = PLAYER_DIFFICULTY1,
 	[2] = PLAYER_DIFFICULTY2,
-	
+
 	[3] = L["10N"],
 	[4] = L["25N"],
 	[5] = L["10H"],
@@ -56,23 +58,23 @@ L.slots = {
 };
 
 L.professions = {
-	[1] = GetSpellInfo(2259), -- Alchemy
-	[2] = GetSpellInfo(2018), -- Blacksmithing
-	[3] = GetSpellInfo(7411), -- Enchanting
-	[4] = GetSpellInfo(4036), -- Engineering
-	[5] = GetSpellInfo(45357), -- Inscription
-	[6] = GetSpellInfo(25229), -- Jewelcrafting
-	[7] = GetSpellInfo(2108), -- Leatherworking
-	[8] = GetSpellInfo(3908), -- Tailoring
+	[1] = GetSpellName(2259), -- Alchemy
+	[2] = GetSpellName(2018), -- Blacksmithing
+	[3] = GetSpellName(7411), -- Enchanting
+	[4] = GetSpellName(4036), -- Engineering
+	[5] = GetSpellName(45357), -- Inscription
+	[6] = GetSpellName(25229), -- Jewelcrafting
+	[7] = GetSpellName(2108), -- Leatherworking
+	[8] = GetSpellName(3908), -- Tailoring
 
-	[9] = GetSpellInfo(2366), -- Herbalism
-	[10] = GetSpellInfo(2575), -- Mining
-	[11] = GetSpellInfo(8613), -- Skinning
+	[9] = GetSpellName(2366), -- Herbalism
+	[10] = GetSpellName(2575), -- Mining
+	[11] = GetSpellName(8613), -- Skinning
 
-	[12] = GetSpellInfo(78670), -- Archaeology
-	[13] = GetSpellInfo(2550), -- Cooking
-	[14] = GetSpellInfo(3273), -- First Aid
-	[15] = GetSpellInfo(7620), -- Fishing
+	[12] = GetSpellName(78670), -- Archaeology
+	[13] = GetSpellName(2550), -- Cooking
+	[14] = GetSpellName(3273), -- First Aid
+	[15] = GetSpellName(7620), -- Fishing
 };
 
 L.quality = {
@@ -103,9 +105,9 @@ L.classBits = {
 };
 
 L.bind = {
-	[LE_ITEM_BIND_NONE] = NONE,
-	[LE_ITEM_BIND_ON_EQUIP] = ITEM_BIND_ON_EQUIP,
-	[LE_ITEM_BIND_ON_ACQUIRE] = ITEM_BIND_ON_PICKUP,
+	[Enum.ItemBind.None] = NONE,
+	[Enum.ItemBind.OnEquip] = ITEM_BIND_ON_EQUIP,
+	[Enum.ItemBind.OnAcquire] = ITEM_BIND_ON_PICKUP,
 	-- [4] = ITEM_BIND_TO_BNETACCOUNT,
 };
 

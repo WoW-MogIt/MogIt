@@ -24,10 +24,10 @@ local function temp(module,tier)
 	end
 end
 
-for i=1,GetNumAddOns() do
-	local name,title,_,_,loadable = GetAddOnInfo(i);
+for i=1,C_AddOns.GetNumAddOns() do
+	local name,title,_,_,loadable = C_AddOns.GetAddOnInfo(i);
 	if loadable and (not mog:GetModule(name)) then
-		local version = tonumber(GetAddOnMetadata(name,"X-MogItModuleVersion"));
+		local version = tonumber(C_AddOns.GetAddOnMetadata(name,"X-MogItModuleVersion"));
 		if version then
 			mog:RegisterModule(name,version,{
 				label = title:match("^MogIt[%s%-_:]+(.+)") or title,

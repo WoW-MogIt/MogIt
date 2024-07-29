@@ -216,11 +216,11 @@ function mog:HasItem(sourceID, includeAlternate)
 	if not sourceInfo then return end
 	found = sourceInfo.isCollected
 	if includeAlternate then
-		local _, _, _, _, _, itemClassID, itemSubclassID = GetItemInfoInstant(sourceInfo.itemID);
+		local _, _, _, _, _, itemClassID, itemSubclassID = C_Item.GetItemInfoInstant(sourceInfo.itemID);
 		local sources = C_TransmogCollection.GetAllAppearanceSources(sourceInfo.visualID)
 		for i, sourceID in ipairs(sources) do
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-			local _, _, _, _, _, itemClassID2, itemSubclassID2 = GetItemInfoInstant(sourceInfo.itemID);
+			local _, _, _, _, _, itemClassID2, itemSubclassID2 = C_Item.GetItemInfoInstant(sourceInfo.itemID);
 			if itemSubclassID2 == itemSubclassID and sourceInfo.isCollected then
 				found = true
 				break
@@ -330,7 +330,7 @@ function mog:ADDON_LOADED(addon)
 		if not mog.db.global.version then
 			mog:Error(L["MogIt has loaded! Type \"/mog\" to open it."]);
 		end
-		mog.db.global.version = GetAddOnMetadata(MogIt,"Version");
+		mog.db.global.version = C_AddOns.GetAddOnMetadata(MogIt,"Version");
 
 		mog.LDBI:Register("MogIt",mog.mmb,mog.db.profile.minimap);
 
@@ -487,12 +487,12 @@ function mog:TRANSMOG_SEARCH_UPDATED()
 
 	mog.relevantCategories[armorClass] = true
 
-	LoadAddOn("MogIt_"..armorClass)
-	LoadAddOn("MogIt_Other")
-	LoadAddOn("MogIt_OneHanded")
-	LoadAddOn("MogIt_TwoHanded")
-	LoadAddOn("MogIt_Ranged")
-	LoadAddOn("MogIt_Artifact")
+	C_AddOns.LoadAddOn("MogIt_"..armorClass)
+	C_AddOns.LoadAddOn("MogIt_Other")
+	C_AddOns.LoadAddOn("MogIt_OneHanded")
+	C_AddOns.LoadAddOn("MogIt_TwoHanded")
+	C_AddOns.LoadAddOn("MogIt_Ranged")
+	C_AddOns.LoadAddOn("MogIt_Artifact")
 
 	local ArmorDB = _G["MogIt_"..armorClass.."DB"] or {}
 	MogIt_OtherDB = MogIt_OtherDB or {}
@@ -556,7 +556,7 @@ end
 
 
 function mog:LoadDB(addon)
-	if not IsAddOnLoaded(addon) then return end
+	if not C_AddOns.IsAddOnLoaded(addon) then return end
 	local SOURCE_TYPES = {
 		[1] = 1,
 		[2] = 3,

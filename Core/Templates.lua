@@ -7,12 +7,12 @@ function mog:GetItemLabel(itemID, callback, includeIcon, iconSize)
 	local item = mog:GetItemInfo(itemID, callback)
 	local name
 	if item then
-		name = format("|c%s%s|r", select(4, GetItemQualityColor(item.quality)), item.name)
+		name = format("|c%s%s|r", select(4, C_Item.GetItemQualityColor(item.quality)), item.name)
 	else
 		name = RED_FONT_COLOR_CODE..RETRIEVING_ITEM_INFO..FONT_COLOR_CODE_CLOSE
 	end
 	if includeIcon then
-		return format("|T%s:%d|t %s", GetItemIcon(itemID), iconSize, name)
+		return format("|T%s:%d|t %s", C_Item.GetItemIconByID(itemID), iconSize, name)
 	else
 		return name
 	end
@@ -250,7 +250,7 @@ do	-- item functions
 		self:ApplyDress()
 		-- hack for items not returning any transmog info
 		if not item then return end
-		local _, _, _, slot = GetItemInfoInstant(item)
+		local _, _, _, slot = C_Item.GetItemInfoInstant(item)
 		local tryonSlot
 		if slot == "INVTYPE_WEAPON" then
 			tryonSlot = "MAINHANDSLOT"
@@ -270,7 +270,7 @@ do	-- item functions
 		if not (self and item) then return end
 
 		if button == "LeftButton" then
-			if not HandleModifiedItemClick(select(2, GetItemInfo(item))) and data.items then
+			if not HandleModifiedItemClick(select(2, C_Item.GetItemInfo(item))) and data.items then
 				data.cycle = (data.cycle % #data.items) + 1
 				data.item = data.items[data.cycle]
 				self:OnEnter()
@@ -290,7 +290,7 @@ do	-- item functions
 	function mog.ShowItemTooltip(self, item, items)
 		-- hack for items not returning any transmog info
 		if not item then return end
-		
+
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 		GameTooltip[mog] = true
 
@@ -362,7 +362,7 @@ do	-- item functions
 			GameTooltip:AddLine(" ")
 			GameTooltip:AddLine(L["Item ID"]..": |cffffffff"..mog:ToNumberItem(item))
 		end
-		
+
 		-- source sometimes can't be determined if item is not cached
 		local hasItem = itemInfo and mog:HasItem(mog:GetSourceFromItem(item))
 		if hasItem then

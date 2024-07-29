@@ -23,7 +23,7 @@ function mog.base.DropdownTier1(self)
 		end
 		mog:SetModule(self.value, self.value.label);
 	else
-		LoadAddOn(self.value.name);
+		C_AddOns.LoadAddOn(self.value.name);
 	end
 end
 
@@ -192,9 +192,9 @@ mog.baseModules = {
 local myName = UnitName("player");
 
 for _, addon in ipairs(mog.baseModules) do
-	local _, title = GetAddOnInfo(addon);
-	if GetAddOnEnableState(myName, addon) > 0 then
-		local module = mog:RegisterModule(addon, tonumber(GetAddOnMetadata(addon, "X-MogItModuleVersion")), {
+	local _, title = C_AddOns.GetAddOnInfo(addon);
+	if C_AddOns.GetAddOnEnableState(addon, myName) > Enum.AddOnEnableState.None then
+		local module = mog:RegisterModule(addon, tonumber(C_AddOns.GetAddOnMetadata(addon, "X-MogItModuleVersion")), {
 			label = title:match("MogIt[%s%-_:]+(.+)") or title,
 			base = true,
 			slots = {},

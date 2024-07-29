@@ -88,7 +88,7 @@ function mog.tooltip:ShowItem(itemLink)
 	end
 
 	if not itemLink then return end
-	local itemID, _, _, slot = GetItemInfoInstant(itemLink);
+	local itemID, _, _, slot = C_Item.GetItemInfoInstant(itemLink);
 	if not itemID then return end
 	local self = GameTooltip;
 
@@ -109,7 +109,7 @@ function mog.tooltip:ShowItem(itemLink)
 						end
 					end
 				end
-				local _, _, _, slot = GetItemInfoInstant(itemLink);
+				local _, _, _, slot = C_Item.GetItemInfoInstant(itemLink);
 				if (not db.tooltipMog or select(3, C_Transmog.CanTransmogItem(itemID))) and tooltip.slots[slot] and C_Item.IsDressableItemByID(itemLink) then
 					tooltip.model:SetFacing(tooltip.slots[slot]-(db.tooltipRotate and 0.5 or 0));
 					tooltip:Show();

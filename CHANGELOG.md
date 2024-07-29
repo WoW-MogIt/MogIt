@@ -1,1 +1,1 @@
-- Added option to dress tooltip model only if a modifier is pressed.
+- Updated for WoW 11.0.

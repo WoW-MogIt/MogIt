@@ -774,7 +774,7 @@ function mog.view.AddItem(item, preview, forceSlot, setItem)
 			end
 		end
 		preview.slots[slot].item = item;
-		slotTexture(preview, slot, GetItemIcon(item));
+		slotTexture(preview, slot, C_Item.GetItemIconByID(item));
 		if preview:IsVisible() then
 			if (slot == "MainHandSlot" or slot == "SecondaryHandSlot") and preview.data.weaponEnchant then
 				item = format(gsub(item, "item:(%d+):0", "item:%1:%%d"), preview.data.weaponEnchant);
@@ -981,7 +981,7 @@ else
 		if addon == "Blizzard_InspectUI" then
 			hookInspectUI();
 		end
-		if IsAddOnLoaded("Blizzard_AuctionUI") and IsAddOnLoaded("Blizzard_InspectUI") and IsAddOnLoaded("Blizzard_EncounterJournal") then
+		if C_AddOns.IsAddOnLoaded("Blizzard_AuctionUI") and C_AddOns.IsAddOnLoaded("Blizzard_InspectUI") and C_AddOns.IsAddOnLoaded("Blizzard_EncounterJournal") then
 			self:UnregisterEvent(event);
 			self:SetScript("OnEvent", nil);
 		end

@@ -53,17 +53,17 @@ local defaults = {
 function Wishlist:MogItLoaded()
 	local db = LibStub("AceDB-3.0"):New("MogItWishlist", defaults)
 	self.db = db
-	
+
 	local _, _, _, tocversion = GetBuildInfo()
-	
+
 	-- add alternate items table to sets
 	for i, set in ipairs(db.profile.sets) do
 		set.alternateItems = set.alternateItems or {}
 	end
-	
+
 	-- convert all bows into main hand instead of off hand
 	convertBowSlots()
-	
+
 	do	-- convert to 6.0 string format
 		for k, profile in pairs(self.db.profiles) do
 			if profile.items then
@@ -73,7 +73,7 @@ function Wishlist:MogItLoaded()
 					end
 				end
 			end
-			
+
 			if profile.sets then
 				for i, set in ipairs(profile.sets) do
 					for k, item in pairs(set.items) do
@@ -85,19 +85,19 @@ function Wishlist:MogItLoaded()
 			end
 		end
 	end
-	
+
 	-- convert item strings to 6.2 format
 	if not db.global.version then
 		local origPattern = MogIt.itemStringPattern
 		MogIt.itemStringPattern = "item:(%d+):%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:(%d+):([%d:]+)";
-		
+
 		for k, profile in pairs(self.db.profiles) do
 			if profile.items then
 				for k, item in pairs(profile.items) do
 					profile.items[k] = MogIt:NormaliseItemString(item)
 				end
 			end
-			
+
 			if profile.sets then
 				for i, set in ipairs(profile.sets) do
 					for k, item in pairs(set.items) do
@@ -106,10 +106,10 @@ function Wishlist:MogItLoaded()
 				end
 			end
 		end
-		
+
 		MogIt.itemStringPattern = origPattern
 	end
-	
+
 	do	-- update item strings wherever possible as the format changes
 		for k, profile in pairs(self.db.profiles) do
 			if profile.items then
@@ -117,7 +117,7 @@ function Wishlist:MogItLoaded()
 					profile.items[k] = MogIt:NormaliseItemString(item)
 				end
 			end
-			
+
 			if profile.sets then
 				for i, set in ipairs(profile.sets) do
 					for k, item in pairs(set.items) do
@@ -127,9 +127,9 @@ function Wishlist:MogItLoaded()
 			end
 		end
 	end
-	
+
 	db.global.version = tocversion
-	
+
 	db.RegisterCallback(self, "OnProfileChanged", onProfileUpdated)
 	db.RegisterCallback(self, "OnProfileCopied", onProfileUpdated)
 	db.RegisterCallback(self, "OnProfileReset", onProfileUpdated)
@@ -259,7 +259,7 @@ function Wishlist:AddItem(item, setName, slot, isAlternate)
 		if type(slot) ~= "string" then
 			slot = nil
 		end
-		slot = slot or MogIt.slotsType[select(4, GetItemInfoInstant(item))]
+		slot = slot or MogIt.slotsType[select(4, C_Item.GetItemInfoInstant(item))]
 		if isAlternate then
 			local altItems = set.alternateItems[slot] or {}
 			set.alternateItems[slot] = altItems
@@ -426,7 +426,7 @@ end
 
 local setFuncs = {
 	addItem = function(self, set, item)
-		if Wishlist:AddItem(item, set, select(4, GetItemInfoInstant(item)) == "INVTYPE_WEAPON" and IsShiftKeyDown() and "SecondaryHandSlot" or nil) then
+		if Wishlist:AddItem(item, set, select(4, C_Item.GetItemInfoInstant(item)) == "INVTYPE_WEAPON" and IsShiftKeyDown() and "SecondaryHandSlot" or nil) then
 			MogIt:BuildList(nil, "Wishlist")
 		end
 		CloseDropDownMenus()
@@ -438,11 +438,11 @@ function Wishlist:AddSetMenuItems(level, func, arg2, profile)
 	if not sets then
 		return
 	end
-	
+
 	local onehand
 	if type(func) ~= "function" then
 		func = setFuncs[func]
-		if select(4, GetItemInfoInstant(arg2)) == "INVTYPE_WEAPON" then
+		if select(4, C_Item.GetItemInfoInstant(arg2)) == "INVTYPE_WEAPON" then
 			onehand = true
 		end
 	end
@@ -511,7 +511,7 @@ do
 		data.name = text
 		MogIt:BuildList(nil, "Wishlist")
 	end
-	
+
 	StaticPopupDialogs["MOGIT_WISHLIST_RENAME_SET"] = {
 		text = L["Enter new set name"],
 		button1 = ACCEPT,
