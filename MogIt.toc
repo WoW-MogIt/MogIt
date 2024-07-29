@@ -15,9 +15,6 @@
 ## Notes-zhTW: 塑形 助理
 ## Notes-ptBR: Assistente Transmogrification
 ## Notes-itIT: Transmogrification Assistant
-## X-Category: Roleplay & Transmogrification
-## X-Website: https://www.curseforge.com/wow/addons/mogit
-## X-Localizations: enUS, frFR, deDE, esES, esMX, ruRU, koKR, zhCN, zhTW, ptBR, itIT
 ## X-Curse-Project-ID: 30961
 
 Libs\Embeds.xml

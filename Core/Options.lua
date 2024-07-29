@@ -4,7 +4,8 @@ local L = mog.L;
 local LBR = LibStub("LibBabble-Race-3.0"):GetUnstrictLookupTable();
 
 function mog.createOptions()
-	local about = LibStub("LibAddonInfo-1.0"):CreateFrame(MogIt,nil,"Interface\\AddOns\\MogIt\\Images");
+	local frame = CreateFrame("Frame");
+	Settings.RegisterCanvasLayoutCategory(frame, MogIt);
 
 	local config = LibStub("AceConfig-3.0");
 	local dialog = LibStub("AceConfigDialog-3.0");
@@ -242,8 +243,8 @@ function mog.createOptions()
 			},
 		},
 	};
-	config:RegisterOptionsTable("MogIt_General",options.args.general);
-	dialog:AddToBlizOptions("MogIt_General",options.args.general.name,MogIt);
+	config:RegisterOptionsTable("MogIt",options.args.general);
+	dialog:AddToBlizOptions("MogIt");
 
 	options.args.tooltip = {
 		type = "group",
