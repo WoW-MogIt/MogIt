@@ -304,7 +304,7 @@ end
 
 function mog:LoadBaseModules()
 	for i, module in ipairs(self.baseModules) do
-		if GetAddOnEnableState(myName, module) > 0 and not IsAddOnLoaded(module) then
+		if C_AddOns.GetAddOnEnableState(module, myName) > Enum.AddOnEnableState.None and not C_AddOns.IsAddOnLoaded(module) then
 			LoadAddOn(module)
 		end
 	end
