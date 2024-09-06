@@ -1,1 +1,0 @@
-- Updated for WoW 11.0.
