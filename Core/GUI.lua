@@ -1,8 +1,6 @@
 local MogIt,mog = ...;
 local L = mog.L;
 
-local LBR = LibStub("LibBabble-Race-3.0"):GetUnstrictLookupTable();
-
 mog.sheathe = false
 
 local ModelFramePrototype = CreateFrame("Button")
@@ -76,14 +74,14 @@ function mog:CreateModelFrame(parent)
 		tremove(mog.modelBin,1);
 		return f;
 	end
-	
+
 	local f = setmetatable(CreateFrame("Button",nil,parent), ModelFrame_MT);
 	f:Hide();
-	
+
 	f.parent = parent;
 	f.data = {};
 	f.indicators = {};
-	
+
 	f.model = CreateFrame("DressUpModel",nil,f);
 	f.model:SetAllPoints(f);
 	f.model:SetModelScale(2);
@@ -92,11 +90,11 @@ function mog:CreateModelFrame(parent)
 
 	local lightValues = { omnidirectional = false, point = CreateVector3D(0, 0.8, -1), ambientIntensity = 1, ambientColor = CreateColor(1, 1, 1), diffuseIntensity = 0.3, diffuseColor = CreateColor(1, 1, 1) };
 	f.model:SetLight(true, lightValues);
-	
+
 	f.bg = f:CreateTexture(nil,"BACKGROUND");
 	f.bg:SetAllPoints(f);
 	f.bg:SetColorTexture(0.3,0.3,0.3,0.2);
-	
+
 	f:RegisterForClicks("AnyUp");
 	f:RegisterForDrag("LeftButton","RightButton");
 	f:SetScript("OnShow",f.OnShow);
@@ -104,7 +102,7 @@ function mog:CreateModelFrame(parent)
 	f:SetScript("OnUpdate",f.OnUpdate);
 	f:SetScript("OnDragStart",f.OnDragStart);
 	f:SetScript("OnDragStop",f.OnDragStop);
-	
+
 	return f;
 end
 
@@ -281,7 +279,7 @@ function mog.DressFromPreview(model, previewFrame)
 	if not previewFrame then
 		return;
 	end
-	
+
 	for id, slot in pairs(previewFrame.slots) do
 		if slot.item then
 			model:TryOn(format(gsub(slot.item, "item:(%d+):0", "item:%1:%%d"), previewFrame.data.weaponEnchant), slot.slot, slot.itemAppearanceModID);
@@ -301,7 +299,7 @@ mog.modelUpdater:SetScript("OnUpdate",function(self,elapsed)
 	local cX,cY = GetCursorPosition();
 	local dX = (cX-self.pX)/50;
 	local dY = (cY-self.pY)/50;
-	
+
 	if (mog.db.profile.sync or self.model.type == "catalogue") then
 		if self.btn == "LeftButton" then
 			mog.posZ = mog.posZ + dY;
@@ -329,7 +327,7 @@ mog.modelUpdater:SetScript("OnUpdate",function(self,elapsed)
 		end
 		self.model:PositionModel();
 	end
-	
+
 	self.pX,self.pY = cX,cY;
 end);
 
@@ -396,7 +394,7 @@ function mog.scroll:update(value, offset, onscroll)
 	if total == math.huge then
 		total = 1;
 	end
-	
+
 	if onscroll then
 		value = onscroll;
 	else
@@ -408,7 +406,7 @@ function mog.scroll:update(value, offset, onscroll)
 		else
 			self:Hide();
 		end
-		
+
 		local old = self:GetValue();
 		value = (value or old or 1) + (offset or 0);
 		if value ~= old then
@@ -427,15 +425,15 @@ function mog.scroll:update(value, offset, onscroll)
 	else
 		self.down:Enable();
 	end
-	
+
 	if mog.Item_Menu:IsShown() or mog.Set_Menu:IsShown() then
 		HideDropDownMenu(1);
 	end
-	
+
 	if mog.active and mog.active.OnScroll then
 		mog.active:OnScroll();
 	end
-	
+
 	for id, frame in ipairs(mog.models) do
 		local index = ((value-1)*models)+id;
 		local value = mog.list[index];
@@ -466,14 +464,14 @@ function mog.scroll:update(value, offset, onscroll)
 			frame:Disable();
 		end
 	end
-	
+
 	if total > 0 then
 		mog.frame.page:SetText(MERCHANT_PAGE_NUMBER:format(value, total));
 		mog.frame.page:Show();
 	else
 		mog.frame.page:Hide();
 	end
-	
+
 	-- incorrect models may be tried on when items aren't cached, this queues another update if uncached items were found
 	if mog.doModelUpdate then
 		updater:Show();
@@ -509,7 +507,7 @@ function mog:UpdateGUI(resize)
 	local total = rows*columns;
 	local current = #mog.models;
 	local modelWidth,modelHeight = mog:GetModelSize();
-	
+
 	if not resize then
 		if current > total then
 			for i=current,(total+1),-1 do
@@ -526,7 +524,7 @@ function mog:UpdateGUI(resize)
 			mog.scroll:update();
 		end
 	end
-	
+
 	for row=1,rows do
 		for column=1,columns do
 			local n = ((row-1)*columns)+column;
@@ -588,18 +586,18 @@ local function createMenu(menuBar, label, func)
 	f.menuBar = menuBar
 	f.menuBar.xOffset = 0
 	f.menuBar.yOffset = 0
-	
+
 	f.nt = f:CreateTexture(nil,"BACKGROUND");
 	--nt:SetColorTexture(0.8,0.3,0.8,1);
 	f.nt:SetColorTexture(0,0,0,0);
 	f.nt:SetAllPoints(f);
 	f:SetNormalTexture(f.nt);
-	
+
 	f.func = func;
 	f:SetScript("OnClick",menuOnClick);
 	f:SetScript("OnEnter",menuOnEnter);
 	f:SetScript("OnLeave",menuOnLeave);
-	
+
 	return f;
 end
 
@@ -626,25 +624,25 @@ mog.menu.modules = mog.menu:CreateMenu(L["Modules"], function(self, tier)
 		info.notCheckable = true;
 		info.justifyH = "CENTER";
 		UIDropDownMenu_AddButton(info,tier);
-		
+
 		for k,v in ipairs(mog.moduleList) do
 			if v.base and v.Dropdown then
 				v:Dropdown(tier);
 			end
 		end
-		
+
 		info = UIDropDownMenu_CreateInfo();
 		info.isTitle = true;
 		info.notCheckable = true;
 		UIDropDownMenu_AddButton(info,tier);
-		
+
 		info = UIDropDownMenu_CreateInfo();
 		info.text = L["Extra Modules"];
 		info.isTitle = true;
 		info.notCheckable = true;
 		info.justifyH = "CENTER";
 		UIDropDownMenu_AddButton(info,tier);
-		
+
 		for k,v in ipairs(mog.moduleList) do
 			if (not v.base) and v.Dropdown then
 				v:Dropdown(tier);
@@ -704,7 +702,7 @@ mog.menu.catalogue = mog.menu:CreateMenu(L["Catalogue"], function(self, tier)
 		info.notCheckable = true;
 		info.func = mog.ToggleFilters;
 		UIDropDownMenu_AddButton(info,tier);
-		
+
 		local info = UIDropDownMenu_CreateInfo();
 		info.text = L["Sorting"];
 		info.value = "sorting";
@@ -712,21 +710,21 @@ mog.menu.catalogue = mog.menu:CreateMenu(L["Catalogue"], function(self, tier)
 		info.hasArrow = true;
 		info.disabled = not (mog.active and mog.active.sorting and #mog.active.sorting > 0);
 		UIDropDownMenu_AddButton(info,tier);
-		
+
 		local info = UIDropDownMenu_CreateInfo();
 		info.text = L["Weapon enchant"];
 		info.value = "weaponEnchant";
 		info.notCheckable = true;
 		info.hasArrow = true;
 		UIDropDownMenu_AddButton(info,tier);
-		
+
 		local info = UIDropDownMenu_CreateInfo();
 		info.text = L["Dress models"];
 		info.value = "gridDress";
 		info.notCheckable = true;
 		info.hasArrow = true;
 		UIDropDownMenu_AddButton(info,tier);
-		
+
 		local info = UIDropDownMenu_CreateInfo();
 		info.text = L["Sheathe weapons"];
 		info.checked = mog.sheathe;
@@ -754,7 +752,7 @@ mog.menu.catalogue = mog.menu:CreateMenu(L["Catalogue"], function(self, tier)
 			info.checked = mog.weaponEnchant == nil;
 			info.keepShownOnClick = true;
 			self:AddButton(info, tier);
-			
+
 			for i, enchantCategory in ipairs(mog.enchants) do
 				local info = UIDropDownMenu_CreateInfo();
 				info.text = enchantCategory.name;
@@ -811,13 +809,13 @@ mog.menu.preview = mog.menu:CreateMenu(L["Preview"], function(self, tier)
 		info.func = newPreview;
 		UIDropDownMenu_AddButton(info,tier);
 	end
-	
+
 	local info = UIDropDownMenu_CreateInfo();
 	info.text = mog.view:IsShown() and L["Hide Previews"] or L["Show Previews"];
 	info.notCheckable = true;
 	info.func = mog.TogglePreview;
 	UIDropDownMenu_AddButton(info,tier);
-	
+
 	local info = UIDropDownMenu_CreateInfo();
 	info.text = L["Synchronize Positioning"];
 	info.checked = mog.db.profile.sync;
