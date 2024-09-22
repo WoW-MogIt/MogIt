@@ -40,9 +40,9 @@ function mog:SetToLink(set, enchant)
 	return format("[MogIt:%s:00:%s]", table.concat(items, ";"), toBase(enchant or 0));
 end
 
-function mog:LinkToSet(link)
+function mog:LinkToSet(linkData)
 	local set = {};
-	local items, enchant = link:match("MogIt:([^:]*):?%w?%w?:?(%w*)");
+	local items, enchant = linkData:match("([^:]*):?%w?%w?:?(%w*)");
 	if items then
 		if items:find("[.;]") then
 			for item in gmatch(items, "[^;]+") do
@@ -61,7 +61,7 @@ function mog:LinkToSet(link)
 end
 
 local function filter(self, event, msg, ...)
-	msg = msg:gsub("%[(MogIt[^%]]+)%]","|cffcc99ff|H%1|h[MogIt]|h|r");
+	msg = msg:gsub("%[MogIt:([^%]]+)%]","|cffcc99ff|Haddon:mogit:%1|h[MogIt]|h|r");
 	return false, msg, ...;
 end
 
@@ -92,18 +92,18 @@ for i, event in ipairs(events) do
 	ChatFrame_AddMessageEventFilter(event, filter);
 end
 
-local SetHyperlink = ItemRefTooltip.SetHyperlink;
-function ItemRefTooltip:SetHyperlink(link)
-	if link:find("^MogIt") then
+local function SetItemRef(self, link, text)
+	local linkType, addonName, linkData = string.split(":", link, 3)
+	if linkType == "addon" and addonName == "mogit" then
 		if IsModifiedClick("CHATLINK") then
-			ChatEdit_InsertLink("["..link.."]")
+			ChatEdit_InsertLink(format("[MogIt:%s]", linkData))
 		else
 			local preview = mog:GetPreview();
-			local set, enchant = mog:LinkToSet(link);
+			local set, enchant = mog:LinkToSet(linkData);
 			preview.data.weaponEnchant = enchant;
 			mog:AddToPreview(set, preview);
 		end
-	else
-		SetHyperlink(self, link);
 	end
 end
+
+EventRegistry:RegisterCallback("SetItemRef", SetItemRef, mog)
