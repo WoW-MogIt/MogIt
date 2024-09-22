@@ -1,39 +1,56 @@
-local strings;
-local output;
+local strings = { }
+local files = { }
 
-function getStrings(name)
-	output = output.."\n\n\t--[[ "..name.." ]]--";
-	local file = io.open(name,"r"):read("*all");
-	for str in file:gmatch("L%[\"(.-[^\\])\"%]") do
+function getStrings(filePath)
+	local content = io.open(filePath, "r"):read("*all")
+
+	if filePath:match(".xml$") then
+		local dir = filePath:match("^(.+\\).-%.xml$")
+		for fileName in content:gmatch("<%s*Script %s*file%s*=%s*\"(.-%.lua)\"%s*/>") do
+			getStrings(dir..fileName)
+		end
+		for fileName in content:gmatch("<%s*Include %s*file%s*=%s*\"(.-%.xml)\"%s*/>") do
+			getStrings(dir..fileName)
+		end
+		return
+	end
+
+	local file = {
+		path = filePath,
+		strings = { },
+	}
+
+	table.insert(files, file)
+
+	for str in content:gmatch("L%[\"(.-[^\\])\"%]") do
 		if not strings[str] then
-			output = output.."\nL[\""..str.."\"] = true"
-			strings[str] = true;
-		end
-	end
-	if name:match(".xml$") then
-		local dir = name:match("^(.+\\).-%.xml$");
-		for lua in file:gmatch("<%s*Script %s*file%s*=%s*\"(.-%.lua)\"%s*/>") do
-			getStrings(dir..lua);
-		end
-		for xml in file:gmatch("<%s*Include %s*file%s*=%s*\"(.-%.xml)\"%s*/>") do
-			getStrings(dir..xml);
+			table.insert(file.strings, "L[\""..str.."\"] = true")
+			strings[str] = true
 		end
 	end
 end
 
-function getLocale(file,files)
-	strings = {};
-	--output = "L[\"Transmogrification Assistant\"] = true";
-	output = "";
-	for k,v in ipairs(files) do
-		output = output.."\n\n";
-		getStrings(v);
+function getLocale(file, indexFiles)
+	local output = { }
+
+	for i, filePath in ipairs(indexFiles) do
+		getStrings(filePath)
 	end
-	local list = io.open(file..".lua","w");
-	list:write(output);
+
+	table.sort(files, function(a, b) return a.path:lower() < b.path:lower() end)
+
+	for i, file in ipairs(files) do
+		table.sort(file.strings, function(a, b) return a:lower() < b:lower() end)
+		if #file.strings > 0 then
+			table.insert(output, string.format("--[[ %s ]]--\n%s", file.path, table.concat(file.strings, "\n")))
+		end
+	end
+
+	local list = io.open(file..".lua", "w")
+	list:write(table.concat(output, "\n\n"))
 end
 
-getLocale("LocaleList",{
+getLocale("LocaleList", {
 	"Core\\Core.xml",
 	"Modules\\Modules.xml",
-});
+})

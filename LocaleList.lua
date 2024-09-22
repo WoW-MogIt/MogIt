@@ -9,10 +9,12 @@ L["Toggle Mogit"] = true
 L["Toggle Preview"] = true
 
 --[[ Core\Enchants.lua ]]--
+L["Battle for Azeroth"] = true
 L["Classic"] = true
 L["Expansions"] = true
 L["Illusions"] = true
 L["Runeforging"] = true
+L["Shadowlands"] = true
 
 --[[ Core\Filters\bind.lua ]]--
 L["Bind"] = true
@@ -37,7 +39,8 @@ L["Results"] = true
 L["This module has no filters"] = true
 
 --[[ Core\Filters\hasItem.lua ]]--
-L["Only items you own"] = true
+L["Items you have collected"] = true
+L["Items you have not collected"] = true
 L["Owned items"] = true
 
 --[[ Core\GUI.lua ]]--
@@ -46,7 +49,6 @@ L["Catalogue"] = true
 L["Dress models"] = true
 L["Equipped"] = true
 L["Extra Modules"] = true
-L["Help"] = true
 L["Hide Filters"] = true
 L["Hide Previews"] = true
 L["How to use"] = true
@@ -57,8 +59,8 @@ L["Module controls"] = true
 L["Modules"] = true
 L["New Preview"] = true
 L["Options"] = true
-L["Preview"] = true
 L["Right click and drag to move"] = true
+L["Sheathe weapons"] = true
 L["Show Filters"] = true
 L["Show Previews"] = true
 L["Sorting"] = true
@@ -66,13 +68,20 @@ L["Synchronize Positioning"] = true
 L["Weapon enchant"] = true
 
 --[[ Core\Options.lua ]]--
+L["Always indicate collected appearance in tooltip"] = true
+L["Always indicate owned item in tooltip"] = true
+L["Anchor point"] = true
 L["Auto rotate"] = true
+L["Check alts for wishlist items"] = true
 L["Columns"] = true
+L["Confirm closing multi previews"] = true
+L["Detailed info for wishlist items"] = true
 L["Dress model"] = true
 L["Enable tooltip model"] = true
 L["Height"] = true
 L["Hide minimap button"] = true
 L["No animation"] = true
+L["Only dress if modifier is pressed"] = true
 L["Only show if modifier is pressed"] = true
 L["Only transmogrification items"] = true
 L["Options profile"] = true
@@ -107,9 +116,9 @@ L["http://www.wowhead.com/"] = true
 L["Import / Export"] = true
 L["Import"] = true
 L["Load"] = true
-L["New set..."] = true
 L["Other profiles"] = true
 L["Preview %d"] = true
+L["Previous items"] = true
 L["Right click to show the item menu"] = true
 L["Save"] = true
 L["Shift + Left click to link an item to chat"] = true
@@ -132,23 +141,25 @@ L["Delete set"] = true
 L["Delete"] = true
 L["Item ID"] = true
 L["Items using this appearance:"] = true
-L["Load module to see other items using this appearance."] = true
 L["New preview"] = true
+L["New set..."] = true
+L["Preview"] = true
 L["Rename set"] = true
 L["Required Level"] = true
 L["Slot"] = true
 L["Source"] = true
-L["You have this item."] = true
-
---[[ Core\Tooltip.lua ]]--
 L["This item is on your wishlist."] = true
 
 --[[ Core\URL.lua ]]--
 L["URL"] = true
 
 --[[ Modules\Base.lua ]]--
-L["Click to load addon"] = true
 L["Left click to cycle through items"] = true
+
+--[[ Modules\Extra.lua ]]--
+L["Click to load addon"] = true
+L["This module was created for a newer version of MogIt and may not work correctly."] = true
+L["This module was created for an older version of MogIt and may not work correctly."] = true
 
 --[[ Modules\Wishlist.lua ]]--
 L["Ctrl-left click to try on in dressing room"] = true

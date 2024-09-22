@@ -435,7 +435,6 @@ end;
 
 --// Toolbar
 local function helpOnEnter(self)
-	self.nt:SetColorTexture(1,0.82,0,1);
 	GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT");
 	GameTooltip:AddLine(L["How to use"]);
 	GameTooltip:AddLine(" ");
@@ -457,7 +456,6 @@ end
 
 local function helpOnLeave(self)
 	GameTooltip:Hide();
-	self.nt:SetColorTexture(0,0,0,0);
 end
 
 local function createMenuBar(parent)
@@ -472,8 +470,8 @@ local function createMenuBar(parent)
 	menuBar.save = menuBar:CreateMenu(L["Save"], saveInitialize);
 	menuBar.save:SetPoint("LEFT", menuBar.load, "RIGHT", 5, 0);
 
-	menuBar.help = menuBar:CreateMenu(L["Help"]);
-	menuBar.help:SetPoint("LEFT", menuBar.save, "RIGHT", 5, 0);
+	menuBar.help = CreateFrame("Button", nil, parent, "UIPanelInfoButton");
+	menuBar.help:SetPoint("TOPRIGHT", -15, -34);
 	menuBar.help:SetScript("OnEnter",helpOnEnter);
 	menuBar.help:SetScript("OnLeave",helpOnLeave);
 end

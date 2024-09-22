@@ -26,10 +26,8 @@ mog.frame:SetScript("OnMouseUp", stopMovingOrSizing);
 mog.frame:SetScript("OnHide", stopMovingOrSizing);
 tinsert(UISpecialFrames,"MogItFrame");
 
+ButtonFrameTemplate_HidePortrait(mog.frame);
 mog.frame:SetTitle("MogIt");
-mog.frame:GetTitleText():SetPoint("RIGHT",mog.frame,"RIGHT",-28,0);
-mog.frame:SetPortraitTextureRaw("Interface\\AddOns\\MogIt\\Images\\MogIt");
-mog.frame:SetPortraitTexCoord(0,106/128,0,105/128);
 MogItFrameBg:SetVertexColor(0.8,0.3,0.8);
 
 mog.frame.resize = CreateFrame("Button",nil,mog.frame);
@@ -545,14 +543,17 @@ end
 
 
 --// Toolbar
-local function menuBarInitialize(self, level)
+local MenuBarMixin = { }
+local MenuMixin = { }
+
+function MenuBarMixin:initialize(level)
 	if self.active and self.active.func then
 		self.tier[level] = UIDROPDOWNMENU_MENU_VALUE;
 		self.active.func(self, level);
 	end
 end
 
-local function menuOnClick(self, btn)
+function MenuMixin:OnClick(btn)
 	if self.menuBar.active ~= self then
 		HideDropDownMenu(1);
 	end
@@ -562,7 +563,7 @@ local function menuOnClick(self, btn)
 	end
 end
 
-local function menuOnEnter(self)
+function MenuMixin:OnEnter()
 	if self.menuBar.active ~= self and self.menuBar:IsShown() then
 		HideDropDownMenu(1);
 		if self.func then
@@ -573,19 +574,24 @@ local function menuOnEnter(self)
 	self.nt:SetColorTexture(1,0.82,0,1);
 end
 
-local function menuOnLeave(self)
+function MenuMixin:OnLeave()
 	self.nt:SetColorTexture(0,0,0,0);
 end
 
-local function createMenu(menuBar, label, func)
-	local f = CreateFrame("Button", nil, menuBar.parent);
+function MenuMixin:HandlesGlobalMouseEvent()
+	return true;
+end
+
+function MenuBarMixin:CreateMenu(label, func)
+	local f = CreateFrame("Button", nil, self.parent);
+	Mixin(f, MenuMixin);
 	f:SetText(label);
 	f:SetNormalFontObject(GameFontNormal);
 	f:SetHighlightFontObject(GameFontBlack);
 	f:SetSize(f:GetFontString():GetStringWidth()+10, f:GetFontString():GetStringHeight()+10);
-	f.menuBar = menuBar
-	f.menuBar.xOffset = 0
-	f.menuBar.yOffset = 0
+	f.menuBar = self;
+	f.menuBar.xOffset = 0;
+	f.menuBar.yOffset = 0;
 
 	f.nt = f:CreateTexture(nil,"BACKGROUND");
 	--nt:SetColorTexture(0.8,0.3,0.8,1);
@@ -594,18 +600,17 @@ local function createMenu(menuBar, label, func)
 	f:SetNormalTexture(f.nt);
 
 	f.func = func;
-	f:SetScript("OnClick",menuOnClick);
-	f:SetScript("OnEnter",menuOnEnter);
-	f:SetScript("OnLeave",menuOnLeave);
+	f:SetScript("OnClick", f.OnClick);
+	f:SetScript("OnEnter", f.OnEnter);
+	f:SetScript("OnLeave", f.OnLeave);
 
 	return f;
 end
 
 function mog.CreateMenuBar(parent)
 	local menuBar = mog:CreateDropdown("Menu");
-	menuBar.initialize = menuBarInitialize
-	menuBar.CreateMenu = createMenu;
-	menuBar.parent = parent
+	Mixin(menuBar, MenuBarMixin);
+	menuBar.parent = parent;
 	menuBar.tier = {};
 	return menuBar;
 end
@@ -837,10 +842,8 @@ mog.menu.options:SetScript("OnClick", mog.ToggleOptions);
 mog.menu.options:SetPoint("LEFT", mog.menu.preview, "RIGHT", 5, 0);
 --//
 
-local help = mog.menu:CreateMenu(L["Help"])
--- help:SetNormalFontObject(GameFontHighlight)
-help:SetPoint("LEFT", mog.menu.options, "RIGHT", 5, 0)
-help:SetScript("OnClick", nil);
+local help = CreateFrame("Button", nil, mog.frame, "UIPanelInfoButton")
+help:SetPoint("TOPRIGHT", -15, -34)
 help:SetScript("OnEnter", function(self)
 	GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
 	GameTooltip:AddLine(L["How to use"]);
@@ -858,11 +861,9 @@ help:SetScript("OnEnter", function(self)
 		end
 	end
 	GameTooltip:Show()
-	self.nt:SetColorTexture(1, 0.82, 0, 1);
 end);
 help:SetScript("OnLeave", function(self)
 	GameTooltip_Hide()
-	self.nt:SetColorTexture(0, 0, 0, 0);
 end);
 
 
