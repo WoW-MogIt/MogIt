@@ -5,7 +5,6 @@ mog.base = {};
 local tinsert = table.insert;
 local sort = table.sort;
 local ipairs = ipairs;
-local select = select;
 
 
 --// Base Functions
@@ -62,7 +61,8 @@ function mog.base:FrameUpdate(frame, value)
 	local items = { };
 	local canUse = false;
 	for i, source in ipairs(value) do
-		tinsert(items, (select(6, C_TransmogCollection.GetAppearanceSourceInfo(source))));
+		local _, _, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(source);
+		tinsert(items, itemLink);
 		local sourceInfo = C_TransmogCollection.GetSourceInfo(source);
 		if not (sourceInfo.useErrorType == Enum.TransmogUseErrorType.Race or sourceInfo.useErrorType == Enum.TransmogUseErrorType.Faction) then
 			canUse = true;

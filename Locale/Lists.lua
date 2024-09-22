@@ -69,14 +69,14 @@ L.professions = {
 };
 
 L.quality = {
-	0, -- Poor
-	1, -- Common
-	2, -- Uncommon
-	3, -- Rare
-	4, -- Epic
-	5, -- Legendary
-	6, -- Artifact
-	7, -- Heirloom
+	Enum.ItemQuality.Poor,
+	Enum.ItemQuality.Common,
+	Enum.ItemQuality.Uncommon,
+	Enum.ItemQuality.Rare,
+	Enum.ItemQuality.Epic,
+	Enum.ItemQuality.Legendary,
+	Enum.ItemQuality.Artifact,
+	Enum.ItemQuality.Heirloom,
 };
 
 L.classBits = {

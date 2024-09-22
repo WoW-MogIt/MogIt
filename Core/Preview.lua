@@ -942,12 +942,18 @@ local function hookInspectUI()
 		_G["Inspect"..v]:SetScript("OnClick", onClick);
 	end
 
+	local origOnClick
+
+	local function onClick(self, button)
+		mog:PreviewFromOutfit(mog:GetPreview(), C_TransmogCollection.GetInspectItemTransmogInfoList());
+		self:SetScript("OnClick", origOnClick);
+	end
+
 	InspectPaperDollFrame.ViewButton:RegisterForClicks("LeftButtonUp", "RightButtonUp");
-	InspectPaperDollFrame.ViewButton:SetScript("OnClick", function(self, button)
+	InspectPaperDollFrame.ViewButton:SetScript("PreClick", function(self, button)
 		if IsControlKeyDown() and button == "RightButton" then
-			mog:PreviewFromOutfit(mog:GetPreview(), C_TransmogCollection.GetInspectItemTransmogInfoList());
-		else
-			InspectPaperDollViewButton_OnClick(self);
+			origOnClick = self:GetScript("OnClick");
+			self:SetScript("OnClick", onClick);
 		end
 	end);
 

@@ -1,8 +1,10 @@
 local MogIt,mog = ...;
 local L = mog.L;
 
+local GetSourceInfo = C_TransmogCollection.GetSourceInfo
+local DoesItemExistByID = C_Item.DoesItemExistByID
+
 local f = mog:CreateFilter("quality");
-local colours = ITEM_QUALITY_COLORS;
 local selected;
 local num;
 local all;
@@ -51,12 +53,12 @@ function f.dd.initialize(self)
 	info.func = f.dd.SelectAll;
 	info.notCheckable = true;
 	UIDropDownMenu_AddButton(info);
-	
+
 	for i,v in ipairs(L.quality) do
 		info = UIDropDownMenu_CreateInfo();
 		info.text =	_G["ITEM_QUALITY"..v.."_DESC"];
 		info.value = v;
-		info.colorCode = colours[v].hex;
+		info.colorCode = ITEM_QUALITY_COLORS[v].hex;
 		info.func = f.dd.Tier1;
 		info.keepShownOnClick = true;
 		info.isNotRadio = true;
@@ -67,8 +69,8 @@ end
 
 function f.Filter(item)
 	if num == #L.quality then return true end
-	local sourceInfo = C_TransmogCollection.GetSourceInfo(item)
-	if not sourceInfo or not C_Item.DoesItemExistByID(sourceInfo.itemID) then return end
+	local sourceInfo = GetSourceInfo(item)
+	if not sourceInfo or not DoesItemExistByID(sourceInfo.itemID) then return end
 	local item = mog:GetItemInfo(sourceInfo.itemID, "BuildList");
 	return not item or selected[item.quality];
 end
