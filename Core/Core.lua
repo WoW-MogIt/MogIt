@@ -241,7 +241,6 @@ local defaults = {
 		tooltipWishlistDetail = true,
 
 		noAnim = false,
-		url = "Battle.net",
 
 		dressupPreview = false,
 		singlePreview = false,

@@ -101,21 +101,4 @@ L.bind = {
 	[Enum.ItemBind.OnAcquire] = ITEM_BIND_ON_PICKUP,
 	-- [4] = ITEM_BIND_TO_BNETACCOUNT,
 };
-
-L.BattleNetBonus = {
-	-- MoP
-	[451] = "raid-finder",
-	[449] = "raid-heroic",
-	[450] = "raid-mythic",
-
-	-- WoD
-	[518] = "dungeon-level-up-1",
-	[519] = "dungeon-level-up-2",
-	[520] = "dungeon-level-up-3",
-	[521] = "dungeon-level-up-4",
-	[522] = "dungeon-normal",
-	[524] = "dungeon-heroic",
-	[566] = "raid-heroic",
-	[567] = "raid-mythic",
-};
 --//

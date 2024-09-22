@@ -122,19 +122,6 @@ function mog.createOptions()
 						width = "double",
 						arg = "noAnim",
 					},
-					url = {
-						type = "select",
-						order = 2.5,
-						name = L["URL website"],
-						values = function()
-							local tbl = {};
-							for k,v in pairs(mog.url) do
-								tbl[k] = (v.fav and "\124T"..v.fav..":16\124t " or "")..k;
-							end
-							return tbl;
-						end,
-						arg = "url",
-					},
 					rows = {
 						type = "range",
 						order = 4,
@@ -334,19 +321,6 @@ function mog.createOptions()
 	};
 	config:RegisterOptionsTable("MogIt_Tooltip",options.args.tooltip);
 	dialog:AddToBlizOptions("MogIt_Tooltip",options.args.tooltip.name,MogIt);
-
-	--[[options.args.modules = {
-		type = "group",
-		order = 2,
-		name = L["Modules"],
-		--plugins
-		args = {
-			wishlist = db:GetOptionsTable(mog.wishlist.db),
-		},
-	};
-	options.args.modules.args.wishlist.name = L["Wishlist"];
-	config:RegisterOptionsTable("MogIt_Modules",options.args.modules);
-	dialog:AddToBlizOptions("MogIt_Modules",options.args.modules.name,MogIt);--]]
 
 	options.args.options = db:GetOptionsTable(mog.db);
 	options.args.options.name = L["Options profile"];
