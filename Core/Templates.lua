@@ -26,41 +26,31 @@ end
 function mog.GetItemSourceInfo(itemID)
 	local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemID)
 	itemID = sourceID
-	local source, info, zone;
-	local sourceType = mog:GetData("item", itemID, "source");
-	local sourceID = mog:GetData("item", itemID, "sourceid");
-	local sourceInfo = mog:GetData("item", itemID, "sourceinfo");
+	local source, zone;
+	local sourceType = mog:GetData("item", itemID, "source")
 
-	if sourceType == 1 and sourceInfo and #sourceInfo > 0 then -- Drop
-		local drop = sourceInfo[1]
-		source = drop.encounter
-		zone = drop.instance
-		local diff = drop.difficulties[1]
-		if diff then
-			zone = format("%s (%s)", zone, diff);
+	if sourceID and not sourceType then
+		local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+		if sourceInfo then
+			sourceType = sourceInfo.sourceType
+			mog:AddData("item", itemID, "source", sourceType)
 		end
-	elseif sourceType == 3 and sourceID then -- Quest
-		info = IsQuestFlaggedCompleted(sourceID) or false;
-	elseif sourceType == 5 and sourceInfo then -- Crafted
-		source = L.professions[sourceInfo];
-	elseif sourceType == 6 and sourceID then -- Achievement
-		local _, name, _, complete = GetAchievementInfo(sourceID);
-		source = name;
-		info = complete;
 	end
 
-	-- local zone = mog:GetData("item", itemID, "zone");
-	-- if zone then
-		-- zone = GetMapNameByID(zone);
-		-- if zone then
-			-- local diff = L.diffs[sourceInfo];
-			-- if sourceType == 1 and diff then
-				-- zone = format("%s (%s)", zone, diff);
-			-- end
-		-- end
-	-- end
+	if sourceType == 1 or sourceType == 4 then -- Drop
+		local sourceInfo = C_TransmogCollection.GetAppearanceSourceDrops(sourceID)
+		local drop = sourceInfo and sourceInfo[1]
+		if drop then
+			source = drop.encounter
+			zone = drop.instance
+			local diff = drop.difficulties[1]
+			if diff then
+				zone = format("%s (%s)", zone, diff)
+			end
+		end
+	end
 
-	return L.source[sourceType], source, zone, info;
+	return L.source[sourceType], source, zone
 end
 
 function mog.GetItemSourceShort(itemID)
@@ -229,10 +219,6 @@ local function showMenu(menu, data, isSaved, isPreview)
 end
 
 do	-- item functions
-	local sourceLabels = {
-		[L.source[1]] = BOSS,
-	}
-
 	GameTooltip:RegisterEvent("MODIFIER_STATE_CHANGED")
 	GameTooltip:HookScript("OnEvent", function(self, event, key, state)
 		if self:IsForbidden() then return end
@@ -314,7 +300,7 @@ do	-- item functions
 		if sourceType then
 			GameTooltip:AddLine(L["Source"]..": |cffffffff"..sourceType)
 			if source then
-				GameTooltip:AddLine((sourceLabels[sourceType] or sourceType)..": |cffffffff"..source)
+				GameTooltip:AddLine(sourceType..": |cffffffff"..source)
 			end
 			if info ~= nil then
 				GameTooltip:AddLine(STATUS..": |cffffffff"..(info and COMPLETE or INCOMPLETE))
@@ -322,6 +308,13 @@ do	-- item functions
 		end
 		if zone then
 			GameTooltip:AddLine(ZONE..": |cffffffff"..zone)
+		end
+
+		local sourceID = mog:GetSourceFromItem(item)
+		local sourceInfo = sourceID and C_TransmogCollection.GetSourceInfo(sourceID)
+		if sourceInfo and (sourceInfo.useErrorType == Enum.TransmogUseErrorType.Race or sourceInfo.useErrorType == Enum.TransmogUseErrorType.Faction) then
+			GameTooltip:AddLine(" ")
+			GameTooltip:AddLine(sourceInfo.useError, RED_FONT_COLOR:GetRGB())
 		end
 
 		GameTooltip:AddLine(" ")

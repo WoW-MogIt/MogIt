@@ -239,7 +239,6 @@ local defaults = {
 		tooltipAlwaysShowOwned = true,
 		wishlistCheckAlts = true,
 		tooltipWishlistDetail = true,
-		loadModulesDefault = false,
 
 		noAnim = false,
 		url = "Battle.net",
@@ -251,7 +250,6 @@ local defaults = {
 		previewConfirmClose = true,
 
 		sortWishlist = false,
-		loadModulesWishlist = false,
 
 		tooltip = true,
 		tooltipWidth = 300,
@@ -280,8 +278,6 @@ local defaults = {
 				point = "CENTER",
 			}
 		},
-
-		slotLabels = {},
 	}
 }
 
@@ -300,14 +296,6 @@ function mog.LoadSettings()
 	mog:UpdateScroll();
 
 	mog:SetSinglePreview(mog.db.profile.singlePreview);
-end
-
-function mog:LoadBaseModules()
-	for i, module in ipairs(self.baseModules) do
-		if C_AddOns.GetAddOnEnableState(module, myName) > Enum.AddOnEnableState.None and not C_AddOns.IsAddOnLoaded(module) then
-			LoadAddOn(module)
-		end
-	end
 end
 
 mog.frame:RegisterEvent("ADDON_LOADED");
@@ -344,12 +332,7 @@ function mog:ADDON_LOADED(addon)
 		SetCVar("missingTransmogSourceInItemTooltips", mog.db.profile.alwaysShowCollected)
 
 		mog.createOptions();
-
-		if mog.db.profile.loadModulesDefault then
-			mog:LoadBaseModules()
-		end
 	elseif mog.modules[addon] then
-		mog:LoadDB(addon)
 		mog.modules[addon].loaded = true;
 		if mog.menu.active == mog.menu.modules then
 			mog.menu:Rebuild(1)
@@ -396,211 +379,44 @@ function mog:ADDON_LOADED(addon)
 	end
 end
 
-local SLOTS = {
-	[Enum.TransmogCollectionType["Head"]] = "Head",
-	[Enum.TransmogCollectionType["Shoulder"]] = "Shoulder",
-	[Enum.TransmogCollectionType["Back"]] = "Back",
-	[Enum.TransmogCollectionType["Chest"]] = "Chest",
-	[Enum.TransmogCollectionType["Shirt"]] = "Shirt",
-	[Enum.TransmogCollectionType["Tabard"]] = "Tabard",
-	[Enum.TransmogCollectionType["Wrist"]] = "Wrist",
-	[Enum.TransmogCollectionType["Hands"]] = "Hands",
-	[Enum.TransmogCollectionType["Waist"]] = "Waist",
-	[Enum.TransmogCollectionType["Legs"]] = "Legs",
-	[Enum.TransmogCollectionType["Feet"]] = "Feet",
-	[Enum.TransmogCollectionType["Wand"]] = "Wand",
-	[Enum.TransmogCollectionType["OneHAxe"]] = "1H-axe",
-	[Enum.TransmogCollectionType["OneHSword"]] = "1H-sword",
-	[Enum.TransmogCollectionType["OneHMace"]] = "1H-mace",
-	[Enum.TransmogCollectionType["Dagger"]] = "Dagger",
-	[Enum.TransmogCollectionType["Fist"]] = "Fist",
-	[Enum.TransmogCollectionType["Shield"]] = "Shield",
-	[Enum.TransmogCollectionType["Holdable"]] = "Holdable",
-	[Enum.TransmogCollectionType["TwoHAxe"]] = "2H-axe",
-	[Enum.TransmogCollectionType["TwoHSword"]] = "2H-sword",
-	[Enum.TransmogCollectionType["TwoHMace"]] = "2H-mace",
-	[Enum.TransmogCollectionType["Staff"]] = "Staff",
-	[Enum.TransmogCollectionType["Polearm"]] = "Polearm",
-	[Enum.TransmogCollectionType["Bow"]] = "Bow",
-	[Enum.TransmogCollectionType["Gun"]] = "Gun",
-	[Enum.TransmogCollectionType["Crossbow"]] = "Crossbow",
-	[Enum.TransmogCollectionType["Warglaives"]] = "Warglaives",
-	[Enum.TransmogCollectionType["Paired"]] = "ArtifactLegion",
-}
+function mog:TRANSMOG_SEARCH_UPDATED(searchType, categoryType)
+	if searchType ~= Enum.TransmogSearchType.Items then return end
 
-local SLOT_MODULES = {
-	[Enum.TransmogCollectionType["Back"]] = "Other",
-	[Enum.TransmogCollectionType["Shirt"]] = "Other",
-	[Enum.TransmogCollectionType["Tabard"]] = "Other",
-	[Enum.TransmogCollectionType["Wand"]] = "Ranged",
-	[Enum.TransmogCollectionType["OneHAxe"]] = "OneHanded",
-	[Enum.TransmogCollectionType["OneHSword"]] = "OneHanded",
-	[Enum.TransmogCollectionType["OneHMace"]] = "OneHanded",
-	[Enum.TransmogCollectionType["Dagger"]] = "OneHanded",
-	[Enum.TransmogCollectionType["Fist"]] = "OneHanded",
-	[Enum.TransmogCollectionType["Shield"]] = "Other",
-	[Enum.TransmogCollectionType["Holdable"]] = "Other",
-	[Enum.TransmogCollectionType["TwoHAxe"]] = "TwoHanded",
-	[Enum.TransmogCollectionType["TwoHSword"]] = "TwoHanded",
-	[Enum.TransmogCollectionType["TwoHMace"]] = "TwoHanded",
-	[Enum.TransmogCollectionType["Staff"]] = "TwoHanded",
-	[Enum.TransmogCollectionType["Polearm"]] = "TwoHanded",
-	[Enum.TransmogCollectionType["Bow"]] = "Ranged",
-	[Enum.TransmogCollectionType["Gun"]] = "Ranged",
-	[Enum.TransmogCollectionType["Crossbow"]] = "Ranged",
-	[Enum.TransmogCollectionType["Warglaives"]] = "OneHanded",
-	[Enum.TransmogCollectionType["Paired"]] = "Artifact",
-}
+	local categoryModule = self.queueModule
+	self.queueModule = nil
 
-mog.relevantCategories = {}
+	if not (categoryModule and categoryType == categoryModule.category) then return end
 
-function mog:TRANSMOG_SEARCH_UPDATED()
-	-- local t = debugprofilestop()
-
-	local ARMOR_CLASSES = {
-		WARRIOR = "Plate",
-		DEATHKNIGHT = "Plate",
-		PALADIN = "Plate",
-		MONK = "Leather",
-		PRIEST = "Cloth",
-		SHAMAN = "Mail",
-		DRUID = "Leather",
-		ROGUE = "Leather",
-		MAGE = "Cloth",
-		WARLOCK = "Cloth",
-		HUNTER = "Mail",
-		DEMONHUNTER = "Leather",
-		EVOKER = "Mail",
-	}
-
-	local FACTIONS = {
-		["Alliance"] = 1,
-		["Horde"] = 2,
-		-- hack for neutral pandaren, the items they can see are for both factions
-		["Neutral"] = 3,
-	}
-
-	local _, playerClass = UnitClass("player")
-	local faction = UnitFactionGroup("player")
-
-	local armorClass = ARMOR_CLASSES[playerClass]
-
-	mog.relevantCategories[armorClass] = true
-
-	C_AddOns.LoadAddOn("MogIt_"..armorClass)
-	C_AddOns.LoadAddOn("MogIt_Other")
-	C_AddOns.LoadAddOn("MogIt_OneHanded")
-	C_AddOns.LoadAddOn("MogIt_TwoHanded")
-	C_AddOns.LoadAddOn("MogIt_Ranged")
-	C_AddOns.LoadAddOn("MogIt_Artifact")
-
-	local ArmorDB = _G["MogIt_"..armorClass.."DB"] or {}
-	MogIt_OtherDB = MogIt_OtherDB or {}
-	MogIt_OneHandedDB = MogIt_OneHandedDB or {}
-	MogIt_TwoHandedDB = MogIt_TwoHandedDB or {}
-	MogIt_RangedDB = MogIt_RangedDB or {}
-	MogIt_ArtifactDB = MogIt_ArtifactDB or {}
-
-	_G["MogIt_"..armorClass.."DB"] = ArmorDB
+	local module = categoryModule.parentModule
 
 	local GetAppearanceSources = C_TransmogCollection.GetAppearanceSources
-	local GetAppearanceSourceDrops = C_TransmogCollection.GetAppearanceSourceDrops
-	local bor = bit.bor
 
-	for categoryType = Enum.TransmogCollectionTypeMeta.MinValue, Enum.TransmogCollectionTypeMeta.MaxValue do
-		local name, isWeapon, canEnchant, canMainHand, canOffHand = C_TransmogCollection.GetCategoryInfo(categoryType)
-		if name then
-			name = SLOTS[categoryType]
-			local db = db
-			if isWeapon then
-				mog.relevantCategories[name] = true
-			end
-			if SLOT_MODULES[categoryType] then
-				db = _G["MogIt_"..SLOT_MODULES[categoryType].."DB"]
-			else
-				db = ArmorDB
-			end
-			db[name] = db[name] or {}
-			local transmogLocation = TransmogUtil.GetTransmogLocation(1, Enum.TransmogType.Appearance, Enum.TransmogModification.Main)
-			for i, appearance in ipairs(C_TransmogCollection.GetCategoryAppearances(categoryType, transmogLocation)) do
-				if not appearance.isHideVisual then
-					local v = db[name][appearance.visualID] or {}
-					db[name][appearance.visualID] = v
-					if v[1] and v[1].sourceID then
-						db[name][appearance.visualID] = {}
-					end
-					for i, source in ipairs(GetAppearanceSources(appearance.visualID, categoryType, transmogLocation)) do
-						local s = v[source.sourceID] or {}
-						v[source.sourceID] = s
-						s.sourceType = source.sourceType
-						s.drops = GetAppearanceSourceDrops(source.sourceID)
-						s.classes = bor(s.classes or 0, L.classBits[playerClass])
-						s.faction = bor(s.faction or 0, FACTIONS[faction])
-					end
-				end
-			end
-		end
-	end
+	local currentClassFilter = C_TransmogCollection.GetClassFilter()
+	local allRacesShown = C_TransmogCollection.GetAllRacesShown()
+	local allFactionsShown = C_TransmogCollection.GetAllFactionsShown()
 
-	self:LoadDB("MogIt_"..armorClass)
-	self:LoadDB("MogIt_Other")
-	self:LoadDB("MogIt_OneHanded")
-	self:LoadDB("MogIt_TwoHanded")
-	self:LoadDB("MogIt_Ranged")
-	self:LoadDB("MogIt_Artifact")
+	C_TransmogCollection.SetClassFilter(module.classID)
+	C_TransmogCollection.SetAllRacesShown(true)
+	C_TransmogCollection.SetAllFactionsShown(true)
 
-	self.frame:UnregisterEvent("TRANSMOG_SEARCH_UPDATED")
-
-	-- print(format("MogIt modules loaded in %d ms.", debugprofilestop() - t))
-end
-
-
-function mog:LoadDB(addon)
-	if not C_AddOns.IsAddOnLoaded(addon) then return end
-	local SOURCE_TYPES = {
-		[1] = 1,
-		[2] = 3,
-		[3] = 4,
-		[4] = 1,
-		[5] = 6,
-		[6] = 5,
-	}
-
-	local module = mog:GetModule(addon)
-	local moduleDB = _G[addon.."DB"]
-
-	-- won't exist if module was never loaded
-	if not moduleDB then return end
-
-	for slot, appearances in pairs(moduleDB) do
-		local list = {}
-		module.slots[slot] = {
-			label = slot,
-			list = list,
-		}
-		wipe(module.slotList)
-		for visualID, appearance in pairs(appearances) do
-			for sourceID, source in pairs(appearance) do
+	local transmogLocation = TransmogUtil.GetTransmogLocation(CollectionWardrobeUtil.GetSlotFromCategoryID(categoryType), Enum.TransmogType.Appearance, Enum.TransmogModification.Main)
+	for i, appearance in ipairs(C_TransmogCollection.GetCategoryAppearances(categoryType, transmogLocation)) do
+		if not appearance.isHideVisual and appearance.canDisplayOnPlayer then
+			for i, source in ipairs(GetAppearanceSources(appearance.visualID, categoryType, transmogLocation)) do
 				local id = source.sourceID or sourceID
-				tinsert(list, id)
-				mog:AddData("item", id, "display", visualID)
-				-- mog:AddData("item", id, "level", lvl)
-				mog:AddData("item", id, "faction", source.faction)
-				mog:AddData("item", id, "class", source.classes)
-				mog:AddData("item", id, "source", SOURCE_TYPES[source.sourceType])
-				-- mog:AddData("item", id, "sourceid", sourceid)
-				mog:AddData("item", id, "sourceinfo", source.drops)
-				-- mog:AddData("item", id, "zone", zone)
+				tinsert(categoryModule.list, id)
+				mog:AddData("item", id, "display", appearance.visualID)
+				mog:AddData("item", id, "source", source.sourceType)
 			end
 		end
 	end
 
-	for i = 1, Enum.TransmogCollectionTypeMeta.NumValues do
-		local slotID = SLOTS[i]
-		if moduleDB[slotID] then
-			tinsert(module.slotList, slotID)
-		end
-	end
+	C_TransmogCollection.SetClassFilter(currentClassFilter)
+	C_TransmogCollection.SetAllRacesShown(allRacesShown)
+	C_TransmogCollection.SetAllFactionsShown(allFactionsShown)
+
+	mog:SetModule(module, module.label.." - "..categoryModule.label)
+	categoryModule.loaded = true
 end
 
 
@@ -622,19 +438,36 @@ function mog:PLAYER_LOGIN()
 	end)
 	]]
 
-	for k, slot in pairs(SLOTS) do
-		local name = C_TransmogCollection.GetCategoryInfo(k)
-		if name then
-			mog.db.profile.slotLabels[slot] = name
-		end
-	end
-
 	mog:LoadSettings();
 	self.frame:SetScript("OnSizeChanged", function(self, width, height)
 		mog.db.profile.gridWidth = width;
 		mog.db.profile.gridHeight = height;
 		mog:UpdateGUI(true);
 	end)
+
+	local currentClassFilter = C_TransmogCollection.GetClassFilter()
+
+	for k, module in pairs(self.modules) do
+		if module.base and module.classID then
+			C_TransmogCollection.SetClassFilter(module.classID)
+
+			for categoryType = Enum.TransmogCollectionTypeMeta.MinValue, Enum.TransmogCollectionTypeMeta.MaxValue do
+				local name, isWeapon = C_TransmogCollection.GetCategoryInfo(categoryType)
+				if name then
+					module.slots[categoryType] = {
+						category = categoryType,
+						label = name,
+						isWeapon = isWeapon,
+						parentModule = module,
+						list = { },
+					}
+					tinsert(module.slotList, module.slots[categoryType])
+				end
+			end
+		end
+	end
+
+	C_TransmogCollection.SetClassFilter(currentClassFilter)
 end
 
 function mog:PLAYER_EQUIPMENT_CHANGED(slot)

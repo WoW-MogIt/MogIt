@@ -11,76 +11,67 @@ local select = select;
 --// Base Functions
 local list = {};
 
-function mog.base.DropdownTier1(self)
-	if self.value.loaded then
-		self.value.active = nil;
-		if mog.relevantCategories[self.value.label] then
-			mog:GetFilter("class").Default()
-		else
-			mog:GetFilter("class"):SelectAll()
-		end
-		mog:SetModule(self.value, self.value.label);
+function mog.base.DropdownTier2(self, module, categoryModule)
+	module.active = categoryModule
+	if categoryModule.loaded then
+		mog:SetModule(module, module.label.." - "..categoryModule.label)
 	else
-		C_AddOns.LoadAddOn(self.value.name);
+		mog.queueModule = categoryModule
+		C_TransmogCollection.SetSearchAndFilterCategory(categoryModule.category)
 	end
-end
-
-function mog.base.DropdownTier2(self)
-	self.arg1.active = self.value;
-	if mog.relevantCategories[self.arg1.label] or mog.relevantCategories[self.value.label] then
-		mog:GetFilter("class").Default()
-	else
-		mog:GetFilter("class"):SelectAll()
-	end
-	mog:SetModule(self.arg1, self.arg1.label.." - "..mog.db.profile.slotLabels[self.value.label]);
-	CloseDropDownMenus();
+	CloseDropDownMenus()
 end
 
 function mog.base.Dropdown(module, tier)
-	local info;
 	if tier == 1 then
-		local moduleDB = _G[module.name.."DB"]
-		info = UIDropDownMenu_CreateInfo();
-		info.text = module.label..(module.loaded and "" or " |cFFFFFFFF("..L["Click to load addon"]..")");
+		local info = UIDropDownMenu_CreateInfo();
+		info.text = module.label;
 		info.value = module;
-		info.colorCode = "|cFF"..(module.loaded and ((moduleDB and next(moduleDB)) and "00FF00" or "c0c0c0") or "FF0000");
-		info.hasArrow = module.loaded and moduleDB and next(moduleDB) and module.label ~= "Artifact";
-		info.keepShownOnClick = not module.loaded;
+		info.hasArrow = true;
+		info.keepShownOnClick = true;
 		info.notCheckable = true;
-		info.func = (not module.loaded or moduleDB) and mog.base.DropdownTier1;
-		if not module.loaded then
-			if module.version < mog.moduleVersion then
-				info.tooltipOnButton = true;
-				info.tooltipTitle = RED_FONT_COLOR_CODE..ADDON_INTERFACE_VERSION;
-				info.tooltipText = L["This module was created for an older version of MogIt and may not work correctly."];
-			elseif module.version > mog.moduleVersion then
-				info.tooltipOnButton = true;
-				info.tooltipTitle = RED_FONT_COLOR_CODE..ADDON_INTERFACE_VERSION;
-				info.tooltipText = L["This module was created for a newer version of MogIt and may not work correctly."];
-			end
-		elseif not moduleDB or not next(moduleDB) then
-			info.tooltipOnButton = true;
-			info.tooltipTitle = RED_FONT_COLOR_CODE..L["No data"];
-			info.tooltipText = L["This module has no items registered. Please log in with a character of appropriate armor class to register items."];
-		end
 		UIDropDownMenu_AddButton(info, tier);
 	elseif tier == 2 then
-		for _,slot in ipairs(module.slotList) do
-			info = UIDropDownMenu_CreateInfo();
-			info.text = mog.db.profile.slotLabels[module.slots[slot].label];
-			info.value = module.slots[slot];
+		local info = UIDropDownMenu_CreateInfo();
+		info.text = ARMOR;
+		info.isTitle = true;
+		info.notCheckable = true;
+		UIDropDownMenu_AddButton(info, tier);
+
+		for i, slot in ipairs(module.slotList) do
+			if slot.isWeapon and not module.slotList[i - 1].isWeapon then
+				local info = UIDropDownMenu_CreateInfo();
+				info.text = WEAPON;
+				info.isTitle = true;
+				info.notCheckable = true;
+				UIDropDownMenu_AddButton(info, tier);
+			end
+			local info = UIDropDownMenu_CreateInfo();
+			info.text = slot.label;
+			info.value = slot;
 			info.notCheckable = true;
 			info.func = mog.base.DropdownTier2;
 			info.arg1 = module;
+			info.arg2 = slot;
 			UIDropDownMenu_AddButton(info, tier);
 		end
 	end
 end
 
 function mog.base:FrameUpdate(frame, value)
-	local items = {}
+	local items = { };
+	local canUse = false;
 	for i, source in ipairs(value) do
-		tinsert(items, (select(6, C_TransmogCollection.GetAppearanceSourceInfo(source))))
+		tinsert(items, (select(6, C_TransmogCollection.GetAppearanceSourceInfo(source))));
+		local sourceInfo = C_TransmogCollection.GetSourceInfo(source);
+		if not (sourceInfo.useErrorType == Enum.TransmogUseErrorType.Race or sourceInfo.useErrorType == Enum.TransmogUseErrorType.Faction) then
+			canUse = true;
+		end
+	end
+	if not canUse then
+		frame.bg:SetColorTexture(1.0, 0.3, 0.3, 0.2);
+	else
+		frame.bg:SetColorTexture(0.3, 0.3, 0.3, 0.2);
 	end
 	frame.data.items = items;
 	frame.data.sourceID = value[1];
@@ -175,57 +166,45 @@ end
 
 
 --// Register Modules
-mog.baseModules = {
-	"MogIt_Cloth",
-	"MogIt_Leather",
-	"MogIt_Mail",
-	"MogIt_Plate",
-	"MogIt_Other",
-	"MogIt_OneHanded",
-	"MogIt_TwoHanded",
-	"MogIt_Ranged",
-	"MogIt_Artifact",
-};
+local classes = { }
 
-local myName = UnitName("player");
+for classID = 1, GetNumClasses() do
+	local classInfo = C_CreatureInfo.GetClassInfo(classID)
+	table.insert(classes, classInfo)
+end
 
-for _, addon in ipairs(mog.baseModules) do
-	local _, title = C_AddOns.GetAddOnInfo(addon);
-	if C_AddOns.GetAddOnEnableState(addon, myName) > Enum.AddOnEnableState.None then
-		local module = mog:RegisterModule(addon, tonumber(C_AddOns.GetAddOnMetadata(addon, "X-MogItModuleVersion")), {
-			label = title:match("MogIt[%s%-_:]+(.+)") or title,
-			base = true,
-			slots = {},
-			slotList = {},
-			Dropdown = mog.base.Dropdown,
-			BuildList = mog.base.BuildList,
-			FrameUpdate = mog.base.FrameUpdate,
-			OnEnter = mog.base.OnEnter,
-			OnClick = mog.base.OnClick,
-			Unlist = mog.base.Unlist,
-			Help = mog.base.Help,
-			GetFilterArgs = mog.base.GetFilterArgs,
-			filters = {
-				"name",
-				"level",
-				"itemLevel",
-				"faction",
-				"class",
-				"source",
-				"quality",
-				"bind",
-				"chestType",
-				-- (addon == "MogIt_OneHanded" and "slot") or nil,
-			},
-			sorting = {
-				"display",
-			},
-			sorts = {},
-		});
-		if module then
-			-- dirty fix for now - if the "slot" filter is not present the array is broken unless we do this
-			tinsert(module.filters, "hasItem");
-		end
+for _, class in ipairs(classes) do
+	local module = mog:RegisterModule(class.classFile, mog.moduleVersion, {
+		label = class.className,
+		base = true,
+		classID = class.classID,
+		slots = { },
+		slotList = { },
+		Dropdown = mog.base.Dropdown,
+		BuildList = mog.base.BuildList,
+		FrameUpdate = mog.base.FrameUpdate,
+		OnEnter = mog.base.OnEnter,
+		OnClick = mog.base.OnClick,
+		Unlist = mog.base.Unlist,
+		Help = mog.base.Help,
+		GetFilterArgs = mog.base.GetFilterArgs,
+		filters = {
+			"name",
+			"level",
+			"itemLevel",
+			"source",
+			"quality",
+			"bind",
+			"chestType",
+		},
+		sorting = {
+			"display",
+		},
+		sorts = { },
+	})
+	if module then
+		-- dirty fix for now - if the "slot" filter is not present the array is broken unless we do this
+		tinsert(module.filters, "hasItem")
 	end
 end
 --//

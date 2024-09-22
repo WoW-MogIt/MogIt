@@ -6,20 +6,11 @@ local GetSpellName = C_Spell.GetSpellName
 
 
 --// Useful Lists
-L.source = {
-	[1] = L["Drop"],
-	[2] = PVP,
-	[3] = L["Quest"],
-	[4] = L["Vendor"],
-	[5] = L["Crafted"],
-	[6] = L["Achievement"],
-	-- [7] = L["Code Redemption"],
-	-- [8] = L["In-Game Store"],
-	-- [9] = L["Black Market Auction House"],
-	-- [10] = L["Starter Gear"],
-	-- [11] = L["Event"],
-	-- [12] = L["Follower Mission"],
-};
+L.source = { }
+
+for i = 1, C_TransmogCollection.GetNumTransmogSources() do
+	L.source[i] = _G["TRANSMOG_SOURCE_"..i]
+end
 
 L.diffs = {
 	[1] = PLAYER_DIFFICULTY1,

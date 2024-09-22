@@ -1,6 +1,15 @@
 local MogIt,mog = ...;
 local L = mog.L;
 
+local function onClick(self)
+	if self.value.loaded then
+		self.value.active = nil;
+		mog:SetModule(self.value, self.value.label);
+	else
+		C_AddOns.LoadAddOn(self.value.name);
+	end
+end
+
 local function temp(module,tier)
 	local info;
 	if tier == 1 then
@@ -10,7 +19,7 @@ local function temp(module,tier)
 		info.colorCode = "\124cFF"..(module.loaded and "00FF00" or "FF0000");
 		info.keepShownOnClick = true;
 		info.notCheckable = true;
-		info.func = mog.base.DropdownTier1;
+		info.func = onClick;
 		if module.version < mog.moduleVersion then
 			info.tooltipOnButton = true;
 			info.tooltipTitle = RED_FONT_COLOR_CODE..ADDON_INTERFACE_VERSION;
