@@ -1,8 +1,6 @@
 local MogIt,mog = ...;
 local L = mog.L;
 
-local LBI = LibStub("LibBabble-Inventory-3.0"):GetUnstrictLookupTable();
-
 local TITANS_GRIP_SPELLID = 46917
 
 
@@ -744,7 +742,7 @@ function mog.view.AddItem(item, preview, forceSlot, setItem)
 				end
 			end
 
-			if invType == "INVTYPE_2HWEAPON" or invType == "INVTYPE_RANGED" or (invType == "INVTYPE_RANGEDRIGHT" and itemInfo.subType ~= LBI["Wands"]) then
+			if invType == "INVTYPE_2HWEAPON" or invType == "INVTYPE_RANGED" or (invType == "INVTYPE_RANGEDRIGHT" and itemInfo.subClassID == Enum.ItemWeaponSubclass.Wand) then
 				-- if any two handed weapon is being equipped, first clear up both hands
 				mog.view.DelItem("MainHandSlot", preview);
 				mog.view.DelItem("SecondaryHandSlot", preview);

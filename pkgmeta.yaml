@@ -7,9 +7,16 @@ externals:
   Libs/AceDBOptions-3.0: https://repos.wowace.com/wow/ace3/trunk/AceDBOptions-3.0
   Libs/LibDataBroker-1.1: https://repos.wowace.com/wow/libdatabroker-1-1
   Libs/LibDBIcon-1.0: https://repos.wowace.com/wow/libdbicon-1-0/trunk/LibDBIcon-1.0
-  Libs/LibBabble-Inventory-3.0: https://repos.wowace.com/wow/libbabble-inventory-3-0/trunk
-  Libs/Libra: https://github.com/Lombra/Libra.git
-  Libs/LibItemInfo-1.0: https://github.com/Lombra/LibItemInfo-1.0.git/LibItemInfo-1.0
+  Libs/Libra:
+    url: https://github.com/Lombra/Libra.git
+    curse-slug: libra
+  Libs/LibItemInfo-1.0:
+    url: https://github.com/Lombra/LibItemInfo-1.0.git/LibItemInfo-1.0
+    curse-slug: libiteminfo-1-0
+
+plain-copy:
+  - Core/*.lua
+  - Modules/*.lua
 
 ignore:
   - pkgmeta.yaml
