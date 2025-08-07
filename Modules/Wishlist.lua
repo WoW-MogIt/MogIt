@@ -460,7 +460,7 @@ end
 
 do
 	local function onAccept(self, data)
-		local text = self.editBox:GetText()
+		local text = self:GetEditBox():GetText()
 		local create = Wishlist:CreateSet(text)
 		if not create then
 			print("MogIt: A set with this name already exists.")
@@ -490,8 +490,8 @@ do
 			parent:Hide()
 		end,
 		OnShow = function(self, data)
-			self.editBox:SetText(data and data.name or ("Set "..(#Wishlist:GetSets() + 1)))
-			self.editBox:HighlightText()
+			self:GetEditBox():SetText(data and data.name or ("Set "..(#Wishlist:GetSets() + 1)))
+			self:GetEditBox():HighlightText()
 		end,
 		whileDead = true,
 	}
@@ -499,7 +499,7 @@ end
 
 do
 	local function onAccept(self, data)
-		local text = self.editBox:GetText()
+		local text = self:GetEditBox():GetText()
 		local set = Wishlist:GetSet(text)
 		if set then
 			print("MogIt: A set with this name already exists.")
@@ -521,8 +521,8 @@ do
 			parent:Hide()
 		end,
 		OnShow = function(self, data)
-			self.editBox:SetText(data.name)
-			self.editBox:HighlightText()
+			self:GetEditBox():SetText(data.name)
+			self:GetEditBox():HighlightText()
 		end,
 		whileDead = true,
 	}

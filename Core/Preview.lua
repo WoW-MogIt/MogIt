@@ -997,7 +997,7 @@ end
 
 --// Popups
 local function onAccept(self, preview)
-	local text = self.editBox:GetText();
+	local text = self:GetEditBox():GetText();
 	if text then
 		local id,bonus = mog:ToNumberItem(text);
 		if not id then
@@ -1030,7 +1030,7 @@ StaticPopupDialogs["MOGIT_PREVIEW_ADDITEM"] = {
 };
 
 local function onAccept(self, preview)
-	local items = self.editBox:GetText();
+	local items = self:GetEditBox():GetText();
 	items = items and items:match("compare%?items=([^#]+)");
 	if items then
 		local tbl = {};
@@ -1058,8 +1058,8 @@ StaticPopupDialogs["MOGIT_PREVIEW_IMPORT"] = {
 				str = (str and str..":" or L["http://www.wowhead.com/"].."compare?items=")..id..(bonus and ".0.0.0.0.0.0.0.0.0."..bonus or "")
 			end
 		end
-		self.editBox:SetText(str or "");
-		self.editBox:HighlightText();
+		self:GetEditBox():SetText(str or "");
+		self:GetEditBox():HighlightText();
 	end,
 	OnAccept = onAccept,
 	EditBoxOnEnterPressed = function(self, data)

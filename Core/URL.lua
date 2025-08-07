@@ -33,9 +33,9 @@ StaticPopupDialogs["MOGIT_URL"] = {
 	maxLetters = 512,
 	editBoxWidth = 260,
 	OnShow = function(self,url)
-		self.editBox:SetText(url)
-		self.editBox:SetFocus()
-		self.editBox:HighlightText()
+		self:GetEditBox():SetText(url)
+		self:GetEditBox():SetFocus()
+		self:GetEditBox():HighlightText()
 	end,
 	EditBoxOnEnterPressed = function(self)
 		self:GetParent():Hide()
