@@ -490,8 +490,9 @@ do
 			parent:Hide()
 		end,
 		OnShow = function(self, data)
-			self:GetEditBox():SetText(data and data.name or ("Set "..(#Wishlist:GetSets() + 1)))
-			self:GetEditBox():HighlightText()
+			local editbox = self:GetEditBox()
+			editbox:SetText(data and data.name or ("Set "..(#Wishlist:GetSets() + 1)))
+			editbox:HighlightText()
 		end,
 		whileDead = true,
 	}
@@ -521,8 +522,9 @@ do
 			parent:Hide()
 		end,
 		OnShow = function(self, data)
-			self:GetEditBox():SetText(data.name)
-			self:GetEditBox():HighlightText()
+			local editbox = self:GetEditBox()
+			editbox:SetText(data.name)
+			editbox:HighlightText()
 		end,
 		whileDead = true,
 	}
