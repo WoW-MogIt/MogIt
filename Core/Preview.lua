@@ -898,7 +898,7 @@ tinsert(ModifiedItemClickHandlers, function(link, itemLocation)
 	end
 	local _, staticPopup = StaticPopup_Visible("MOGIT_PREVIEW_ADDITEM");
 	if IsModifiedClick("CHATLINK") and staticPopup then
-		staticPopup.editBox:SetText(link);
+		staticPopup:GetEditBox():SetText(link);
 		return true
 	end
 end);
@@ -997,7 +997,7 @@ end
 
 --// Popups
 local function onAccept(self, preview)
-	local text = self.editBox:GetText();
+	local text = self:GetEditBox():GetText();
 	if text then
 		local id,bonus = mog:ToNumberItem(text);
 		if not id then
@@ -1030,7 +1030,7 @@ StaticPopupDialogs["MOGIT_PREVIEW_ADDITEM"] = {
 };
 
 local function onAccept(self, preview)
-	local items = self.editBox:GetText();
+	local items = self:GetEditBox():GetText();
 	items = items and items:match("compare%?items=([^#]+)");
 	if items then
 		local tbl = {};
@@ -1058,8 +1058,9 @@ StaticPopupDialogs["MOGIT_PREVIEW_IMPORT"] = {
 				str = (str and str..":" or L["http://www.wowhead.com/"].."compare?items=")..id..(bonus and ".0.0.0.0.0.0.0.0.0."..bonus or "")
 			end
 		end
-		self.editBox:SetText(str or "");
-		self.editBox:HighlightText();
+		local editbox = self:GetEditBox()
+		editbox:SetText(str or "");
+		editbox:HighlightText();
 	end,
 	OnAccept = onAccept,
 	EditBoxOnEnterPressed = function(self, data)
