@@ -153,7 +153,7 @@ mog.base.Help = {
 }
 
 function mog.base.GetFilterArgs(filter,item)
-	if filter == "name" or filter == "level" or filter == "quality" or filter == "itemLevel" or filter == "bind" or filter == "hasItem" or filter == "chestType" then
+	if filter == "name" or filter == "level" or filter == "expansion" or filter == "quality" or filter == "itemLevel" or filter == "bind" or filter == "hasItem" or filter == "chestType" then
 		return item;
 	elseif filter == "source" then
 		return mog:GetData("item", item, "source"),mog:GetData("item", item, "sourceinfo");
@@ -193,6 +193,7 @@ for _, class in ipairs(classes) do
 			"level",
 			"itemLevel",
 			"source",
+			"expansion",
 			"quality",
 			"bind",
 			"chestType",

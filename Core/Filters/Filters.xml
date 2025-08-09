@@ -10,6 +10,7 @@
 <Script file="faction.lua"/>
 <Script file="class.lua"/>
 <Script file="source.lua"/>
+<Script file="expansion.lua"/>
 <Script file="slot.lua"/>
 <Script file="quality.lua"/>
 <Script file="bind.lua"/>
