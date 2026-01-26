@@ -401,7 +401,7 @@ local function loadInitialize(self, level)
 			end
 		end
 		if UIDROPDOWNMENU_MENU_VALUE == "outfits" then
-			if #C_TransmogCollection.GetOutfits() > 0 then
+			if C_TransmogCollection.GetOutfits and #C_TransmogCollection.GetOutfits() > 0 then
 				for i, outfit in ipairs(C_TransmogCollection.GetOutfits()) do
 					local info = UIDropDownMenu_CreateInfo()
 					info.text = C_TransmogCollection.GetOutfitInfo(outfit)
