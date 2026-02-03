@@ -2,9 +2,6 @@ local MogIt,mog = ...;
 local L = mog.L;
 
 function mog.createOptions()
-	local frame = CreateFrame("Frame");
-	Settings.RegisterCanvasLayoutCategory(frame, MogIt);
-
 	local config = LibStub("AceConfig-3.0");
 	local dialog = LibStub("AceConfigDialog-3.0");
 	local db = LibStub("AceDBOptions-3.0");
@@ -216,6 +213,7 @@ function mog.createOptions()
 	};
 	config:RegisterOptionsTable("MogIt",options.args.general);
 	dialog:AddToBlizOptions("MogIt");
+	mog.settingsCategoryID = dialog.BlizOptionsIDMap["MogIt"];
 
 	options.args.tooltip = {
 		type = "group",
