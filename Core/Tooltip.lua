@@ -213,7 +213,8 @@ mog.tooltip.repos = CreateFrame("Frame");
 mog.tooltip.repos:Hide();
 mog.tooltip.repos:SetScript("OnUpdate", function(self)
 	local x,y = mog.tooltip.owner:GetCenter();
-	if x and y then
+	-- this can be secret after showing enemy tooltips
+	if x and y and not issecretvalue(x) then
 		mog.tooltip:ClearAllPoints();
 		local mogpoint, ownerpoint;
 		if mog.db.profile.tooltipAnchor == "vertical" then
