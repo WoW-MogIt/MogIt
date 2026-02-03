@@ -185,23 +185,39 @@ end
 
 local itemSourceID = {}
 
-local model = CreateFrame("DressUpModel")
-model:SetAutoDress(false)
+-- ModelScene for source detection (replaces DressUpModel)
+-- Lazy initialization to avoid errors at load time
+local sourceModelScene
+local sourceActor
+
+local function ensureSourceModel()
+	if not sourceModelScene then
+		-- Must use template to get SetFromModelSceneID method
+		sourceModelScene = CreateFrame("ModelScene", nil, UIParent, "PanningModelSceneMixinTemplate")
+		sourceModelScene:Hide()
+		sourceModelScene:SetFromModelSceneID(596, true, true)
+		sourceActor = sourceModelScene:GetActorByTag("player-0") or sourceModelScene:CreateActor("source-actor")
+	end
+	return sourceActor
+end
 
 function mog:GetSourceFromItem(item)
 	if not itemSourceID[item] then
 		local visualID, sourceID = C_TransmogCollection.GetItemInfo(item)
 		itemSourceID[item] = sourceID
 		if not itemSourceID[item] then
-			model:SetUnit("player")
-			model:Undress()
-			model:TryOn(item)
-			for i = 1, 19 do
-				local itemTransmogInfo = model:GetItemTransmogInfo(i)
-				local appearanceID = itemTransmogInfo and itemTransmogInfo.appearanceID or Constants.Transmog.NoTransmogID
-				if appearanceID ~= Constants.Transmog.NoTransmogID then
-					itemSourceID[item] = appearanceID
-					break
+			local actor = ensureSourceModel()
+			if actor then
+				actor:SetModelByUnit("player")
+				actor:Undress()
+				actor:TryOn(item)
+				for i = 1, 19 do
+					local itemTransmogInfo = actor:GetItemTransmogInfo(i)
+					local appearanceID = itemTransmogInfo and itemTransmogInfo.appearanceID or Constants.Transmog.NoTransmogID
+					if appearanceID ~= Constants.Transmog.NoTransmogID then
+						itemSourceID[item] = appearanceID
+						break
+					end
 				end
 			end
 		end

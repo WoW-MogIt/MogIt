@@ -10,12 +10,12 @@ mog.view:SetScript("OnShow",function(self)
 	if #mog.previews == 0 then
 		mog:CreatePreview();
 	end
-	if mog.db.profile.singlePreview then
+	if mog.db and mog.db.profile and mog.db.profile.singlePreview then
 		ShowUIPanel(mog.previews[1]);
 	end
 end);
 mog.view:SetScript("OnHide",function(self)
-	if mog.db.profile.singlePreview then
+	if mog.db and mog.db.profile and mog.db.profile.singlePreview then
 		HideUIPanel(mog.previews[1]);
 	end
 end);
@@ -72,10 +72,11 @@ local function resizeOnMouseUp(self)
 	end
 end
 
+-- Mouse wheel zoom for preview - adjusts Y position (distance from camera)
 local function modelOnMouseWheel(self, v)
-	local delta = ((v > 0 and 0.6) or -0.6);
+	local delta = ((v > 0 and 0.25) or -0.25);
 	if mog.db.profile.sync then
-		mog.posZ = mog.posZ + delta;
+		mog.posY = (mog.posY or 0) - delta;
 		for id, model in ipairs(mog.models) do
 			model:PositionModel();
 		end
@@ -83,7 +84,7 @@ local function modelOnMouseWheel(self, v)
 			preview.model:PositionModel();
 		end
 	else
-		self.parent.data.posZ = (self.parent.data.posZ or mog.posZ or 0) + delta;
+		self.parent.data.posY = (self.parent.data.posY or mog.posY or 0) - delta;
 		self:PositionModel();
 	end
 end
@@ -177,11 +178,11 @@ local function setWeaponEnchant(self, preview, enchant)
 	mog:UpdateScroll();
 	local mainHandItem = preview.slots["MainHandSlot"].item;
 	local offHandItem = preview.slots["SecondaryHandSlot"].item;
-	if mainHandItem then
-		preview.model:TryOn(format("item:%s:%d", mainHandItem:match("item:(%d+)"), preview.data.weaponEnchant), "MainHandSlot");
+	if mainHandItem and preview.model.actor then
+		preview.model.actor:TryOn(format("item:%s:%d", mainHandItem:match("item:(%d+)"), preview.data.weaponEnchant), "MainHandSlot");
 	end
-	if offHandItem then
-		preview.model:TryOn(format("item:%s:%d", offHandItem:match("item:(%d+)"), preview.data.weaponEnchant), "SecondaryHandSlot");
+	if offHandItem and preview.model.actor then
+		preview.model.actor:TryOn(format("item:%s:%d", offHandItem:match("item:(%d+)"), preview.data.weaponEnchant), "SecondaryHandSlot");
 	end
 end
 
@@ -205,7 +206,9 @@ local previewMenu = {
 		func = function(self, arg1, arg2, checked)
 			checked = not checked
 			currentPreview.data.sheathe = checked
-			currentPreview.model.model:SetSheathed(checked)
+			if currentPreview.model.actor then
+				currentPreview.model.actor:SetSheathed(checked)
+			end
 		end,
 	},
 	{
@@ -452,11 +455,12 @@ end
 local function createMenuBar(parent)
 	local menuBar = mog.CreateMenuBar(parent)
 
-	menuBar.preview = menuBar:CreateMenu(L["Preview"], previewInitialize);
-	menuBar.preview:SetPoint("TOPLEFT", parent, 62, -31);
-
+	-- Center menu: Load is the middle button, anchored to center
 	menuBar.load = menuBar:CreateMenu(L["Load"], loadInitialize);
-	menuBar.load:SetPoint("LEFT", menuBar.preview, "RIGHT", 5, 0);
+	menuBar.load:SetPoint("TOP", parent, "TOP", 0, -31);
+
+	menuBar.preview = menuBar:CreateMenu(L["Preview"], previewInitialize);
+	menuBar.preview:SetPoint("RIGHT", menuBar.load, "LEFT", -5, 0);
 
 	menuBar.save = menuBar:CreateMenu(L["Save"], saveInitialize);
 	menuBar.save:SetPoint("LEFT", menuBar.load, "RIGHT", 5, 0);
@@ -477,7 +481,13 @@ local function initPreview(frame, id)
 	frame:SetPoint(props.point, props.x, props.y);
 	frame:SetSize(props.w, props.h);
 	frame:SetTitle(L["Preview %d"]:format(id));
-	frame.data = { };
+	-- Initialize model position data (centered, facing camera)
+	frame.data = {
+		posX = -0.5,
+		posY = 0,
+		posZ = 0,
+		face = -math.pi / 2,  -- -90 degrees, face toward camera
+	};
 end
 
 mog.previews = {};
@@ -555,10 +565,107 @@ function mog:CreatePreview()
 	f.model = mog:CreateModelFrame(f);
 	f.model.type = "preview";
 	f.model:Show();
-	f.model:EnableMouseWheel(true);
-	f.model:SetScript("OnMouseWheel", modelOnMouseWheel);
+	-- Re-enable mouse on the ModelScene for preview's custom controls
+	f.model.model:EnableMouse(true);
+	f.model.model:EnableMouseWheel(true);
+	-- Wrap modelOnMouseWheel to pass the Button frame (f.model) as self
+	f.model.model:SetScript("OnMouseWheel", function(self, v)
+		modelOnMouseWheel(f.model, v)
+	end);
 	f.model:SetPoint("TOPLEFT", f.Inset, "TOPLEFT", 49, -8);
-	f.model:SetPoint("BOTTOMRIGHT", f.Inset, "BOTTOMRIGHT", -49, 8);
+	f.model:SetPoint("BOTTOMRIGHT", f.Inset, "BOTTOMRIGHT", -49, 30);
+
+	-- Custom mouse controls for ModelScene (like ModelSceneTest)
+	-- Set handlers on the ModelScene (f.model.model), not the Button (f.model)
+	local isDragging = false
+	local isRightDragging = false
+	local lastX, lastY = 0, 0
+
+	f.model.model:SetScript("OnMouseDown", function(self, button)
+		if button == "LeftButton" then
+			isDragging = true
+			lastX, lastY = GetCursorPosition()
+		elseif button == "RightButton" then
+			isRightDragging = true
+			lastX, lastY = GetCursorPosition()
+		end
+	end)
+
+	f.model.model:SetScript("OnMouseUp", function(self, button)
+		if button == "LeftButton" then
+			isDragging = false
+		elseif button == "RightButton" then
+			isRightDragging = false
+		end
+	end)
+
+	f.model.model:SetScript("OnUpdate", function(self)
+		if isDragging and f.model.actor then
+			local curX, curY = GetCursorPosition()
+			local deltaX = (curX - lastX) * 0.01
+			local currentYaw = f.model.actor:GetYaw() or 0
+			f.model.actor:SetYaw(currentYaw + deltaX)
+			lastX, lastY = curX, curY
+		elseif isRightDragging and f.model.actor then
+			local curX, curY = GetCursorPosition()
+			local deltaX = (curX - lastX) * 0.01
+			local deltaY = (curY - lastY) * 0.01
+			local x, y, z = f.model.actor:GetPosition()
+			f.model.actor:SetPosition(x + deltaX, y, z + deltaY)
+			lastX, lastY = curX, curY
+		end
+	end)
+
+	-- Model control button bar (centered)
+	-- Undress is anchored to center, others chain from it
+	f.undressBtn = CreateFrame("Button", nil, f, "MagicButtonTemplate")
+	f.undressBtn:SetText(L["Undress"])
+	f.undressBtn:SetPoint("BOTTOM", f.Inset, "BOTTOM", -40, 4)
+	f.undressBtn:SetScript("OnClick", function()
+		if f.model.actor then
+			f.model.actor:Undress()
+		end
+	end)
+
+	f.showTransmogBtn = CreateFrame("Button", nil, f, "MagicButtonTemplate")
+	f.showTransmogBtn:SetText(L["Transmog"])
+	f.showTransmogBtn:SetPoint("RIGHT", f.undressBtn, "LEFT", -2, 0)
+	f.showTransmogBtn:SetScript("OnClick", function()
+		if f.model.actor then
+			f.model.actor:SetModelByUnit("player")
+		end
+	end)
+
+	f.showEquippedBtn = CreateFrame("Button", nil, f, "MagicButtonTemplate")
+	f.showEquippedBtn:SetText(L["Equipped"])
+	f.showEquippedBtn:SetPoint("RIGHT", f.showTransmogBtn, "LEFT", -2, 0)
+	f.showEquippedBtn:SetScript("OnClick", function()
+		if f.model.actor then
+			f.model.actor:SetModelByUnit("player")
+			f.model.actor:Undress()
+			for i = 1, 19 do
+				local itemLink = GetInventoryItemLink("player", i)
+				if itemLink then
+					f.model.actor:TryOn(itemLink)
+				end
+			end
+		end
+	end)
+
+	f.resetBtn = CreateFrame("Button", nil, f, "MagicButtonTemplate")
+	f.resetBtn:SetText(L["Reset"])
+	f.resetBtn:SetPoint("LEFT", f.undressBtn, "RIGHT", 2, 0)
+	f.resetBtn:SetScript("OnClick", function()
+		-- Reset stored position data (facing camera)
+		f.data.posX = -0.5
+		f.data.posY = 0
+		f.data.posZ = 0
+		f.data.face = -math.pi / 2
+		if f.model.actor then
+			f.model.actor:SetPosition(-0.5, 2, 0)
+			f.model.actor:SetYaw(-math.pi / 2)
+		end
+	end)
 
 	f.activate = CreateFrame("Button", "MogItPreview"..id.."Activate", f, "MagicButtonTemplate");
 	f.activate:SetText(L["Activate"]);
@@ -773,7 +880,9 @@ function mog.view.AddItem(item, preview, forceSlot, setItem)
 			if invType == "INVTYPE_RANGED" then
 				slot = "SecondaryHandSlot";
 			end
-			preview.model:TryOn(item, slot);
+			if preview.model.actor then
+				preview.model.actor:TryOn(item, slot);
+			end
 			if preview.data.title and not setItem then
 				preview:SetTitle("*"..preview.data.title);
 			end
@@ -797,7 +906,9 @@ function mog.view.DelItem(slot, preview)
 		if invType == "INVTYPE_RANGED" then
 			slot = "SecondaryHandSlot"
 		end
-		preview.model:UndressSlot(GetInventorySlotInfo(slot));
+		if preview.model.actor then
+			preview.model.actor:UndressSlot(GetInventorySlotInfo(slot));
+		end
 	end
 end
 

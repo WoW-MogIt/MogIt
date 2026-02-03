@@ -6,9 +6,9 @@
 		MogIt:TogglePreview()
 	</Binding>
 	<Binding name="MogIt_TooltipScrollUp" hidden="true">
-		MogIt.tooltip.model:SetFacing(MogIt.tooltip.model:GetFacing()+0.3);
+		if MogIt.tooltip.actor then local yaw = MogIt.tooltip.actor:GetYaw() or 0; MogIt.tooltip.actor:SetYaw(yaw + 0.3); end
 	</Binding>
 	<Binding name="MogIt_TooltipScrollDown" hidden="true">
-		MogIt.tooltip.model:SetFacing(MogIt.tooltip.model:GetFacing()-0.3);
+		if MogIt.tooltip.actor then local yaw = MogIt.tooltip.actor:GetYaw() or 0; MogIt.tooltip.actor:SetYaw(yaw - 0.3); end
 	</Binding>
 </Bindings>

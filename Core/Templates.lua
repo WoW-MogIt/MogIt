@@ -141,8 +141,8 @@ local itemOptions = {
 		func = function(self, set)
 			if set.name then
 				local slot = mog.wishlist:DeleteItem(self.value, set.name)
-				if slot then
-					set.frame.model:UndressSlot(GetInventorySlotInfo(slot))
+				if slot and set.frame.actor then
+					set.frame.actor:UndressSlot(GetInventorySlotInfo(slot))
 				end
 			else
 				mog.wishlist:DeleteItem(self.value)
@@ -242,7 +242,7 @@ do	-- item functions
 			tryonSlot = "MAINHANDSLOT"
 		end
 		if data.sourceID then
-			self.model:TryOn(data.sourceID, tryonSlot)
+			self.actor:TryOn(data.sourceID, tryonSlot)
 		else
 			self:TryOn(format(gsub(item, "item:(%d+):0", "item:%1:%%d"), mog.weaponEnchant), tryonSlot)
 		end

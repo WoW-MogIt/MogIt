@@ -19,8 +19,10 @@ mog.frame:SetDontSavePosition(true);
 mog.frame:SetScript("OnMouseDown", mog.frame.StartMoving);
 local function stopMovingOrSizing(self)
 	self:StopMovingOrSizing();
-	local profile = mog.db.profile;
-	profile.point, profile.x, profile.y = select(3, self:GetPoint());
+	if mog.db and mog.db.profile then
+		local profile = mog.db.profile;
+		profile.point, profile.x, profile.y = select(3, self:GetPoint());
+	end
 end
 mog.frame:SetScript("OnMouseUp", stopMovingOrSizing);
 mog.frame:SetScript("OnHide", stopMovingOrSizing);
@@ -61,7 +63,7 @@ mog.modelBin = {};
 mog.posX = 0;
 mog.posY = 0;
 mog.posZ = 0;
-mog.face = 0;
+mog.face = -math.pi / 2;  -- -90 degrees, face toward camera
 
 function mog:CreateModelFrame(parent)
 	if mog.modelBin[1] then
@@ -80,14 +82,16 @@ function mog:CreateModelFrame(parent)
 	f.data = {};
 	f.indicators = {};
 
-	f.model = CreateFrame("DressUpModel",nil,f);
+	-- ModelScene replaces DressUpModel
+	f.model = CreateFrame("ModelScene", nil, f, "PanningModelSceneMixinTemplate");
 	f.model:SetAllPoints(f);
-	f.model:SetModelScale(2);
-	f.model:SetUnit("PLAYER");
-	f.model:SetPosition(0,0,0);
-
-	local lightValues = { omnidirectional = false, point = CreateVector3D(0, 0.8, -1), ambientIntensity = 1, ambientColor = CreateColor(1, 1, 1), diffuseIntensity = 0.3, diffuseColor = CreateColor(1, 1, 1) };
-	f.model:SetLight(true, lightValues);
+	f.model:SetFromModelSceneID(596, true, true);
+	-- Pass mouse events through to parent button for drag handling
+	f.model:EnableMouse(false);
+	f.actor = f.model:GetActorByTag("player-0") or f.model:CreateActor("model-actor");
+	f.actor:SetModelByUnit("player");
+	f.actor:SetPosition(0, 2, 0);
+	f.actor:SetYaw(-math.pi / 2);  -- -90 degrees, face toward camera
 
 	f.bg = f:CreateTexture(nil,"BACKGROUND");
 	f.bg:SetAllPoints(f);
@@ -111,7 +115,9 @@ function mog:DeleteModelFrame(f)
 	f:SetScript("OnEnter",nil);
 	f:SetScript("OnLeave",nil);
 	f:SetScript("OnMouseWheel",nil);
-	f.model:SetSheathed(false);
+	if f.actor then
+		f.actor:SetSheathed(false);
+	end
 	f:EnableMouseWheel(false);
 	for ind,frame in pairs(f.indicators) do
 		frame:Hide();
@@ -181,14 +187,14 @@ function ModelFramePrototype:OnHide()
 	if mog.modelUpdater.model == self then
 		mog:StopModelUpdater();
 	end
-	self.model:SetPosition(0,0,0);
+	if self.actor then
+		self.actor:SetPosition(0, 2, 0);
+	end
 end
 
 function ModelFramePrototype:OnUpdate()
-	--56, 108, 237, 238, 239, 243, 249, 250, 251, 252, 253, 254, 255
-	if mog.db.profile.noAnim then
-		self.model:SetSequence(254);
-	end
+	-- Animation control - ModelScene handles animations differently
+	-- No equivalent to SetSequence needed for ModelScene
 end
 
 function ModelFramePrototype:OnDragStart(button)
@@ -223,25 +229,31 @@ function ModelFramePrototype:TryOn(item, slot, itemAppearanceModID)
 	if type(item) == "number" then
 		item = "item:"..item
 	end
-	self.model:TryOn(item, tryOnSlots[slot] or slot, itemAppearanceModID);
+	if self.actor then
+		self.actor:TryOn(item, tryOnSlots[slot] or slot, itemAppearanceModID);
+	end
 end
 
 function ModelFramePrototype:Undress()
-	-- the worst of hacks to prevent certain armor model pieces from getting stuck on the character
-	for i, slotName in ipairs(mog.slots) do
-		local slot = GetInventorySlotInfo(slotName);
-		local item = GetInventoryItemLink("player", slot);
-		if item then
-			self:TryOn(item);
-			self:UndressSlot(slot);
+	if self.actor then
+		-- the worst of hacks to prevent certain armor model pieces from getting stuck on the character
+		for i, slotName in ipairs(mog.slots) do
+			local slot = GetInventorySlotInfo(slotName);
+			local item = GetInventoryItemLink("player", slot);
+			if item then
+				self:TryOn(item);
+				self:UndressSlot(slot);
+			end
 		end
+		self:UndressSlot(GetInventorySlotInfo("MainHandSlot"));
+		self:UndressSlot(GetInventorySlotInfo("SecondaryHandSlot"));
 	end
-	self:UndressSlot(GetInventorySlotInfo("MainHandSlot"));
-	self:UndressSlot(GetInventorySlotInfo("SecondaryHandSlot"));
 end
 
 function ModelFramePrototype:UndressSlot(slot)
-	self.model:UndressSlot(slot)
+	if self.actor then
+		self.actor:UndressSlot(slot)
+	end
 end
 
 function ModelFramePrototype:ApplyDress()
@@ -256,20 +268,19 @@ function ModelFramePrototype:ApplyDress()
 end
 
 function ModelFramePrototype:ResetModel()
-	local model = self.model;
-	model:SetPosition(0, 0, 0);
-	model:Dress();
-	model:SetAnimation(0, 0)
-	self:PositionModel();
+	if self.actor then
+		self.actor:SetModelByUnit("player");
+		self:PositionModel();
+	end
 end
 
 function ModelFramePrototype:PositionModel()
-	local model = self.model
-	if model:IsVisible() then
+	if self.actor and self.model:IsVisible() then
 		local sync = (mog.db.profile.sync or self.type == "catalogue");
 		local modelData = sync and mog or self.parent.data
-		model:SetPosition(modelData.posZ or 0, modelData.posX or 0, modelData.posY or 0);
-		model:SetFacing(modelData.face or 0);
+		-- ModelScene uses SetPosition(x, y, z) where y is distance from camera
+		self.actor:SetPosition(modelData.posX or 0, (modelData.posY or 0) + 2, modelData.posZ or 0);
+		self.actor:SetYaw(modelData.face or 0);
 	end
 end
 
@@ -300,11 +311,12 @@ mog.modelUpdater:SetScript("OnUpdate",function(self,elapsed)
 
 	if (mog.db.profile.sync or self.model.type == "catalogue") then
 		if self.btn == "LeftButton" then
-			mog.posZ = mog.posZ + dY;
+			-- Left-drag: rotate only (yaw)
 			mog.face = mog.face + dX;
 		elseif self.btn == "RightButton" then
+			-- Right-drag: pan (X = horizontal, Z = vertical)
 			mog.posX = mog.posX + dX;
-			mog.posY = mog.posY + dY;
+			mog.posZ = mog.posZ + dY;
 		end
 		for id,model in ipairs(mog.models) do
 			model:PositionModel();
@@ -317,11 +329,12 @@ mog.modelUpdater:SetScript("OnUpdate",function(self,elapsed)
 	else
 		local modelData = self.model.parent.data
 		if self.btn == "LeftButton" then
-			modelData.posZ = (modelData.posZ or mog.posZ or 0) + dY;
+			-- Left-drag: rotate only (yaw)
 			modelData.face = (modelData.face or mog.face or 0) + dX;
 		elseif self.btn == "RightButton" then
+			-- Right-drag: pan (X = horizontal, Z = vertical)
 			modelData.posX = (modelData.posX or mog.posX or 0) + dX;
-			modelData.posY = (modelData.posY or mog.posY or 0) + dY;
+			modelData.posZ = (modelData.posZ or mog.posZ or 0) + dY;
 		end
 		self.model:PositionModel();
 	end
@@ -451,7 +464,9 @@ function mog.scroll:update(value, offset, onscroll)
 			else
 				frame:Show();
 			end
-			frame.model:SetSheathed(mog.sheathe);
+			if frame.actor then
+				frame.actor:SetSheathed(mog.sheathe);
+			end
 			frame:SetAlpha(1);
 			frame:Enable();
 		else
@@ -677,7 +692,9 @@ local dressOptions = {
 local function setGridDress(self)
 	mog.db.profile.gridDress = self.value
 	for i, model in ipairs(mog.models) do
-		model.model:SetPosition(0, 0, 0)
+		if model.actor then
+			model.actor:SetPosition(0, 2, 0)
+		end
 	end
 	mog.scroll:update();
 	for i, model in ipairs(mog.models) do
@@ -690,7 +707,9 @@ local function setSheathe(self, arg1, arg2, checked)
 	checked = not checked
 	mog.sheathe = checked
 	for i, model in ipairs(mog.models) do
-		model.model:SetSheathed(checked)
+		if model.actor then
+			model.actor:SetSheathed(checked)
+		end
 	end
 end
 

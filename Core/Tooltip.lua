@@ -21,7 +21,7 @@ mog.tooltip:SetClampedToScreen(true);
 mog.tooltip:SetFrameStrata("TOOLTIP");
 
 mog.tooltip:SetScript("OnShow", function(self)
-	if mog.db.profile.tooltipMouse and not InCombatLockdown() then
+	if mog.db and mog.db.profile and mog.db.profile.tooltipMouse and not InCombatLockdown() then
 		SetOverrideBinding(mog.tooltip, true, "MOUSEWHEELUP", "MogIt_TooltipScrollUp");
 		SetOverrideBinding(mog.tooltip, true, "MOUSEWHEELDOWN", "MogIt_TooltipScrollDown");
 	end
@@ -35,12 +35,43 @@ end);
 
 mog.tooltip:SetScript("OnEvent", function(self, event, arg1)
 	if event == "PLAYER_LOGIN" then
-		mog.tooltip.model:SetUnit("player");
+		-- Initialize ModelScene on PLAYER_LOGIN to ensure API is available
+		if not mog.tooltip.model then
+			mog.tooltip.model = CreateFrame("ModelScene", nil, mog.tooltip, "PanningModelSceneMixinTemplate");
+			mog.tooltip.model:SetPoint("TOPLEFT", mog.tooltip, "TOPLEFT", 5, -5);
+			mog.tooltip.model:SetPoint("BOTTOMRIGHT", mog.tooltip, "BOTTOMRIGHT", -5, 5);
+			mog.tooltip.model:SetFromModelSceneID(596, true, true);
+			mog.tooltip.actor = mog.tooltip.model:GetActorByTag("player-0") or mog.tooltip.model:CreateActor("tooltip-actor");
+			mog.tooltip.actor:SetPosition(0, 2, 0);
+			mog.tooltip.model.ResetModel = function(modelSelf)
+				if not (mog.db and mog.db.profile) then return end
+				local db = mog.db.profile
+				local actor = mog.tooltip.actor
+				actor:SetModelByUnit("player")
+				if not (db.tooltipDress and isModifierKeyDown(db.tooltipDressMod)) then
+					-- the worst of hacks to prevent certain armor model pieces from getting stuck on the character
+					for i, slotName in ipairs(mog.slots) do
+						local slot = GetInventorySlotInfo(slotName);
+						local item = GetInventoryItemLink("player", slot);
+						if item then
+							actor:TryOn(item);
+							actor:UndressSlot(slot);
+						end
+					end
+					actor:UndressSlot(GetInventorySlotInfo("MainHandSlot"));
+					actor:UndressSlot(GetInventorySlotInfo("SecondaryHandSlot"));
+				end
+			end
+			mog.tooltip.model:SetScript("OnShow", mog.tooltip.model.ResetModel);
+		end
+		if mog.tooltip.actor then
+			mog.tooltip.actor:SetModelByUnit("player");
+		end
 	elseif event == "PLAYER_REGEN_DISABLED" then
 		ClearOverrideBindings(mog.tooltip);
 	elseif event == "PLAYER_REGEN_ENABLED" then
 		if self:IsForbidden() then return end
-		if self:IsShown() and mog.db.profile.tooltipMouse then
+		if self:IsShown() and mog.db and mog.db.profile and mog.db.profile.tooltipMouse then
 			SetOverrideBinding(mog.tooltip, true, "MOUSEWHEELUP", "MogIt_TooltipScrollUp");
 			SetOverrideBinding(mog.tooltip, true, "MOUSEWHEELDOWN", "MogIt_TooltipScrollDown");
 		end
@@ -56,31 +87,7 @@ mog.tooltip:RegisterEvent("DISPLAY_SIZE_CHANGED");
 --//
 
 
---// Model
-mog.tooltip.model = CreateFrame("DressUpModel", nil, mog.tooltip);
-mog.tooltip.model:SetPoint("TOPLEFT", mog.tooltip, "TOPLEFT", 5, -5);
-mog.tooltip.model:SetPoint("BOTTOMRIGHT", mog.tooltip, "BOTTOMRIGHT", -5, 5);
-mog.tooltip.model:SetAnimation(0, 0);
-local lightValues = { omnidirectional = false, point = CreateVector3D(0, 0.8, -1), ambientIntensity = 1, ambientColor = CreateColor(1, 1, 1), diffuseIntensity = 0.3, diffuseColor = CreateColor(1, 1, 1) };
-mog.tooltip.model:SetLight(true, lightValues);
-mog.tooltip.model.ResetModel = function(self)
-	local db = mog.db.profile
-	self:Dress();
-	if not (db.tooltipDress and isModifierKeyDown(db.tooltipDressMod)) then
-		-- the worst of hacks to prevent certain armor model pieces from getting stuck on the character
-		for i, slotName in ipairs(mog.slots) do
-			local slot = GetInventorySlotInfo(slotName);
-			local item = GetInventoryItemLink("player", slot);
-			if item then
-				self:TryOn(item);
-				self:UndressSlot(slot);
-			end
-		end
-		self:UndressSlot(GetInventorySlotInfo("MainHandSlot"));
-		self:UndressSlot(GetInventorySlotInfo("SecondaryHandSlot"));
-	end
-end
-mog.tooltip.model:SetScript("OnShow", mog.tooltip.model.ResetModel);
+--// Model (ModelScene) - initialized in PLAYER_LOGIN event handler above
 
 
 function mog.tooltip:ShowItem(itemLink)
@@ -96,6 +103,8 @@ function mog.tooltip:ShowItem(itemLink)
 	if not itemID then return end
 	local self = GameTooltip;
 
+	-- Guard against uninitialized state (before PLAYER_LOGIN)
+	if not (mog.db and mog.db.profile) then return end
 	local db = mog.db.profile;
 	local tooltip = mog.tooltip;
 	if db.tooltip and (isModifierKeyDown(db.tooltipMod)) then
@@ -114,8 +123,8 @@ function mog.tooltip:ShowItem(itemLink)
 					end
 				end
 				local _, _, _, slot = C_Item.GetItemInfoInstant(itemLink);
-				if (not db.tooltipMog or C_TransmogCollection.GetItemInfo(itemID)) and tooltip.slots[slot] and C_Item.IsDressableItemByID(itemLink) then
-					tooltip.model:SetFacing(tooltip.slots[slot]-(db.tooltipRotate and 0.5 or 0));
+				if (not db.tooltipMog or C_TransmogCollection.GetItemInfo(itemID)) and tooltip.slots[slot] and C_Item.IsDressableItemByID(itemLink) and mog.tooltip.actor and tooltip.model then
+					mog.tooltip.actor:SetYaw(tooltip.slots[slot]-(db.tooltipRotate and 0.5 or 0));
 					tooltip:Show();
 					tooltip.owner = self;
 					--if mog.global.tooltipAnchor then
@@ -126,7 +135,7 @@ function mog.tooltip:ShowItem(itemLink)
 					--end
 					-- this seems to be needed for when moving from one item to another without the tooltip hiding in between
 					tooltip.model:ResetModel();
-					tooltip.model:TryOn(itemLink);
+					mog.tooltip.actor:TryOn(itemLink);
 				else
 					tooltip:Hide();
 				end
@@ -212,6 +221,7 @@ end);
 mog.tooltip.repos = CreateFrame("Frame");
 mog.tooltip.repos:Hide();
 mog.tooltip.repos:SetScript("OnUpdate", function(self)
+	if not (mog.db and mog.db.profile) then return end
 	local x,y = mog.tooltip.owner:GetCenter();
 	-- this can be secret after showing enemy tooltips
 	if x and y and not issecretvalue(x) then
@@ -278,7 +288,9 @@ end);
 mog.tooltip.rotate = CreateFrame("Frame",nil,mog.tooltip);
 mog.tooltip.rotate:Hide();
 mog.tooltip.rotate:SetScript("OnUpdate",function(self,elapsed)
-	mog.tooltip.model:SetFacing(mog.tooltip.model:GetFacing() + elapsed);
+	if not mog.tooltip.actor then return end
+	local currentYaw = mog.tooltip.actor:GetYaw() or 0;
+	mog.tooltip.actor:SetYaw(currentYaw + elapsed);
 end);
 --//
 
