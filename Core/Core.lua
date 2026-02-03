@@ -389,34 +389,43 @@ function mog:TRANSMOG_SEARCH_UPDATED(searchType, categoryType)
 
 	local module = categoryModule.parentModule
 
-	local GetAppearanceSources = C_TransmogCollection.GetAppearanceSources
-
+	-- Save current filter settings to restore later
 	local currentClassFilter = C_TransmogCollection.GetClassFilter()
 	local allRacesShown = C_TransmogCollection.GetAllRacesShown()
 	local allFactionsShown = C_TransmogCollection.GetAllFactionsShown()
+	local uncollectedShown = C_TransmogCollection.GetUncollectedShown()
 
+	-- Set our desired filter settings
 	C_TransmogCollection.SetClassFilter(module.classID)
 	C_TransmogCollection.SetAllRacesShown(true)
 	C_TransmogCollection.SetAllFactionsShown(true)
+	C_TransmogCollection.SetUncollectedShown(true)
 
-	local transmogLocation = TransmogUtil.GetTransmogLocation(CollectionWardrobeUtil.GetSlotFromCategoryID(categoryType), Enum.TransmogType.Appearance, Enum.TransmogModification.Main)
-	for i, appearance in ipairs(C_TransmogCollection.GetCategoryAppearances(categoryType, transmogLocation)) do
-		if not appearance.isHideVisual and appearance.canDisplayOnPlayer then
-			for i, source in ipairs(GetAppearanceSources(appearance.visualID, categoryType, transmogLocation)) do
-				local id = source.sourceID or sourceID
-				tinsert(categoryModule.list, id)
-				mog:AddData("item", id, "display", appearance.visualID)
-				mog:AddData("item", id, "source", source.sourceType)
+	-- Delay the query to the next frame to ensure filter settings have taken effect
+	-- This fixes an issue where SetUncollectedShown(true) doesn't work reliably on first login
+	C_Timer.After(0, function()
+		local GetAppearanceSources = C_TransmogCollection.GetAppearanceSources
+		local transmogLocation = TransmogUtil.GetTransmogLocation(CollectionWardrobeUtil.GetSlotFromCategoryID(categoryType), Enum.TransmogType.Appearance, Enum.TransmogModification.Main)
+		for i, appearance in ipairs(C_TransmogCollection.GetCategoryAppearances(categoryType, transmogLocation)) do
+			if not appearance.isHideVisual and appearance.canDisplayOnPlayer then
+				for i, source in ipairs(GetAppearanceSources(appearance.visualID, categoryType, transmogLocation)) do
+					local id = source.sourceID or sourceID
+					tinsert(categoryModule.list, id)
+					mog:AddData("item", id, "display", appearance.visualID)
+					mog:AddData("item", id, "source", source.sourceType)
+				end
 			end
 		end
-	end
 
-	C_TransmogCollection.SetClassFilter(currentClassFilter)
-	C_TransmogCollection.SetAllRacesShown(allRacesShown)
-	C_TransmogCollection.SetAllFactionsShown(allFactionsShown)
+		-- Restore original filter settings
+		C_TransmogCollection.SetClassFilter(currentClassFilter)
+		C_TransmogCollection.SetAllRacesShown(allRacesShown)
+		C_TransmogCollection.SetAllFactionsShown(allFactionsShown)
+		C_TransmogCollection.SetUncollectedShown(uncollectedShown)
 
-	mog:SetModule(module, module.label.." - "..categoryModule.label)
-	categoryModule.loaded = true
+		mog:SetModule(module, module.label.." - "..categoryModule.label)
+		categoryModule.loaded = true
+	end)
 end
 
 
