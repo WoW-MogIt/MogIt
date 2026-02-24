@@ -15,7 +15,7 @@ end
 
 --// Slash Commands
 function mog:ToggleFrame()
-	ToggleFrame(mog.frame);
+	mog.frame:SetShown(not mog.frame:IsShown());
 end
 
 function mog:TogglePreview()
