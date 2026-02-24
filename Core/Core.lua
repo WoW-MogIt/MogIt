@@ -397,15 +397,34 @@ function mog:TRANSMOG_SEARCH_UPDATED(searchType, categoryType)
 
 	local module = categoryModule.parentModule
 
-	local GetAppearanceSources = C_TransmogCollection.GetAppearanceSources
-
 	local currentClassFilter = C_TransmogCollection.GetClassFilter()
 	local allRacesShown = C_TransmogCollection.GetAllRacesShown()
 	local allFactionsShown = C_TransmogCollection.GetAllFactionsShown()
+	local collectedShown = C_TransmogCollection.GetCollectedShown()
+	local uncollectedShown = C_TransmogCollection.GetUncollectedShown()
 
 	C_TransmogCollection.SetClassFilter(module.classID)
 	C_TransmogCollection.SetAllRacesShown(true)
 	C_TransmogCollection.SetAllFactionsShown(true)
+	C_TransmogCollection.SetCollectedShown(true)
+	C_TransmogCollection.SetUncollectedShown(true)
+
+	RunNextFrame(function()
+		self:AddTransmogCategoryCollection(categoryType, categoryModule)
+
+		C_TransmogCollection.SetClassFilter(currentClassFilter)
+		C_TransmogCollection.SetAllRacesShown(allRacesShown)
+		C_TransmogCollection.SetAllFactionsShown(allFactionsShown)
+		C_TransmogCollection.SetCollectedShown(collectedShown)
+		C_TransmogCollection.SetUncollectedShown(uncollectedShown)
+
+		mog:SetModule(module, module.label.." - "..categoryModule.label)
+		categoryModule.loaded = true
+	end)
+end
+
+function mog:AddTransmogCategoryCollection(categoryType, categoryModule)
+	local GetAppearanceSources = C_TransmogCollection.GetAppearanceSources
 
 	local transmogLocation = TransmogUtil.GetTransmogLocation(CollectionWardrobeUtil.GetSlotFromCategoryID(categoryType), Enum.TransmogType.Appearance, Enum.TransmogModification.Main)
 	for i, appearance in ipairs(C_TransmogCollection.GetCategoryAppearances(categoryType, transmogLocation)) do
@@ -418,13 +437,6 @@ function mog:TRANSMOG_SEARCH_UPDATED(searchType, categoryType)
 			end
 		end
 	end
-
-	C_TransmogCollection.SetClassFilter(currentClassFilter)
-	C_TransmogCollection.SetAllRacesShown(allRacesShown)
-	C_TransmogCollection.SetAllFactionsShown(allFactionsShown)
-
-	mog:SetModule(module, module.label.." - "..categoryModule.label)
-	categoryModule.loaded = true
 end
 
 
