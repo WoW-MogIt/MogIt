@@ -341,20 +341,27 @@ function mog:ADDON_LOADED(addon)
 		for i, model in ipairs(WardrobeCollectionFrame.ItemsCollectionFrame.Models) do
 			model:SetScript("OnMouseDown", function(self, button)
 				if IsControlKeyDown() and button == "RightButton" then
+					return
+				end
+				self:OnMouseDown(button)
+			end)
+
+			model:SetScript("OnMouseUp", function(self, button)
+				if IsControlKeyDown() and button == "RightButton" then
 					local itemsCollectionFrame = self:GetParent()
 					if not itemsCollectionFrame.transmogLocation:IsIllusion() then
 						local sources = CollectionWardrobeUtil.GetSortedAppearanceSources(self.visualInfo.visualID, itemsCollectionFrame:GetActiveCategory(), itemsCollectionFrame.transmogLocation)
 						if WardrobeCollectionFrame.tooltipSourceIndex then
 							local index = CollectionWardrobeUtil.GetValidIndexForNumSources(WardrobeCollectionFrame.tooltipSourceIndex, #sources)
-							local link = select(6, C_TransmogCollection.GetAppearanceSourceInfo(sources[index].sourceID))
-							mog:AddToPreview(link)
-							return
+							local sourceInfo = C_TransmogCollection.GetAppearanceSourceInfo(sources[index].sourceID)
+							mog:AddToPreview(sourceInfo.itemLink)
 						end
 					else
 						mog:SetPreviewEnchant(mog:GetPreview(mog.activePreview), self.visualInfo.sourceID);
 					end
+					return
 				end
-				self:OnMouseDown(button)
+				self:OnMouseUp(button)
 			end)
 		end
 		ScrollUtil.AddInitializedFrameCallback(WardrobeCollectionFrame.SetsCollectionFrame.ListContainer.ScrollBox, function(self, button, elementData)
@@ -366,7 +373,8 @@ function mog:ADDON_LOADED(addon)
 						local primaryAppearances = C_TransmogSets.GetSetPrimaryAppearances(self.setID);
 						for _, primaryAppearance in ipairs(primaryAppearances) do
 							local sourceID = primaryAppearance.appearanceID;
-							mog:AddToPreview(select(6, C_TransmogCollection.GetAppearanceSourceInfo(sourceID)), preview);
+							local sourceInfo = C_TransmogCollection.GetAppearanceSourceInfo(sourceID);
+							mog:AddToPreview(sourceInfo.itemLink, preview);
 						end
 						return
 					end
