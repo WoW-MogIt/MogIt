@@ -84,13 +84,6 @@ mog.tooltip.model:SetScript("OnShow", mog.tooltip.model.ResetModel);
 
 
 function mog.tooltip:ShowItem(itemLink)
-	for i = 1, GameTooltip:NumLines() do
-		local line = GameTooltip["TextLeft"..i]
-		if line and line:GetText() == TRANSMOGRIFY_TOOLTIP_ITEM_UNKNOWN_APPEARANCE_KNOWN then
-			line:SetTextColor(136 / 255, 1, 170 / 255)
-		end
-	end
-
 	if not itemLink then return end
 	local itemID, _, _, slot = C_Item.GetItemInfoInstant(itemLink);
 	if not itemID then return end
