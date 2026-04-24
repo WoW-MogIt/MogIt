@@ -467,6 +467,20 @@ function mog:PLAYER_LOGIN()
 
 	local currentClassFilter = C_TransmogCollection.GetClassFilter()
 
+    classModuleHardcodeTable = {
+        {category = 1,  label = 'Head',      isWeapon = false, parentModule = "", list = {},},
+        {category = 2,  label = 'Shoulder',  isWeapon = false, parentModule = "", list = {},},
+        {category = 3,  label = 'Back',      isWeapon = false, parentModule = "", list = {},},
+        {category = 4,  label = 'Chest',     isWeapon = false, parentModule = "", list = {},},
+        {category = 5,  label = 'Shirt',     isWeapon = false, parentModule = "", list = {},},
+        {category = 6,  label = 'Tabard',    isWeapon = false, parentModule = "", list = {},},
+        {category = 7,  label = 'Wrist',     isWeapon = false, parentModule = "", list = {},},
+        {category = 8,  label = 'Hands',     isWeapon = false, parentModule = "", list = {},},
+        {category = 9,  label = 'Waist',     isWeapon = false, parentModule = "", list = {},},
+        {category = 10, label = 'Legs',      isWeapon = false, parentModule = "", list = {},},
+        {category = 11, label = 'Feet',      isWeapon = false, parentModule = "", list = {},},
+    }
+
 	for k, module in pairs(self.modules) do
 		if module.base and module.classID then
 			C_TransmogCollection.SetClassFilter(module.classID)
@@ -482,6 +496,10 @@ function mog:PLAYER_LOGIN()
 						list = { },
 					}
 					tinsert(module.slotList, module.slots[categoryType])
+                elseif classModuleHardcodeTable[categoryType] then
+                    tmp = classModuleHardcodeTable[categoryType]
+                    tmp.parentModule = module
+                    tinsert(module.slotList, tmp)
 				end
 			end
 		end
