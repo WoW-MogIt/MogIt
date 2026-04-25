@@ -7,16 +7,7 @@ local ModelFramePrototype = CreateFrame("Button")
 local ModelFrame_MT = {__index = ModelFramePrototype}
 
 --// mog.frame
-mog.frame:SetPoint("CENTER");
-mog.frame:SetSize(252,108);
-mog.frame:SetToplevel(true);
-mog.frame:SetClampedToScreen(true);
-mog.frame:EnableMouse(true);
 mog.frame:EnableMouseWheel(true);
-mog.frame:SetMovable(true);
-mog.frame:SetResizable(true);
-mog.frame:SetDontSavePosition(true);
-mog.frame:SetScript("OnMouseDown", mog.frame.StartMoving);
 local function stopMovingOrSizing(self)
 	self:StopMovingOrSizing();
 	local profile = mog.db.profile;
@@ -28,12 +19,8 @@ tinsert(UISpecialFrames,"MogItFrame");
 
 ButtonFrameTemplate_HidePortrait(mog.frame);
 mog.frame:SetTitle("MogIt");
-MogItFrameBg:SetVertexColor(0.8,0.3,0.8);
+mog.frame.Bg:SetVertexColor(0.8,0.3,0.8);
 
-mog.frame.resize = CreateFrame("Button",nil,mog.frame);
-mog.frame.resize:SetSize(16,16);
-mog.frame.resize:SetPoint("BOTTOMRIGHT",-4,3);
-mog.frame.resize:SetHitRectInsets(0, -4, 0, -3)
 mog.frame.resize:SetScript("OnMouseDown", function(self)
 	mog.frame:SetResizeBounds(510, 350, GetScreenWidth(), GetScreenHeight());
 	mog.frame:StartSizing();
@@ -43,15 +30,6 @@ local function stopMovingOrSizing()
 end
 mog.frame.resize:SetScript("OnMouseUp", stopMovingOrSizing);
 mog.frame.resize:SetScript("OnHide", stopMovingOrSizing);
-mog.frame.resize:SetNormalTexture([[Interface\ChatFrame\UI-ChatIM-SizeGrabber-Up]]);
-mog.frame.resize:SetPushedTexture([[Interface\ChatFrame\UI-ChatIM-SizeGrabber-Down]])
-mog.frame.resize:SetHighlightTexture([[Interface\ChatFrame\UI-ChatIM-SizeGrabber-Highlight]])
-
-mog.frame.path = mog.frame:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall");
-mog.frame.path:SetPoint("BOTTOMLEFT",mog.frame,"BOTTOMLEFT",17,10);
-
-mog.frame.page = mog.frame:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall");
-mog.frame.page:SetPoint("BOTTOMRIGHT",mog.frame,"BOTTOMRIGHT",-17,10);
 --//
 
 
@@ -73,28 +51,20 @@ function mog:CreateModelFrame(parent)
 		return f;
 	end
 
-	local f = setmetatable(CreateFrame("Button",nil,parent), ModelFrame_MT);
-	f:Hide();
+	local f = setmetatable(CreateFrame("Button", nil, parent, "MogIt.ModelFrameTemplate"), ModelFrame_MT);
 
 	f.parent = parent;
 	f.data = {};
 	f.indicators = {};
 
-	f.model = CreateFrame("DressUpModel",nil,f);
-	f.model:SetAllPoints(f);
-	f.model:SetModelScale(2);
 	f.model:SetUnit("PLAYER");
 	f.model:SetPosition(0,0,0);
 
 	local lightValues = { omnidirectional = false, point = CreateVector3D(0, 0.8, -1), ambientIntensity = 1, ambientColor = CreateColor(1, 1, 1), diffuseIntensity = 0.3, diffuseColor = CreateColor(1, 1, 1) };
 	f.model:SetLight(true, lightValues);
 
-	f.bg = f:CreateTexture(nil,"BACKGROUND");
-	f.bg:SetAllPoints(f);
 	f.bg:SetColorTexture(0.3,0.3,0.3,0.2);
 
-	f:RegisterForClicks("AnyUp");
-	f:RegisterForDrag("LeftButton","RightButton");
 	f:SetScript("OnShow",f.OnShow);
 	f:SetScript("OnHide",f.OnHide);
 	f:SetScript("OnUpdate",f.OnUpdate);
@@ -364,11 +334,7 @@ updater:SetScript("OnUpdate", function(self)
 end);
 
 
-mog.scroll = CreateFrame("Slider","MogItScroll",mog.frame,"UIPanelScrollBarTrimTemplate");
-mog.scroll:Hide();
-mog.scroll:SetPoint("TOPRIGHT",mog.frame.Inset,"TOPRIGHT",1,-17);
-mog.scroll:SetPoint("BOTTOMRIGHT",mog.frame.Inset,"BOTTOMRIGHT",1,16);
-mog.scroll:SetValueStep(1);
+mog.scroll = mog.frame.scroll;
 mog.scroll:SetScript("OnValueChanged",function(self,value,isUserInput)
 	if isUserInput then
 		self:SetValue(value);
@@ -377,12 +343,10 @@ mog.scroll:SetScript("OnValueChanged",function(self,value,isUserInput)
 	self:update(nil,nil,value);
 end);
 
-mog.scroll.up = MogItScrollScrollUpButton;
-mog.scroll.down = MogItScrollScrollDownButton;
-mog.scroll.up:SetScript("OnClick",function(self)
+mog.scroll.ScrollUpButton:SetScript("OnClick",function(self)
 	mog.scroll:update(nil,-1);
 end);
-mog.scroll.down:SetScript("OnClick",function(self)
+mog.scroll.ScrollDownButton:SetScript("OnClick",function(self)
 	mog.scroll:update(nil,1);
 end);
 
@@ -414,14 +378,14 @@ function mog.scroll:update(value, offset, onscroll)
 	end
 
 	if value == 1 then
-		self.up:Disable();
+		self.ScrollUpButton:Disable();
 	else
-		self.up:Enable();
+		self.ScrollUpButton:Enable();
 	end
 	if value == total then
-		self.down:Disable();
+		self.ScrollDownButton:Disable();
 	else
-		self.down:Enable();
+		self.ScrollDownButton:Enable();
 	end
 
 	if mog.Item_Menu:IsShown() or mog.Set_Menu:IsShown() then
@@ -842,8 +806,7 @@ mog.menu.options:SetScript("OnClick", mog.ToggleOptions);
 mog.menu.options:SetPoint("LEFT", mog.menu.preview, "RIGHT", 5, 0);
 --//
 
-local help = CreateFrame("Button", nil, mog.frame, "UIPanelInfoButton")
-help:SetPoint("TOPRIGHT", -15, -34)
+local help = mog.frame.InfoButton
 help:SetScript("OnEnter", function(self)
 	GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
 	GameTooltip:AddLine(L["How to use"]);

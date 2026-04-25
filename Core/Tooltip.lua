@@ -15,10 +15,7 @@ local function isModifierKeyDown(key)
 end
 
 --// Tooltip
-mog.tooltip = CreateFrame("Frame", "MogItTooltip", UIParent, "TooltipBorderedFrameTemplate");
-mog.tooltip:Hide();
-mog.tooltip:SetClampedToScreen(true);
-mog.tooltip:SetFrameStrata("TOOLTIP");
+mog.tooltip = MogItTooltip;
 
 mog.tooltip:SetScript("OnShow", function(self)
 	if mog.db.profile.tooltipMouse and not InCombatLockdown() then
@@ -57,9 +54,6 @@ mog.tooltip:RegisterEvent("DISPLAY_SIZE_CHANGED");
 
 
 --// Model
-mog.tooltip.model = CreateFrame("DressUpModel", nil, mog.tooltip);
-mog.tooltip.model:SetPoint("TOPLEFT", mog.tooltip, "TOPLEFT", 5, -5);
-mog.tooltip.model:SetPoint("BOTTOMRIGHT", mog.tooltip, "BOTTOMRIGHT", -5, 5);
 mog.tooltip.model:SetAnimation(0, 0);
 local lightValues = { omnidirectional = false, point = CreateVector3D(0, 0.8, -1), ambientIntensity = 1, ambientColor = CreateColor(1, 1, 1), diffuseIntensity = 0.3, diffuseColor = CreateColor(1, 1, 1) };
 mog.tooltip.model:SetLight(true, lightValues);
@@ -195,7 +189,7 @@ mog.tooltip.check = CreateFrame("Frame");
 mog.tooltip.check:Hide();
 mog.tooltip.check:SetScript("OnUpdate", function(self)
 	if (mog.tooltip.owner and mog.tooltip.owner:IsForbidden()) then return end
-	if (mog.tooltip.owner and not (mog.tooltip.owner:IsShown() and mog.tooltip.owner:GetItem())) or not mog.tooltip.owner then
+	if (mog.tooltip.owner and not (mog.tooltip.owner:IsShown() and mog.tooltip.owner:IsTooltipType(Enum.TooltipDataType.Item))) or not mog.tooltip.owner then
 		mog.tooltip:Hide();
 		mog.tooltip.item = nil;
 	end

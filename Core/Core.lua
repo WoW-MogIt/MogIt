@@ -6,7 +6,7 @@ local ItemInfo = LibStub("LibItemInfo-1.0");
 
 LibStub("Libra"):Embed(mog);
 
-mog.frame = CreateFrame("Frame","MogItFrame",UIParent,"ButtonFrameTemplate");
+mog.frame = MogItFrame;
 mog.list = {};
 
 function mog:Error(msg)

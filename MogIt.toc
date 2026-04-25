@@ -20,5 +20,6 @@
 Libs\Embeds.xml
 Locale\Locale.xml
 
+GUI.xml
 Core\Core.xml
 Modules\Modules.xml

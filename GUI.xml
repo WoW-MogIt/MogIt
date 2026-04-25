@@ -1,0 +1,83 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+	<Button name="MogIt.ModelFrameTemplate" hidden="true" registerForClicks="AnyUp" registerForDrag="LeftButton,RightButton" virtual="true">
+		<Frames>
+			<DressUpModel parentKey="model" setAllPoints="true" modelScale="2"/>
+		</Frames>
+
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="bg" setAllPoints="true"/>
+			</Layer>
+		</Layers>
+	</Button>
+
+	<Frame name="MogItFrame" parent="UIParent" hidden="true" toplevel="true" enableMouse="true" movable="true" resizable="true" clampedToScreen="true" dontSavePosition="true" inherits="ButtonFrameTemplate">
+		<Size x="252" y="108"/>
+
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+
+		<Scripts>
+			<OnMouseDown method="StartMoving"/>
+		</Scripts>
+
+		<Frames>
+			<Button parentKey="resize">
+				<Size x="16" y="16"/>
+
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" x="-4" y="3" />
+				</Anchors>
+
+				<HitRectInsets left="0" right="-4" top="0" bottom="-3"/>
+				<NormalTexture file="Interface\ChatFrame\UI-ChatIM-SizeGrabber-Up"/>
+				<PushedTexture file="Interface\ChatFrame\UI-ChatIM-SizeGrabber-Down"/>
+				<HighlightTexture file="Interface\ChatFrame\UI-ChatIM-SizeGrabber-Highlight"/>
+			</Button>
+
+			<Slider parentKey="scroll" valueStep="1" hidden="true" inherits="UIPanelScrollBarTrimTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeKey="$parent.Inset" x="0" y="-17" />
+					<Anchor point="BOTTOM" relativeKey="$parent.Inset" x="0" y="16" />
+					<Anchor point="RIGHT" relativeKey="$parent.Inset" x="1" y="0" />
+				</Anchors>
+			</Slider>
+
+			<Button parentKey="InfoButton" inherits="UIPanelInfoButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT" x="-15" y="-34" />
+				</Anchors>
+			</Button>
+		</Frames>
+
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString parentKey="path" inherits="GameFontHighlightSmall">
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" x="17" y="10"/>
+					</Anchors>
+				</FontString>
+
+				<FontString parentKey="page" inherits="GameFontHighlightSmall">
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT" x="-17" y="10"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Frame>
+
+	<Frame name="MogItTooltip" parent="UIParent" hidden="true" frameStrata="TOOLTIP" clampedToScreen="true" inherits="TooltipBorderedFrameTemplate">
+		<Frames>
+			<DressUpModel parentKey="model">
+				<Anchors>
+					<Anchor point="TOPLEFT" x="5" y="-5" />
+					<Anchor point="BOTTOMRIGHT" x="-5" y="5" />
+				</Anchors>
+			</DressUpModel>
+		</Frames>
+	</Frame>
+
+</Ui>
