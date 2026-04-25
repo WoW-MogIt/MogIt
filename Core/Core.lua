@@ -471,9 +471,26 @@ function mog:PLAYER_LOGIN()
 		if module.base and module.classID then
 			C_TransmogCollection.SetClassFilter(module.classID)
 
+			for i, slot in ipairs(self.slots) do
+				slot = slot:upper()
+				local transmogLocation = TransmogUtil.GetTransmogLocation(slot, Enum.TransmogType.Appearance, false)
+				if not transmogLocation:IsEitherHand() then
+					local categoryType = transmogLocation:GetArmorCategoryID()
+					local name = _G[slot]
+					module.slots[categoryType] = {
+						category = categoryType,
+						label = name,
+						isWeapon = false,
+						parentModule = module,
+						list = { },
+					}
+					tinsert(module.slotList, module.slots[categoryType])
+				end
+			end
+
 			for categoryType = Enum.TransmogCollectionTypeMeta.MinValue, Enum.TransmogCollectionTypeMeta.MaxValue do
 				local name, isWeapon = C_TransmogCollection.GetCategoryInfo(categoryType)
-				if name then
+				if name and isWeapon then
 					module.slots[categoryType] = {
 						category = categoryType,
 						label = name,
