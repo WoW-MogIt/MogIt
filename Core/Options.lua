@@ -320,7 +320,8 @@ function mog.createOptions()
 		},
 	};
 	config:RegisterOptionsTable("MogIt_Tooltip",options.args.tooltip);
-	dialog:AddToBlizOptions("MogIt_Tooltip",options.args.tooltip.name,MogIt);
+	local settingsFrame, categoryID = dialog:AddToBlizOptions("MogIt_Tooltip",options.args.tooltip.name,MogIt);
+	mog.settingsCategoryID = categoryID;
 
 	options.args.options = db:GetOptionsTable(mog.db);
 	options.args.options.name = L["Options profile"];
